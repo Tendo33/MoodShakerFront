@@ -94,10 +94,9 @@ function logDetail(type: "INFO" | "ERROR" | "DEBUG", message: string, data?: any
 /**
  * 创建系统提示
  */
-function createSystemPrompt(request: BartenderRequest, agentType: AgentType): string {
+function createSystemPrompt(agentType: AgentType): string {
 	// 使用简化的系统提示
-	return agentType === AgentType.CLASSIC_BARTENDER
-		? `你是一位专注于经典鸡尾酒的调酒师,需要根据用户的心情和偏好推荐合适的经典鸡尾酒。
+	const classic_bartender_prompt = `你是一位专注于经典鸡尾酒的调酒师,需要根据用户的心情和偏好推荐合适的经典鸡尾酒。
 分析用户需求，考虑酒精浓度、制作难度和可用基酒，推荐最合适的经典鸡尾酒。
 
 # 重要提示
@@ -140,8 +139,8 @@ function createSystemPrompt(request: BartenderRequest, agentType: AgentType): st
         }
     ],
     "serving_glass": "建议使用的酒杯"
-}`
-		: `你是一位创意调酒师,需要根据用户的心情和偏好创造独特的鸡尾酒配方。
+}`;
+	const creative_bartender_prompt = `你是一位创意调酒师,需要根据用户的心情和偏好创造独特的鸡尾酒配方。
 分析用户需求，考虑酒精浓度、制作难度和可用基酒，创造一款独特的鸡尾酒。
 
 # 重要提示
@@ -186,6 +185,8 @@ function createSystemPrompt(request: BartenderRequest, agentType: AgentType): st
     ],
     "serving_glass": "建议使用的酒杯"
 }`;
+
+	return agentType === AgentType.CLASSIC_BARTENDER ? classic_bartender_prompt : creative_bartender_prompt;
 }
 
 /**
@@ -327,7 +328,7 @@ export async function requestCocktailRecommendation(
 			}
 		}
 
-		const systemPrompt = createSystemPrompt(request, agentType);
+		const systemPrompt = createSystemPrompt(agentType);
 		const userMessage = createUserMessage(request);
 
 		logDetail("DEBUG", `准备发送请求 [${requestId}]`, {

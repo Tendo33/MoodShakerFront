@@ -5,7 +5,7 @@ const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY
 const OPENAI_BASE_URL = process.env.NEXT_PUBLIC_OPENAI_BASE_URL
 
 // Image generation API
-const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL || "https://api.siliconflow.cn/v1/images/generations"
+const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL
 const IMAGE_API_KEY = process.env.NEXT_PUBLIC_IMAGE_API_KEY
 
 /**
@@ -199,6 +199,10 @@ export async function generateImage(
 
     // 打印完整的请求体，便于调试
     console.log("完整请求体:", JSON.stringify(requestBody, null, 2))
+
+    if (!IMAGE_API_URL) {
+      throw new Error("Image API URL is required")
+    }
 
     const response = await fetch(IMAGE_API_URL, {
       method: "POST",
