@@ -303,16 +303,6 @@ export async function requestCocktailRecommendation(
 ): Promise<Cocktail> {
   const requestId = `cocktail_${Math.random().toString(36).substring(2, 15)}`
   const startTime = Date.now()
-
-  logDetail("INFO", `开始请求鸡尾酒推荐 [${requestId}]`, {
-    agentType,
-    alcoholLevel: request.alcohol_level,
-    difficultyLevel: request.difficulty_level,
-    baseSpirits: request.base_spirits,
-    sessionId: request.session_id,
-    messagePreview: request.message.substring(0, 100) + (request.message.length > 100 ? "..." : ""),
-  })
-
   try {
     // 检查本地缓存
     const cacheKey = `${agentType}-${request.alcohol_level}-${request.difficulty_level}-${request.message.substring(0, 20)}`
