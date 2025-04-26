@@ -9,9 +9,9 @@ import {
   useMemo,
 } from "react";
 import type { ReactNode } from "react";
+import { getCocktailImage } from "@/api/image";
 import {
   requestCocktailRecommendation,
-  getCocktailImage,
   AlcoholLevel,
   DifficultyLevel,
   AgentType,
@@ -32,6 +32,7 @@ const STORAGE_KEYS = {
   BASE_SPIRITS: "moodshaker-base-spirits",
   RECOMMENDATION: "moodshaker-recommendation",
   SESSION_ID: "moodshaker-session-id",
+  REQUEST: "moodshaker-request",
 };
 
 interface SpiritOption {

@@ -23,11 +23,14 @@ export async function generateCocktailImage(
 ): Promise<string> {
   const requestId = `cocktail_img_${Math.random().toString(36).substring(2, 15)}`;
   const startTime = Date.now();
+  const negativePrompt = "low quality, blurry, out of focus, low resolution, bad anatomy, worst quality, low quality";
 
   console.log("INFO", `开始生成鸡尾酒图片 [${requestId}]`, {
     sessionId,
     promptLength: prompt.length,
     promptPreview: prompt.substring(0, 100) + "...",
+    negativePromptLength: negativePrompt.length,
+    negativePromptPreview: negativePrompt.substring(0, 100) + "...",
   });
 
   try {
@@ -45,16 +48,10 @@ export async function generateCocktailImage(
       }
     }
 
-    console.log("DEBUG", `调用图像生成API [${requestId}]`, {
-      negativePrompt:
-        "low quality, blurry, out of focus, low resolution, bad anatomy, worst quality, low quality",
-      imageSize: "1024x1024",
-    });
 
     // 更新图像生成调用，使用更详细的提示词和负面提示词
     const imageUrl = await generateImage(prompt, {
-      negative_prompt:
-        "low quality, blurry, out of focus, low resolution, bad anatomy, worst quality, low quality",
+      negative_prompt: negativePrompt,
       image_size: "1024x1024",
       // 不传入image参数，因为我们是从文本生成图像
     });

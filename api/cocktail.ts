@@ -1,4 +1,4 @@
-import { getChatCompletion, generateImage } from "./openai";
+import { getChatCompletion } from "./openai";
 
 // 简化枚举
 export enum AlcoholLevel {

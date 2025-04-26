@@ -26,7 +26,8 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme] = useState<ThemeType>("dark");
+  const [theme, setTheme] = useState<ThemeType>("dark");
+  const [mounted, setMounted] = useState(false);
 
   // 应用主题到文档
   const applyTheme = (newTheme: ThemeType): void => {
@@ -59,8 +60,25 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // 初始化主题
   useEffect(() => {
+    setMounted(true);
     applyTheme(theme);
   }, [theme]);
+
+  // 防止水合不匹配
+  if (!mounted) {
+    return (
+      <ThemeContext.Provider
+        value={{
+          theme: "dark",
+          getTextColorClass,
+          getSecondaryTextColorClass,
+          getMutedTextColorClass,
+        }}
+      >
+        {children}
+      </ThemeContext.Provider>
+    );
+  }
 
   return (
     <ThemeContext.Provider
