@@ -186,11 +186,6 @@ export async function generateImage(
       guidance_scale: 7.5,
     }
 
-    // 如果提供了image参数，添加到请求体中
-    if (options.image) {
-      requestBody["image"] = options.image
-    }
-
     logDetail("DEBUG", `图像生成请求体 [${requestId}]`, {
       model: requestBody.model,
       promptLength: prompt.length,

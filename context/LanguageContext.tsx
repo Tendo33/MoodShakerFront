@@ -18,7 +18,7 @@ const translations: Record<string, Record<string, string>> = {
   "zh-CN": {
     "app.title": "MoodShaker - 找到适合您心情的鸡尾酒",
     "home.title": "找到适合您心情的鸡尾酒",
-    "home.subtitle": "通过回答几个简单问题，让我���为您推荐完美的鸡尾酒",
+    "home.subtitle": "通过回答几个简单问题，让我为您推荐完美的鸡尾酒",
     "home.feature1.title": "个性化推荐",
     "home.feature1.description": "根据您的口味偏好和心情，为您量身定制鸡尾酒推荐",
     "home.feature2.title": "详细配方",
