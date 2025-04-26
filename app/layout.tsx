@@ -19,7 +19,7 @@ const montserrat = Montserrat({
 })
 
 export const metadata: Metadata = {
-  title: "MoodShaker - Find the Perfect Cocktail for Your Mood",
+  title: "MoodShaker",
   description: "Answer a few simple questions and let us recommend the perfect cocktail for you",
   generator: "v0.dev",
 }

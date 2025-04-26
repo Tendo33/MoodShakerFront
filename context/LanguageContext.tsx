@@ -16,7 +16,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 // 翻译字典，包含中文和英文
 const translations: Record<string, Record<string, string>> = {
   "zh-CN": {
-    "app.title": "MoodShaker - 找到适合您心情的鸡尾酒",
+    "app.title": "MoodShaker",
     "home.title": "找到适合您心情的鸡尾酒",
     "home.subtitle": "通过回答几个简单问题，让我为您推荐完美的鸡尾酒",
     "home.feature1.title": "个性化推荐",
@@ -58,7 +58,7 @@ const translations: Record<string, Record<string, string>> = {
     "recommendation.imageLoading": "正在生成鸡尾酒图片...",
   },
   en: {
-    "app.title": "MoodShaker - Find the Perfect Cocktail for Your Mood",
+    "app.title": "MoodShaker",
     "home.title": "Find the Perfect Cocktail for Your Mood",
     "home.subtitle": "Answer a few simple questions and let us recommend the perfect cocktail for you",
     "home.feature1.title": "Personalized Recommendations",
