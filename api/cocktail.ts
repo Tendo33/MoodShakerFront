@@ -1,103 +1,103 @@
-import { getChatCompletion, generateImage } from "./openai"
+import { getChatCompletion, generateImage } from "./openai";
 
 // 简化枚举
 export enum AlcoholLevel {
-  ANY = "any",
-  NONE = "none",
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
+	ANY = "any",
+	NONE = "none",
+	LOW = "low",
+	MEDIUM = "medium",
+	HIGH = "high",
 }
 
 export enum DifficultyLevel {
-  ANY = "any",
-  EASY = "easy",
-  MEDIUM = "medium",
-  HARD = "hard",
+	ANY = "any",
+	EASY = "easy",
+	MEDIUM = "medium",
+	HARD = "hard",
 }
 
 export enum AgentType {
-  CLASSIC_BARTENDER = "classic_bartender",
-  CREATIVE_BARTENDER = "creative_bartender",
+	CLASSIC_BARTENDER = "classic_bartender",
+	CREATIVE_BARTENDER = "creative_bartender",
 }
 
 // 接口定义
 export interface Ingredient {
-  name: string
-  amount: string
-  unit?: string
-  substitute?: string
+	name: string;
+	amount: string;
+	unit?: string;
+	substitute?: string;
 }
 
 export interface Tool {
-  name: string
-  alternative?: string
+	name: string;
+	alternative?: string;
 }
 
 export interface Step {
-  step_number: number
-  description: string
-  tips?: string
+	step_number: number;
+	description: string;
+	tips?: string;
 }
 
 export interface Cocktail {
-  id?: string | number
-  name: string
-  english_name?: string
-  description: string
-  match_reason: string
-  base_spirit: string
-  alcohol_level: string
-  serving_glass: string
-  time_required?: string
-  flavor_profiles: string[]
-  ingredients: Ingredient[]
-  tools: Tool[]
-  steps: Step[]
-  image?: string
+	id?: string | number;
+	name: string;
+	english_name?: string;
+	description: string;
+	match_reason: string;
+	base_spirit: string;
+	alcohol_level: string;
+	serving_glass: string;
+	time_required?: string;
+	flavor_profiles: string[];
+	ingredients: Ingredient[];
+	tools: Tool[];
+	steps: Step[];
+	image?: string;
 }
 
 export interface BartenderRequest {
-  message: string
-  alcohol_level: AlcoholLevel
-  has_tools?: boolean | null
-  difficulty_level: DifficultyLevel
-  base_spirits: string[] | null
-  session_id?: string
+	message: string;
+	alcohol_level: AlcoholLevel;
+	has_tools?: boolean | null;
+	difficulty_level: DifficultyLevel;
+	base_spirits: string[] | null;
+	session_id?: string;
 }
 
 /**
  * 记录详细日志
  */
 function logDetail(type: "INFO" | "ERROR" | "DEBUG", message: string, data?: any): void {
-  const timestamp = new Date().toISOString()
-  const prefix = `[${type}][Cocktail API][${timestamp}]`
+	const timestamp = new Date().toISOString();
+	const prefix = `[${type}][Cocktail API][${timestamp}]`;
 
-  let logMessage = `${prefix} ${message}`
+	let logMessage = `${prefix} ${message}`;
 
-  if (data) {
-    try {
-      if (typeof data === "object") {
-        const stringified = JSON.stringify(data)
-        logMessage += `\n${stringified.length > 500 ? stringified.substring(0, 500) + "..." : stringified}`
-      } else {
-        logMessage += `\n${data}`
-      }
-    } catch (e) {
-      logMessage += `\n[Object cannot be stringified]`
-    }
-  }
+	if (data) {
+		try {
+			if (typeof data === "object") {
+				const stringified = JSON.stringify(data);
+				logMessage += `\n${stringified.length > 500 ? stringified.substring(0, 500) + "..." : stringified}`;
+			} else {
+				logMessage += `\n${data}`;
+			}
+		} catch (e) {
+			logMessage += `\n[Object cannot be stringified]`;
+		}
+	}
 
-  console[type === "ERROR" ? "error" : type === "DEBUG" ? "debug" : "log"](logMessage)
+	console[type === "ERROR" ? "error" : type === "DEBUG" ? "debug" : "log"](logMessage);
 }
 
 /**
  * 创建系统提示
  */
 function createSystemPrompt(request: BartenderRequest, agentType: AgentType): string {
-  // 使用简化的系统提示
-  return agentType === AgentType.CLASSIC_BARTENDER
-    ? `你是一位专注于经典鸡尾酒的调酒师,需要根据用户的心情和偏好推荐合适的经典鸡尾酒。
+	// 使用简化的系统提示
+	return agentType === AgentType.CLASSIC_BARTENDER
+		? `你是一位专注于经典鸡尾酒的调酒师,需要根据用户的心情和偏好推荐合适的经典鸡尾酒。
 分析用户需求，考虑酒精浓度、制作难度和可用基酒，推荐最合适的经典鸡尾酒。
 
 # 重要提示
@@ -141,7 +141,7 @@ function createSystemPrompt(request: BartenderRequest, agentType: AgentType): st
     ],
     "serving_glass": "建议使用的酒杯"
 }`
-    : `你是一位创意调酒师,需要根据用户的心情和偏好创造独特的鸡尾酒配方。
+		: `你是一位创意调酒师,需要根据用户的心情和偏好创造独特的鸡尾酒配方。
 分析用户需求，考虑酒精浓度、制作难度和可用基酒，创造一款独特的鸡尾酒。
 
 # 重要提示
@@ -185,332 +185,320 @@ function createSystemPrompt(request: BartenderRequest, agentType: AgentType): st
         }
     ],
     "serving_glass": "建议使用的酒杯"
-}`
+}`;
 }
 
 /**
  * 创建用户消息
  */
 function createUserMessage(request: BartenderRequest): string {
-  let message = `用户需求: ${request.message}\n`
+	let message = `用户需求: ${request.message}\n`;
 
-  // 添加其他条件
-  const conditions = []
-  if (request.alcohol_level !== AlcoholLevel.ANY) {
-    conditions.push(`酒精浓度: ${request.alcohol_level}`)
-  }
-  if (request.has_tools !== null && request.has_tools !== undefined) {
-    conditions.push(`是否有调酒工具: ${request.has_tools ? "有" : "没有"}`)
-  }
-  if (request.difficulty_level !== DifficultyLevel.ANY) {
-    conditions.push(`制作难度: ${request.difficulty_level}`)
-  }
-  if (request.base_spirits && request.base_spirits.length > 0) {
-    conditions.push(`可用的基酒: ${request.base_spirits.join(", ")}`)
-  }
+	// 添加其他条件
+	const conditions = [];
+	if (request.alcohol_level !== AlcoholLevel.ANY) {
+		conditions.push(`酒精浓度: ${request.alcohol_level}`);
+	}
+	if (request.has_tools !== null && request.has_tools !== undefined) {
+		conditions.push(`是否有调酒工具: ${request.has_tools ? "有" : "没有"}`);
+	}
+	if (request.difficulty_level !== DifficultyLevel.ANY) {
+		conditions.push(`制作难度: ${request.difficulty_level}`);
+	}
+	if (request.base_spirits && request.base_spirits.length > 0) {
+		conditions.push(`可用的基酒: ${request.base_spirits.join(", ")}`);
+	}
 
-  if (conditions.length > 0) {
-    message += "其他条件:\n" + conditions.join("\n")
-  }
+	if (conditions.length > 0) {
+		message += "其他条件:\n" + conditions.join("\n");
+	}
 
-  return message
+	return message;
 }
 
 /**
  * 解析完成结果为鸡尾酒对象
  */
 function parseCocktailFromCompletion(completion: string): Cocktail {
-  try {
-    logDetail("DEBUG", "解析模型返回的鸡尾酒数据", {
-      completionLength: completion.length,
-      completionPreview: completion.substring(0, 200) + "...",
-    })
+	try {
+		logDetail("DEBUG", "解析模型返回的鸡尾酒数据", {
+			completionLength: completion.length,
+			completionPreview: completion.substring(0, 200) + "...",
+		});
 
-    const jsonMatch = completion.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) {
-      logDetail("ERROR", "无法从返回中提取JSON数据", {
-        completionPreview: completion.substring(0, 300) + "...",
-      })
-      throw new Error("No JSON found in completion")
-    }
+		const jsonMatch = completion.match(/\{[\s\S]*\}/);
+		if (!jsonMatch) {
+			logDetail("ERROR", "无法从返回中提取JSON数据", {
+				completionPreview: completion.substring(0, 300) + "...",
+			});
+			throw new Error("No JSON found in completion");
+		}
 
-    const jsonString = jsonMatch[0]
-    logDetail("DEBUG", "提取的JSON字符串", {
-      jsonLength: jsonString.length,
-      jsonPreview: jsonString.substring(0, 200) + "...",
-    })
+		const jsonString = jsonMatch[0];
+		logDetail("DEBUG", "提取的JSON字符串", {
+			jsonLength: jsonString.length,
+			jsonPreview: jsonString.substring(0, 200) + "...",
+		});
 
-    const cocktail = JSON.parse(jsonString) as Cocktail
+		const cocktail = JSON.parse(jsonString) as Cocktail;
 
-    // 记录解析结果
-    logDetail("INFO", "成功解析鸡尾酒数据", {
-      name: cocktail.name,
-      english_name: cocktail.english_name,
-      ingredientsCount: cocktail.ingredients?.length || 0,
-      stepsCount: cocktail.steps?.length || 0,
-      toolsCount: cocktail.tools?.length || 0,
-    })
+		// 记录解析结果
+		logDetail("INFO", "成功解析鸡尾酒数据", {
+			name: cocktail.name,
+			english_name: cocktail.english_name,
+			ingredientsCount: cocktail.ingredients?.length || 0,
+			stepsCount: cocktail.steps?.length || 0,
+			toolsCount: cocktail.tools?.length || 0,
+		});
 
-    // 确保所有必填字段都存在
-    return {
-      name: cocktail.name || "Unknown Cocktail",
-      english_name: cocktail.english_name || "",
-      description: cocktail.description || "No description available",
-      match_reason: cocktail.match_reason || "This cocktail matches your preferences",
-      base_spirit: cocktail.base_spirit || "Various",
-      alcohol_level: cocktail.alcohol_level || "medium",
-      serving_glass: cocktail.serving_glass || "Cocktail glass",
-      time_required: cocktail.time_required || "5 minutes",
-      flavor_profiles: cocktail.flavor_profiles || ["balanced"],
-      ingredients: cocktail.ingredients || [],
-      tools: cocktail.tools || [],
-      steps: cocktail.steps || [],
-    }
-  } catch (error) {
-    logDetail("ERROR", "解析鸡尾酒数据失败", {
-      error:
-        error instanceof Error
-          ? {
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-            }
-          : String(error),
-      completionPreview: completion.substring(0, 300) + "...",
-    })
+		// 确保所有必填字段都存在
+		return {
+			name: cocktail.name || "Unknown Cocktail",
+			english_name: cocktail.english_name || "",
+			description: cocktail.description || "No description available",
+			match_reason: cocktail.match_reason || "This cocktail matches your preferences",
+			base_spirit: cocktail.base_spirit || "Various",
+			alcohol_level: cocktail.alcohol_level || "medium",
+			serving_glass: cocktail.serving_glass || "Cocktail glass",
+			time_required: cocktail.time_required || "5 minutes",
+			flavor_profiles: cocktail.flavor_profiles || ["balanced"],
+			ingredients: cocktail.ingredients || [],
+			tools: cocktail.tools || [],
+			steps: cocktail.steps || [],
+		};
+	} catch (error) {
+		logDetail("ERROR", "解析鸡尾酒数据失败", {
+			error:
+				error instanceof Error
+					? {
+							name: error.name,
+							message: error.message,
+							stack: error.stack,
+					  }
+					: String(error),
+			completionPreview: completion.substring(0, 300) + "...",
+		});
 
-    return {
-      name: "Parsing Error Cocktail",
-      description: "Sorry, there was an error parsing the cocktail recommendation.",
-      match_reason: "This is a fallback recommendation due to a parsing error.",
-      base_spirit: "Various",
-      alcohol_level: "medium",
-      serving_glass: "Cocktail glass",
-      flavor_profiles: ["balanced"],
-      ingredients: [],
-      tools: [],
-      steps: [],
-    }
-  }
+		return {
+			name: "Parsing Error Cocktail",
+			description: "Sorry, there was an error parsing the cocktail recommendation.",
+			match_reason: "This is a fallback recommendation due to a parsing error.",
+			base_spirit: "Various",
+			alcohol_level: "medium",
+			serving_glass: "Cocktail glass",
+			flavor_profiles: ["balanced"],
+			ingredients: [],
+			tools: [],
+			steps: [],
+		};
+	}
 }
 
 /**
  * 生成鸡尾酒推荐
  */
 export async function requestCocktailRecommendation(
-  request: BartenderRequest,
-  agentType: AgentType = AgentType.CLASSIC_BARTENDER,
+	request: BartenderRequest,
+	agentType: AgentType = AgentType.CLASSIC_BARTENDER
 ): Promise<Cocktail> {
-  const requestId = `cocktail_${Math.random().toString(36).substring(2, 15)}`
-  const startTime = Date.now()
-  try {
-    // 检查本地缓存
-    const cacheKey = `${agentType}-${request.alcohol_level}-${request.difficulty_level}-${request.message.substring(0, 20)}`
-    if (typeof window !== "undefined") {
-      const cachedResult = localStorage.getItem(`moodshaker-cocktail-${cacheKey}`)
-      if (cachedResult) {
-        try {
-          const parsed = JSON.parse(cachedResult)
-          logDetail("INFO", `找到缓存的鸡尾酒推荐 [${requestId}]`, {
-            cacheKey,
-            cocktailName: parsed.name,
-          })
-          return parsed
-        } catch (e) {
-          logDetail("DEBUG", `缓存解析失败 [${requestId}]`, {
-            error: e instanceof Error ? e.message : String(e),
-          })
-        }
-      }
-    }
+	const requestId = `cocktail_${Math.random().toString(36).substring(2, 15)}`;
+	const startTime = Date.now();
+	try {
+		// 检查本地缓存
+		const cacheKey = `${agentType}-${request.alcohol_level}-${request.difficulty_level}-${request.message.substring(
+			0,
+			20
+		)}`;
+		if (typeof window !== "undefined") {
+			const cachedResult = localStorage.getItem(`moodshaker-cocktail-${cacheKey}`);
+			if (cachedResult) {
+				try {
+					const parsed = JSON.parse(cachedResult);
+					logDetail("INFO", `找到缓存的鸡尾酒推荐 [${requestId}]`, {
+						cacheKey,
+						cocktailName: parsed.name,
+					});
+					return parsed;
+				} catch (e) {
+					logDetail("DEBUG", `缓存解析失败 [${requestId}]`, {
+						error: e instanceof Error ? e.message : String(e),
+					});
+				}
+			}
+		}
 
-    const systemPrompt = createSystemPrompt(request, agentType)
-    const userMessage = createUserMessage(request)
+		const systemPrompt = createSystemPrompt(request, agentType);
+		const userMessage = createUserMessage(request);
 
-    logDetail("DEBUG", `准备发送请求 [${requestId}]`, {
-      systemPromptLength: systemPrompt.length,
-      userMessageLength: userMessage.length,
-      systemPromptPreview: systemPrompt.substring(0, 100) + "...",
-      userMessagePreview: userMessage.substring(0, 100) + "...",
-    })
+		logDetail("DEBUG", `准备发送请求 [${requestId}]`, {
+			systemPromptLength: systemPrompt.length,
+			userMessageLength: userMessage.length,
+			systemPromptPreview: systemPrompt.substring(0, 100) + "...",
+			userMessagePreview: userMessage.substring(0, 100) + "...",
+		});
 
-    const completion = await getChatCompletion(
-      [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage },
-      ],
-      {
-        model: "deepseek-v3-250324",
-        temperature: 0.7,
-        max_tokens: 2000,
-      },
-    )
+		const completion = await getChatCompletion(
+			[
+				{ role: "system", content: systemPrompt },
+				{ role: "user", content: userMessage },
+			],
+			{
+				model: "deepseek-v3-250324",
+				temperature: 0.7,
+				max_tokens: 2000,
+			}
+		);
 
-    logDetail("DEBUG", `收到模型响应 [${requestId}]`, {
-      completionLength: completion.length,
-      completionPreview: completion.substring(0, 100) + "...",
-    })
+		logDetail("DEBUG", `收到模型响应 [${requestId}]`, {
+			completionLength: completion.length,
+			completionPreview: completion.substring(0, 100) + "...",
+		});
 
-    const cocktail = parseCocktailFromCompletion(completion)
+		const cocktail = parseCocktailFromCompletion(completion);
 
-    const endTime = Date.now()
-    const duration = endTime - startTime
+		const endTime = Date.now();
+		const duration = endTime - startTime;
 
-    logDetail("INFO", `鸡尾酒推荐完成 [${requestId}] (${duration}ms)`, {
-      cocktailName: cocktail.name,
-      englishName: cocktail.english_name,
-      baseSpirit: cocktail.base_spirit,
-      ingredientsCount: cocktail.ingredients.length,
-      stepsCount: cocktail.steps.length,
-    })
+		logDetail("INFO", `鸡尾酒推荐完成 [${requestId}] (${duration}ms)`, {
+			cocktailName: cocktail.name,
+			englishName: cocktail.english_name,
+			baseSpirit: cocktail.base_spirit,
+			ingredientsCount: cocktail.ingredients.length,
+			stepsCount: cocktail.steps.length,
+		});
 
-    // 缓存结果
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem(`moodshaker-cocktail-${cacheKey}`, JSON.stringify(cocktail))
-        logDetail("DEBUG", `已缓存鸡尾酒推荐 [${requestId}]`, { cacheKey })
-      } catch (e) {
-        logDetail("DEBUG", `缓存鸡尾酒失败 [${requestId}]`, {
-          error: e instanceof Error ? e.message : String(e),
-        })
-      }
-    }
+		// 缓存结果
+		if (typeof window !== "undefined") {
+			try {
+				localStorage.setItem(`moodshaker-cocktail-${cacheKey}`, JSON.stringify(cocktail));
+				logDetail("DEBUG", `已缓存鸡尾酒推荐 [${requestId}]`, { cacheKey });
+			} catch (e) {
+				logDetail("DEBUG", `缓存鸡尾酒失败 [${requestId}]`, {
+					error: e instanceof Error ? e.message : String(e),
+				});
+			}
+		}
 
-    return cocktail
-  } catch (error) {
-    const endTime = Date.now()
-    const duration = endTime - startTime
+		return cocktail;
+	} catch (error) {
+		const endTime = Date.now();
+		const duration = endTime - startTime;
 
-    logDetail("ERROR", `鸡尾酒推荐失败 [${requestId}] (${duration}ms)`, {
-      error:
-        error instanceof Error
-          ? {
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-            }
-          : String(error),
-    })
+		logDetail("ERROR", `鸡尾酒推荐失败 [${requestId}] (${duration}ms)`, {
+			error:
+				error instanceof Error
+					? {
+							name: error.name,
+							message: error.message,
+							stack: error.stack,
+					  }
+					: String(error),
+		});
 
-    throw error
-  }
-}
-
-/**
- * 生成图片提示
- */
-export function generateImagePrompt(cocktail: Cocktail): string {
-  const cocktailName = cocktail.english_name || cocktail.name
-
-  logDetail("DEBUG", "生成图片提示", {
-    cocktailName,
-    englishName: cocktail.english_name,
-    name: cocktail.name,
-  })
-
-  return `Create a high-resolution image featuring a cocktail named ${cocktailName} prominently in the center, elegantly garnished. The background should be intentionally blurred to draw attention to the cocktail. Capture the image using a professional camera with shallow depth of field. The photo should have a vivid and clear style, highlighting the intricate details and vibrant colors of the ${cocktailName} cocktail.`
+		throw error;
+	}
 }
 
 /**
  * 生成鸡尾酒图片
  */
 export async function generateCocktailImage(prompt: string, sessionId: string): Promise<string> {
-  const requestId = `cocktail_img_${Math.random().toString(36).substring(2, 15)}`
-  const startTime = Date.now()
+	const requestId = `cocktail_img_${Math.random().toString(36).substring(2, 15)}`;
+	const startTime = Date.now();
 
-  logDetail("INFO", `开始生成鸡尾酒图片 [${requestId}]`, {
-    sessionId,
-    promptLength: prompt.length,
-    promptPreview: prompt.substring(0, 100) + "...",
-  })
+	logDetail("INFO", `开始生成鸡尾酒图片 [${requestId}]`, {
+		sessionId,
+		promptLength: prompt.length,
+		promptPreview: prompt.substring(0, 100) + "...",
+	});
 
-  try {
-    // 检查缓存
-    if (typeof window !== "undefined") {
-      const cacheKey = `moodshaker-image-prompt-${prompt.substring(0, 50)}`
-      const cachedImage = localStorage.getItem(cacheKey)
+	try {
+		// 检查缓存
+		if (typeof window !== "undefined") {
+			const cacheKey = `moodshaker-image-prompt-${prompt.substring(0, 50)}`;
+			const cachedImage = localStorage.getItem(cacheKey);
 
-      if (cachedImage) {
-        logDetail("INFO", `使用缓存的鸡尾酒图片 [${requestId}]`, {
-          cacheKey,
-          imageUrlPreview: cachedImage.substring(0, 50) + "...",
-        })
-        return cachedImage
-      }
-    }
+			if (cachedImage) {
+				logDetail("INFO", `使用缓存的鸡尾酒图片 [${requestId}]`, {
+					cacheKey,
+					imageUrlPreview: cachedImage.substring(0, 50) + "...",
+				});
+				return cachedImage;
+			}
+		}
 
-    logDetail("DEBUG", `调用图像生成API [${requestId}]`, {
-      negativePrompt: "low quality, blurry, out of focus, low resolution, bad anatomy, worst quality, low quality",
-      imageSize: "1024x1024",
-    })
+		logDetail("DEBUG", `调用图像生成API [${requestId}]`, {
+			negativePrompt: "low quality, blurry, out of focus, low resolution, bad anatomy, worst quality, low quality",
+			imageSize: "1024x1024",
+		});
 
-    // 更新图像生成调用，使用更详细的提示词和负面提示词
-    const imageUrl = await generateImage(prompt, {
-      negative_prompt: "low quality, blurry, out of focus, low resolution, bad anatomy, worst quality, low quality",
-      image_size: "1024x1024",
-      // 不传入image参数，因为我们是从文本生成图像
-    })
+		// 更新图像生成调用，使用更详细的提示词和负面提示词
+		const imageUrl = await generateImage(prompt, {
+			negative_prompt: "low quality, blurry, out of focus, low resolution, bad anatomy, worst quality, low quality",
+			image_size: "1024x1024",
+			// 不传入image参数，因为我们是从文本生成图像
+		});
 
-    const endTime = Date.now()
-    const duration = endTime - startTime
+		const endTime = Date.now();
+		const duration = endTime - startTime;
 
-    logDetail("INFO", `鸡尾酒图片生成成功 [${requestId}] (${duration}ms)`, {
-      imageUrlPreview: imageUrl.substring(0, 50) + "...",
-    })
+		logDetail("INFO", `鸡尾酒图片生成成功 [${requestId}] (${duration}ms)`, {
+			imageUrlPreview: imageUrl.substring(0, 50) + "...",
+		});
 
-    // 保存图片URL到本地存储
-    if (typeof window !== "undefined") {
-      localStorage.setItem(`moodshaker-image-${sessionId}`, imageUrl)
+		// 保存图片URL到本地存储
+		if (typeof window !== "undefined") {
+			localStorage.setItem(`moodshaker-image-${sessionId}`, imageUrl);
 
-      // 同时按prompt缓存
-      const cacheKey = `moodshaker-image-prompt-${prompt.substring(0, 50)}`
-      localStorage.setItem(cacheKey, imageUrl)
+			// 同时按prompt缓存
+			const cacheKey = `moodshaker-image-prompt-${prompt.substring(0, 50)}`;
+			localStorage.setItem(cacheKey, imageUrl);
 
-      logDetail("DEBUG", `已缓存鸡尾酒图片 [${requestId}]`, {
-        sessionCacheKey: `moodshaker-image-${sessionId}`,
-        promptCacheKey: cacheKey,
-      })
-    }
+			logDetail("DEBUG", `已缓存鸡尾酒图片 [${requestId}]`, {
+				sessionCacheKey: `moodshaker-image-${sessionId}`,
+				promptCacheKey: cacheKey,
+			});
+		}
 
-    return imageUrl
-  } catch (error) {
-    const endTime = Date.now()
-    const duration = endTime - startTime
+		return imageUrl;
+	} catch (error) {
+		const endTime = Date.now();
+		const duration = endTime - startTime;
 
-    logDetail("ERROR", `鸡尾酒图片生成失败 [${requestId}] (${duration}ms)`, {
-      error:
-        error instanceof Error
-          ? {
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-            }
-          : String(error),
-    })
+		logDetail("ERROR", `鸡尾酒图片生成失败 [${requestId}] (${duration}ms)`, {
+			error:
+				error instanceof Error
+					? {
+							name: error.name,
+							message: error.message,
+							stack: error.stack,
+					  }
+					: String(error),
+		});
 
-    // 添加更多错误信息记录
-    console.error("生成图片失败详情:", error)
+		// 添加更多错误信息记录
+		console.error("生成图片失败详情:", error);
 
-    logDetail("INFO", `返回占位图片 [${requestId}]`)
-    return `/placeholder.svg?height=1024&width=1024&query=${encodeURIComponent("cocktail")}`
-  }
+		logDetail("INFO", `返回占位图片 [${requestId}]`);
+		return `/placeholder.svg?height=1024&width=1024&query=${encodeURIComponent("cocktail")}`;
+	}
 }
 
 /**
  * 获取会话的鸡尾酒图片
  */
 export function getCocktailImage(sessionId: string): string | null {
-  if (typeof window === "undefined") return null
+	if (typeof window === "undefined") return null;
 
-  const imageKey = `moodshaker-image-${sessionId}`
-  const imageUrl = localStorage.getItem(imageKey)
+	const imageKey = `moodshaker-image-${sessionId}`;
+	const imageUrl = localStorage.getItem(imageKey);
 
-  logDetail("DEBUG", `获取会话鸡尾酒图片`, {
-    sessionId,
-    imageKey,
-    found: !!imageUrl,
-    imageUrlPreview: imageUrl ? imageUrl.substring(0, 50) + "..." : "null",
-  })
+	logDetail("DEBUG", `获取会话鸡尾酒图片`, {
+		sessionId,
+		imageKey,
+		found: !!imageUrl,
+		imageUrlPreview: imageUrl ? imageUrl.substring(0, 50) + "..." : "null",
+	});
 
-  return imageUrl
+	return imageUrl;
 }

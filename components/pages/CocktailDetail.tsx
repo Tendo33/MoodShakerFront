@@ -8,6 +8,7 @@ import { ArrowLeft, Clock, Droplet, ThumbsUp, Share2 } from "lucide-react"
 import { useTheme } from "@/context/ThemeContext"
 import type { Cocktail } from "@/api/cocktail"
 import LoadingSpinner from "@/components/LoadingSpinner"
+import CocktailImage from "@/components/CocktailImage"
 import { getCocktailById } from "@/services/cocktailService"
 
 interface CocktailDetailProps {
@@ -57,7 +58,13 @@ const CocktailDetail: React.FC<CocktailDetailProps> = ({ id }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <img src={cocktail.image || "/placeholder.svg"} alt={cocktail.name} className="rounded-lg shadow-md w-full" />
+          <CocktailImage
+            cocktailId={id}
+            imageData={cocktail.image || null}
+            cocktailName={cocktail.name}
+            staticCocktailImages={{}}
+            className="rounded-lg shadow-md w-full"
+          />
         </div>
         <div>
           <h1 className="text-2xl font-bold mb-2">{cocktail.name}</h1>
