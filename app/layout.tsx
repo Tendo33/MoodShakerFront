@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/context/LanguageContext"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
 import ErrorAlert from "@/components/ErrorAlert"
+import PageTransition from "@/components/animations/PageTransition"
 import "./globals.css"
 
 // Configure Montserrat font
@@ -38,7 +39,9 @@ export default function RootLayout({
                 <div className="min-h-screen flex flex-col">
                   <Header />
                   <ErrorAlert />
-                  <main className="flex-1">{children}</main>
+                  <main className="flex-1">
+                    <PageTransition>{children}</PageTransition>
+                  </main>
                   <Footer />
                 </div>
               </LanguageProvider>

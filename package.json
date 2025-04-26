@@ -59,11 +59,13 @@
     "vaul": "^0.9.6",
     "zod": "^3.24.1",
     "eslint": "latest",
+    "@emotion/is-prop-valid": "latest",
     "@eslint/js": "latest",
     "globals": "latest",
     "eslint-plugin-react-hooks": "latest",
     "eslint-plugin-react-refresh": "latest",
-    "typescript-eslint": "latest"
+    "typescript-eslint": "latest",
+    "framer-motion": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

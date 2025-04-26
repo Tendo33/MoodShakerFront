@@ -2,28 +2,25 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, ArrowRight, Check, X } from "lucide-react"
+import { ArrowLeft, ArrowRight, Check } from "lucide-react"
 import { useTheme } from "@/context/ThemeContext"
 import { useCocktail } from "@/context/CocktailContext"
 import { useLanguage } from "@/context/LanguageContext"
 import React from "react"
 
-// Question option images
-const optionImages = {
+// 优化：合并图片对象
+const images = {
+  // 问题选项图片
   classic: "/polished-cocktail-shaker.png",
   custom: "/tropical-fusion.png",
-  yes: "/professional-cocktail-kit.png",
-  no: "/elegant-cocktail-glass.png",
   low: "/tropical-splash.png",
   medium: "/vibrant-citrus-harmony.png",
   high: "/dark-stormy-cocktail.png",
   any: "/vibrant-cocktail-collection.png",
   easy: "/refreshing-cocktail.png",
   hard: "/intricate-mixology.png",
-}
 
-// Spirit images
-const spiritImages = {
+  // 基酒图片
   gin: "/classic-gin-still-life.png",
   rum: "/weathered-rum-bottle.png",
   vodka: "/frosted-vodka.png",
@@ -59,25 +56,21 @@ export default function Questions() {
   const baseSpiritsRef = useRef<HTMLDivElement | null>(null)
   const [localUserFeedback, setLocalUserFeedback] = useState("")
   const [animateProgress, setAnimateProgress] = useState(false)
-  // 添加一个标志来防止重复设置
   const initialSetupDone = useRef(false)
 
   // 使用useMemo优化计算属性
   const themeClasses = useMemo(
-    () =>
-      theme === "dark"
-        ? "bg-gradient-to-b from-gray-950 to-gray-900 text-white"
-        : "bg-gradient-to-b from-amber-50 to-white text-gray-900",
+    () => (theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"),
     [theme],
   )
-
   const textColorClass = useMemo(() => (theme === "dark" ? "text-white" : "text-gray-900"), [theme])
   const cardClasses = useMemo(
-    () => (theme === "dark" ? "bg-white/10 text-white" : "bg-white/80 text-gray-900"),
+    () => (theme === "dark" ? "bg-gray-800/80 text-white" : "bg-white/90 text-gray-900"),
     [theme],
   )
-  const borderClasses = useMemo(() => (theme === "dark" ? "border-white/10" : "border-gray-200"), [theme])
+  const borderClasses = useMemo(() => (theme === "dark" ? "border-gray-700" : "border-gray-200"), [theme])
 
+  // 优化：简化问题数据结构
   const questions = useMemo(
     () => [
       {
@@ -85,16 +78,8 @@ export default function Questions() {
         title: locale === "en" ? "How would you like to drink today?" : "今天想怎么喝？",
         description: locale === "en" ? "Choose your preferred drinking style" : "选择您喜欢的饮用方式",
         options: [
-          {
-            id: "classic",
-            text: locale === "en" ? "Choose from classics" : "从经典中选择",
-            image: optionImages.classic,
-          },
-          {
-            id: "custom",
-            text: locale === "en" ? "Custom mix" : "自己调配",
-            image: optionImages.custom,
-          },
+          { id: "classic", text: locale === "en" ? "Choose from classics" : "从经典中选择", image: images.classic },
+          { id: "custom", text: locale === "en" ? "Custom mix" : "自己调配", image: images.custom },
         ],
       },
       {
@@ -102,26 +87,10 @@ export default function Questions() {
         title: locale === "en" ? "Preferred alcohol level?" : "喜欢什么酒精浓度？",
         description: locale === "en" ? "Select your preferred alcohol strength" : "选择您偏好的酒精浓度",
         options: [
-          {
-            id: "low",
-            text: locale === "en" ? "Low" : "低酒精度",
-            image: optionImages.low,
-          },
-          {
-            id: "medium",
-            text: locale === "en" ? "Medium" : "中等酒精度",
-            image: optionImages.medium,
-          },
-          {
-            id: "high",
-            text: locale === "en" ? "High" : "高酒精度",
-            image: optionImages.high,
-          },
-          {
-            id: "any",
-            text: locale === "en" ? "Any" : "无所谓",
-            image: optionImages.any,
-          },
+          { id: "low", text: locale === "en" ? "Low" : "低酒精度", image: images.low },
+          { id: "medium", text: locale === "en" ? "Medium" : "中等酒精度", image: images.medium },
+          { id: "high", text: locale === "en" ? "High" : "高酒精度", image: images.high },
+          { id: "any", text: locale === "en" ? "Any" : "无所谓", image: images.any },
         ],
       },
       {
@@ -129,76 +98,30 @@ export default function Questions() {
         title: locale === "en" ? "Preparation difficulty" : "制作难度偏好",
         description: locale === "en" ? "Select your acceptable preparation difficulty" : "选择您能接受的制作难度",
         options: [
-          {
-            id: "easy",
-            text: locale === "en" ? "Easy" : "简单",
-            image: optionImages.easy,
-          },
-          {
-            id: "medium",
-            text: locale === "en" ? "Medium" : "中等",
-            image: optionImages.medium,
-          },
-          {
-            id: "hard",
-            text: locale === "en" ? "Complex" : "复杂",
-            image: optionImages.hard,
-          },
-          {
-            id: "any",
-            text: locale === "en" ? "Any" : "无所谓",
-            image: optionImages.any,
-          },
+          { id: "easy", text: locale === "en" ? "Easy" : "简单", image: images.easy },
+          { id: "medium", text: locale === "en" ? "Medium" : "中等", image: images.medium },
+          { id: "hard", text: locale === "en" ? "Complex" : "复杂", image: images.hard },
+          { id: "any", text: locale === "en" ? "Any" : "无所谓", image: images.any },
         ],
       },
     ],
     [locale],
   )
 
+  // 优化：简化基酒选项
   const baseSpiritsOptions = useMemo(
     () => [
       {
         id: "all",
         name: locale === "en" ? "All" : "全部",
         description: locale === "en" ? "Use all base spirits" : "使用所有基酒",
-        image: null,
       },
-      {
-        id: "gin",
-        name: locale === "en" ? "Gin" : "金酒",
-        description: "Gin",
-        image: spiritImages.gin,
-      },
-      {
-        id: "rum",
-        name: locale === "en" ? "Rum" : "朗姆酒",
-        description: "Rum",
-        image: spiritImages.rum,
-      },
-      {
-        id: "vodka",
-        name: locale === "en" ? "Vodka" : "伏特加",
-        description: "Vodka",
-        image: spiritImages.vodka,
-      },
-      {
-        id: "whiskey",
-        name: locale === "en" ? "Whiskey" : "威士忌",
-        description: "Whiskey",
-        image: spiritImages.whiskey,
-      },
-      {
-        id: "tequila",
-        name: locale === "en" ? "Tequila" : "龙舌兰",
-        description: "Tequila",
-        image: spiritImages.tequila,
-      },
-      {
-        id: "brandy",
-        name: locale === "en" ? "Brandy" : "白兰地",
-        description: "Brandy",
-        image: spiritImages.brandy,
-      },
+      { id: "gin", name: locale === "en" ? "Gin" : "金酒", description: "Gin", image: images.gin },
+      { id: "rum", name: locale === "en" ? "Rum" : "朗姆酒", description: "Rum", image: images.rum },
+      { id: "vodka", name: locale === "en" ? "Vodka" : "伏特加", description: "Vodka", image: images.vodka },
+      { id: "whiskey", name: locale === "en" ? "Whiskey" : "威士忌", description: "Whiskey", image: images.whiskey },
+      { id: "tequila", name: locale === "en" ? "Tequila" : "龙舌兰", description: "Tequila", image: images.tequila },
+      { id: "brandy", name: locale === "en" ? "Brandy" : "白兰地", description: "Brandy", image: images.brandy },
     ],
     [locale],
   )
@@ -210,41 +133,28 @@ export default function Questions() {
 
       saveAnswer(questionId.toString(), optionId)
       setAnimateProgress(true)
-
-      setTimeout(() => {
-        setAnimateProgress(false)
-      }, 1000)
+      setTimeout(() => setAnimateProgress(false), 1000)
 
       // 显示下一个问题或基酒选择部分
       const nextQuestionId = questionId + 1
       if (nextQuestionId <= questions.length) {
-        // 只有当下一个问题不在可见列表中时才更新状态
         if (!visibleQuestions.includes(nextQuestionId)) {
           setVisibleQuestions((prev) => [...prev, nextQuestionId])
-
-          // 滚动到下一个问题
           setTimeout(() => {
-            if (questionRefs.current[nextQuestionId]) {
-              questionRefs.current[nextQuestionId]?.scrollIntoView({ behavior: "smooth" })
-            }
+            questionRefs.current[nextQuestionId]?.scrollIntoView({ behavior: "smooth" })
           }, 100)
         }
       } else if (questionId === questions.length && !showBaseSpirits) {
-        // 如果是最后一个问题且基酒选择部分未显示，则显示基酒选择部分
         setShowBaseSpirits(true)
         setTimeout(() => {
-          if (baseSpiritsRef.current) {
-            baseSpiritsRef.current.scrollIntoView({ behavior: "smooth" })
-          }
+          baseSpiritsRef.current?.scrollIntoView({ behavior: "smooth" })
         }, 100)
       }
     },
-    [answers, saveAnswer, setAnimateProgress, visibleQuestions, questions.length, showBaseSpirits, questions],
+    [answers, saveAnswer, visibleQuestions, questions.length, showBaseSpirits],
   )
 
-  const handleBack = () => {
-    router.push("/")
-  }
+  const handleBack = () => router.push("/")
 
   const handleBaseSpiritsToggle = useCallback(
     (spiritId: string) => {
@@ -266,17 +176,11 @@ export default function Questions() {
 
   const handleSubmitFeedback = useCallback(async () => {
     try {
-      // Save user feedback first
       saveFeedback(localUserFeedback)
-
-      // Then submit request - this will now handle both recommendation and image generation
       await submitRequest()
-
-      // Navigate to cocktail recommendation page
       router.push("/cocktail/recommendation")
     } catch (error) {
       console.error("Error submitting request:", error)
-      // You might want to show an error message to the user here
     }
   }, [saveFeedback, submitRequest, router, localUserFeedback])
 
@@ -326,12 +230,10 @@ export default function Questions() {
         }
       }
     }
-  }, [searchParams, resetAll, loadSavedData, userFeedback, answers, baseSpirits, questions.length, questions]) // 只依赖于 searchParams，这样只有在 URL 参数变化时才会重新执行
+  }, [searchParams, resetAll, loadSavedData, userFeedback, answers, baseSpirits, questions.length])
 
   // 当 userFeedback 变化时更新本地状态
   useEffect(() => {
-    // Only set the local feedback from context when it's empty locally
-    // This prevents overwriting what the user is currently typing
     if (userFeedback && localUserFeedback === "") {
       setLocalUserFeedback(userFeedback)
     }
@@ -347,42 +249,36 @@ export default function Questions() {
       option: { id: string; text: string; image: string }
       isSelected: boolean
       onSelect: () => void
-    }) => {
-      const { theme } = useTheme()
-      const borderClasses = theme === "dark" ? "border-white/10" : "border-gray-200"
-      const cardClasses = theme === "dark" ? "bg-white/10 text-white" : "bg-white/80 text-gray-900"
-
-      return (
-        <div className="transition-all duration-300">
-          <div
-            className={`cursor-pointer transition-all duration-300 hover:scale-105 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} ${
-              isSelected ? "ring-2 ring-pink-500 shadow-lg" : ""
-            }`}
-            onClick={onSelect}
-          >
-            <div className="p-4">
-              <div className="flex flex-col items-center text-center">
-                <div className="mb-3 rounded-full overflow-hidden bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-2">
-                  <img
-                    src={option.image || "/placeholder.svg"}
-                    alt={option.text}
-                    className="w-20 h-20 object-cover rounded-full"
-                  />
-                </div>
-                <h3 className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{option.text}</h3>
+    }) => (
+      <div className="transition-all duration-300">
+        <div
+          className={`cursor-pointer transition-all duration-300 hover:scale-105 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} ${
+            isSelected ? "ring-2 ring-pink-500 shadow-lg" : ""
+          }`}
+          onClick={onSelect}
+        >
+          <div className="p-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-3 rounded-full overflow-hidden bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-2">
+                <img
+                  src={option.image || "/placeholder.svg"}
+                  alt={option.text}
+                  className="w-20 h-20 object-cover rounded-full"
+                />
               </div>
+              <h3 className={`font-medium ${textColorClass}`}>{option.text}</h3>
             </div>
           </div>
         </div>
-      )
-    },
+      </div>
+    ),
   )
   QuestionOption.displayName = "QuestionOption"
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className={`container mx-auto px-4 py-8 ${themeClasses}`}>
       <div className="flex">
-        {/* 垂直进度条 - 从上往下增长，跟随内容滚动 */}
+        {/* 垂直进度条 */}
         <div className="mr-6 sticky top-8 self-start">
           <button
             className="flex items-center px-4 py-2 rounded-full hover:bg-white/10 transition-colors mb-6"
@@ -411,13 +307,15 @@ export default function Questions() {
                   questionRefs.current[question.id] = el
                 }}
                 className={`transition-all duration-500 ${
-                  visibleQuestions.includes(question.id) ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
+                  visibleQuestions.includes(question.id)
+                    ? "opacity-100 transform translate-y-0"
+                    : "opacity-0 transform translate-y-8 h-0 overflow-hidden"
                 }`}
               >
                 <div className={`mb-6 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}>
                   <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10 relative">
                     <div className={isQuestionAnswered(question.id.toString()) ? "absolute right-6 top-6" : "hidden"}>
-                      <div className="bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-full p-1.5">
+                      <div className="bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-full p-1.5 animate-pulse">
                         <Check className="h-4 w-4" />
                       </div>
                     </div>
@@ -427,13 +325,36 @@ export default function Questions() {
                 </div>
 
                 <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-                  {question.options.map((option) => (
-                    <QuestionOption
+                  {question.options.map((option, index) => (
+                    <div
                       key={option.id}
-                      option={option}
-                      isSelected={answers[question.id] === option.id}
-                      onSelect={() => handleOptionSelect(question.id, option.id)}
-                    />
+                      className="transition-all duration-300"
+                      style={{
+                        animationDelay: `${index * 100}ms`,
+                        animation: visibleQuestions.includes(question.id) ? "fadeIn 0.5s ease-in-out forwards" : "none",
+                        opacity: visibleQuestions.includes(question.id) ? 1 : 0,
+                      }}
+                    >
+                      <div
+                        className={`cursor-pointer transition-all duration-300 hover:scale-105 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} ${
+                          answers[question.id] === option.id ? "ring-2 ring-pink-500 shadow-lg" : ""
+                        }`}
+                        onClick={() => handleOptionSelect(question.id, option.id)}
+                      >
+                        <div className="p-4">
+                          <div className="flex flex-col items-center text-center">
+                            <div className="mb-3 rounded-full overflow-hidden bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-2">
+                              <img
+                                src={option.image || "/placeholder.svg"}
+                                alt={option.text}
+                                className="w-20 h-20 object-cover rounded-full"
+                              />
+                            </div>
+                            <h3 className={`font-medium ${textColorClass}`}>{option.text}</h3>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -479,11 +400,7 @@ export default function Questions() {
                               : "h-5 w-5 rounded-full bg-white/10 flex items-center justify-center"
                           }
                         >
-                          {baseSpirits.includes(spirit.id) ? (
-                            <Check className="h-3 w-3 text-white" />
-                          ) : (
-                            <X className="h-3 w-3 text-gray-400" />
-                          )}
+                          {baseSpirits.includes(spirit.id) && <Check className="h-3 w-3 text-white" />}
                         </div>
                       </div>
                       <p className="text-xs text-gray-400">{spirit.description}</p>

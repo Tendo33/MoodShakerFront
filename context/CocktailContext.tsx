@@ -29,7 +29,6 @@ interface SpiritOption {
   description?: string
 }
 
-// Update the CocktailContextType interface to include setIsImageLoading
 interface CocktailContextType {
   answers: Record<string, string>
   userFeedback: string
@@ -57,12 +56,8 @@ interface CocktailProviderProps {
   children: ReactNode
 }
 
-/**
- * 鸡尾酒上下文提供者组件
- * 管理鸡尾酒推荐相关的状态和操作
- */
-// Add the setIsImageLoading function to the provider
 export const CocktailProvider = ({ children }: CocktailProviderProps) => {
+  // 状态
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [userFeedback, setUserFeedback] = useState<string>("")
   const [baseSpirits, setBaseSpirits] = useState<string[]>([])
@@ -85,7 +80,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         saveToStorage(STORAGE_KEYS.SESSION_ID, newSessionId)
       }
     }
-  }, []) // Remove sessionId from the dependency array
+  }, [sessionId])
 
   // 计算进度百分比
   const progressPercentage = useMemo(() => {
