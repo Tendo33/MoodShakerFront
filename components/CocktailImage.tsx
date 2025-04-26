@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
 
 interface CocktailImageProps {
-  cocktailId?: string
-  imageData: string | null
-  cocktailName?: string
-  staticCocktailImages: Record<string, string>
-  className?: string
-  placeholderClassName?: string
+  cocktailId?: string;
+  imageData: string | null;
+  cocktailName?: string;
+  staticCocktailImages: Record<string, string>;
+  className?: string;
+  placeholderClassName?: string;
 }
 
 const CocktailImage = React.memo(
@@ -19,50 +19,50 @@ const CocktailImage = React.memo(
     staticCocktailImages,
     className = "w-full h-full object-cover transition-transform duration-700 group-hover:scale-105",
   }: CocktailImageProps) => {
-    const [imageSrc, setImageSrc] = useState<string | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
+    const [imageSrc, setImageSrc] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     // Generate a reliable placeholder URL
-    const placeholderUrl = `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(cocktailName || "cocktail")}`
+    const placeholderUrl = `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(cocktailName || "cocktail")}`;
 
     useEffect(() => {
-      setIsLoading(true)
+      setIsLoading(true);
 
       // Determine the source based on available data
-      let sourceToUse: string | null = null
+      let sourceToUse: string | null = null;
 
       if (cocktailId && staticCocktailImages[cocktailId]) {
-        sourceToUse = staticCocktailImages[cocktailId]
+        sourceToUse = staticCocktailImages[cocktailId];
       } else if (imageData) {
-        sourceToUse = imageData
+        sourceToUse = imageData;
       }
 
       if (!sourceToUse) {
-        setImageSrc(placeholderUrl)
-        setIsLoading(false)
-        return
+        setImageSrc(placeholderUrl);
+        setIsLoading(false);
+        return;
       }
 
       // For data URLs, set directly
       if (sourceToUse.startsWith("data:")) {
-        setImageSrc(sourceToUse)
-        setIsLoading(false)
-        return
+        setImageSrc(sourceToUse);
+        setIsLoading(false);
+        return;
       }
 
       // Load the image
-      const img = new Image()
+      const img = new Image();
       img.onload = () => {
-        setImageSrc(sourceToUse)
-        setIsLoading(false)
-      }
+        setImageSrc(sourceToUse);
+        setIsLoading(false);
+      };
       img.onerror = () => {
-        console.error("Failed to load image:", sourceToUse)
-        setImageSrc(placeholderUrl)
-        setIsLoading(false)
-      }
-      img.src = sourceToUse
-    }, [cocktailId, imageData, staticCocktailImages, placeholderUrl])
+        console.error("Failed to load image:", sourceToUse);
+        setImageSrc(placeholderUrl);
+        setIsLoading(false);
+      };
+      img.src = sourceToUse;
+    }, [cocktailId, imageData, staticCocktailImages, placeholderUrl]);
 
     if (isLoading) {
       return (
@@ -78,7 +78,7 @@ const CocktailImage = React.memo(
             </div>
           </div>
         </div>
-      )
+      );
     }
 
     return (
@@ -90,10 +90,10 @@ const CocktailImage = React.memo(
           loading="lazy"
         />
       </div>
-    )
+    );
   },
-)
+);
 
-CocktailImage.displayName = "CocktailImage"
+CocktailImage.displayName = "CocktailImage";
 
-export default CocktailImage
+export default CocktailImage;

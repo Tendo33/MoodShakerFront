@@ -1,53 +1,53 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, Clock, Droplet, ThumbsUp, Share2 } from "lucide-react"
-import { useTheme } from "@/context/ThemeContext"
-import type { Cocktail } from "@/api/cocktail"
-import LoadingSpinner from "@/components/LoadingSpinner"
-import CocktailImage from "@/components/CocktailImage"
-import { getCocktailById } from "@/services/cocktailService"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Clock, Droplet, ThumbsUp, Share2 } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
+import type { Cocktail } from "@/api/cocktail";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import CocktailImage from "@/components/CocktailImage";
+import { getCocktailById } from "@/services/cocktailService";
 
 interface CocktailDetailProps {
-  id: string
+  id: string;
 }
 
 const CocktailDetail: React.FC<CocktailDetailProps> = ({ id }) => {
-  const [cocktail, setCocktail] = useState<Cocktail | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
-  const { theme } = useTheme()
+  const [cocktail, setCocktail] = useState<Cocktail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const { theme } = useTheme();
 
   useEffect(() => {
     // Fetch cocktail data from our service
-    setIsLoading(true)
+    setIsLoading(true);
 
     getCocktailById(id)
       .then((data) => {
         if (data) {
-          setCocktail(data)
+          setCocktail(data);
         }
-        setIsLoading(false)
+        setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching cocktail:", error)
-        setIsLoading(false)
-      })
-  }, [id])
+        console.error("Error fetching cocktail:", error);
+        setIsLoading(false);
+      });
+  }, [id]);
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <LoadingSpinner />
       </div>
-    )
+    );
   }
 
   if (!cocktail) {
-    return <div>Cocktail not found</div>
+    return <div>Cocktail not found</div>;
   }
 
   return (
@@ -74,12 +74,16 @@ const CocktailDetail: React.FC<CocktailDetailProps> = ({ id }) => {
 
           <div className="flex items-center mb-2">
             <Clock className="mr-2" />
-            <span className="text-sm">Prep Time: {cocktail.time_required || "5 min"}</span>
+            <span className="text-sm">
+              Prep Time: {cocktail.time_required || "5 min"}
+            </span>
           </div>
 
           <div className="flex items-center mb-2">
             <Droplet className="mr-2" />
-            <span className="text-sm">Ingredients: {cocktail.ingredients.length}</span>
+            <span className="text-sm">
+              Ingredients: {cocktail.ingredients.length}
+            </span>
           </div>
 
           <div className="flex items-center mb-4">
@@ -108,7 +112,7 @@ const CocktailDetail: React.FC<CocktailDetailProps> = ({ id }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CocktailDetail
+export default CocktailDetail;

@@ -1,19 +1,24 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
+import { useState } from "react";
+import { motion } from "framer-motion";
 
 interface AnimatedCardProps {
-  children: React.ReactNode
-  className?: string
-  delay?: number
-  hoverEffect?: boolean
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  hoverEffect?: boolean;
 }
 
-export default function AnimatedCard({ children, className = "", delay = 0, hoverEffect = true }: AnimatedCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
+export default function AnimatedCard({
+  children,
+  className = "",
+  delay = 0,
+  hoverEffect = true,
+}: AnimatedCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div
@@ -40,5 +45,5 @@ export default function AnimatedCard({ children, className = "", delay = 0, hove
         {children}
       </motion.div>
     </motion.div>
-  )
+  );
 }

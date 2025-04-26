@@ -1,10 +1,10 @@
-import React from "react"
-import type { LucideIcon } from "lucide-react"
+import React from "react";
+import type { LucideIcon } from "lucide-react";
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  icon?: LucideIcon
-  label?: string
-  error?: string
+  icon?: LucideIcon;
+  label?: string;
+  error?: string;
 }
 
 export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
@@ -12,7 +12,10 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
     return (
       <div className="space-y-1">
         {label && (
-          <label htmlFor={props.id} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor={props.id}
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             {label}
           </label>
         )}
@@ -32,7 +35,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
         </div>
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
-    )
+    );
   },
-)
-FormInput.displayName = "FormInput"
+);
+FormInput.displayName = "FormInput";

@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
 /**
  * 通用表单元素组件
  * 提供一致的样式和行为
  */
-import React, { forwardRef } from "react"
-import { Eye, EyeOff, Lock } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+import React, { forwardRef } from "react";
+import { Eye, EyeOff, Lock } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 // 表单输入框组件
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  icon?: LucideIcon
-  label?: string
-  error?: string
+  icon?: LucideIcon;
+  label?: string;
+  error?: string;
 }
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
@@ -20,7 +20,10 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     return (
       <div className="space-y-1">
         {label && (
-          <label htmlFor={props.id} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor={props.id}
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             {label}
           </label>
         )}
@@ -40,25 +43,29 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
         </div>
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
-    )
+    );
   },
-)
-FormInput.displayName = "FormInput"
+);
+FormInput.displayName = "FormInput";
 
 // 密码输入框组件
-interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string
-  error?: string
+interface PasswordInputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
 }
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ label, error, className, ...props }, ref) => {
-    const [showPassword, setShowPassword] = React.useState(false)
+    const [showPassword, setShowPassword] = React.useState(false);
 
     return (
       <div className="space-y-1">
         {label && (
-          <label htmlFor={props.id} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor={props.id}
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             {label}
           </label>
         )}
@@ -88,16 +95,17 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         </div>
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
-    )
+    );
   },
-)
-PasswordInput.displayName = "PasswordInput"
+);
+PasswordInput.displayName = "PasswordInput";
 
 // 加载按钮组件
-interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  loading?: boolean
-  loadingText?: string
-  icon?: React.ReactNode
+interface LoadingButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  loading?: boolean;
+  loadingText?: string;
+  icon?: React.ReactNode;
 }
 
 export const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(
@@ -117,7 +125,14 @@ export const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(
               fill="none"
               viewBox="0 0 24 24"
             >
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
               <path
                 className="opacity-75"
                 fill="currentColor"
@@ -133,7 +148,7 @@ export const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(
           </>
         )}
       </button>
-    )
+    );
   },
-)
-LoadingButton.displayName = "LoadingButton"
+);
+LoadingButton.displayName = "LoadingButton";

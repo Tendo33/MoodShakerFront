@@ -1,33 +1,33 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Montserrat } from "next/font/google"
-import { ThemeProvider } from "@/context/ThemeContext"
-import { ErrorProvider } from "@/context/ErrorContext"
-import { CocktailProvider } from "@/context/CocktailContext"
-import { LanguageProvider } from "@/context/LanguageContext"
-import Header from "@/components/layout/Header"
-import Footer from "@/components/layout/Footer"
-import ErrorAlert from "@/components/ErrorAlert"
-import PageTransition from "@/components/animations/PageTransition"
-import "./globals.css"
+import type React from "react";
+import type { Metadata } from "next";
+import { Montserrat } from "next/font/google";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { ErrorProvider } from "@/context/ErrorContext";
+import { CocktailProvider } from "@/context/CocktailContext";
+import { LanguageProvider } from "@/context/LanguageContext";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import ErrorAlert from "@/components/ErrorAlert";
+import PageTransition from "@/components/animations/PageTransition";
+import "./globals.css";
 
 // Configure Montserrat font
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
   display: "swap",
-})
+});
 
 export const metadata: Metadata = {
   title: "MoodShaker",
-  description: "Answer a few simple questions and let us recommend the perfect cocktail for you",
-  generator: "v0.dev",
-}
+  description:
+    "Answer a few simple questions and let us recommend the perfect cocktail for you",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={montserrat.variable}>
@@ -50,5 +50,5 @@ export default function RootLayout({
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }

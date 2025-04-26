@@ -1,11 +1,14 @@
-"use client"
+"use client";
 
 interface LoadingSpinnerProps {
-  text?: string
-  colorClass?: string
+  text?: string;
+  colorClass?: string;
 }
 
-export default function LoadingSpinner({ text, colorClass = "border-amber-500" }: LoadingSpinnerProps) {
+export default function LoadingSpinner({
+  text,
+  colorClass = "border-amber-500",
+}: LoadingSpinnerProps) {
   return (
     <div className="flex items-center justify-center">
       <div className="relative">
@@ -16,5 +19,5 @@ export default function LoadingSpinner({ text, colorClass = "border-amber-500" }
       </div>
       {text && <div className="ml-4 text-lg">{text}</div>}
     </div>
-  )
+  );
 }

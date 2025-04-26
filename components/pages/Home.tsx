@@ -1,30 +1,30 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { ArrowRight, History } from "lucide-react"
-import { useTheme } from "@/context/ThemeContext"
-import { useLanguage } from "@/context/LanguageContext"
-import AnimatedCard from "@/components/ui/AnimatedCard"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight, History } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
+import { useLanguage } from "@/context/LanguageContext";
+import AnimatedCard from "@/components/ui/AnimatedCard";
 
 // Import cocktail images
 const cocktailImages = {
   mojito: "/vibrant-mojito.png",
   margarita: "/vibrant-margarita.png",
   cosmopolitan: "/city-lights-cocktail.png",
-}
+};
 
 // Animation variants
 const fadeIn = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.6 } },
-}
+};
 
 const slideUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-}
+};
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -34,15 +34,15 @@ const staggerContainer = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
 export default function Home() {
-  const { theme } = useTheme()
-  const { t } = useLanguage()
-  const [hasSavedSession, setHasSavedSession] = useState(false)
-  const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0)
-  const [isClient, setIsClient] = useState(false)
-  const [isPageLoaded, setIsPageLoaded] = useState(false)
+  const { theme } = useTheme();
+  const { t } = useLanguage();
+  const [hasSavedSession, setHasSavedSession] = useState(false);
+  const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0);
+  const [isClient, setIsClient] = useState(false);
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
 
   // Featured cocktails for the hero section
   const featuredCocktails = [
@@ -67,31 +67,34 @@ export default function Home() {
       description: "时尚优雅的蔓越莓伏特加鸡尾酒",
       image: cocktailImages.cosmopolitan,
     },
-  ]
+  ];
 
   useEffect(() => {
-    setIsClient(true)
-    const answers = localStorage.getItem("moodshaker-answers")
-    setHasSavedSession(!!answers)
+    setIsClient(true);
+    const answers = localStorage.getItem("moodshaker-answers");
+    setHasSavedSession(!!answers);
 
     // Add a small delay before showing animations
-    setTimeout(() => setIsPageLoaded(true), 100)
-  }, [])
+    setTimeout(() => setIsPageLoaded(true), 100);
+  }, []);
 
   // Rotate featured cocktails
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentCocktailIndex((prev) => (prev + 1) % featuredCocktails.length)
-    }, 5000)
+      setCurrentCocktailIndex((prev) => (prev + 1) % featuredCocktails.length);
+    }, 5000);
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   // 确定主题相关的样式
-  const bgClass = theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-  const textClass = theme === "dark" ? "text-white" : "text-gray-900"
-  const cardClass = theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-  const mutedTextClass = theme === "dark" ? "text-gray-400" : "text-gray-600"
+  const bgClass = theme === "dark" ? "bg-gray-900" : "bg-gray-50";
+  const textClass = theme === "dark" ? "text-white" : "text-gray-900";
+  const cardClass =
+    theme === "dark"
+      ? "bg-gray-800 border-gray-700"
+      : "bg-white border-gray-200";
+  const mutedTextClass = theme === "dark" ? "text-gray-400" : "text-gray-600";
 
   return (
     <motion.div
@@ -105,7 +108,11 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left column - Text content */}
-            <motion.div initial="hidden" animate={isPageLoaded ? "visible" : "hidden"} variants={staggerContainer}>
+            <motion.div
+              initial="hidden"
+              animate={isPageLoaded ? "visible" : "hidden"}
+              variants={staggerContainer}
+            >
               <motion.h1
                 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent"
                 variants={slideUp}
@@ -113,13 +120,19 @@ export default function Home() {
                 {t("home.title")}
               </motion.h1>
 
-              <motion.p className={`text-lg mb-8 ${mutedTextClass}`} variants={slideUp}>
+              <motion.p
+                className={`text-lg mb-8 ${mutedTextClass}`}
+                variants={slideUp}
+              >
                 {t("home.subtitle")}
               </motion.p>
 
               {/* Session buttons with animations */}
               {hasSavedSession ? (
-                <motion.div className={`p-6 border rounded-xl mb-6 ${cardClass}`} variants={slideUp}>
+                <motion.div
+                  className={`p-6 border rounded-xl mb-6 ${cardClass}`}
+                  variants={slideUp}
+                >
                   <div className="flex items-center mb-4">
                     <motion.div
                       className="w-10 h-10 rounded-full bg-gradient-to-r from-amber-500/20 to-pink-500/20 flex items-center justify-center mr-3"
@@ -128,9 +141,13 @@ export default function Home() {
                     >
                       <History className="h-5 w-5 text-amber-500" />
                     </motion.div>
-                    <h3 className="text-xl font-bold">{t("home.savedSession")}</h3>
+                    <h3 className="text-xl font-bold">
+                      {t("home.savedSession")}
+                    </h3>
                   </div>
-                  <p className={`mb-5 ${mutedTextClass}`}>{t("home.savedSessionDesc")}</p>
+                  <p className={`mb-5 ${mutedTextClass}`}>
+                    {t("home.savedSessionDesc")}
+                  </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <Link
                       href="/questions"
@@ -175,7 +192,11 @@ export default function Home() {
                       : "opacity-0 translate-y-8 pointer-events-none"
                   }`}
                   initial={false}
-                  animate={index === currentCocktailIndex ? { scale: 1 } : { scale: 0.95 }}
+                  animate={
+                    index === currentCocktailIndex
+                      ? { scale: 1 }
+                      : { scale: 0.95 }
+                  }
                   transition={{ duration: 0.5 }}
                 >
                   <div className="relative h-full">
@@ -199,7 +220,7 @@ export default function Home() {
                       alt={cocktail.name}
                       className="relative rounded-3xl shadow-2xl w-full h-full object-cover"
                       onError={(e) => {
-                        e.currentTarget.src = `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(cocktail.name)}`
+                        e.currentTarget.src = `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(cocktail.name)}`;
                       }}
                     />
                     <motion.div
@@ -208,9 +229,15 @@ export default function Home() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3, duration: 0.5 }}
                     >
-                      <h3 className="text-2xl font-bold text-white">{cocktail.name}</h3>
-                      <p className="text-sm text-gray-300">{cocktail.englishName}</p>
-                      <p className="text-white/80 mt-2">{cocktail.description}</p>
+                      <h3 className="text-2xl font-bold text-white">
+                        {cocktail.name}
+                      </h3>
+                      <p className="text-sm text-gray-300">
+                        {cocktail.englishName}
+                      </p>
+                      <p className="text-white/80 mt-2">
+                        {cocktail.description}
+                      </p>
                     </motion.div>
                   </div>
                 </motion.div>
@@ -223,7 +250,9 @@ export default function Home() {
                     key={index}
                     onClick={() => setCurrentCocktailIndex(index)}
                     className={`w-3 h-3 rounded-full transition-all ${
-                      index === currentCocktailIndex ? "bg-gradient-to-r from-amber-500 to-pink-500" : "bg-white/30"
+                      index === currentCocktailIndex
+                        ? "bg-gradient-to-r from-amber-500 to-pink-500"
+                        : "bg-white/30"
                     }`}
                     whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.9 }}
@@ -251,7 +280,9 @@ export default function Home() {
           <motion.div
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
-            animate={isPageLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            animate={
+              isPageLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+            }
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-amber-400 to-pink-500 bg-clip-text text-transparent">
@@ -268,7 +299,10 @@ export default function Home() {
             animate={isPageLoaded ? "visible" : "hidden"}
             variants={staggerContainer}
           >
-            <AnimatedCard className={`border rounded-xl p-6 text-left ${cardClass}`} delay={0}>
+            <AnimatedCard
+              className={`border rounded-xl p-6 text-left ${cardClass}`}
+              delay={0}
+            >
               <motion.div
                 className="w-12 h-12 rounded-full bg-gradient-to-r from-amber-500/20 to-pink-500/20 flex items-center justify-center mb-4"
                 whileHover={{ scale: 1.1, rotate: 5 }}
@@ -276,11 +310,16 @@ export default function Home() {
               >
                 <span className="text-2xl">🧪</span>
               </motion.div>
-              <h3 className="text-xl font-bold mb-2">{t("home.feature1.title")}</h3>
+              <h3 className="text-xl font-bold mb-2">
+                {t("home.feature1.title")}
+              </h3>
               <p className={mutedTextClass}>{t("home.feature1.description")}</p>
             </AnimatedCard>
 
-            <AnimatedCard className={`border rounded-xl p-6 text-left ${cardClass}`} delay={1}>
+            <AnimatedCard
+              className={`border rounded-xl p-6 text-left ${cardClass}`}
+              delay={1}
+            >
               <motion.div
                 className="w-12 h-12 rounded-full bg-gradient-to-r from-amber-500/20 to-pink-500/20 flex items-center justify-center mb-4"
                 whileHover={{ scale: 1.1, rotate: -5 }}
@@ -288,11 +327,16 @@ export default function Home() {
               >
                 <span className="text-2xl">📝</span>
               </motion.div>
-              <h3 className="text-xl font-bold mb-2">{t("home.feature2.title")}</h3>
+              <h3 className="text-xl font-bold mb-2">
+                {t("home.feature2.title")}
+              </h3>
               <p className={mutedTextClass}>{t("home.feature2.description")}</p>
             </AnimatedCard>
 
-            <AnimatedCard className={`border rounded-xl p-6 text-left ${cardClass}`} delay={2}>
+            <AnimatedCard
+              className={`border rounded-xl p-6 text-left ${cardClass}`}
+              delay={2}
+            >
               <motion.div
                 className="w-12 h-12 rounded-full bg-gradient-to-r from-amber-500/20 to-pink-500/20 flex items-center justify-center mb-4"
                 whileHover={{ scale: 1.1, rotate: 5 }}
@@ -300,7 +344,9 @@ export default function Home() {
               >
                 <span className="text-2xl">✨</span>
               </motion.div>
-              <h3 className="text-xl font-bold mb-2">{t("home.feature3.title")}</h3>
+              <h3 className="text-xl font-bold mb-2">
+                {t("home.feature3.title")}
+              </h3>
               <p className={mutedTextClass}>{t("home.feature3.description")}</p>
             </AnimatedCard>
           </motion.div>
@@ -318,13 +364,17 @@ export default function Home() {
           <motion.div
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
-            animate={isPageLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            animate={
+              isPageLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+            }
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-amber-400 to-pink-500 bg-clip-text text-transparent">
               热门鸡尾酒
             </h2>
-            <p className={`text-lg max-w-2xl mx-auto ${mutedTextClass}`}>探索我们用户最喜爱的鸡尾酒</p>
+            <p className={`text-lg max-w-2xl mx-auto ${mutedTextClass}`}>
+              探索我们用户最喜爱的鸡尾酒
+            </p>
           </motion.div>
 
           <motion.div
@@ -340,11 +390,16 @@ export default function Home() {
                 variants={slideUp}
                 whileHover={{
                   scale: 1.03,
-                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                  boxShadow:
+                    "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                 }}
                 transition={{ duration: 0.3 }}
               >
-                <motion.div className="h-48" whileHover={{ scale: 1.05 }} transition={{ duration: 0.5 }}>
+                <motion.div
+                  className="h-48"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <img
                     src={
                       cocktail.image ||
@@ -353,15 +408,20 @@ export default function Home() {
                     alt={cocktail.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name)}`
+                      e.currentTarget.src = `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name)}`;
                     }}
                   />
                 </motion.div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-1">{cocktail.name}</h3>
-                  <p className="text-sm text-gray-400 mb-3">{cocktail.englishName}</p>
+                  <p className="text-sm text-gray-400 mb-3">
+                    {cocktail.englishName}
+                  </p>
                   <p className={mutedTextClass}>{cocktail.description}</p>
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <Link
                       href={`/cocktail/recommendation?id=${cocktail.id}`}
                       className="mt-4 w-full py-2 bg-gradient-to-r from-amber-500/20 to-pink-500/20 hover:from-amber-500/30 hover:to-pink-500/30 text-white border border-white/10 rounded-full transition-all duration-300 block text-center"
@@ -376,5 +436,5 @@ export default function Home() {
         </div>
       </motion.section>
     </motion.div>
-  )
+  );
 }

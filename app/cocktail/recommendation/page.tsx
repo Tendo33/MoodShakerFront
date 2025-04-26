@@ -1,7 +1,7 @@
-import { Suspense } from "react"
-import CocktailRecommendation from "@/components/pages/CocktailRecommendation"
-import LoadingSpinner from "@/components/LoadingSpinner"
-import ErrorBoundary from "@/components/ErrorBoundary"
+import { Suspense } from "react";
+import CocktailRecommendation from "@/components/pages/CocktailRecommendation";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function RecommendationPage() {
   return (
@@ -16,5 +16,5 @@ export default function RecommendationPage() {
         <CocktailRecommendation />
       </Suspense>
     </ErrorBoundary>
-  )
+  );
 }

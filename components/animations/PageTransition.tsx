@@ -6,31 +6,31 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 interface PageTransitionProps {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export default function PageTransition({ children }: PageTransitionProps) {
-	const pathname = usePathname();
-	const [transitionStage, setTransitionStage] = useState("fadeIn");
+  const pathname = usePathname();
+  const [transitionStage, setTransitionStage] = useState("fadeIn");
 
-	useEffect(() => {
-		if (pathname) {
-			setTransitionStage("fadeOut");
+  useEffect(() => {
+    if (pathname) {
+      setTransitionStage("fadeOut");
 
-			const timeout = setTimeout(() => {
-				setTransitionStage("fadeIn");
-			}, 300); // Match this with the animation duration
+      const timeout = setTimeout(() => {
+        setTransitionStage("fadeIn");
+      }, 300); // Match this with the animation duration
 
-			return () => clearTimeout(timeout);
-		}
-	}, [pathname]);
+      return () => clearTimeout(timeout);
+    }
+  }, [pathname]);
 
-	return (
-		<div
-			key={pathname}
-			className={`w-full transition-opacity duration-300 ${transitionStage === "fadeIn" ? "opacity-100" : "opacity-0"}`}
-		>
-			{children}
-		</div>
-	);
+  return (
+    <div
+      key={pathname}
+      className={`w-full transition-opacity duration-300 ${transitionStage === "fadeIn" ? "opacity-100" : "opacity-0"}`}
+    >
+      {children}
+    </div>
+  );
 }

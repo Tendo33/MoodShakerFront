@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef, useMemo, useCallback } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, ArrowRight, Check } from "lucide-react"
-import { useTheme } from "@/context/ThemeContext"
-import { useCocktail } from "@/context/CocktailContext"
-import { useLanguage } from "@/context/LanguageContext"
-import React from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
+import { useCocktail } from "@/context/CocktailContext";
+import { useLanguage } from "@/context/LanguageContext";
+import React from "react";
 
 // 优化：合并图片对象
 const images = {
@@ -27,13 +27,13 @@ const images = {
   whiskey: "/amber-glass-still-life.png",
   tequila: "/aged-agave-spirit.png",
   brandy: "/amber-glass-still-life.png",
-}
+};
 
 export default function Questions() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { theme } = useTheme()
-  const { t, locale } = useLanguage()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { theme } = useTheme();
+  const { t, locale } = useLanguage();
   const {
     answers,
     userFeedback,
@@ -47,66 +47,129 @@ export default function Questions() {
     submitRequest,
     isQuestionAnswered,
     resetAll,
-  } = useCocktail()
+  } = useCocktail();
 
-  const [visibleQuestions, setVisibleQuestions] = useState<number[]>([1])
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false)
-  const [showBaseSpirits, setShowBaseSpirits] = useState(false)
-  const questionRefs = useRef<Record<number, HTMLDivElement | null>>({})
-  const baseSpiritsRef = useRef<HTMLDivElement | null>(null)
-  const [localUserFeedback, setLocalUserFeedback] = useState("")
-  const [animateProgress, setAnimateProgress] = useState(false)
-  const initialSetupDone = useRef(false)
+  const [visibleQuestions, setVisibleQuestions] = useState<number[]>([1]);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [showBaseSpirits, setShowBaseSpirits] = useState(false);
+  const questionRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const baseSpiritsRef = useRef<HTMLDivElement | null>(null);
+  const [localUserFeedback, setLocalUserFeedback] = useState("");
+  const [animateProgress, setAnimateProgress] = useState(false);
+  const initialSetupDone = useRef(false);
 
   // 使用useMemo优化计算属性
   const themeClasses = useMemo(
-    () => (theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"),
+    () =>
+      theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900",
     [theme],
-  )
-  const textColorClass = useMemo(() => (theme === "dark" ? "text-white" : "text-gray-900"), [theme])
+  );
+  const textColorClass = useMemo(
+    () => (theme === "dark" ? "text-white" : "text-gray-900"),
+    [theme],
+  );
   const cardClasses = useMemo(
-    () => (theme === "dark" ? "bg-gray-800/80 text-white" : "bg-white/90 text-gray-900"),
+    () =>
+      theme === "dark"
+        ? "bg-gray-800/80 text-white"
+        : "bg-white/90 text-gray-900",
     [theme],
-  )
-  const borderClasses = useMemo(() => (theme === "dark" ? "border-gray-700" : "border-gray-200"), [theme])
+  );
+  const borderClasses = useMemo(
+    () => (theme === "dark" ? "border-gray-700" : "border-gray-200"),
+    [theme],
+  );
 
   // 优化：简化问题数据结构
   const questions = useMemo(
     () => [
       {
         id: 1,
-        title: locale === "en" ? "How would you like to drink today?" : "今天想怎么喝？",
-        description: locale === "en" ? "Choose your preferred drinking style" : "选择您喜欢的饮用方式",
+        title:
+          locale === "en"
+            ? "How would you like to drink today?"
+            : "今天想怎么喝？",
+        description:
+          locale === "en"
+            ? "Choose your preferred drinking style"
+            : "选择您喜欢的饮用方式",
         options: [
-          { id: "classic", text: locale === "en" ? "Choose from classics" : "从经典中选择", image: images.classic },
-          { id: "custom", text: locale === "en" ? "Custom mix" : "自己调配", image: images.custom },
+          {
+            id: "classic",
+            text: locale === "en" ? "Choose from classics" : "从经典中选择",
+            image: images.classic,
+          },
+          {
+            id: "custom",
+            text: locale === "en" ? "Custom mix" : "自己调配",
+            image: images.custom,
+          },
         ],
       },
       {
         id: 2,
-        title: locale === "en" ? "Preferred alcohol level?" : "喜欢什么酒精浓度？",
-        description: locale === "en" ? "Select your preferred alcohol strength" : "选择您偏好的酒精浓度",
+        title:
+          locale === "en" ? "Preferred alcohol level?" : "喜欢什么酒精浓度？",
+        description:
+          locale === "en"
+            ? "Select your preferred alcohol strength"
+            : "选择您偏好的酒精浓度",
         options: [
-          { id: "low", text: locale === "en" ? "Low" : "低酒精度", image: images.low },
-          { id: "medium", text: locale === "en" ? "Medium" : "中等酒精度", image: images.medium },
-          { id: "high", text: locale === "en" ? "High" : "高酒精度", image: images.high },
-          { id: "any", text: locale === "en" ? "Any" : "无所谓", image: images.any },
+          {
+            id: "low",
+            text: locale === "en" ? "Low" : "低酒精度",
+            image: images.low,
+          },
+          {
+            id: "medium",
+            text: locale === "en" ? "Medium" : "中等酒精度",
+            image: images.medium,
+          },
+          {
+            id: "high",
+            text: locale === "en" ? "High" : "高酒精度",
+            image: images.high,
+          },
+          {
+            id: "any",
+            text: locale === "en" ? "Any" : "无所谓",
+            image: images.any,
+          },
         ],
       },
       {
         id: 3,
         title: locale === "en" ? "Preparation difficulty" : "制作难度偏好",
-        description: locale === "en" ? "Select your acceptable preparation difficulty" : "选择您能接受的制作难度",
+        description:
+          locale === "en"
+            ? "Select your acceptable preparation difficulty"
+            : "选择您能接受的制作难度",
         options: [
-          { id: "easy", text: locale === "en" ? "Easy" : "简单", image: images.easy },
-          { id: "medium", text: locale === "en" ? "Medium" : "中等", image: images.medium },
-          { id: "hard", text: locale === "en" ? "Complex" : "复杂", image: images.hard },
-          { id: "any", text: locale === "en" ? "Any" : "无所谓", image: images.any },
+          {
+            id: "easy",
+            text: locale === "en" ? "Easy" : "简单",
+            image: images.easy,
+          },
+          {
+            id: "medium",
+            text: locale === "en" ? "Medium" : "中等",
+            image: images.medium,
+          },
+          {
+            id: "hard",
+            text: locale === "en" ? "Complex" : "复杂",
+            image: images.hard,
+          },
+          {
+            id: "any",
+            text: locale === "en" ? "Any" : "无所谓",
+            image: images.any,
+          },
         ],
       },
     ],
     [locale],
-  )
+  );
 
   // 优化：简化基酒选项
   const baseSpiritsOptions = useMemo(
@@ -116,128 +179,168 @@ export default function Questions() {
         name: locale === "en" ? "All" : "全部",
         description: locale === "en" ? "Use all base spirits" : "使用所有基酒",
       },
-      { id: "gin", name: locale === "en" ? "Gin" : "金酒", description: "Gin", image: images.gin },
-      { id: "rum", name: locale === "en" ? "Rum" : "朗姆酒", description: "Rum", image: images.rum },
-      { id: "vodka", name: locale === "en" ? "Vodka" : "伏特加", description: "Vodka", image: images.vodka },
-      { id: "whiskey", name: locale === "en" ? "Whiskey" : "威士忌", description: "Whiskey", image: images.whiskey },
-      { id: "tequila", name: locale === "en" ? "Tequila" : "龙舌兰", description: "Tequila", image: images.tequila },
-      { id: "brandy", name: locale === "en" ? "Brandy" : "白兰地", description: "Brandy", image: images.brandy },
+      {
+        id: "gin",
+        name: locale === "en" ? "Gin" : "金酒",
+        description: "Gin",
+        image: images.gin,
+      },
+      {
+        id: "rum",
+        name: locale === "en" ? "Rum" : "朗姆酒",
+        description: "Rum",
+        image: images.rum,
+      },
+      {
+        id: "vodka",
+        name: locale === "en" ? "Vodka" : "伏特加",
+        description: "Vodka",
+        image: images.vodka,
+      },
+      {
+        id: "whiskey",
+        name: locale === "en" ? "Whiskey" : "威士忌",
+        description: "Whiskey",
+        image: images.whiskey,
+      },
+      {
+        id: "tequila",
+        name: locale === "en" ? "Tequila" : "龙舌兰",
+        description: "Tequila",
+        image: images.tequila,
+      },
+      {
+        id: "brandy",
+        name: locale === "en" ? "Brandy" : "白兰地",
+        description: "Brandy",
+        image: images.brandy,
+      },
     ],
     [locale],
-  )
+  );
 
   const handleOptionSelect = useCallback(
     (questionId: number, optionId: string) => {
       // 如果已经选择了相同的选项，不做任何操作
-      if (answers[questionId] === optionId) return
+      if (answers[questionId] === optionId) return;
 
-      saveAnswer(questionId.toString(), optionId)
-      setAnimateProgress(true)
-      setTimeout(() => setAnimateProgress(false), 1000)
+      saveAnswer(questionId.toString(), optionId);
+      setAnimateProgress(true);
+      setTimeout(() => setAnimateProgress(false), 1000);
 
       // 显示下一个问题或基酒选择部分
-      const nextQuestionId = questionId + 1
+      const nextQuestionId = questionId + 1;
       if (nextQuestionId <= questions.length) {
         if (!visibleQuestions.includes(nextQuestionId)) {
-          setVisibleQuestions((prev) => [...prev, nextQuestionId])
+          setVisibleQuestions((prev) => [...prev, nextQuestionId]);
           setTimeout(() => {
-            questionRefs.current[nextQuestionId]?.scrollIntoView({ behavior: "smooth" })
-          }, 100)
+            questionRefs.current[nextQuestionId]?.scrollIntoView({
+              behavior: "smooth",
+            });
+          }, 100);
         }
       } else if (questionId === questions.length && !showBaseSpirits) {
-        setShowBaseSpirits(true)
+        setShowBaseSpirits(true);
         setTimeout(() => {
-          baseSpiritsRef.current?.scrollIntoView({ behavior: "smooth" })
-        }, 100)
+          baseSpiritsRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
       }
     },
     [answers, saveAnswer, visibleQuestions, questions.length, showBaseSpirits],
-  )
+  );
 
-  const handleBack = () => router.push("/")
+  const handleBack = () => router.push("/");
 
   const handleBaseSpiritsToggle = useCallback(
     (spiritId: string) => {
-      toggleBaseSpirit(spiritId, baseSpiritsOptions)
+      toggleBaseSpirit(spiritId, baseSpiritsOptions);
 
       // 选择基酒后自动显示反馈表单
       if (!showFeedbackForm) {
-        setShowFeedbackForm(true)
+        setShowFeedbackForm(true);
         setTimeout(() => {
-          const feedbackForm = document.getElementById("feedback-form")
+          const feedbackForm = document.getElementById("feedback-form");
           if (feedbackForm) {
-            feedbackForm.scrollIntoView({ behavior: "smooth" })
+            feedbackForm.scrollIntoView({ behavior: "smooth" });
           }
-        }, 100)
+        }, 100);
       }
     },
     [toggleBaseSpirit, showFeedbackForm, baseSpiritsOptions],
-  )
+  );
 
   const handleSubmitFeedback = useCallback(async () => {
     try {
-      saveFeedback(localUserFeedback)
-      await submitRequest()
-      router.push("/cocktail/recommendation")
+      saveFeedback(localUserFeedback);
+      await submitRequest();
+      router.push("/cocktail/recommendation");
     } catch (error) {
-      console.error("Error submitting request:", error)
+      console.error("Error submitting request:", error);
     }
-  }, [saveFeedback, submitRequest, router, localUserFeedback])
+  }, [saveFeedback, submitRequest, router, localUserFeedback]);
 
   // 初始化函数 - 只在组件挂载时执行一次
   useEffect(() => {
     if (typeof window !== "undefined" && !initialSetupDone.current) {
-      initialSetupDone.current = true
+      initialSetupDone.current = true;
 
       // 检查是否有 URL 参数指示新会话
-      const isNewSession = searchParams?.get("new") === "true"
+      const isNewSession = searchParams?.get("new") === "true";
 
       // 如果是新会话，清除之前的数据
       if (isNewSession) {
-        resetAll()
-        setVisibleQuestions([1])
-        setShowBaseSpirits(false)
-        setShowFeedbackForm(false)
-        return
+        resetAll();
+        setVisibleQuestions([1]);
+        setShowBaseSpirits(false);
+        setShowFeedbackForm(false);
+        return;
       }
 
       // 加载保存的数据
-      loadSavedData()
+      loadSavedData();
 
       // 设置本地反馈
       if (userFeedback) {
-        setLocalUserFeedback(userFeedback)
+        setLocalUserFeedback(userFeedback);
       }
 
       // 根据已保存的答案设置可见问题
-      const answeredQuestionIds = Object.keys(answers).map(Number)
+      const answeredQuestionIds = Object.keys(answers).map(Number);
       if (answeredQuestionIds.length > 0) {
-        const maxAnsweredId = Math.max(...answeredQuestionIds)
-        const nextVisible = [...new Set([...answeredQuestionIds, maxAnsweredId + 1])].filter(
-          (id) => id <= questions.length,
-        )
+        const maxAnsweredId = Math.max(...answeredQuestionIds);
+        const nextVisible = [
+          ...new Set([...answeredQuestionIds, maxAnsweredId + 1]),
+        ].filter((id) => id <= questions.length);
 
-        setVisibleQuestions(nextVisible)
+        setVisibleQuestions(nextVisible);
 
         // 如果已回答最后一个问题，显示基酒选择部分
         if (maxAnsweredId >= questions.length) {
-          setShowBaseSpirits(true)
+          setShowBaseSpirits(true);
 
           // 如果已选择基酒，显示反馈表单
           if (baseSpirits.length > 0) {
-            setShowFeedbackForm(true)
+            setShowFeedbackForm(true);
           }
         }
       }
     }
-  }, [searchParams, resetAll, loadSavedData, userFeedback, answers, baseSpirits, questions.length])
+  }, [
+    searchParams,
+    resetAll,
+    loadSavedData,
+    userFeedback,
+    answers,
+    baseSpirits,
+    questions.length,
+  ]);
 
   // 当 userFeedback 变化时更新本地状态
   useEffect(() => {
     if (userFeedback && localUserFeedback === "") {
-      setLocalUserFeedback(userFeedback)
+      setLocalUserFeedback(userFeedback);
     }
-  }, [userFeedback, localUserFeedback])
+  }, [userFeedback, localUserFeedback]);
 
   // 问题选项组件
   const QuestionOption = React.memo(
@@ -246,9 +349,9 @@ export default function Questions() {
       isSelected,
       onSelect,
     }: {
-      option: { id: string; text: string; image: string }
-      isSelected: boolean
-      onSelect: () => void
+      option: { id: string; text: string; image: string };
+      isSelected: boolean;
+      onSelect: () => void;
     }) => (
       <div className="transition-all duration-300">
         <div
@@ -272,8 +375,8 @@ export default function Questions() {
         </div>
       </div>
     ),
-  )
-  QuestionOption.displayName = "QuestionOption"
+  );
+  QuestionOption.displayName = "QuestionOption";
 
   return (
     <div className={`container mx-auto px-4 py-8 ${themeClasses}`}>
@@ -304,7 +407,7 @@ export default function Questions() {
               <div
                 key={question.id}
                 ref={(el) => {
-                  questionRefs.current[question.id] = el
+                  questionRefs.current[question.id] = el;
                 }}
                 className={`transition-all duration-500 ${
                   visibleQuestions.includes(question.id)
@@ -312,14 +415,24 @@ export default function Questions() {
                     : "opacity-0 transform translate-y-8 h-0 overflow-hidden"
                 }`}
               >
-                <div className={`mb-6 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}>
+                <div
+                  className={`mb-6 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}
+                >
                   <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10 relative">
-                    <div className={isQuestionAnswered(question.id.toString()) ? "absolute right-6 top-6" : "hidden"}>
+                    <div
+                      className={
+                        isQuestionAnswered(question.id.toString())
+                          ? "absolute right-6 top-6"
+                          : "hidden"
+                      }
+                    >
                       <div className="bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-full p-1.5 animate-pulse">
                         <Check className="h-4 w-4" />
                       </div>
                     </div>
-                    <h3 className={`text-2xl font-bold mb-3 ${textColorClass}`}>{question.title}</h3>
+                    <h3 className={`text-2xl font-bold mb-3 ${textColorClass}`}>
+                      {question.title}
+                    </h3>
                     <p className="text-gray-400">{question.description}</p>
                   </div>
                 </div>
@@ -331,15 +444,21 @@ export default function Questions() {
                       className="transition-all duration-300"
                       style={{
                         animationDelay: `${index * 100}ms`,
-                        animation: visibleQuestions.includes(question.id) ? "fadeIn 0.5s ease-in-out forwards" : "none",
+                        animation: visibleQuestions.includes(question.id)
+                          ? "fadeIn 0.5s ease-in-out forwards"
+                          : "none",
                         opacity: visibleQuestions.includes(question.id) ? 1 : 0,
                       }}
                     >
                       <div
                         className={`cursor-pointer transition-all duration-300 hover:scale-105 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} ${
-                          answers[question.id] === option.id ? "ring-2 ring-pink-500 shadow-lg" : ""
+                          answers[question.id] === option.id
+                            ? "ring-2 ring-pink-500 shadow-lg"
+                            : ""
                         }`}
-                        onClick={() => handleOptionSelect(question.id, option.id)}
+                        onClick={() =>
+                          handleOptionSelect(question.id, option.id)
+                        }
                       >
                         <div className="p-4">
                           <div className="flex flex-col items-center text-center">
@@ -350,7 +469,9 @@ export default function Questions() {
                                 className="w-20 h-20 object-cover rounded-full"
                               />
                             </div>
-                            <h3 className={`font-medium ${textColorClass}`}>{option.text}</h3>
+                            <h3 className={`font-medium ${textColorClass}`}>
+                              {option.text}
+                            </h3>
                           </div>
                         </div>
                       </div>
@@ -362,11 +483,20 @@ export default function Questions() {
           </div>
 
           {/* 基酒选择 */}
-          <div ref={baseSpiritsRef} className={showBaseSpirits ? "mt-12 max-w-3xl" : "hidden"}>
-            <div className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}>
+          <div
+            ref={baseSpiritsRef}
+            className={showBaseSpirits ? "mt-12 max-w-3xl" : "hidden"}
+          >
+            <div
+              className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}
+            >
               <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
-                <h3 className={`text-xl font-bold mb-2 ${textColorClass}`}>{t("questions.availableSpirits")}</h3>
-                <p className="text-gray-400 mb-4">{t("questions.selectSpirits")}</p>
+                <h3 className={`text-xl font-bold mb-2 ${textColorClass}`}>
+                  {t("questions.availableSpirits")}
+                </h3>
+                <p className="text-gray-400 mb-4">
+                  {t("questions.selectSpirits")}
+                </p>
               </div>
               <div className="p-6">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -388,10 +518,14 @@ export default function Questions() {
                               alt={spirit.name}
                               className="w-8 h-8 object-cover rounded-full mr-2"
                             />
-                            <span className={`font-medium ${textColorClass}`}>{spirit.name}</span>
+                            <span className={`font-medium ${textColorClass}`}>
+                              {spirit.name}
+                            </span>
                           </div>
                         ) : (
-                          <span className={`font-medium ${textColorClass}`}>{spirit.name}</span>
+                          <span className={`font-medium ${textColorClass}`}>
+                            {spirit.name}
+                          </span>
                         )}
                         <div
                           className={
@@ -400,10 +534,14 @@ export default function Questions() {
                               : "h-5 w-5 rounded-full bg-white/10 flex items-center justify-center"
                           }
                         >
-                          {baseSpirits.includes(spirit.id) && <Check className="h-3 w-3 text-white" />}
+                          {baseSpirits.includes(spirit.id) && (
+                            <Check className="h-3 w-3 text-white" />
+                          )}
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400">{spirit.description}</p>
+                      <p className="text-xs text-gray-400">
+                        {spirit.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -412,11 +550,20 @@ export default function Questions() {
           </div>
 
           {/* 反馈表单 */}
-          <div id="feedback-form" className={showFeedbackForm ? "mt-12 max-w-3xl" : "hidden"}>
-            <div className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}>
+          <div
+            id="feedback-form"
+            className={showFeedbackForm ? "mt-12 max-w-3xl" : "hidden"}
+          >
+            <div
+              className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}
+            >
               <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
-                <h3 className={`text-xl font-bold mb-2 ${textColorClass}`}>{t("questions.feedback.title")}</h3>
-                <p className="text-gray-400">{t("questions.feedback.description")}</p>
+                <h3 className={`text-xl font-bold mb-2 ${textColorClass}`}>
+                  {t("questions.feedback.title")}
+                </h3>
+                <p className="text-gray-400">
+                  {t("questions.feedback.description")}
+                </p>
               </div>
               <div className="p-6">
                 <textarea
@@ -430,14 +577,18 @@ export default function Questions() {
                 <button
                   onClick={handleSubmitFeedback}
                   className={`bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full flex items-center ${
-                    isLoading ? "opacity-70 cursor-not-allowed" : "hover:scale-105"
+                    isLoading
+                      ? "opacity-70 cursor-not-allowed"
+                      : "hover:scale-105"
                   }`}
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
                       <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
-                      <span className="font-medium">{t("questions.loading")}</span>
+                      <span className="font-medium">
+                        {t("questions.loading")}
+                      </span>
                     </>
                   ) : (
                     <span className="font-medium inline-flex items-center">
@@ -452,5 +603,5 @@ export default function Questions() {
         </div>
       </div>
     </div>
-  )
+  );
 }

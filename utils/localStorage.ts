@@ -10,16 +10,16 @@
  * @returns 解析后的数据或默认值
  */
 export function getFromStorage<T>(key: string, defaultValue: T): T {
-  if (typeof window === "undefined") return defaultValue
+  if (typeof window === "undefined") return defaultValue;
 
   try {
-    const item = localStorage.getItem(key)
-    if (!item) return defaultValue
+    const item = localStorage.getItem(key);
+    if (!item) return defaultValue;
 
-    return JSON.parse(item) as T
+    return JSON.parse(item) as T;
   } catch (error) {
-    console.error(`Error reading ${key} from localStorage:`, error)
-    return defaultValue
+    console.error(`Error reading ${key} from localStorage:`, error);
+    return defaultValue;
   }
 }
 
@@ -29,12 +29,12 @@ export function getFromStorage<T>(key: string, defaultValue: T): T {
  * @param value 要存储的数据
  */
 export function saveToStorage<T>(key: string, value: T): void {
-  if (typeof window === "undefined") return
+  if (typeof window === "undefined") return;
 
   try {
-    localStorage.setItem(key, JSON.stringify(value))
+    localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error(`Error saving ${key} to localStorage:`, error)
+    console.error(`Error saving ${key} to localStorage:`, error);
   }
 }
 
@@ -43,12 +43,12 @@ export function saveToStorage<T>(key: string, value: T): void {
  * @param key 存储键名
  */
 export function removeFromStorage(key: string): void {
-  if (typeof window === "undefined") return
+  if (typeof window === "undefined") return;
 
   try {
-    localStorage.removeItem(key)
+    localStorage.removeItem(key);
   } catch (error) {
-    console.error(`Error removing ${key} from localStorage:`, error)
+    console.error(`Error removing ${key} from localStorage:`, error);
   }
 }
 
@@ -57,13 +57,16 @@ export function removeFromStorage(key: string): void {
  * @param prefix 键名前缀
  */
 export function clearStorageWithPrefix(prefix: string): void {
-  if (typeof window === "undefined") return
+  if (typeof window === "undefined") return;
 
   try {
     Object.keys(localStorage)
       .filter((key) => key.startsWith(prefix))
-      .forEach((key) => localStorage.removeItem(key))
+      .forEach((key) => localStorage.removeItem(key));
   } catch (error) {
-    console.error(`Error clearing localStorage items with prefix ${prefix}:`, error)
+    console.error(
+      `Error clearing localStorage items with prefix ${prefix}:`,
+      error,
+    );
   }
 }

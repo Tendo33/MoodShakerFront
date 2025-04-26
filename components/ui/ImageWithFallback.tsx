@@ -1,26 +1,32 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Image, { type ImageProps } from "next/image"
+import { useState, useEffect } from "react";
+import Image, { type ImageProps } from "next/image";
 
 interface ImageWithFallbackProps extends Omit<ImageProps, "onError"> {
-  fallbackSrc: string
-  fallbackAlt?: string
+  fallbackSrc: string;
+  fallbackAlt?: string;
 }
 
 /**
  * 带有备用图像的图片组件
  * 当主图像加载失败时显示备用图像
  */
-export default function ImageWithFallback({ src, fallbackSrc, alt, fallbackAlt, ...rest }: ImageWithFallbackProps) {
-  const [imgSrc, setImgSrc] = useState(src)
-  const [imgAlt, setImgAlt] = useState(alt)
-  const [isLoading, setIsLoading] = useState(true)
+export default function ImageWithFallback({
+  src,
+  fallbackSrc,
+  alt,
+  fallbackAlt,
+  ...rest
+}: ImageWithFallbackProps) {
+  const [imgSrc, setImgSrc] = useState(src);
+  const [imgAlt, setImgAlt] = useState(alt);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setImgSrc(src)
-    setImgAlt(alt)
-  }, [src, alt])
+    setImgSrc(src);
+    setImgAlt(alt);
+  }, [src, alt]);
 
   return (
     <div className="relative">
@@ -35,11 +41,11 @@ export default function ImageWithFallback({ src, fallbackSrc, alt, fallbackAlt, 
         alt={imgAlt}
         onLoadingComplete={() => setIsLoading(false)}
         onError={() => {
-          setImgSrc(fallbackSrc)
-          if (fallbackAlt) setImgAlt(fallbackAlt)
-          setIsLoading(false)
+          setImgSrc(fallbackSrc);
+          if (fallbackAlt) setImgAlt(fallbackAlt);
+          setIsLoading(false);
         }}
       />
     </div>
-  )
+  );
 }

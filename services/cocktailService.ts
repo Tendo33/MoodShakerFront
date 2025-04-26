@@ -1,4 +1,4 @@
-import type { Cocktail } from "@/api/cocktail"
+import type { Cocktail } from "@/api/cocktail";
 
 // 这是一个简单的服务，用于获取鸡尾酒数据
 // 在实际应用中，这将调用后端API
@@ -8,7 +8,8 @@ const popularCocktails: Record<string, Cocktail> = {
   mojito: {
     name: "莫吉托",
     english_name: "Mojito",
-    description: "莫吉托是一款清爽的朗姆酒鸡尾酒，源自古巴，以薄荷、青柠和苏打水的清新口感著称。",
+    description:
+      "莫吉托是一款清爽的朗姆酒鸡尾酒，源自古巴，以薄荷、青柠和苏打水的清新口感著称。",
     match_reason:
       "这款低酒精度的清爽鸡尾酒非常受欢迎。莫吉托制作简单，不需要专业工具，且口感清新，带有薄荷和青柠的香气。",
     base_spirit: "朗姆酒",
@@ -57,8 +58,10 @@ const popularCocktails: Record<string, Cocktail> = {
   margarita: {
     name: "玛格丽特",
     english_name: "Margarita",
-    description: "玛格丽特是一款经典的龙舌兰鸡尾酒，以其完美平衡的酸甜口感和盐边杯口而闻名。",
-    match_reason: "这款经典鸡尾酒平衡了龙舌兰的烈性与青柠的酸甜，是世界上最受欢迎的鸡尾酒之一。",
+    description:
+      "玛格丽特是一款经典的龙舌兰鸡尾酒，以其完美平衡的酸甜口感和盐边杯口而闻名。",
+    match_reason:
+      "这款经典鸡尾酒平衡了龙舌兰的烈性与青柠的酸甜，是世界上最受欢迎的鸡尾酒之一。",
     base_spirit: "龙舌兰",
     alcohol_level: "中",
     serving_glass: "玛格丽特杯",
@@ -79,7 +82,8 @@ const popularCocktails: Record<string, Cocktail> = {
     steps: [
       {
         step_number: 1,
-        description: "用青柠片润湿杯口，然后将杯口倒扣在盐盘中，使杯口沾上一圈盐。",
+        description:
+          "用青柠片润湿杯口，然后将杯口倒扣在盐盘中，使杯口沾上一圈盐。",
         tips: "只在杯口外侧沾盐，避免盐进入酒中。",
       },
       {
@@ -103,15 +107,22 @@ const popularCocktails: Record<string, Cocktail> = {
   cosmopolitan: {
     name: "大都会",
     english_name: "Cosmopolitan",
-    description: "大都会是一款优雅的伏特加鸡尾酒，以其漂亮的粉红色和蔓越莓的甜酸口感而著名。",
-    match_reason: "这款时尚的鸡尾酒在90年代因《欲望都市》而走红，口感平衡，外观精致。",
+    description:
+      "大都会是一款优雅的伏特加鸡尾酒，以其漂亮的粉红色和蔓越莓的甜酸口感而著名。",
+    match_reason:
+      "这款时尚的鸡尾酒在90年代因《欲望都市》而走红，口感平衡，外观精致。",
     base_spirit: "伏特加",
     alcohol_level: "中",
     serving_glass: "马天尼杯",
     time_required: "5分钟",
     flavor_profiles: ["甜酸", "果香", "清爽"],
     ingredients: [
-      { name: "柑橘伏特加", amount: "40", unit: "ml", substitute: "普通伏特加" },
+      {
+        name: "柑橘伏特加",
+        amount: "40",
+        unit: "ml",
+        substitute: "普通伏特加",
+      },
       { name: "君度橙酒", amount: "15", unit: "ml" },
       { name: "蔓越莓汁", amount: "30", unit: "ml" },
       { name: "新鲜青柠汁", amount: "15", unit: "ml" },
@@ -142,22 +153,22 @@ const popularCocktails: Record<string, Cocktail> = {
       },
     ],
   },
-}
+};
 
 // 根据ID获取鸡尾酒
 export const getCocktailById = async (id: string): Promise<Cocktail | null> => {
   // 在实际应用中，这将是一个API调用
   // 现在，我们只返回模拟数据
-  return popularCocktails[id] || null
-}
+  return popularCocktails[id] || null;
+};
 
 // 获取所有热门鸡尾酒
 export const getPopularCocktails = async (): Promise<Cocktail[]> => {
   // 在实际应用中，这将是一个API调用
-  return Object.values(popularCocktails)
-}
+  return Object.values(popularCocktails);
+};
 
 // 获取热门鸡尾酒的ID
 export const getPopularCocktailIds = (): string[] => {
-  return Object.keys(popularCocktails)
-}
+  return Object.keys(popularCocktails);
+};
