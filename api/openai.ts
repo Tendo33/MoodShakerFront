@@ -3,7 +3,8 @@
 // Environment variables
 const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.NEXT_PUBLIC_OPENAI_BASE_URL;
-const OPENAI_MODEL = process.env.NEXT_PUBLIC_OPENAI_MODEL || "deepseek-v3-250324";
+const OPENAI_MODEL =
+  process.env.NEXT_PUBLIC_OPENAI_MODEL || "deepseek-v3-250324";
 
 // Image generation API
 const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
@@ -54,14 +55,13 @@ function logDetail(
 export async function getChatCompletion(
   messages: { role: "system" | "user" | "assistant"; content: string }[],
   options: {
-    model?: string;
     temperature?: number;
     max_tokens?: number;
   } = {},
 ): Promise<string> {
   const requestId = `req_${Math.random().toString(36).substring(2, 15)}`;
   const startTime = Date.now();
-  const model = options.model || OPENAI_MODEL;
+  const model = OPENAI_MODEL;
 
   logDetail("INFO", `开始请求模型 [${requestId}]`, {
     model,

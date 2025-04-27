@@ -633,7 +633,6 @@ export async function requestCocktailRecommendation(
         { role: "user", content: userMessage },
       ],
       {
-        model: "deepseek-v3-250324",
         temperature: 0.7,
         max_tokens: 2000,
       },
