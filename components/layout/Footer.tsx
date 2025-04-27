@@ -73,7 +73,7 @@ export default function Footer() {
     <footer className="bg-gray-800/90 backdrop-blur-sm border-t border-gray-700/50 pt-12 pb-6">
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Brand Information */}
+          {/* MoodShaker Column */}
           <motion.div
             className="md:col-span-1"
             initial="hidden"
@@ -113,7 +113,7 @@ export default function Footer() {
             </motion.div>
           </motion.div>
 
-          {/* Contact Us */}
+          {/* Contact Us Column */}
           <motion.div
             className="md:col-span-1"
             initial="hidden"

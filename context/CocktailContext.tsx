@@ -33,6 +33,7 @@ const STORAGE_KEYS = {
   RECOMMENDATION: "moodshaker-recommendation",
   SESSION_ID: "moodshaker-session-id",
   REQUEST: "moodshaker-request",
+  IMAGE_DATA: "moodshaker-image-data",
 };
 
 interface SpiritOption {
@@ -129,36 +130,139 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     [answers],
   );
 
-  // Add a function to refresh the image
-  const refreshImage = useCallback(async (): Promise<string | null> => {
-    if (!recommendation) return null;
+  // 保存答案
+  const saveAnswer = useCallback((questionId: string, optionId: string) => {
+    setAnswers((prev) => {
+      const newAnswers = { ...prev, [questionId]: optionId };
+      saveToStorage(STORAGE_KEYS.ANSWERS, newAnswers);
+      return newAnswers;
+    });
+  }, []);
+
+  // 保存反馈
+  const saveFeedback = useCallback((feedback: string) => {
+    setUserFeedback(feedback);
+    saveToStorage(STORAGE_KEYS.FEEDBACK, feedback);
+  }, []);
+
+  // 保存基酒选择
+  const saveBaseSpirits = useCallback((spirits: string[]) => {
+    setBaseSpirits(spirits);
+    saveToStorage(STORAGE_KEYS.BASE_SPIRITS, spirits);
+  }, []);
+
+  // 切换基酒选择
+  const toggleBaseSpirit = useCallback(
+    (spiritId: string, allSpiritsOptions: SpiritOption[]) => {
+      setBaseSpirits((prev) => {
+        let newSpirits: string[];
+        if (spiritId === "all") {
+          // 如果选择"全部"，则选择所有基酒
+          newSpirits = allSpiritsOptions
+            .filter((spirit) => spirit.id !== "all")
+            .map((spirit) => spirit.id);
+        } else {
+          // 如果已经选择了"全部"，则先移除"全部"
+          if (prev.includes("all")) {
+            newSpirits = prev.filter((id) => id !== "all");
+          } else {
+            newSpirits = [...prev];
+          }
+
+          // 切换当前基酒的选择状态
+          if (newSpirits.includes(spiritId)) {
+            newSpirits = newSpirits.filter((id) => id !== spiritId);
+          } else {
+            newSpirits.push(spiritId);
+          }
+
+          // 如果选择了所有基酒，则添加"全部"选项
+          if (
+            newSpirits.length ===
+            allSpiritsOptions.filter((spirit) => spirit.id !== "all").length
+          ) {
+            newSpirits.push("all");
+          }
+        }
+
+        saveToStorage(STORAGE_KEYS.BASE_SPIRITS, newSpirits);
+        return newSpirits;
+      });
+    },
+    [],
+  );
+
+  // 提交请求
+  const submitRequest = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
 
     try {
-      setIsImageLoading(true);
-      console.log(
-        "Refreshing image for:",
-        recommendation.english_name || recommendation.name,
-      );
+      // 获取当前语言
+      const currentLanguage =
+        localStorage.getItem("moodshaker-language") || "en";
 
+      // 构建请求
+      const request: BartenderRequest = {
+        message: userFeedback,
+        alcohol_level: answers["2"] as AlcoholLevel,
+        has_tools: answers["1"] === "custom",
+        difficulty_level: answers["3"] as DifficultyLevel,
+        base_spirits: baseSpirits.filter((id) => id !== "all"),
+        session_id: sessionId,
+      };
+
+      // 保存请求到本地存储
+      saveToStorage(STORAGE_KEYS.REQUEST, request);
+
+      // 根据语言选择调酒师类型
+      const agentType =
+        currentLanguage === "en"
+          ? AgentType.CLASSIC_BARTENDER
+          : AgentType.CREATIVE_BARTENDER;
+
+      // 发送请求
+      const cocktail = await requestCocktailRecommendation(request, agentType);
+
+      // 保存推荐结果
+      setRecommendation(cocktail);
+      saveToStorage(STORAGE_KEYS.RECOMMENDATION, cocktail);
+
+      // 生成图片
+      const imagePrompt = generateImagePrompt(cocktail);
+      const image = await generateCocktailImage(imagePrompt, sessionId);
+      setImageData(image);
+      setImageVersion(Date.now());
+
+      return cocktail;
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [answers, baseSpirits, sessionId, userFeedback]);
+
+  // 刷新图片
+  const refreshImage = useCallback(async () => {
+    if (!recommendation) return null;
+
+    setIsImageLoading(true);
+    try {
+      // 获取当前语言
+      const currentLanguage =
+        localStorage.getItem("moodshaker-language") || "en";
+
+      // 生成新的图片提示
       const imagePrompt = generateImagePrompt(recommendation);
-      const imageUrl = await generateCocktailImage(imagePrompt, sessionId);
-
-      if (imageUrl) {
-        // Add timestamp to ensure it's fresh
-        const timestampedUrl = imageUrl.includes("?")
-          ? `${imageUrl}&_t=${Date.now()}`
-          : `${imageUrl}?_t=${Date.now()}`;
-
-        setImageData(timestampedUrl);
-        setImageVersion(Date.now());
-
-        console.log("DEBUG", "Generated fresh image", { sessionId });
-
-        return timestampedUrl;
-      }
-      return null;
-    } catch (error) {
-      console.error("Error refreshing image:", error);
+      const image = await generateCocktailImage(imagePrompt, sessionId);
+      setImageData(image);
+      setImageVersion(Date.now());
+      return image;
+    } catch (err) {
+      console.error("Failed to refresh image:", err);
       return null;
     } finally {
       setIsImageLoading(false);
@@ -166,289 +270,68 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   }, [recommendation, sessionId]);
 
   // 加载保存的数据
-  const loadSavedData = useCallback((): void => {
-    try {
-      const savedAnswers = getFromStorage<Record<string, string>>(
-        STORAGE_KEYS.ANSWERS,
-        {},
-      );
-      const savedFeedback = getFromStorage<string>(STORAGE_KEYS.FEEDBACK, "");
-      const savedSpirits = getFromStorage<string[]>(
-        STORAGE_KEYS.BASE_SPIRITS,
-        [],
-      );
-      const savedRecommendation = getFromStorage<Cocktail | null>(
-        STORAGE_KEYS.RECOMMENDATION,
-        null,
-      );
-      const savedSessionId = getFromStorage<string>(
-        STORAGE_KEYS.SESSION_ID,
-        "",
-      );
+  const loadSavedData = useCallback(() => {
+    const savedAnswers = getFromStorage<Record<string, string>>(
+      STORAGE_KEYS.ANSWERS,
+      {},
+    );
+    const savedFeedback = getFromStorage<string>(STORAGE_KEYS.FEEDBACK, "");
+    const savedBaseSpirits = getFromStorage<string[]>(
+      STORAGE_KEYS.BASE_SPIRITS,
+      [],
+    );
+    const savedRecommendation = getFromStorage<Cocktail | null>(
+      STORAGE_KEYS.RECOMMENDATION,
+      null,
+    );
+    const savedImageData = getFromStorage<string | null>(
+      STORAGE_KEYS.IMAGE_DATA,
+      null,
+    );
 
-      setAnswers(savedAnswers);
-      setUserFeedback(savedFeedback);
-      setBaseSpirits(savedSpirits);
+    setAnswers(savedAnswers);
+    setUserFeedback(savedFeedback);
+    setBaseSpirits(savedBaseSpirits);
+    if (savedRecommendation) {
       setRecommendation(savedRecommendation);
-
-      // Only update sessionId if it's not already set
-      if (savedSessionId && !sessionId) {
-        setSessionId(savedSessionId);
-      }
-
-      // Check for current image data
-      if (savedSessionId) {
-        const currentImage = getCocktailImage(savedSessionId);
-        if (currentImage) {
-          setImageData(currentImage);
-          setImageVersion(Date.now());
-        }
-      }
-    } catch (e) {
-      console.error("Error loading saved data:", e);
-      setError("加载保存的数据时出错");
     }
-  }, [sessionId]); // Keep sessionId in the dependency array for this function
-
-  // 保存答案
-  const saveAnswer = useCallback(
-    (questionId: string, optionId: string): void => {
-      const newAnswers = { ...answers, [questionId]: optionId };
-      setAnswers(newAnswers);
-      saveToStorage(STORAGE_KEYS.ANSWERS, newAnswers);
-    },
-    [answers],
-  );
-
-  // 保存用户反馈
-  const saveFeedback = useCallback((feedback: string): void => {
-    setUserFeedback(feedback);
-    saveToStorage(STORAGE_KEYS.FEEDBACK, feedback);
-  }, []);
-
-  // 保存基酒选择
-  const saveBaseSpirits = useCallback((spirits: string[]): void => {
-    setBaseSpirits(spirits);
-    saveToStorage(STORAGE_KEYS.BASE_SPIRITS, spirits);
-  }, []);
-
-  // 切换基酒选择
-  const toggleBaseSpirit = useCallback(
-    (spiritId: string, allSpiritsOptions: SpiritOption[]): void => {
-      let newSpirits = [...baseSpirits];
-
-      if (spiritId === "all") {
-        if (baseSpirits.includes("all")) {
-          newSpirits = [];
-        } else {
-          newSpirits = allSpiritsOptions
-            .filter((option) => option.id !== "all")
-            .map((option) => option.id);
-        }
-      } else {
-        if (baseSpirits.includes(spiritId)) {
-          newSpirits = baseSpirits.filter(
-            (id) => id !== spiritId && id !== "all",
-          );
-        } else {
-          newSpirits = [...baseSpirits.filter((id) => id !== "all"), spiritId];
-
-          // 检查是否选择了所有基酒
-          const allOtherSpirits = allSpiritsOptions
-            .filter((option) => option.id !== "all")
-            .map((option) => option.id);
-
-          if (allOtherSpirits.every((id) => newSpirits.includes(id))) {
-            newSpirits.push("all");
-          }
-        }
-      }
-
-      saveBaseSpirits(newSpirits);
-    },
-    [baseSpirits, saveBaseSpirits],
-  );
-
-  // 创建请求对象
-  const createRequestObject = useCallback((): BartenderRequest => {
-    const alcoholLevel = (answers[2] as AlcoholLevel) || AlcoholLevel.MEDIUM;
-    const difficultyLevel =
-      (answers[3] as DifficultyLevel) || DifficultyLevel.MEDIUM;
-    const filteredSpirits = baseSpirits.filter((spirit) => spirit !== "");
-
-    return {
-      message: userFeedback,
-      alcohol_level: alcoholLevel,
-      difficulty_level: difficultyLevel,
-      base_spirits: filteredSpirits.length > 0 ? filteredSpirits : null,
-      session_id: sessionId,
-    };
-  }, [answers, baseSpirits, sessionId, userFeedback]);
-
-  // 提交请求获取推荐
-  const submitRequest = async (): Promise<Cocktail> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Create request object
-      const request = createRequestObject();
-
-      // Save request object
-      saveToStorage(STORAGE_KEYS.REQUEST, request);
-
-      // Determine which bartender type to use
-      const bartenderType =
-        answers[1] === "classic"
-          ? AgentType.CLASSIC_BARTENDER
-          : AgentType.CREATIVE_BARTENDER;
-
-      console.log("Submitting request:", JSON.stringify(request, null, 2));
-      console.log("Using bartender type:", bartenderType);
-
-      // Send request to get cocktail recommendation
-      const result = await requestCocktailRecommendation(
-        request,
-        bartenderType,
-      );
-
-      console.log("Received recommendation:", result);
-
-      if (result) {
-        // Save recommendation result
-        setRecommendation(result);
-        saveToStorage(STORAGE_KEYS.RECOMMENDATION, result);
-
-        // Clear any previous image data
-        if (typeof window !== "undefined" && window.__currentCocktailImage) {
-          window.__currentCocktailImage = undefined;
-        }
-
-        // Generate image using the cocktail name
-        try {
-          setIsImageLoading(true);
-          console.log(
-            "Generating image for:",
-            result.english_name || result.name,
-          );
-          const imagePrompt = generateImagePrompt(result);
-          const imageUrl = await generateCocktailImage(imagePrompt, sessionId);
-
-          if (imageUrl) {
-            // Add timestamp to ensure it's fresh
-            const timestampedUrl = imageUrl.includes("?")
-              ? `${imageUrl}&_t=${Date.now()}`
-              : `${imageUrl}?_t=${Date.now()}`;
-
-            setImageData(timestampedUrl);
-            setImageVersion(Date.now());
-
-            console.log(
-              "DEBUG",
-              "Generated fresh image for new recommendation",
-              {
-                sessionId,
-                cocktailName: result.name,
-              },
-            );
-          }
-        } catch (imageError) {
-          console.error("Error generating image:", imageError);
-          // Continue even if image generation fails
-        } finally {
-          setIsImageLoading(false);
-        }
-      }
-
-      return result;
-    } catch (e) {
-      console.error("Error submitting request:", e);
-      setError(
-        `获取推荐时出错: ${e instanceof Error ? e.message : "未知错误"}`,
-      );
-      throw e;
-    } finally {
-      setIsLoading(false);
+    if (savedImageData) {
+      setImageData(savedImageData);
     }
-  };
+  }, []);
 
   // 重置所有数据
-  const resetAll = useCallback((): void => {
+  const resetAll = useCallback(() => {
     setAnswers({});
     setUserFeedback("");
     setBaseSpirits([]);
     setRecommendation(null);
     setImageData(null);
     setError(null);
-    setImageVersion(Date.now());
-
-    // Generate new session ID
-    const newSessionId = `session-${Math.random().toString(36).substring(2, 15)}`;
-    setSessionId(newSessionId);
-    saveToStorage(STORAGE_KEYS.SESSION_ID, newSessionId);
-
-    // Clear current image data
-    if (typeof window !== "undefined" && window.__currentCocktailImage) {
-      window.__currentCocktailImage = undefined;
-    }
-
-    // Clear all localStorage items with the moodshaker prefix
-    if (typeof window !== "undefined") {
-      // Then clear all other moodshaker data
-      clearStorageWithPrefix("moodshaker-");
-
-      // Log the cleanup for debugging
-      console.log("DEBUG", "Reset all data and cleared storage", {
-        newSessionId,
-      });
-    }
+    clearStorageWithPrefix("moodshaker-");
   }, []);
 
-  // Include setIsImageLoading and refreshImage in the contextValue
-  const contextValue = useMemo(
-    () => ({
-      answers,
-      userFeedback,
-      baseSpirits,
-      recommendation,
-      imageData,
-      isLoading,
-      isImageLoading,
-      error,
-      progressPercentage,
-      loadSavedData,
-      saveAnswer,
-      saveFeedback,
-      saveBaseSpirits,
-      toggleBaseSpirit,
-      submitRequest,
-      isQuestionAnswered,
-      resetAll,
-      setIsImageLoading,
-      refreshImage,
-    }),
-    [
-      answers,
-      userFeedback,
-      baseSpirits,
-      recommendation,
-      imageData,
-      isLoading,
-      isImageLoading,
-      error,
-      progressPercentage,
-      loadSavedData,
-      saveAnswer,
-      saveFeedback,
-      saveBaseSpirits,
-      toggleBaseSpirit,
-      isQuestionAnswered,
-      resetAll,
-      setIsImageLoading,
-      refreshImage,
-      imageVersion, // Include imageVersion in dependencies to ensure context updates when image refreshes
-    ],
-  );
+  const contextValue = {
+    answers,
+    userFeedback,
+    baseSpirits,
+    recommendation,
+    imageData,
+    isLoading,
+    isImageLoading,
+    error,
+    progressPercentage,
+    loadSavedData,
+    saveAnswer,
+    saveFeedback,
+    saveBaseSpirits,
+    toggleBaseSpirit,
+    submitRequest,
+    isQuestionAnswered,
+    resetAll,
+    setIsImageLoading,
+    refreshImage,
+  };
 
   return (
     <CocktailContext.Provider value={contextValue}>

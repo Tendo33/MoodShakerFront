@@ -33,7 +33,7 @@ export default function Questions() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { theme } = useTheme();
-  const { t, locale, getPathWithLanguage } = useLanguage(); // Move the hook call to the top level
+  const { t, locale, getPathWithLanguage } = useLanguage();
   const {
     answers,
     userFeedback,
@@ -492,9 +492,7 @@ export default function Questions() {
 
         <div className="flex-1" ref={containerRef}>
           {/* 问题列表 */}
-          <div className="space-y-24 max-w-3xl">
-            {" "}
-            {/* Increased spacing between questions */}
+          <div className="space-y-12">
             {questions.map((question) => (
               <div
                 key={question.id}
@@ -530,7 +528,7 @@ export default function Questions() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
                   {question.options.map((option, index) => (
                     <div
                       key={option.id}
@@ -543,31 +541,13 @@ export default function Questions() {
                         opacity: visibleQuestions.includes(question.id) ? 1 : 0,
                       }}
                     >
-                      <div
-                        className={`cursor-pointer transition-all duration-300 hover:scale-105 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} ${
-                          answers[question.id] === option.id
-                            ? "ring-2 ring-pink-500 shadow-lg"
-                            : ""
-                        }`}
-                        onClick={() =>
+                      <QuestionOption
+                        option={option}
+                        isSelected={answers[question.id] === option.id}
+                        onSelect={() =>
                           handleOptionSelect(question.id, option.id)
                         }
-                      >
-                        <div className="p-4">
-                          <div className="flex flex-col items-center text-center">
-                            <div className="mb-3 rounded-full overflow-hidden bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-2">
-                              <img
-                                src={option.image || "/placeholder.svg"}
-                                alt={option.text}
-                                className="w-20 h-20 object-cover rounded-full"
-                              />
-                            </div>
-                            <h3 className={`font-medium ${textColorClass}`}>
-                              {option.text}
-                            </h3>
-                          </div>
-                        </div>
-                      </div>
+                      />
                     </div>
                   ))}
                 </div>
@@ -595,7 +575,7 @@ export default function Questions() {
                 </p>
               </div>
               <div className="p-6">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {baseSpiritsOptions.map((spirit) => (
                     <div
                       key={spirit.id}
@@ -647,7 +627,6 @@ export default function Questions() {
 
           {/* 反馈表单 */}
           <div
-            id="feedback-form"
             ref={feedbackFormRef}
             className={
               showFeedbackForm ? "mt-24 max-w-3xl scroll-mt-24" : "hidden"
@@ -678,7 +657,7 @@ export default function Questions() {
                   className={`bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full flex items-center ${
                     isLoading || localLoading
                       ? "opacity-70 cursor-not-allowed"
-                      : "hover:scale-105"
+                      : ""
                   }`}
                   disabled={isLoading || localLoading}
                 >
@@ -692,7 +671,6 @@ export default function Questions() {
                   ) : (
                     <span className="font-medium inline-flex items-center">
                       {t("questions.submit")}
-                      <ArrowRight className="ml-2 h-5 w-5" />
                     </span>
                   )}
                 </button>
