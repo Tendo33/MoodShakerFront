@@ -3,10 +3,12 @@
 // Environment variables
 const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.NEXT_PUBLIC_OPENAI_BASE_URL;
+const OPENAI_MODEL = process.env.NEXT_PUBLIC_OPENAI_MODEL || "deepseek-v3-250324";
 
 // Image generation API
 const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
 const IMAGE_API_KEY = process.env.NEXT_PUBLIC_IMAGE_API_KEY;
+const IMAGE_MODEL = process.env.NEXT_PUBLIC_IMAGE_MODEL || "Kwai-Kolors/Kolors";
 
 /**
  * 格式化日志消息
@@ -59,7 +61,7 @@ export async function getChatCompletion(
 ): Promise<string> {
   const requestId = `req_${Math.random().toString(36).substring(2, 15)}`;
   const startTime = Date.now();
-  const model = options.model || "deepseek-v3-250324";
+  const model = options.model || OPENAI_MODEL;
 
   logDetail("INFO", `开始请求模型 [${requestId}]`, {
     model,
@@ -182,10 +184,8 @@ export async function generateImage(
     }
 
     const seed = options.seed || Math.floor(Math.random() * 4999999999);
-
-    // 修改为使用用户示例中的模型
     const requestBody = {
-      model: "Kwai-Kolors/Kolors", // 更改为用户示例中的模型
+      model: IMAGE_MODEL,
       prompt,
       negative_prompt: options.negative_prompt || "",
       image_size: options.image_size || "1024x1024",
