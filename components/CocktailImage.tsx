@@ -21,24 +21,34 @@ const CocktailImage = React.memo(
   }: CocktailImageProps) => {
     const [imageSrc, setImageSrc] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    // Add a unique key to force re-render when imageData changes
+    const [imageKey, setImageKey] = useState<string>(Date.now().toString());
 
     // Generate a reliable placeholder URL
     const placeholderUrl = `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(cocktailName || "cocktail")}`;
 
     useEffect(() => {
       setIsLoading(true);
+      // Generate a new image key whenever imageData changes
+      setImageKey(Date.now().toString());
 
       // Determine the source based on available data
       let sourceToUse: string | null = null;
 
       if (cocktailId && staticCocktailImages[cocktailId]) {
-        sourceToUse = staticCocktailImages[cocktailId];
+        // For static images, add a cache-busting parameter
+        sourceToUse = `${staticCocktailImages[cocktailId]}?nocache=${Date.now()}`;
       } else if (imageData) {
-        sourceToUse = imageData;
+        // Always add a cache-busting parameter
+        const timestamp = Date.now();
+        sourceToUse = imageData.includes("?")
+          ? `${imageData}&_t=${timestamp}`
+          : `${imageData}?_t=${timestamp}`;
       }
 
       if (!sourceToUse) {
-        setImageSrc(placeholderUrl);
+        // Add cache-busting to placeholder as well
+        setImageSrc(`${placeholderUrl}&_t=${Date.now()}`);
         setIsLoading(false);
         return;
       }
@@ -50,17 +60,25 @@ const CocktailImage = React.memo(
         return;
       }
 
-      // Load the image
+      // Load the image with cache prevention
       const img = new Image();
+
+      // Prevent browser caching
+      img.setAttribute("crossOrigin", "anonymous");
+
       img.onload = () => {
         setImageSrc(sourceToUse);
         setIsLoading(false);
       };
+
       img.onerror = () => {
         console.error("Failed to load image:", sourceToUse);
-        setImageSrc(placeholderUrl);
+        // Add cache-busting to placeholder on error
+        setImageSrc(`${placeholderUrl}&_t=${Date.now()}`);
         setIsLoading(false);
       };
+
+      // Set the src after setting up event handlers
       img.src = sourceToUse;
     }, [cocktailId, imageData, staticCocktailImages, placeholderUrl]);
 
@@ -83,11 +101,22 @@ const CocktailImage = React.memo(
 
     return (
       <div className="group overflow-hidden h-full w-full">
+        {/* Use the key prop to force re-render when image changes */}
         <img
-          src={imageSrc || placeholderUrl}
+          key={imageKey}
+          src={imageSrc || `${placeholderUrl}&_t=${Date.now()}`}
           alt={cocktailName ?? "Cocktail image"}
           className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 animate-fadeIn"
           loading="lazy"
+          // Prevent browser caching
+          onError={(e) => {
+            // If image fails to load, try with a new cache-busting parameter
+            const target = e.currentTarget;
+            const newSrc = `${placeholderUrl}&_t=${Date.now()}`;
+            if (target.src !== newSrc) {
+              target.src = newSrc;
+            }
+          }}
         />
       </div>
     );

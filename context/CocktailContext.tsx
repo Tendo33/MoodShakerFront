@@ -63,6 +63,7 @@ interface CocktailContextType {
   isQuestionAnswered: (questionId: string) => boolean;
   resetAll: () => void;
   setIsImageLoading: (loading: boolean) => void;
+  refreshImage: () => Promise<string | null>;
 }
 
 const CocktailContext = createContext<CocktailContextType | undefined>(
@@ -84,6 +85,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string>("");
+  const [imageVersion, setImageVersion] = useState<number>(Date.now());
 
   // 初始化会话ID
   useEffect(() => {
@@ -117,6 +119,42 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     [answers],
   );
 
+  // Add a function to refresh the image
+  const refreshImage = useCallback(async (): Promise<string | null> => {
+    if (!recommendation) return null;
+
+    try {
+      setIsImageLoading(true);
+      console.log(
+        "Refreshing image for:",
+        recommendation.english_name || recommendation.name,
+      );
+
+      const imagePrompt = generateImagePrompt(recommendation);
+      const imageUrl = await generateCocktailImage(imagePrompt, sessionId);
+
+      if (imageUrl) {
+        // Add timestamp to ensure it's fresh
+        const timestampedUrl = imageUrl.includes("?")
+          ? `${imageUrl}&_t=${Date.now()}`
+          : `${imageUrl}?_t=${Date.now()}`;
+
+        setImageData(timestampedUrl);
+        setImageVersion(Date.now());
+
+        console.log("DEBUG", "Generated fresh image", { sessionId });
+
+        return timestampedUrl;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error refreshing image:", error);
+      return null;
+    } finally {
+      setIsImageLoading(false);
+    }
+  }, [recommendation, sessionId]);
+
   // 加载保存的数据
   const loadSavedData = useCallback((): void => {
     try {
@@ -148,11 +186,12 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         setSessionId(savedSessionId);
       }
 
-      // Check for image data
+      // Check for current image data
       if (savedSessionId) {
-        const savedImage = getCocktailImage(savedSessionId);
-        if (savedImage) {
-          setImageData(savedImage);
+        const currentImage = getCocktailImage(savedSessionId);
+        if (currentImage) {
+          setImageData(currentImage);
+          setImageVersion(Date.now());
         }
       }
     } catch (e) {
@@ -270,8 +309,14 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         setRecommendation(result);
         saveToStorage(STORAGE_KEYS.RECOMMENDATION, result);
 
+        // Clear any previous image data
+        if (typeof window !== "undefined" && window.__currentCocktailImage) {
+          window.__currentCocktailImage = undefined;
+        }
+
         // Generate image using the cocktail name
         try {
+          setIsImageLoading(true);
           console.log(
             "Generating image for:",
             result.english_name || result.name,
@@ -280,15 +325,28 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
           const imageUrl = await generateCocktailImage(imagePrompt, sessionId);
 
           if (imageUrl) {
-            setImageData(imageUrl);
-            // Save image URL to localStorage
-            if (typeof window !== "undefined") {
-              localStorage.setItem(`moodshaker-image-${sessionId}`, imageUrl);
-            }
+            // Add timestamp to ensure it's fresh
+            const timestampedUrl = imageUrl.includes("?")
+              ? `${imageUrl}&_t=${Date.now()}`
+              : `${imageUrl}?_t=${Date.now()}`;
+
+            setImageData(timestampedUrl);
+            setImageVersion(Date.now());
+
+            console.log(
+              "DEBUG",
+              "Generated fresh image for new recommendation",
+              {
+                sessionId,
+                cocktailName: result.name,
+              },
+            );
           }
         } catch (imageError) {
           console.error("Error generating image:", imageError);
           // Continue even if image generation fails
+        } finally {
+          setIsImageLoading(false);
         }
       }
 
@@ -304,9 +362,6 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     }
   };
 
-  // Remove the startImagePolling function since we're not using polling anymore
-  // Instead, we'll directly set the image data when it's available
-
   // 重置所有数据
   const resetAll = useCallback((): void => {
     setAnswers({});
@@ -315,17 +370,31 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     setRecommendation(null);
     setImageData(null);
     setError(null);
+    setImageVersion(Date.now());
 
     // Generate new session ID
     const newSessionId = `session-${Math.random().toString(36).substring(2, 15)}`;
     setSessionId(newSessionId);
     saveToStorage(STORAGE_KEYS.SESSION_ID, newSessionId);
 
-    // Clear local storage
-    clearStorageWithPrefix("moodshaker-");
+    // Clear current image data
+    if (typeof window !== "undefined" && window.__currentCocktailImage) {
+      window.__currentCocktailImage = undefined;
+    }
+
+    // Clear all localStorage items with the moodshaker prefix
+    if (typeof window !== "undefined") {
+      // Then clear all other moodshaker data
+      clearStorageWithPrefix("moodshaker-");
+
+      // Log the cleanup for debugging
+      console.log("DEBUG", "Reset all data and cleared storage", {
+        newSessionId,
+      });
+    }
   }, []);
 
-  // Include setIsImageLoading in the contextValue
+  // Include setIsImageLoading and refreshImage in the contextValue
   const contextValue = useMemo(
     () => ({
       answers,
@@ -346,6 +415,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       isQuestionAnswered,
       resetAll,
       setIsImageLoading,
+      refreshImage,
     }),
     [
       answers,
@@ -365,6 +435,8 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       isQuestionAnswered,
       resetAll,
       setIsImageLoading,
+      refreshImage,
+      imageVersion, // Include imageVersion in dependencies to ensure context updates when image refreshes
     ],
   );
 

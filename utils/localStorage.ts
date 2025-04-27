@@ -60,9 +60,23 @@ export function clearStorageWithPrefix(prefix: string): void {
   if (typeof window === "undefined") return;
 
   try {
-    Object.keys(localStorage)
-      .filter((key) => key.startsWith(prefix))
-      .forEach((key) => localStorage.removeItem(key));
+    const keysToRemove: string[] = [];
+
+    // First collect all keys to remove
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith(prefix)) {
+        keysToRemove.push(key);
+      }
+    });
+
+    // Then remove them
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+    });
+
+    console.log(
+      `Cleared ${keysToRemove.length} localStorage items with prefix ${prefix}`,
+    );
   } catch (error) {
     console.error(
       `Error clearing localStorage items with prefix ${prefix}:`,

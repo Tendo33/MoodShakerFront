@@ -33,7 +33,7 @@ export default function Questions() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { theme } = useTheme();
-  const { t, locale } = useLanguage();
+  const { t, locale, getPathWithLanguage } = useLanguage(); // Move the hook call to the top level
   const {
     answers,
     userFeedback,
@@ -49,14 +49,22 @@ export default function Questions() {
     resetAll,
   } = useCocktail();
 
+  // Add local loading state instead of using setIsLoading from context
+  const [localLoading, setLocalLoading] = useState(false);
   const [visibleQuestions, setVisibleQuestions] = useState<number[]>([1]);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [showBaseSpirits, setShowBaseSpirits] = useState(false);
   const questionRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const baseSpiritsRef = useRef<HTMLDivElement | null>(null);
+  const feedbackFormRef = useRef<HTMLDivElement | null>(null);
   const [localUserFeedback, setLocalUserFeedback] = useState("");
   const [animateProgress, setAnimateProgress] = useState(false);
   const initialSetupDone = useRef(false);
+
+  // Add state to track the currently active question for better scrolling
+  const [activeQuestionId, setActiveQuestionId] = useState(1);
+  // Add ref for the container to calculate scroll position
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // 使用useMemo优化计算属性
   const themeClasses = useMemo(
@@ -219,6 +227,26 @@ export default function Questions() {
     [locale],
   );
 
+  // Improved scroll function with offset calculation and better timing
+  const scrollToElement = useCallback(
+    (element: HTMLElement | null, offset = 20) => {
+      if (!element) return;
+
+      // Calculate the element's position relative to the viewport
+      const rect = element.getBoundingClientRect();
+
+      // Calculate the scroll position that would place the element at the top with offset
+      const scrollPosition = window.pageYOffset + rect.top - offset;
+
+      // Animate the scroll with a smoother easing
+      window.scrollTo({
+        top: scrollPosition,
+        behavior: "smooth",
+      });
+    },
+    [],
+  );
+
   const handleOptionSelect = useCallback(
     (questionId: number, optionId: string) => {
       // 如果已经选择了相同的选项，不做任何操作
@@ -231,53 +259,96 @@ export default function Questions() {
       // 显示下一个问题或基酒选择部分
       const nextQuestionId = questionId + 1;
       if (nextQuestionId <= questions.length) {
+        setActiveQuestionId(nextQuestionId);
+
         if (!visibleQuestions.includes(nextQuestionId)) {
           setVisibleQuestions((prev) => [...prev, nextQuestionId]);
+
+          // Use a longer timeout to ensure DOM updates are complete
           setTimeout(() => {
-            questionRefs.current[nextQuestionId]?.scrollIntoView({
-              behavior: "smooth",
-            });
+            const nextElement = questionRefs.current[nextQuestionId];
+            scrollToElement(nextElement, 80); // Use a larger offset for better visibility
+          }, 300);
+        } else {
+          // If question is already visible, just scroll to it
+          setTimeout(() => {
+            const nextElement = questionRefs.current[nextQuestionId];
+            scrollToElement(nextElement, 80);
           }, 100);
         }
       } else if (questionId === questions.length && !showBaseSpirits) {
         setShowBaseSpirits(true);
         setTimeout(() => {
-          baseSpiritsRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+          scrollToElement(baseSpiritsRef.current, 80);
+        }, 300);
       }
     },
-    [answers, saveAnswer, visibleQuestions, questions.length, showBaseSpirits],
+    [
+      answers,
+      saveAnswer,
+      visibleQuestions,
+      questions.length,
+      showBaseSpirits,
+      scrollToElement,
+    ],
   );
 
-  const handleBack = () => router.push("/");
+  // Fixed: Now using getPathWithLanguage from the top-level hook call
+  const handleBack = () => {
+    router.push(getPathWithLanguage("/"));
+  };
 
   const handleBaseSpiritsToggle = useCallback(
     (spiritId: string) => {
       toggleBaseSpirit(spiritId, baseSpiritsOptions);
 
       // 选择基酒后自动显示反馈表单
-      if (!showFeedbackForm) {
-        setShowFeedbackForm(true);
-        setTimeout(() => {
-          const feedbackForm = document.getElementById("feedback-form");
-          if (feedbackForm) {
-            feedbackForm.scrollIntoView({ behavior: "smooth" });
-          }
-        }, 100);
-      }
+      setShowFeedbackForm(true);
+
+      // Scroll to feedback form after a short delay
+      setTimeout(() => {
+        scrollToElement(feedbackFormRef.current, 80);
+      }, 300);
     },
-    [toggleBaseSpirit, showFeedbackForm, baseSpiritsOptions],
+    [toggleBaseSpirit, baseSpiritsOptions, scrollToElement],
   );
 
+  // Update the handleSubmitFeedback function to use localLoading instead of setIsLoading
   const handleSubmitFeedback = useCallback(async () => {
     try {
+      // Use local loading state
+      setLocalLoading(true);
+
+      // First save the feedback
       saveFeedback(localUserFeedback);
-      await submitRequest();
-      router.push("/cocktail/recommendation");
+
+      // Then submit the request and wait for it to complete
+      const result = await submitRequest();
+
+      // Log the result for debugging
+      console.log(
+        "Request submitted successfully, navigating to recommendation page",
+        {
+          resultName: result.name,
+        },
+      );
+
+      // Add a small delay to ensure all state updates are processed
+      setTimeout(() => {
+        router.push(getPathWithLanguage("/cocktail/recommendation"));
+      }, 100);
     } catch (error) {
       console.error("Error submitting request:", error);
+      // Reset loading state on error
+      setLocalLoading(false);
     }
-  }, [saveFeedback, submitRequest, router, localUserFeedback]);
+  }, [
+    saveFeedback,
+    submitRequest,
+    router,
+    localUserFeedback,
+    getPathWithLanguage,
+  ]);
 
   // 初始化函数 - 只在组件挂载时执行一次
   useEffect(() => {
@@ -293,6 +364,7 @@ export default function Questions() {
         setVisibleQuestions([1]);
         setShowBaseSpirits(false);
         setShowFeedbackForm(false);
+        setActiveQuestionId(1);
         return;
       }
 
@@ -313,6 +385,11 @@ export default function Questions() {
         ].filter((id) => id <= questions.length);
 
         setVisibleQuestions(nextVisible);
+        setActiveQuestionId(
+          maxAnsweredId + 1 <= questions.length
+            ? maxAnsweredId + 1
+            : maxAnsweredId,
+        );
 
         // 如果已回答最后一个问题，显示基酒选择部分
         if (maxAnsweredId >= questions.length) {
@@ -341,6 +418,19 @@ export default function Questions() {
       setLocalUserFeedback(userFeedback);
     }
   }, [userFeedback, localUserFeedback]);
+
+  // Add effect to handle initial scroll position based on active question
+  useEffect(() => {
+    if (initialSetupDone.current && activeQuestionId > 0) {
+      const activeElement = questionRefs.current[activeQuestionId];
+      if (activeElement) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          scrollToElement(activeElement, 80);
+        }, 300);
+      }
+    }
+  }, [activeQuestionId, scrollToElement]);
 
   // 问题选项组件
   const QuestionOption = React.memo(
@@ -400,20 +490,23 @@ export default function Questions() {
           </div>
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1" ref={containerRef}>
           {/* 问题列表 */}
-          <div className="space-y-12 max-w-3xl">
+          <div className="space-y-24 max-w-3xl">
+            {" "}
+            {/* Increased spacing between questions */}
             {questions.map((question) => (
               <div
                 key={question.id}
                 ref={(el) => {
                   questionRefs.current[question.id] = el;
                 }}
-                className={`transition-all duration-500 ${
+                className={`transition-all duration-500 scroll-mt-24 ${
                   visibleQuestions.includes(question.id)
                     ? "opacity-100 transform translate-y-0"
                     : "opacity-0 transform translate-y-8 h-0 overflow-hidden"
                 }`}
+                id={`question-${question.id}`}
               >
                 <div
                   className={`mb-6 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}
@@ -485,7 +578,10 @@ export default function Questions() {
           {/* 基酒选择 */}
           <div
             ref={baseSpiritsRef}
-            className={showBaseSpirits ? "mt-12 max-w-3xl" : "hidden"}
+            className={
+              showBaseSpirits ? "mt-24 max-w-3xl scroll-mt-24" : "hidden"
+            }
+            id="base-spirits-section"
           >
             <div
               className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}
@@ -552,7 +648,10 @@ export default function Questions() {
           {/* 反馈表单 */}
           <div
             id="feedback-form"
-            className={showFeedbackForm ? "mt-12 max-w-3xl" : "hidden"}
+            ref={feedbackFormRef}
+            className={
+              showFeedbackForm ? "mt-24 max-w-3xl scroll-mt-24" : "hidden"
+            }
           >
             <div
               className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}
@@ -577,13 +676,13 @@ export default function Questions() {
                 <button
                   onClick={handleSubmitFeedback}
                   className={`bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full flex items-center ${
-                    isLoading
+                    isLoading || localLoading
                       ? "opacity-70 cursor-not-allowed"
                       : "hover:scale-105"
                   }`}
-                  disabled={isLoading}
+                  disabled={isLoading || localLoading}
                 >
-                  {isLoading ? (
+                  {isLoading || localLoading ? (
                     <>
                       <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
                       <span className="font-medium">

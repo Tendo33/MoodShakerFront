@@ -15,6 +15,7 @@ import {
   ChevronUp,
   Printer,
   BookmarkPlus,
+  RefreshCcw,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useCocktail } from "@/context/CocktailContext";
@@ -62,13 +63,16 @@ export default function CocktailRecommendation() {
   const searchParams = useSearchParams();
   const cocktailId = searchParams?.get("id");
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, getPathWithLanguage } = useLanguage();
   const {
     recommendation: contextCocktail,
     userFeedback,
     imageData,
     isLoading: isContextLoading,
+    isImageLoading,
     loadSavedData,
+    refreshImage,
+    setIsImageLoading,
   } = useCocktail();
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
@@ -79,6 +83,7 @@ export default function CocktailRecommendation() {
   const [expandedSection, setExpandedSection] = useState<string | null>(
     "steps",
   ); // Default expanded section
+  const [isRefreshingImage, setIsRefreshingImage] = useState(false);
 
   // Optimize computed properties with useMemo
   const themeClasses = useMemo(
@@ -102,7 +107,9 @@ export default function CocktailRecommendation() {
   const gradientText =
     "bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent";
 
-  const handleBack = () => router.push("/");
+  const handleBack = () => {
+    router.push(getPathWithLanguage("/"));
+  };
 
   const handleTryAgain = () => {
     // Clear local storage and restart the question flow
@@ -112,7 +119,7 @@ export default function CocktailRecommendation() {
       localStorage.removeItem("moodshaker-recommendation");
       localStorage.removeItem("moodshaker-base-spirits");
     }
-    router.push("/questions");
+    router.push(getPathWithLanguage("/questions"));
   };
 
   const handleShare = () => {
@@ -151,6 +158,20 @@ export default function CocktailRecommendation() {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
+  // Handle image refresh
+  const handleRefreshImage = async () => {
+    if (isRefreshingImage) return;
+
+    setIsRefreshingImage(true);
+    try {
+      await refreshImage();
+    } catch (error) {
+      console.error("Failed to refresh image:", error);
+    } finally {
+      setIsRefreshingImage(false);
+    }
+  };
+
   // Load cocktail data
   useEffect(() => {
     if (cocktailId) {
@@ -164,12 +185,51 @@ export default function CocktailRecommendation() {
         })
         .catch(() => setIsLoading(false));
     } else if (!cocktail) {
+      // Always load fresh data from storage
       loadSavedData();
+
+      // Log the loaded data for debugging
+      console.log("DEBUG", "Loaded data in recommendation page", {
+        hasContextCocktail: !!contextCocktail,
+        hasImageData: !!imageData,
+        cocktailName: contextCocktail?.name,
+      });
+
+      // Set the cocktail from context
       setCocktail(contextCocktail);
+
       // Add a small delay before showing animations
       setTimeout(() => setIsPageLoaded(true), 100);
     }
-  }, [cocktailId, contextCocktail, loadSavedData, cocktail]);
+  }, [
+    cocktailId,
+    contextCocktail,
+    loadSavedData,
+    cocktail,
+    getPathWithLanguage,
+    imageData,
+  ]);
+
+  // Add a useEffect to refresh the component when it mounts
+  useEffect(() => {
+    // This will ensure we're always showing the latest data
+    const checkForUpdates = () => {
+      if (!cocktailId && contextCocktail && contextCocktail !== cocktail) {
+        console.log("DEBUG", "Updating cocktail from context", {
+          oldName: cocktail?.name,
+          newName: contextCocktail.name,
+        });
+        setCocktail(contextCocktail);
+      }
+    };
+
+    checkForUpdates();
+
+    // Set up an interval to check for updates (useful if the user navigates back and forth)
+    const intervalId = setInterval(checkForUpdates, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [contextCocktail, cocktail, cocktailId]);
 
   // Show loading state
   if ((cocktailId && isLoading) || (!cocktailId && isContextLoading)) {
@@ -353,6 +413,32 @@ export default function CocktailRecommendation() {
                   cocktailName={cocktail?.name}
                   staticCocktailImages={staticCocktailImages}
                 />
+
+                {/* Add refresh image button */}
+                <motion.button
+                  className="absolute bottom-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/70 transition-colors"
+                  onClick={handleRefreshImage}
+                  disabled={isRefreshingImage || isImageLoading}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                >
+                  <RefreshCcw
+                    className={`h-5 w-5 ${isRefreshingImage || isImageLoading ? "animate-spin" : ""}`}
+                  />
+                </motion.button>
+
+                {/* Loading overlay for image */}
+                {(isRefreshingImage || isImageLoading) && (
+                  <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto mb-2"></div>
+                      <p>{t("recommendation.imageLoading")}</p>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             </motion.div>
 
