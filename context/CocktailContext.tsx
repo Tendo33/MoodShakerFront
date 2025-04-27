@@ -75,7 +75,6 @@ interface CocktailProviderProps {
 }
 
 export const CocktailProvider = ({ children }: CocktailProviderProps) => {
-  // 状态
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [userFeedback, setUserFeedback] = useState<string>("");
   const [baseSpirits, setBaseSpirits] = useState<string[]>([]);
@@ -84,8 +83,19 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string>("");
-  const [imageVersion, setImageVersion] = useState<number>(Date.now());
+  const [sessionId, setSessionId] = useState<string>(() => {
+    // Use a stable initial session ID
+    if (typeof window === "undefined") return "server-session";
+    return getFromStorage(
+      STORAGE_KEYS.SESSION_ID,
+      `session-${Math.random().toString(36).substring(2, 15)}`,
+    );
+  });
+  const [imageVersion, setImageVersion] = useState<number>(() => {
+    // Use a stable initial version
+    if (typeof window === "undefined") return 0;
+    return Date.now();
+  });
 
   // 初始化会话ID
   useEffect(() => {

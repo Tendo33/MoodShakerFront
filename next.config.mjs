@@ -31,6 +31,22 @@ const nextConfig = {
       },
     ];
   },
+  // 添加重写规则，将静态资源请求重定向到根路径
+  async rewrites() {
+    return [
+      {
+        source: "/:lang/:path*",
+        destination: "/:path*",
+        has: [
+          {
+            type: "header",
+            key: "accept",
+            value: "image/.*",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

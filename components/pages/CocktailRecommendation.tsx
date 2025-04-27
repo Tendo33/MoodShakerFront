@@ -408,7 +408,7 @@ export default function CocktailRecommendation() {
                 transition={{ duration: 0.3 }}
               >
                 <CocktailImage
-                  cocktailId={cocktailId}
+                  cocktailId={cocktailId ?? undefined}
                   imageData={imageData}
                   cocktailName={cocktail?.name}
                   staticCocktailImages={staticCocktailImages}

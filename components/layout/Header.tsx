@@ -14,9 +14,11 @@ export default function Header() {
   const { t, language, getPathWithLanguage } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Handle scroll effect
+  // Handle scroll effect - only run on client side
   useEffect(() => {
+    setIsMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -48,6 +50,11 @@ export default function Header() {
   // Get the correct home link based on language
   const homeLink = getPathWithLanguage("/");
   const questionsLink = getPathWithLanguage("/questions");
+
+  // Don't render anything until client-side hydration is complete
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <header

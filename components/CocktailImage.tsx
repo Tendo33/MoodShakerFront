@@ -21,16 +21,19 @@ const CocktailImage = React.memo(
   }: CocktailImageProps) => {
     const [imageSrc, setImageSrc] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    // Add a unique key to force re-render when imageData changes
-    const [imageKey, setImageKey] = useState<string>(Date.now().toString());
+    const [imageKey, setImageKey] = useState<string>(
+      () =>
+        // Use a stable key based on props instead of Date.now()
+        `${cocktailId || ""}-${imageData ? "dynamic" : "static"}`,
+    );
 
     // Generate a reliable placeholder URL
     const placeholderUrl = `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(cocktailName || "cocktail")}`;
 
     useEffect(() => {
       setIsLoading(true);
-      // Generate a new image key whenever imageData changes
-      setImageKey(Date.now().toString());
+      // Update key only when relevant props change
+      setImageKey(`${cocktailId || ""}-${imageData ? "dynamic" : "static"}`);
 
       // Determine the source based on available data
       let sourceToUse: string | null = null;

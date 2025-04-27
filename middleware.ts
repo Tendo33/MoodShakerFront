@@ -5,8 +5,30 @@ import type { NextRequest } from "next/server";
 const supportedLanguages = ["en", "zh"];
 const defaultLanguage = "en";
 
+// 静态资源文件扩展名列表
+const staticFileExtensions = [
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".svg",
+  ".ico",
+  ".webp",
+  ".avif",
+];
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // 检查是否是静态资源请求
+  const isStaticFile = staticFileExtensions.some((ext) =>
+    pathname.endsWith(ext),
+  );
+
+  // 如果是静态资源请求，直接放行
+  if (isStaticFile) {
+    return NextResponse.next();
+  }
 
   // Check if the pathname already has a language prefix
   const pathnameHasLanguage = supportedLanguages.some(

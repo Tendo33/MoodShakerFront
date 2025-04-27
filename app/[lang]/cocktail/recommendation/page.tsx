@@ -4,13 +4,14 @@ import CocktailRecommendation from "@/components/pages/CocktailRecommendation";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-export default function RecommendationPage({
+export default async function RecommendationPage({
   params,
 }: {
   params: { lang: string };
 }) {
   // Validate language parameter
-  if (params.lang !== "en" && params.lang !== "zh") {
+  const { lang } = await params;
+  if (lang !== "en" && lang !== "zh") {
     redirect("/en/cocktail/recommendation");
   }
 
