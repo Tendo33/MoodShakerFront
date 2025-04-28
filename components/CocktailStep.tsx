@@ -10,6 +10,7 @@ interface CocktailStepProps {
   isLast: boolean;
   theme: "dark" | "light";
   textColorClass: string;
+  additionalTip?: string; // New prop for additional tips from the general tips section
 }
 
 export default function CocktailStep({
@@ -17,6 +18,7 @@ export default function CocktailStep({
   isLast,
   theme,
   textColorClass,
+  additionalTip,
 }: CocktailStepProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -34,6 +36,9 @@ export default function CocktailStep({
       },
     },
   };
+
+  // Determine if we have any tips to show (either from step or additional)
+  const hasTips = step.tips || additionalTip;
 
   return (
     <motion.li
@@ -87,7 +92,7 @@ export default function CocktailStep({
             </p>
 
             {/* Tip toggle button (only if there's a tip) */}
-            {step.tips && (
+            {hasTips && (
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className={`
@@ -105,8 +110,8 @@ export default function CocktailStep({
             )}
           </div>
 
-          {/* Tip content with animation */}
-          {step.tips && (
+          {/* Combined tips content with animation */}
+          {hasTips && (
             <motion.div
               className="overflow-hidden"
               initial="collapsed"
@@ -116,7 +121,10 @@ export default function CocktailStep({
               <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-lg">
                 <div className="flex items-start gap-2">
                   <Lightbulb className="h-5 w-5 text-amber-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-amber-400/80 text-sm">{step.tips}</p>
+                  <div className="text-amber-400/80 text-sm">
+                    {step.tips && <p className="mb-2">{step.tips}</p>}
+                    {additionalTip && <p>{additionalTip}</p>}
+                  </div>
                 </div>
               </div>
             </motion.div>

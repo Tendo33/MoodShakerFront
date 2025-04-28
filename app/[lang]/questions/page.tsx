@@ -8,8 +8,8 @@ export default function QuestionsPage({
   params: { lang: string };
 }) {
   // Validate language parameter
-  if (params.lang !== "en" && params.lang !== "zh") {
-    redirect("/en/questions");
+  if (params.lang !== "en" && params.lang !== "cn") {
+    redirect("/cn/questions");
   }
 
   return (

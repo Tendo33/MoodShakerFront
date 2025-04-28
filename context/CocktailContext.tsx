@@ -9,11 +9,10 @@ import {
   useMemo,
 } from "react";
 import type { ReactNode } from "react";
-import { getCocktailImage } from "@/api/image";
 import {
   requestCocktailRecommendation,
-  AlcoholLevel,
-  DifficultyLevel,
+  type AlcoholLevel,
+  type DifficultyLevel,
   AgentType,
   type Cocktail,
   type BartenderRequest,
@@ -200,7 +199,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     try {
       // 获取当前语言
       const currentLanguage =
-        localStorage.getItem("moodshaker-language") || "en";
+        localStorage.getItem("moodshaker-language") || "cn";
 
       // 构建请求
       const request: BartenderRequest = {
@@ -253,7 +252,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     try {
       // 获取当前语言
       const currentLanguage =
-        localStorage.getItem("moodshaker-language") || "en";
+        localStorage.getItem("moodshaker-language") || "cn";
 
       // 生成新的图片提示
       const imagePrompt = generateImagePrompt(recommendation);

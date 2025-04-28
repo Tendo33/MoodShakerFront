@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/context/LanguageContext";
+import Link from "next/link";
 import {
   Button,
   Card,
@@ -131,8 +132,12 @@ export default function Home() {
   ];
 
   // Get the correct question path based on language
-  const questionsPath = `/${language === "en" ? "en" : "zh"}/questions`;
-  const newQuestionPath = `/${language === "en" ? "en" : "zh"}/questions?new=true`;
+  const questionsPath = `/${language === "en" ? "en" : "cn"}/questions`;
+  const newQuestionPath = `/${language === "en" ? "en" : "cn"}/questions?new=true`;
+
+  const getPathWithLanguage = (path: string) => {
+    return `/${language === "en" ? "en" : "cn"}${path}`;
+  };
 
   return (
     <div className="bg-gray-900 text-white">
@@ -264,7 +269,10 @@ export default function Home() {
                         exit={{ opacity: 0, scale: 1.05 }}
                         transition={{ duration: 0.5 }}
                       >
-                        <div className="relative h-full">
+                        <Link
+                          href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}
+                          className="block relative h-full"
+                        >
                           <motion.div
                             className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 to-pink-500/20 rounded-full blur-xl"
                             animate={pulseAnimation}
@@ -275,7 +283,7 @@ export default function Home() {
                               `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(cocktail.name) || "/placeholder.svg"}`
                             }
                             alt={cocktail.name}
-                            className="relative rounded-3xl shadow-2xl w-full h-full object-cover"
+                            className="relative rounded-3xl shadow-2xl w-full h-full object-cover cursor-pointer transition-transform duration-300 hover:scale-[1.02]"
                             onError={(e) => {
                               e.currentTarget.src = `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(
                                 cocktail.name,
@@ -317,7 +325,7 @@ export default function Home() {
                               ))}
                             </div>
                           </motion.div>
-                        </div>
+                        </Link>
                       </motion.div>
                     ),
                 )}
@@ -445,41 +453,43 @@ export default function Home() {
                 }
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
-                <Card
-                  gradient={false}
-                  hoverEffect={true}
-                  className="overflow-hidden border-gray-700/50 h-full"
-                >
-                  <div className="relative h-48 overflow-hidden">
-                    <motion.div
-                      className="w-full h-full"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <img
-                        src={
-                          cocktail.image ||
-                          `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name) || "/placeholder.svg"}`
-                        }
-                        alt={cocktail.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(
-                            cocktail.name,
-                          )}`;
-                        }}
-                      />
-                    </motion.div>
-                  </div>
-                  <CardContent className="p-6">
-                    <CardTitle className="text-xl font-bold mb-2">
-                      {cocktail.name}
-                    </CardTitle>
-                    <CardDescription className="text-gray-400">
-                      {cocktail.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
+                <Link href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}>
+                  <Card
+                    gradient={false}
+                    hoverEffect={true}
+                    className="overflow-hidden border-gray-700/50 h-full"
+                  >
+                    <div className="relative h-48 overflow-hidden">
+                      <motion.div
+                        className="w-full h-full"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <img
+                          src={
+                            cocktail.image ||
+                            `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name) || "/placeholder.svg"}`
+                          }
+                          alt={cocktail.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(
+                              cocktail.name,
+                            )}`;
+                          }}
+                        />
+                      </motion.div>
+                    </div>
+                    <CardContent className="p-6">
+                      <CardTitle className="text-xl font-bold mb-2">
+                        {cocktail.name}
+                      </CardTitle>
+                      <CardDescription className="text-gray-400">
+                        {cocktail.description}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>
             ))}
           </div>

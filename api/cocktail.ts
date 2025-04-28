@@ -1032,7 +1032,7 @@ export async function requestCocktailRecommendation(
     // 获取当前语言
     const currentLanguage =
       typeof window !== "undefined"
-        ? localStorage.getItem("moodshaker-language") || "en"
+        ? localStorage.getItem("moodshaker-language") || "cn"
         : "en";
 
     const systemPrompt = createSystemPrompt(agentType, currentLanguage);

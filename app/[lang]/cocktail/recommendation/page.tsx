@@ -11,8 +11,8 @@ export default async function RecommendationPage({
 }) {
   // Validate language parameter
   const { lang } = await params;
-  if (lang !== "en" && lang !== "zh") {
-    redirect("/en/cocktail/recommendation");
+  if (lang !== "en" && lang !== "cn") {
+    redirect("/cn/cocktail/recommendation");
   }
 
   return (

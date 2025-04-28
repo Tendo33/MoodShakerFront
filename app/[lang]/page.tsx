@@ -8,7 +8,7 @@ export default async function LangHomePage({
 }) {
   // Validate language parameter
   const { lang } = await params;
-  if (lang !== "en" && lang !== "zh") {
+  if (lang !== "en" && lang !== "cn") {
     redirect("/cn");
   }
 

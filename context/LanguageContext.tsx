@@ -11,7 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 // Define available languages
-export type Language = "en" | "zh-CN";
+export type Language = "en" | "cn";
 
 // Define translation dictionary structure
 type TranslationDictionary = Record<string, Record<string, string>>;
@@ -32,7 +32,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 
 // Translation dictionaries
 const translations: TranslationDictionary = {
-  "zh-CN": {
+  cn: {
     // App title
     "app.title": "MoodShaker",
     // Navigation
@@ -103,7 +103,7 @@ const translations: TranslationDictionary = {
     // Language selector
     "language.select": "选择语言",
     "language.en": "English",
-    "language.zh": "中文",
+    "language.cn": "中文",
 
     // Common
     "common.loading": "加载中...",
@@ -184,7 +184,7 @@ const translations: TranslationDictionary = {
     // Language selector
     "language.select": "Select Language",
     "language.en": "English",
-    "language.zh": "中文",
+    "language.cn": "中文",
 
     // Common
     "common.loading": "Loading...",
@@ -200,19 +200,19 @@ interface LanguageProviderProps {
 export function LanguageProvider({ children }: LanguageProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [language, setLanguageState] = useState<Language>("en");
+  const [language, setLanguageState] = useState<Language>("cn");
   const [isLoading, setIsLoading] = useState(true);
 
   const availableLanguages: Record<string, string> = {
     en: "English",
-    "zh-CN": "中文",
+    cn: "中文",
   };
 
   // Helper function to extract language from pathname
   const extractLanguageFromPathname = useCallback(
     (path: string): Language | null => {
       if (path.startsWith("/en")) return "en";
-      if (path.startsWith("/zh")) return "zh-CN";
+      if (path.startsWith("/cn")) return "cn";
       return null;
     },
     [],
@@ -221,15 +221,15 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   // Helper function to get path without language prefix
   const getPathWithoutLanguage = useCallback((path: string): string => {
     if (path.startsWith("/en/")) return path.substring(3);
-    if (path.startsWith("/zh/")) return path.substring(3);
-    if (path === "/en" || path === "/zh") return "/";
+    if (path.startsWith("/cn/")) return path.substring(3);
+    if (path === "/en" || path === "/cn") return "/";
     return path;
   }, []);
 
   // Helper function to get path with language prefix
   const getPathWithLanguage = useCallback(
     (path: string): string => {
-      const langPrefix = language === "en" ? "/en" : "/zh";
+      const langPrefix = language === "en" ? "/en" : "/cn";
       const pathWithoutLang = getPathWithoutLanguage(path);
 
       if (pathWithoutLang === "/") return langPrefix;
@@ -257,10 +257,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
       // Then check localStorage
       const savedLanguage = localStorage.getItem("moodshaker-language");
-      if (
-        savedLanguage &&
-        (savedLanguage === "en" || savedLanguage === "zh-CN")
-      ) {
+      if (savedLanguage && (savedLanguage === "en" || savedLanguage === "cn")) {
         setLanguageState(savedLanguage as Language);
         setIsLoading(false);
         return;
@@ -268,7 +265,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
       // Finally, try to detect browser language
       const browserLang = navigator.language;
-      const detectedLang = browserLang.startsWith("zh") ? "zh-CN" : "en";
+      // Default to Chinese if browser language is not English
+      const detectedLang = browserLang.startsWith("en") ? "en" : "cn";
       setLanguageState(detectedLang);
       localStorage.setItem("moodshaker-language", detectedLang);
 
@@ -299,7 +297,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         if (
           !pathLang ||
           (pathLang !== language &&
-            pathLang !== (language === "en" ? "en" : "zh"))
+            pathLang !== (language === "en" ? "en" : "cn"))
         ) {
           const newPath = getPathWithLanguage(currentPath);
           window.history.replaceState(null, "", newPath);
@@ -325,7 +323,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
       // Update URL path if we're on the client side
       if (typeof window !== "undefined" && pathname) {
-        const langPrefix = lang === "en" ? "/en" : "/zh";
+        const langPrefix = lang === "en" ? "/en" : "/cn";
         const pathWithoutLang = getPathWithoutLanguage(pathname);
 
         const newPath =
@@ -359,7 +357,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     t,
     availableLanguages,
     isLoading,
-    locale: language === "en" ? "en" : "zh",
+    locale: language === "en" ? "en" : "cn",
     getPathWithLanguage,
   };
 

@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // List of all supported languages
-const supportedLanguages = ["en", "zh"];
-const defaultLanguage = "en";
+const supportedLanguages = ["en", "cn"];
+const defaultLanguage = "cn";
 
-// 静态资源文件扩展名列表
+// Static resource file extensions
 const staticFileExtensions = [
   ".png",
   ".jpg",
@@ -20,12 +20,12 @@ const staticFileExtensions = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 检查是否是静态资源请求
+  // Check if it's a static resource request
   const isStaticFile = staticFileExtensions.some((ext) =>
     pathname.endsWith(ext),
   );
 
-  // 如果是静态资源请求，直接放行
+  // If it's a static resource request, proceed directly
   if (isStaticFile) {
     return NextResponse.next();
   }
@@ -62,11 +62,8 @@ export function middleware(request: NextRequest) {
           );
 
         if (preferredLanguage) {
-          if (preferredLanguage.startsWith("zh")) {
-            language = "zh";
-          } else {
-            language = "en";
-          }
+          // Only use English if explicitly set to English
+          language = preferredLanguage.startsWith("en") ? "en" : "cn";
         }
       }
     }

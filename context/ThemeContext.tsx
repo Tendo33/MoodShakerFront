@@ -75,7 +75,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           getMutedTextColorClass,
         }}
       >
-        {children}
+        <div style={{ visibility: "hidden" }}>{children}</div>
       </ThemeContext.Provider>
     );
   }

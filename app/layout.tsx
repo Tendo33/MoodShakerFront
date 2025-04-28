@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   title: "MoodShaker",
   description:
     "Answer a few simple questions and let us recommend the perfect cocktail for you",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
