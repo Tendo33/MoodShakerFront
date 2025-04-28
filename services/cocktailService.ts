@@ -1,8 +1,5 @@
 import type { Cocktail } from "@/api/cocktail";
 
-// 这是一个简单的服务，用于获取鸡尾酒数据
-// 在实际应用中，这将调用后端API
-
 // 示例热门鸡尾酒数据
 const popularCocktails: Record<string, Cocktail> = {
   mojito: {
@@ -95,7 +92,7 @@ const popularCocktails: Record<string, Cocktail> = {
         step_number: 3,
         description: "用力摇晃约15秒，直到雪克杯外壁结霜。",
         tips: "摇晃时力度要适中，以免酒液溢出。",
-        },
+      },
       {
         step_number: 4,
         description: "将调好的酒液过滤倒入已经沾好盐的玛格丽特杯中。",
