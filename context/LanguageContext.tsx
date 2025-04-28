@@ -242,11 +242,14 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   useEffect(() => {
     const initializeLanguage = () => {
       setIsLoading(true);
+      console.log("初始化语言...");
 
       // First check URL path for language parameter
       if (pathname) {
+        console.log("检查URL路径:", pathname);
         const pathLang = extractLanguageFromPathname(pathname);
         if (pathLang) {
+          console.log("从URL检测到语言:", pathLang);
           setLanguageState(pathLang);
           // Save to localStorage to maintain consistency
           localStorage.setItem("moodshaker-language", pathLang);
@@ -257,19 +260,18 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
       // Then check localStorage
       const savedLanguage = localStorage.getItem("moodshaker-language");
+      console.log("从localStorage中读取语言:", savedLanguage);
       if (savedLanguage && (savedLanguage === "en" || savedLanguage === "cn")) {
+        console.log("使用localStorage中的语言:", savedLanguage);
         setLanguageState(savedLanguage as Language);
         setIsLoading(false);
         return;
       }
 
-      // Finally, try to detect browser language
-      const browserLang = navigator.language;
-      // Default to Chinese if browser language is not English
-      const detectedLang = browserLang.startsWith("en") ? "en" : "cn";
-      setLanguageState(detectedLang);
-      localStorage.setItem("moodshaker-language", detectedLang);
-
+      // Default to Chinese
+      console.log("默认使用中文");
+      setLanguageState("cn");
+      localStorage.setItem("moodshaker-language", "cn");
       setIsLoading(false);
     };
 
@@ -315,6 +317,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const setLanguage = useCallback(
     (lang: Language) => {
       setLanguageState(lang);
+      console.log("Setting language to:", lang);
 
       // Save to localStorage
       if (typeof window !== "undefined") {
@@ -323,13 +326,11 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
       // Update URL path if we're on the client side
       if (typeof window !== "undefined" && pathname) {
-        const langPrefix = lang === "en" ? "/en" : "/cn";
         const pathWithoutLang = getPathWithoutLanguage(pathname);
-
         const newPath =
           pathWithoutLang === "/"
-            ? langPrefix
-            : `${langPrefix}${pathWithoutLang}`;
+            ? `/${lang}`
+            : `/${lang}${pathWithoutLang}`;
         router.push(newPath);
       }
     },
