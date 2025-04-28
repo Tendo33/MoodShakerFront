@@ -11,7 +11,9 @@ interface PageProps {
 export default async function QuestionsPage({ params }: PageProps) {
   // Validate language parameter
   const validLangs = ["en", "cn"];
-  if (!validLangs.includes(params.lang)) {
+  const lang = await Promise.resolve(params.lang);
+  
+  if (!validLangs.includes(lang)) {
     redirect("/cn/questions");
   }
 

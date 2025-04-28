@@ -19,8 +19,9 @@ interface CocktailPageProps {
 export async function generateMetadata({
   params,
 }: CocktailPageProps): Promise<Metadata> {
+  const { id } = await params;
   try {
-    const cocktail = await getCocktailById(params.id);
+    const cocktail = await getCocktailById(id);
     return {
       title: `${cocktail?.name || "Cocktail"} | MoodShaker`,
       description:
@@ -49,15 +50,16 @@ export function generateStaticParams() {
 }
 
 export default async function CocktailPage({ params }: CocktailPageProps) {
+  const { lang, id } = await params;
+  
   // Validate language parameter
-  const { lang } = await params;
   if (lang !== "en" && lang !== "cn") {
-    redirect("/cn/cocktail/" + params.id);
+    redirect("/cn/cocktail/" + id);
   }
 
   // Validate cocktail ID
   const validCocktailIds = getPopularCocktailIds();
-  if (!validCocktailIds.includes(params.id)) {
+  if (!validCocktailIds.includes(id)) {
     notFound();
   }
 
@@ -70,7 +72,7 @@ export default async function CocktailPage({ params }: CocktailPageProps) {
           </div>
         }
       >
-        <CocktailDetailPage id={params.id} />
+        <CocktailDetailPage id={id} />
       </Suspense>
     </ErrorBoundary>
   );
