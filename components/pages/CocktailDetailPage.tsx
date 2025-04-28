@@ -29,76 +29,6 @@ const staticCocktailImages = {
   cosmopolitan: "/cocktail-cosmopolitan.png",
 };
 
-// Static tips for each cocktail - we'll map these to specific steps
-const cocktailTips = {
-  mojito: [
-    {
-      stepNumber: 1,
-      content:
-        "When muddling mint, be gentle. The goal is to release the oils, not shred the leaves. Press and twist, don't pound.",
-    },
-    {
-      stepNumber: 2,
-      content:
-        "Try using demerara sugar or honey syrup for a different flavor profile. Each sweetener brings its own character to the drink.",
-    },
-    {
-      stepNumber: 3,
-      content:
-        "While white rum is traditional, aged rum can add complexity. Try a blend of white and aged rum for a more nuanced flavor.",
-    },
-    {
-      stepNumber: 4,
-      content:
-        "Serve with a straw and encourage stirring before drinking to mix the flavors that settle at the bottom.",
-    },
-  ],
-  margarita: [
-    {
-      stepNumber: 1,
-      content:
-        "For the perfect salt rim, run a lime wedge around the edge of the glass, then dip in coarse salt. Only salt the outside edge for a better drinking experience.",
-    },
-    {
-      stepNumber: 2,
-      content:
-        "Always use 100% agave tequila. The quality of tequila significantly impacts the final taste of your margarita.",
-    },
-    {
-      stepNumber: 3,
-      content:
-        "Try infusing your simple syrup with jalapeño for a spicy kick, or muddle fresh fruits like strawberry or mango for fruity variations.",
-    },
-    {
-      stepNumber: 4,
-      content:
-        "Adjust the agave nectar or simple syrup to your preference. A well-balanced margarita should be tart with just enough sweetness.",
-    },
-  ],
-  cosmopolitan: [
-    {
-      stepNumber: 1,
-      content:
-        "Fresh lime juice is essential, but try adding a small amount of fresh lemon juice for complexity. The combination of citrus adds depth.",
-    },
-    {
-      stepNumber: 2,
-      content:
-        "Use 100% cranberry juice rather than cranberry cocktail for a more authentic flavor. Adjust sweetness separately with simple syrup if needed.",
-    },
-    {
-      stepNumber: 3,
-      content:
-        "Citrus-infused vodka works best, but you can also use regular vodka and add a bit of lemon zest to the shaker for a similar effect.",
-    },
-    {
-      stepNumber: 4,
-      content:
-        "A Cosmopolitan should be ice-cold. Chill your glass in the freezer before serving, and don't over-dilute when shaking.",
-    },
-  ],
-};
-
 interface CocktailDetailPageProps {
   id: string;
 }
@@ -115,7 +45,6 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
   );
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
-  const [stepTips, setStepTips] = useState<Record<number, string>>({});
 
   // Computed properties for styling
   const textColorClass = theme === "dark" ? "text-white" : "text-gray-900";
@@ -133,18 +62,6 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
       try {
         const data = await getCocktailById(id);
         setCocktail(data);
-
-        // Set tips based on cocktail ID
-        if (id === "mojito" || id === "margarita" || id === "cosmopolitan") {
-          const tips = cocktailTips[id as keyof typeof cocktailTips];
-          const tipsMap: Record<number, string> = {};
-
-          tips.forEach((tip) => {
-            tipsMap[tip.stepNumber] = tip.content;
-          });
-
-          setStepTips(tipsMap);
-        }
 
         // Add a small delay before showing animations
         setTimeout(() => setIsPageLoaded(true), 100);
@@ -710,7 +627,6 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         isLast={step.step_number === cocktail.steps.length}
                         theme={theme}
                         textColorClass={textColorClass}
-                        additionalTip={stepTips[step.step_number]}
                       />
                     ))}
                   </ol>
@@ -821,7 +737,6 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         isLast={step.step_number === cocktail.steps.length}
                         theme={theme}
                         textColorClass={textColorClass}
-                        additionalTip={stepTips[step.step_number]}
                       />
                     ))}
                   </ol>

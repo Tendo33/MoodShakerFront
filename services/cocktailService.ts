@@ -89,18 +89,22 @@ const popularCocktails: Record<string, Cocktail> = {
       {
         step_number: 2,
         description: "将龙舌兰酒、君度橙酒、青柠汁和冰块放入雪克杯中。",
+        tips: "冰块要适量，以免影响口感。",
       },
       {
         step_number: 3,
         description: "用力摇晃约15秒，直到雪克杯外壁结霜。",
-      },
+        tips: "摇晃时力度要适中，以免酒液溢出。",
+        },
       {
         step_number: 4,
         description: "将调好的酒液过滤倒入已经沾好盐的玛格丽特杯中。",
+        tips: "过滤时动作要轻柔，以免破坏酒液的气泡。",
       },
       {
         step_number: 5,
         description: "用青柠片装饰杯口，即可享用。",
+        tips: "装饰时不要过度，以免影响口感。",
       },
     ],
   },
@@ -137,14 +141,17 @@ const popularCocktails: Record<string, Cocktail> = {
       {
         step_number: 1,
         description: "将伏特加、君度橙酒、蔓越莓汁、青柠汁和冰块放入雪克杯中。",
+        tips: "冰块要适量，以免影响口感。",
       },
       {
         step_number: 2,
         description: "用力摇晃约15秒，直到雪克杯外壁结霜。",
+        tips: "摇晃时力度要适中，以免酒液溢出。",
       },
       {
         step_number: 3,
         description: "将调好的酒液过滤倒入预先冰镇的马天尼杯中。",
+        tips: "过滤时动作要轻柔，以免破坏酒液的气泡。",
       },
       {
         step_number: 4,
