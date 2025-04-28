@@ -33,6 +33,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 // Translation dictionaries
 const translations: TranslationDictionary = {
   "zh-CN": {
+    // App title
+    "app.title": "MoodShaker",
     // Navigation
     "nav.home": "首页",
     "nav.discover": "探索",
@@ -109,6 +111,8 @@ const translations: TranslationDictionary = {
     "common.tryAgain": "重试",
   },
   en: {
+    // App title
+    "app.title": "MoodShaker",
     // Navigation
     "nav.home": "Home",
     "nav.discover": "Discover",

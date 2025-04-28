@@ -24,7 +24,11 @@ export default function Footer() {
     { icon: <Facebook size={18} />, href: "#", label: "Facebook" },
     { icon: <Instagram size={18} />, href: "#", label: "Instagram" },
     { icon: <Twitter size={18} />, href: "#", label: "Twitter" },
-    { icon: <Github size={18} />, href: "#", label: "Github" },
+    {
+      icon: <Github size={18} />,
+      href: "https://github.com/Tendo33",
+      label: "Github",
+    },
   ];
 
   const contactInfo = [
@@ -106,6 +110,7 @@ export default function Footer() {
                   href={link.href}
                   className="text-gray-400 hover:text-amber-500 transition-colors p-2 hover:bg-white/5 rounded-full"
                   aria-label={link.label}
+                  target="_blank"
                 >
                   {link.icon}
                 </Link>
