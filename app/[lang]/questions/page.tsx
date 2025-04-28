@@ -2,13 +2,16 @@ import { redirect } from "next/navigation";
 import Questions from "@/components/pages/Questions";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-export default function QuestionsPage({
-  params,
-}: {
-  params: { lang: string };
-}) {
+interface PageProps {
+  params: {
+    lang: string;
+  };
+}
+
+export default async function QuestionsPage({ params }: PageProps) {
   // Validate language parameter
-  if (params.lang !== "en" && params.lang !== "cn") {
+  const validLangs = ["en", "cn"];
+  if (!validLangs.includes(params.lang)) {
     redirect("/cn/questions");
   }
 
