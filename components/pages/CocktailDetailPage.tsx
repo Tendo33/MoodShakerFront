@@ -23,7 +23,7 @@ import CocktailImage from "@/components/CocktailImage";
 
 // Static cocktail images mapping
 const staticCocktailImages = {
-  mojito: "/cocktails/cocktail-mojito.png",
+  mojito: "/cocktails/cocktail-margarita.png",
   margarita: "/cocktails/cocktail-margarita.png",
   cosmopolitan: "/cocktails/cocktail-cosmopolitan.png",
 };
@@ -289,7 +289,6 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                   cocktailId={id}
                   imageData={null}
                   cocktailName={cocktail?.name}
-                  staticCocktailImages={staticCocktailImages}
                 />
               </motion.div>
             </motion.div>

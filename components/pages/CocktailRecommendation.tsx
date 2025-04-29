@@ -362,7 +362,6 @@ export default function CocktailRecommendation() {
                   cocktailId={cocktailId ?? undefined}
                   imageData={imageData}
                   cocktailName={cocktail?.name}
-                  staticCocktailImages={staticCocktailImages}
                 />
 
                 {/* Add refresh image button */}

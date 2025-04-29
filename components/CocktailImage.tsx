@@ -9,14 +9,12 @@ interface CocktailImageProps {
   cocktailId?: string;
   imageData: string | null;
   cocktailName?: string;
-  staticCocktailImages?: Record<string, string>;
 }
 
 export default function CocktailImage({
   cocktailId,
   imageData,
   cocktailName = "Cocktail",
-  staticCocktailImages = {},
 }: CocktailImageProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,13 +29,7 @@ export default function CocktailImage({
       setError(null);
 
       try {
-        // First, check if we have a static image for this cocktail ID
-        if (cocktailId && staticCocktailImages[cocktailId]) {
-          setImageSrc(staticCocktailImages[cocktailId]);
-          return;
-        }
-
-        // Next, check if we have image data from the context
+        // Check if we have image data from the context
         if (imageData) {
           setImageSrc(imageData);
           return;
@@ -68,7 +60,6 @@ export default function CocktailImage({
     cocktailId,
     imageData,
     cocktailName,
-    staticCocktailImages,
     placeholderUrl,
   ]);
 
