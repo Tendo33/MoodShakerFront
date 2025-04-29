@@ -22,10 +22,10 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import CocktailImage from "@/components/CocktailImage";
 
 // Static cocktail images mapping
-const staticCocktailImages = {
-  mojito: "/cocktails/cocktail-margarita.png",
-  margarita: "/cocktails/cocktail-margarita.png",
-  cosmopolitan: "/cocktails/cocktail-cosmopolitan.png",
+export const cocktailImages = {
+  mojito: "/vibrant-mojito.png",
+  margarita: "/vibrant-margarita.png",
+  cosmopolitan: "/city-lights-cocktail.png",
 };
 
 interface CocktailDetailPageProps {

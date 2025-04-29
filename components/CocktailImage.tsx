@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { getCocktailImage } from "@/api/image";
+import { cocktailImages } from "./pages/CocktailDetailPage";
 
 interface CocktailImageProps {
   cocktailId?: string;
@@ -35,7 +36,13 @@ export default function CocktailImage({
           return;
         }
 
-        // If we have a cocktail ID, try to get the image from the session
+        // If we have a cocktail ID, try to get the static image first
+        if (cocktailId && cocktailId in cocktailImages) {
+          setImageSrc(cocktailImages[cocktailId as keyof typeof cocktailImages]);
+          return;
+        }
+
+        // If no static image, try to get the image from the session
         if (cocktailId) {
           const sessionImage = await getCocktailImage(cocktailId);
           if (sessionImage) {

@@ -31,11 +31,7 @@ import {
 } from "@/utils/animation-utils";
 
 // Import cocktail images
-const cocktailImages = {
-  mojito: "/vibrant-mojito.png",
-  margarita: "/vibrant-margarita.png",
-  cosmopolitan: "/city-lights-cocktail.png",
-};
+import { cocktailImages } from "@/components/pages/CocktailDetailPage";
 
 export default function Home() {
   const { t, language } = useLanguage();

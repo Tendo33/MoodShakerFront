@@ -167,10 +167,6 @@ export const getCocktailById = async (id: string): Promise<Cocktail | null> => {
   return popularCocktails[id] || null;
 };
 
-// Get all popular cocktails
-export const getPopularCocktails = async (): Promise<Cocktail[]> => {
-  return Object.values(popularCocktails);
-};
 
 // Get popular cocktail IDs
 export const getPopularCocktailIds = (): string[] => {
