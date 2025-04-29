@@ -10,22 +10,22 @@ import React from "react";
 // 优化：合并图片对象
 const images = {
   // 问题选项图片
-  classic: "/polished-cocktail-shaker.png",
-  custom: "/tropical-fusion.png",
-  low: "/tropical-splash.png",
-  medium: "/vibrant-citrus-harmony.png",
-  high: "/dark-stormy-cocktail.png",
-  any: "/vibrant-cocktail-collection.png",
-  easy: "/refreshing-cocktail.png",
-  hard: "/intricate-mixology.png",
+  classic: "/classic.png",
+  custom: "/custom.png",
+  low: "/low.png",
+  medium: "/medium.png",
+  high: "/high.png",
+  any: "/any.png",
+  easy: "/easy.png",
+  hard: "/hard.png",
 
   // 基酒图片
-  gin: "/classic-gin-still-life.png",
-  rum: "/weathered-rum-bottle.png",
-  vodka: "/frosted-vodka.png",
-  whiskey: "/amber-glass-still-life.png",
-  tequila: "/aged-agave-spirit.png",
-  brandy: "/amber-glass-still-life.png",
+  gin: "/gin.png",
+  rum: "/rum.png",
+  vodka: "/vodka.png",
+  whiskey: "/whiskey.png",
+  tequila: "/tequila.png",
+  brandy: "/brandy.png",
 };
 
 export default function Questions() {

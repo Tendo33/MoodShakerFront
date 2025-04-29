@@ -24,17 +24,6 @@ import type { Cocktail } from "@/api/cocktail";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CocktailImage from "@/components/CocktailImage";
 
-// Static cocktail images - optimized list with only the most common cocktails
-const staticCocktailImages = {
-  mojito: "/cocktail-mojito.png",
-  margarita: "/cocktail-margarita.png",
-  cosmopolitan: "/cocktail-cosmopolitan.png",
-  "whiskey-sour": "/classic-whiskey-sour.png",
-  manhattan: "/classic-manhattan.png",
-  "old-fashioned": "/classic-old-fashioned.png",
-  negroni: "/classic-negroni.png",
-  daiquiri: "/classic-daiquiri.png",
-};
 
 // Animation variants for framer-motion
 const fadeIn = {
