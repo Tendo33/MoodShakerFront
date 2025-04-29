@@ -454,7 +454,7 @@ export default function Questions() {
   QuestionOption.displayName = "QuestionOption";
 
   return (
-    <div className={`container mx-auto px-4 py-8 ${themeClasses}`}>
+    <div className={`w-full px-4 py-8 ${themeClasses}`}>
       <div className="flex">
         {/* 垂直进度条 */}
         <div className="mr-6 sticky top-8 self-start">
