@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 
 interface AnimatedButtonProps {
@@ -31,11 +30,7 @@ export default function AnimatedButton({
 }: AnimatedButtonProps) {
   const [isPressed, setIsPressed] = useState(false);
 
-  // 基础样式
-  const baseStyles =
-    "relative overflow-hidden font-medium rounded-full transition-all";
-
-  // 变体样式
+  // Style maps
   const variantStyles = {
     primary:
       "bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white shadow-lg",
@@ -46,37 +41,27 @@ export default function AnimatedButton({
     ghost: "bg-transparent hover:bg-white/5 text-white",
   };
 
-  // 尺寸样式
   const sizeStyles = {
     sm: "px-4 py-2 text-sm",
     md: "px-6 py-3 text-base",
     lg: "px-8 py-4 text-lg",
   };
 
-  // 禁用样式
-  const disabledStyles =
-    disabled || isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer";
-
-  // 动画样式
-  const animationStyles = `
+  // Combined styles
+  const buttonStyles = `
+    relative overflow-hidden font-medium rounded-full transition-all
+    ${variantStyles[variant]} 
+    ${sizeStyles[size]} 
+    ${disabled || isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
     after:content-[''] after:absolute after:h-full after:w-full after:top-0 after:left-0 
     after:bg-white after:opacity-0 after:transition-opacity after:duration-300
     hover:after:opacity-10 active:after:opacity-20
     transform transition-transform duration-150 
     ${isPressed ? "scale-95" : "scale-100"}
-  `;
-
-  // 组合所有样式
-  const buttonStyles = `
-    ${baseStyles} 
-    ${variantStyles[variant]} 
-    ${sizeStyles[size]} 
-    ${disabledStyles}
-    ${animationStyles}
     ${className}
   `;
 
-  // 处理点击事件
+  // Handle click event
   const handleClick = () => {
     if (disabled || isLoading) return;
 

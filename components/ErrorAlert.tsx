@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTheme } from "@/context/ThemeContext";
 import { useError } from "@/context/ErrorContext";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function ErrorAlert() {
-  const { message, clearError } = useError();
-  const { theme } = useTheme();
+  const { errors, clearError } = useError();
   const { locale } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
+
+  // Get the first error message (if any)
+  const message = errors.length > 0 ? errors[0].message : null;
 
   useEffect(() => {
     setIsVisible(!!message);
@@ -24,7 +25,7 @@ export default function ErrorAlert() {
           isVisible
             ? "translate-y-0 opacity-100 sm:translate-x-0"
             : "translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-        } ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}
+        } bg-gray-800`}
       >
         <div className="p-4">
           <div className="flex items-start">
@@ -45,25 +46,15 @@ export default function ErrorAlert() {
               </svg>
             </div>
             <div className="ml-3 w-0 flex-1 pt-0.5">
-              <p
-                className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-              >
+              <p className="text-sm font-medium text-white">
                 {locale === "en" ? "Error" : "错误"}
               </p>
-              <p
-                className={`mt-1 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-              >
-                {message}
-              </p>
+              <p className="mt-1 text-sm text-gray-300">{message}</p>
             </div>
             <div className="ml-4 flex-shrink-0 flex">
               <button
-                onClick={clearError}
-                className={`inline-flex text-gray-400 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150 ${
-                  theme === "dark"
-                    ? "hover:text-gray-300"
-                    : "hover:text-gray-600"
-                }`}
+                onClick={() => clearError(errors[0].id)}
+                className="inline-flex text-gray-400 focus:outline-none focus:text-gray-300 transition ease-in-out duration-150 hover:text-gray-300"
               >
                 <svg
                   className="h-5 w-5"

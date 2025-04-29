@@ -1,10 +1,6 @@
 import { generateImage } from "./openai";
 
 /**
- * Image API integration
- */
-
-/**
  * Generate an image prompt for the cocktail
  */
 export function generateImagePrompt(cocktail: {
@@ -26,12 +22,9 @@ export async function generateCocktailImage(
   const negativePrompt =
     "low quality, blurry, out of focus, low resolution, bad anatomy, worst quality, low quality";
 
-  console.log("INFO", `开始生成鸡尾酒图片 [${requestId}]`, {
+  console.log("INFO", `Starting cocktail image generation [${requestId}]`, {
     sessionId,
     promptLength: prompt.length,
-    promptPreview: prompt.substring(0, 100) + "...",
-    negativePromptLength: negativePrompt.length,
-    negativePromptPreview: negativePrompt.substring(0, 100) + "...",
   });
 
   try {
@@ -42,18 +35,18 @@ export async function generateCocktailImage(
     const imageUrl = await generateImage(prompt, {
       negative_prompt: negativePrompt,
       image_size: "1024x1024",
-      seed: uniqueSeed, // Use the unique seed
+      seed: uniqueSeed,
     });
 
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    console.log("INFO", `鸡尾酒图片生成成功 [${requestId}] (${duration}ms)`, {
-      imageUrlPreview: imageUrl.substring(0, 50) + "...",
-    });
+    console.log(
+      "INFO",
+      `Cocktail image generation successful [${requestId}] (${duration}ms)`,
+    );
 
     // Store the image URL in memory for the current session
-    // We're not caching to localStorage anymore, just keeping track of the current image
     if (typeof window !== "undefined") {
       // Add timestamp to the image URL to prevent caching
       const timestampedUrl = imageUrl.includes("?")
@@ -67,7 +60,7 @@ export async function generateCocktailImage(
         timestamp: Date.now(),
       };
 
-      console.log("DEBUG", `生成了新的鸡尾酒图片 [${requestId}]`, {
+      console.log("DEBUG", `Generated new cocktail image [${requestId}]`, {
         sessionId,
         timestamp: Date.now(),
       });
@@ -83,35 +76,26 @@ export async function generateCocktailImage(
 
     console.error(
       "ERROR",
-      `鸡尾酒图片生成失败 [${requestId}] (${duration}ms)`,
+      `Cocktail image generation failed [${requestId}] (${duration}ms)`,
       {
         error:
           error instanceof Error
-            ? {
-                name: error.name,
-                message: error.message,
-                stack: error.stack,
-              }
+            ? { name: error.name, message: error.message }
             : String(error),
       },
     );
 
-    // 添加更多错误信息记录
-    console.error("生成图片失败详情:", error);
-
-    console.log("INFO", `返回占位图片 [${requestId}]`);
+    console.log("INFO", `Returning placeholder image [${requestId}]`);
     return `/placeholder.svg?height=1024&width=1024&query=${encodeURIComponent("cocktail")}&_t=${Date.now()}`;
   }
 }
 
 /**
- * 获取会话的鸡尾酒图片
+ * Get cocktail image for session
  */
 export function getCocktailImage(sessionId: string): string | null {
   if (typeof window === "undefined") return null;
 
-  // We're not using localStorage anymore
-  // Instead, check if we have a current image in memory
   if (
     window.__currentCocktailImage &&
     window.__currentCocktailImage.sessionId === sessionId
@@ -124,17 +108,16 @@ export function getCocktailImage(sessionId: string): string | null {
       ? `${imageUrl}&_t=${timestamp}`
       : `${imageUrl}?_t=${timestamp}`;
 
-    console.log("DEBUG", `获取当前会话鸡尾酒图片`, {
+    console.log("DEBUG", `Retrieved current session cocktail image`, {
       sessionId,
       found: true,
       timestamp: timestamp.toString(),
-      imageUrlPreview: refreshedUrl.substring(0, 50) + "...",
     });
 
     return refreshedUrl;
   }
 
-  console.log("DEBUG", `没有找到当前会话的鸡尾酒图片`, {
+  console.log("DEBUG", `No cocktail image found for current session`, {
     sessionId,
   });
 

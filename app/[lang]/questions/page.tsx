@@ -12,7 +12,7 @@ export default async function QuestionsPage({ params }: PageProps) {
   // Validate language parameter
   const validLangs = ["en", "cn"];
   const lang = await Promise.resolve(params.lang);
-  
+
   if (!validLangs.includes(lang)) {
     redirect("/cn/questions");
   }

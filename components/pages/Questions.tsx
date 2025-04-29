@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Check } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
 import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
 import React from "react";
@@ -32,7 +31,6 @@ const images = {
 export default function Questions() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { theme } = useTheme();
   const { t, locale, getPathWithLanguage } = useLanguage();
   const {
     answers,
@@ -67,26 +65,10 @@ export default function Questions() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 使用useMemo优化计算属性
-  const themeClasses = useMemo(
-    () =>
-      theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900",
-    [theme],
-  );
-  const textColorClass = useMemo(
-    () => (theme === "dark" ? "text-white" : "text-gray-900"),
-    [theme],
-  );
-  const cardClasses = useMemo(
-    () =>
-      theme === "dark"
-        ? "bg-gray-800/80 text-white"
-        : "bg-white/90 text-gray-900",
-    [theme],
-  );
-  const borderClasses = useMemo(
-    () => (theme === "dark" ? "border-gray-700" : "border-gray-200"),
-    [theme],
-  );
+  const themeClasses = "bg-gray-900 text-white";
+  const textColorClass = "text-white";
+  const cardClasses = "bg-gray-800/80 text-white";
+  const borderClasses = "border-gray-700";
 
   // 优化：简化问题数据结构
   const questions = useMemo(
@@ -313,7 +295,7 @@ export default function Questions() {
     [toggleBaseSpirit, baseSpiritsOptions, scrollToElement],
   );
 
-  // Update the handleSubmitFeedback function to use localLoading instead of setIsLoading
+  // Update the handleSubmitFeedback function to navigate immediately after getting the cocktail
   const handleSubmitFeedback = useCallback(async () => {
     try {
       // Use local loading state
@@ -322,7 +304,7 @@ export default function Questions() {
       // First save the feedback
       saveFeedback(localUserFeedback);
 
-      // Then submit the request and wait for it to complete
+      // Then submit the request and wait for the cocktail data only
       const result = await submitRequest();
 
       // Log the result for debugging
@@ -333,10 +315,9 @@ export default function Questions() {
         },
       );
 
-      // Add a small delay to ensure all state updates are processed
-      setTimeout(() => {
-        router.push(getPathWithLanguage("/cocktail/recommendation"));
-      }, 100);
+      // Navigate immediately after getting the cocktail data
+      // Don't wait for image generation
+      router.push(getPathWithLanguage("/cocktail/recommendation"));
     } catch (error) {
       console.error("Error submitting request:", error);
       // Reset loading state on error
@@ -443,23 +424,27 @@ export default function Questions() {
       isSelected: boolean;
       onSelect: () => void;
     }) => (
-      <div className="transition-all duration-300">
+      <div className="h-full w-full">
         <div
           className={`cursor-pointer transition-all duration-300 hover:scale-105 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} ${
             isSelected ? "ring-2 ring-pink-500 shadow-lg" : ""
-          }`}
+          } h-full flex flex-col`}
           onClick={onSelect}
         >
-          <div className="p-4">
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-3 rounded-full overflow-hidden bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-2">
+          <div className="p-4 flex flex-col items-center justify-center flex-1">
+            <div className="flex flex-col items-center text-center w-full">
+              <div className="mb-3 rounded-full overflow-hidden bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-2 w-24 h-24 flex items-center justify-center">
                 <img
                   src={option.image || "/placeholder.svg"}
                   alt={option.text}
                   className="w-20 h-20 object-cover rounded-full"
                 />
               </div>
-              <h3 className={`font-medium ${textColorClass}`}>{option.text}</h3>
+              <h3
+                className={`font-medium ${textColorClass} text-center w-full`}
+              >
+                {option.text}
+              </h3>
             </div>
           </div>
         </div>
@@ -492,14 +477,14 @@ export default function Questions() {
 
         <div className="flex-1" ref={containerRef}>
           {/* 问题列表 */}
-          <div className="space-y-12">
+          <div className="space-y-12 w-full max-w-5xl mx-auto">
             {questions.map((question) => (
               <div
                 key={question.id}
                 ref={(el) => {
                   questionRefs.current[question.id] = el;
                 }}
-                className={`transition-all duration-500 scroll-mt-24 ${
+                className={`transition-all duration-500 scroll-mt-24 w-full ${
                   visibleQuestions.includes(question.id)
                     ? "opacity-100 transform translate-y-0"
                     : "opacity-0 transform translate-y-8 h-0 overflow-hidden"
@@ -528,11 +513,12 @@ export default function Questions() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+                {/* Updated grid layout with fixed column widths and consistent spacing */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
                   {question.options.map((option, index) => (
                     <div
                       key={option.id}
-                      className="transition-all duration-300"
+                      className="transition-all duration-300 h-full"
                       style={{
                         animationDelay: `${index * 100}ms`,
                         animation: visibleQuestions.includes(question.id)
@@ -555,16 +541,18 @@ export default function Questions() {
             ))}
           </div>
 
-          {/* 基酒选择 */}
+          {/* 基酒选择 - Updated for consistent width */}
           <div
             ref={baseSpiritsRef}
             className={
-              showBaseSpirits ? "mt-24 max-w-3xl scroll-mt-24" : "hidden"
+              showBaseSpirits
+                ? "mt-24 w-full max-w-5xl scroll-mt-24 mx-auto"
+                : "hidden"
             }
             id="base-spirits-section"
           >
             <div
-              className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}
+              className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} w-full`}
             >
               <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
                 <h3 className={`text-xl font-bold mb-2 ${textColorClass}`}>
@@ -575,11 +563,12 @@ export default function Questions() {
                 </p>
               </div>
               <div className="p-6">
+                {/* Updated grid layout for base spirits with consistent sizing */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {baseSpiritsOptions.map((spirit) => (
                     <div
                       key={spirit.id}
-                      className={`cursor-pointer p-4 rounded-xl transition-all duration-300 border ${
+                      className={`cursor-pointer p-4 rounded-xl transition-all duration-300 border h-full flex flex-col justify-between ${
                         baseSpirits.includes(spirit.id)
                           ? "border-pink-500 bg-gradient-to-br from-amber-500/10 to-pink-500/10"
                           : `${borderClasses} hover:border-white/30`
@@ -625,15 +614,17 @@ export default function Questions() {
             </div>
           </div>
 
-          {/* 反馈表单 */}
+          {/* 反馈表单 - Updated for consistent width */}
           <div
             ref={feedbackFormRef}
             className={
-              showFeedbackForm ? "mt-24 max-w-3xl scroll-mt-24" : "hidden"
+              showFeedbackForm
+                ? "mt-24 w-full max-w-5xl scroll-mt-24 mx-auto"
+                : "hidden"
             }
           >
             <div
-              className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}
+              className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} w-full`}
             >
               <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
                 <h3 className={`text-xl font-bold mb-2 ${textColorClass}`}>

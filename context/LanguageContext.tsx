@@ -328,9 +328,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       if (typeof window !== "undefined" && pathname) {
         const pathWithoutLang = getPathWithoutLanguage(pathname);
         const newPath =
-          pathWithoutLang === "/"
-            ? `/${lang}`
-            : `/${lang}${pathWithoutLang}`;
+          pathWithoutLang === "/" ? `/${lang}` : `/${lang}${pathWithoutLang}`;
         router.push(newPath);
       }
     },

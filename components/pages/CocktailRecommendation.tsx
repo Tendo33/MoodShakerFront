@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -17,7 +17,6 @@ import {
   BookmarkPlus,
   RefreshCcw,
 } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
 import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { getCocktailById } from "@/services/cocktailService";
@@ -62,7 +61,6 @@ export default function CocktailRecommendation() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const cocktailId = searchParams?.get("id");
-  const { theme } = useTheme();
   const { t, getPathWithLanguage } = useLanguage();
   const {
     recommendation: contextCocktail,
@@ -72,7 +70,6 @@ export default function CocktailRecommendation() {
     isImageLoading,
     loadSavedData,
     refreshImage,
-    setIsImageLoading,
   } = useCocktail();
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
@@ -85,25 +82,11 @@ export default function CocktailRecommendation() {
   ); // Default expanded section
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
 
-  // Optimize computed properties with useMemo
-  const themeClasses = useMemo(
-    () =>
-      theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900",
-    [theme],
-  );
-  const textColorClass = useMemo(
-    () => (theme === "dark" ? "text-white" : "text-gray-900"),
-    [theme],
-  );
-  const cardClasses = useMemo(
-    () =>
-      theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900",
-    [theme],
-  );
-  const borderClasses = useMemo(
-    () => (theme === "dark" ? "border-gray-700" : "border-gray-200"),
-    [theme],
-  );
+  // Constants
+  const themeClasses = "bg-gray-900 text-white";
+  const textColorClass = "text-white";
+  const cardClasses = "bg-gray-800 text-white";
+  const borderClasses = "border-gray-700";
   const gradientText =
     "bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent";
 
@@ -187,48 +170,16 @@ export default function CocktailRecommendation() {
     } else if (!cocktail) {
       // Always load fresh data from storage
       loadSavedData();
-
-      // Log the loaded data for debugging
-      console.log("DEBUG", "Loaded data in recommendation page", {
-        hasContextCocktail: !!contextCocktail,
-        hasImageData: !!imageData,
-        cocktailName: contextCocktail?.name,
-      });
-
-      // Set the cocktail from context
       setCocktail(contextCocktail);
-
-      // Add a small delay before showing animations
       setTimeout(() => setIsPageLoaded(true), 100);
     }
-  }, [
-    cocktailId,
-    contextCocktail,
-    loadSavedData,
-    cocktail,
-    getPathWithLanguage,
-    imageData,
-  ]);
+  }, [cocktailId, contextCocktail, loadSavedData, cocktail]);
 
-  // Add a useEffect to refresh the component when it mounts
+  // Update cocktail when context changes
   useEffect(() => {
-    // This will ensure we're always showing the latest data
-    const checkForUpdates = () => {
-      if (!cocktailId && contextCocktail && contextCocktail !== cocktail) {
-        console.log("DEBUG", "Updating cocktail from context", {
-          oldName: cocktail?.name,
-          newName: contextCocktail.name,
-        });
-        setCocktail(contextCocktail);
-      }
-    };
-
-    checkForUpdates();
-
-    // Set up an interval to check for updates (useful if the user navigates back and forth)
-    const intervalId = setInterval(checkForUpdates, 1000);
-
-    return () => clearInterval(intervalId);
+    if (!cocktailId && contextCocktail && contextCocktail !== cocktail) {
+      setCocktail(contextCocktail);
+    }
   }, [contextCocktail, cocktail, cocktailId]);
 
   // Show loading state

@@ -1,7 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import { ThemeProvider } from "@/context/ThemeContext";
 import { ErrorProvider } from "@/context/ErrorContext";
 import { CocktailProvider } from "@/context/CocktailContext";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -25,6 +24,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  generator: "v0.dev",
 };
 
 export default function RootLayout({
@@ -35,22 +35,20 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning className={montserrat.variable}>
       <body className="dark">
-        <ThemeProvider>
-          <ErrorProvider>
-            <CocktailProvider>
-              <LanguageProvider>
-                <div className="min-h-screen flex flex-col">
-                  <Header />
-                  <ErrorAlert />
-                  <main className="flex-1">
-                    <PageTransition>{children}</PageTransition>
-                  </main>
-                  <Footer />
-                </div>
-              </LanguageProvider>
-            </CocktailProvider>
-          </ErrorProvider>
-        </ThemeProvider>
+        <ErrorProvider>
+          <CocktailProvider>
+            <LanguageProvider>
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <ErrorAlert />
+                <main className="flex-1">
+                  <PageTransition>{children}</PageTransition>
+                </main>
+                <Footer />
+              </div>
+            </LanguageProvider>
+          </CocktailProvider>
+        </ErrorProvider>
       </body>
     </html>
   );

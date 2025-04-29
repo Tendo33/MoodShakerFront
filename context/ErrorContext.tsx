@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import {
   createContext,
   useContext,
@@ -46,7 +45,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
       const newError = { message, severity, id };
       setErrors((prev) => [...prev, newError]);
 
-      // 5秒后自动清除错误
+      // Auto-clear error after 5 seconds
       setTimeout(() => {
         clearError(id);
       }, 5000);

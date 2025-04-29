@@ -12,40 +12,32 @@ const IMAGE_API_KEY = process.env.NEXT_PUBLIC_IMAGE_API_KEY;
 const IMAGE_MODEL = process.env.NEXT_PUBLIC_IMAGE_MODEL || "Kwai-Kolors/Kolors";
 
 /**
- * 格式化日志消息
- */
-function formatLogMessage(message: string, data?: any): string {
-  const timestamp = new Date().toISOString();
-  let formattedMessage = `[${timestamp}] ${message}`;
-
-  if (data) {
-    // 如果数据是对象，格式化它但限制大小
-    if (typeof data === "object") {
-      try {
-        const stringified = JSON.stringify(data);
-        formattedMessage += `\n${stringified.length > 500 ? stringified.substring(0, 500) + "..." : stringified}`;
-      } catch (e) {
-        formattedMessage += `\n[Object cannot be stringified]`;
-      }
-    } else {
-      formattedMessage += `\n${data}`;
-    }
-  }
-
-  return formattedMessage;
-}
-
-/**
- * 记录详细日志
+ * Log details with consistent formatting
  */
 function logDetail(
   type: "INFO" | "ERROR" | "DEBUG",
   message: string,
   data?: any,
 ): void {
+  const timestamp = new Date().toISOString();
   const prefix = `[${type}][OpenAI API]`;
+
+  let logMessage = `${prefix} ${message}`;
+  if (data) {
+    try {
+      if (typeof data === "object") {
+        const stringified = JSON.stringify(data);
+        logMessage += `\n${stringified.length > 500 ? stringified.substring(0, 500) + "..." : stringified}`;
+      } else {
+        logMessage += `\n${data}`;
+      }
+    } catch (e) {
+      logMessage += `\n[Object cannot be stringified]`;
+    }
+  }
+
   console[type === "ERROR" ? "error" : type === "DEBUG" ? "debug" : "log"](
-    `${prefix} ${formatLogMessage(message, data)}`,
+    logMessage,
   );
 }
 
@@ -63,31 +55,14 @@ export async function getChatCompletion(
   const startTime = Date.now();
   const model = OPENAI_MODEL;
 
-  logDetail("INFO", `开始请求模型 [${requestId}]`, {
+  logDetail("INFO", `Starting model request [${requestId}]`, {
     model,
     temperature: options.temperature || 0.7,
     max_tokens: options.max_tokens || 1000,
     messagesCount: messages.length,
-    firstMessagePreview: messages[0]?.content.substring(0, 100) + "...",
-    lastMessagePreview:
-      messages[messages.length - 1]?.content.substring(0, 100) + "...",
   });
 
   try {
-    // 记录请求详情
-    logDetail("DEBUG", `请求详情 [${requestId}]`, {
-      url: `${OPENAI_BASE_URL}chat/completions`,
-      method: "POST",
-      model,
-      temperature: options.temperature || 0.7,
-      max_tokens: options.max_tokens || 1000,
-      messagesCount: messages.length,
-      totalTokensEstimate: messages.reduce(
-        (acc, msg) => acc + msg.content.length / 4,
-        0,
-      ), // 粗略估计
-    });
-
     const response = await fetch(`${OPENAI_BASE_URL}chat/completions`, {
       method: "POST",
       headers: {
@@ -107,24 +82,20 @@ export async function getChatCompletion(
 
     if (!response.ok) {
       const errorText = await response.text();
-      logDetail("ERROR", `请求失败 [${requestId}] (${duration}ms)`, {
+      logDetail("ERROR", `Request failed [${requestId}] (${duration}ms)`, {
         status: response.status,
         statusText: response.statusText,
         errorText,
-        headers: Object.fromEntries(response.headers.entries()),
       });
       throw new Error(`OpenAI API error (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
 
-    // 记录成功响应
-    logDetail("INFO", `请求成功 [${requestId}] (${duration}ms)`, {
+    logDetail("INFO", `Request successful [${requestId}] (${duration}ms)`, {
       status: response.status,
       model: data.model,
       usage: data.usage,
-      responsePreview:
-        data.choices[0].message.content.substring(0, 100) + "...",
       finishReason: data.choices[0].finish_reason,
     });
 
@@ -133,14 +104,10 @@ export async function getChatCompletion(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    logDetail("ERROR", `请求异常 [${requestId}] (${duration}ms)`, {
+    logDetail("ERROR", `Request exception [${requestId}] (${duration}ms)`, {
       error:
         error instanceof Error
-          ? {
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-            }
+          ? { name: error.name, message: error.message }
           : String(error),
     });
 
@@ -157,14 +124,14 @@ export async function generateImage(
     negative_prompt?: string;
     image_size?: string;
     seed?: number;
-    image?: string | null; // 添加image参数，用于图像到图像生成
+    image?: string | null;
   } = {},
 ): Promise<string> {
   const requestId = `img_${Math.random().toString(36).substring(2, 15)}`;
   const startTime = Date.now();
 
-  logDetail("INFO", `开始生成图像 [${requestId}]`, {
-    promptPreview: prompt.substring(0, 100) + "...",
+  logDetail("INFO", `Starting image generation [${requestId}]`, {
+    promptLength: prompt.length,
     imageSize: options.image_size || "1024x1024",
     hasSeed: !!options.seed,
     hasNegativePrompt: !!options.negative_prompt,
@@ -172,14 +139,8 @@ export async function generateImage(
   });
 
   try {
-    logDetail("DEBUG", `图像API配置 [${requestId}]`, {
-      apiUrl: IMAGE_API_URL,
-      apiKeyAvailable: !!IMAGE_API_KEY,
-    });
-
-    // Add more detailed logging
     if (!IMAGE_API_KEY) {
-      logDetail("ERROR", `缺少API密钥 [${requestId}]`);
+      logDetail("ERROR", `Missing API key [${requestId}]`);
       throw new Error("Image API Key is required");
     }
 
@@ -194,20 +155,6 @@ export async function generateImage(
       num_inference_steps: 20,
       guidance_scale: 7.5,
     };
-
-    logDetail("DEBUG", `图像生成请求体 [${requestId}]`, {
-      model: requestBody.model,
-      promptLength: prompt.length,
-      negativePromptLength: requestBody.negative_prompt.length,
-      imageSize: requestBody.image_size,
-      seed,
-      steps: requestBody.num_inference_steps,
-      guidanceScale: requestBody.guidance_scale,
-      hasImage: !!options.image,
-    });
-
-    // 打印完整的请求体，便于调试
-    console.log("完整请求体:", JSON.stringify(requestBody, null, 2));
 
     if (!IMAGE_API_URL) {
       throw new Error("Image API URL is required");
@@ -226,51 +173,51 @@ export async function generateImage(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    // 打印完整的响应，便于调试
-    const responseText = await response.text();
-    console.log("API响应:", responseText);
-
     if (!response.ok) {
-      logDetail("ERROR", `图像生成失败 [${requestId}] (${duration}ms)`, {
-        status: response.status,
-        statusText: response.statusText,
-        responseText,
-        headers: Object.fromEntries(response.headers.entries()),
-      });
+      const responseText = await response.text();
+      logDetail(
+        "ERROR",
+        `Image generation failed [${requestId}] (${duration}ms)`,
+        {
+          status: response.status,
+          statusText: response.statusText,
+          responseText,
+        },
+      );
       throw new Error(
         `Image generation API error (${response.status}): ${responseText}`,
       );
     }
 
-    // 解析响应文本为JSON
+    // Parse response text as JSON
     let data;
     try {
+      const responseText = await response.text();
       data = JSON.parse(responseText);
     } catch (e) {
-      logDetail("ERROR", `解析响应JSON失败 [${requestId}]`, {
-        responseText,
+      logDetail("ERROR", `Failed to parse response JSON [${requestId}]`, {
         error: e instanceof Error ? e.message : String(e),
       });
       throw new Error("Failed to parse response as JSON");
     }
 
-    logDetail("INFO", `图像生成成功 [${requestId}] (${duration}ms)`, {
-      status: response.status,
-      responseStructure: {
+    logDetail(
+      "INFO",
+      `Image generation successful [${requestId}] (${duration}ms)`,
+      {
+        status: response.status,
         hasImages: !!data.images,
         imagesCount: data.images?.length || 0,
-        hasUrls: !!data.images?.[0]?.url,
       },
-      urlPreview: data.images?.[0]?.url
-        ? data.images[0].url.substring(0, 50) + "..."
-        : "No URL",
-      timings: data.timings,
-      seed: data.seed,
-    });
+    );
 
-    // 检查响应格式
+    // Check response format
     if (!data.images || !data.images[0] || !data.images[0].url) {
-      logDetail("ERROR", `图像API响应格式错误 [${requestId}]`, data);
+      logDetail(
+        "ERROR",
+        `Invalid response format from image API [${requestId}]`,
+        data,
+      );
       throw new Error("Invalid response format from image API");
     }
 
@@ -279,16 +226,16 @@ export async function generateImage(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    logDetail("ERROR", `图像生成异常 [${requestId}] (${duration}ms)`, {
-      error:
-        error instanceof Error
-          ? {
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-            }
-          : String(error),
-    });
+    logDetail(
+      "ERROR",
+      `Image generation exception [${requestId}] (${duration}ms)`,
+      {
+        error:
+          error instanceof Error
+            ? { name: error.name, message: error.message }
+            : String(error),
+      },
+    );
 
     throw error;
   }

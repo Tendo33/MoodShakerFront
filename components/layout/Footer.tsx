@@ -12,12 +12,10 @@ import {
   Github,
   Heart,
 } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { Container, Divider } from "@/components/ui/core";
 
 export default function Footer() {
-  const { theme } = useTheme();
   const { t, language } = useLanguage();
 
   const socialLinks = [

@@ -10,7 +10,6 @@ import {
   BookOpen,
   Beaker,
 } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
 import {
@@ -39,7 +38,6 @@ const cocktailImages = {
 };
 
 export default function Home() {
-  const { theme } = useTheme();
   const { t, language } = useLanguage();
   const [hasSavedSession, setHasSavedSession] = useState(false);
   const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0);

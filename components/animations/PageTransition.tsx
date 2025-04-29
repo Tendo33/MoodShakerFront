@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -16,11 +15,9 @@ export default function PageTransition({ children }: PageTransitionProps) {
   useEffect(() => {
     if (pathname) {
       setTransitionStage("fadeOut");
-
       const timeout = setTimeout(() => {
         setTransitionStage("fadeIn");
-      }, 300); // Match this with the animation duration
-
+      }, 300);
       return () => clearTimeout(timeout);
     }
   }, [pathname]);

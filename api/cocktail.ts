@@ -1,6 +1,6 @@
 import { getChatCompletion } from "./openai";
 
-// 简化枚举
+// Simplified enums
 export enum AlcoholLevel {
   ANY = "any",
   NONE = "none",
@@ -21,7 +21,7 @@ export enum AgentType {
   CREATIVE_BARTENDER = "creative_bartender",
 }
 
-// 接口定义
+// Interface definitions
 export interface Ingredient {
   name: string;
   amount: string;
@@ -67,7 +67,7 @@ export interface BartenderRequest {
 }
 
 /**
- * 记录详细日志
+ * Log details with consistent formatting
  */
 function logDetail(
   type: "INFO" | "ERROR" | "DEBUG",
@@ -76,7 +76,6 @@ function logDetail(
 ): void {
   const timestamp = new Date().toISOString();
   const prefix = `[${type}][Cocktail API][${timestamp}]`;
-
   let logMessage = `${prefix} ${message}`;
 
   if (data) {
@@ -98,7 +97,7 @@ function logDetail(
 }
 
 /**
- * 创建系统提示
+ * Create system prompt
  */
 function createSystemPrompt(agentType: AgentType, language: string): string {
   // English prompts
@@ -783,6 +782,11 @@ You must strictly follow this JSON format for your response, do not include any 
             "unit": "ml",
             "substitute": "柠檬汁"
         },
+        {  "青柠汁",
+            "amount": "15",
+            "unit": "ml",
+            "substitute": "柠檬汁"
+        },
         {
             "name": "薄荷叶",
             "amount": "6",
@@ -852,13 +856,12 @@ You must strictly follow this JSON format for your response, do not include any 
 }
 
 /**
- * 创建用户消息
+ * Create user message
  */
 function createUserMessage(
   request: BartenderRequest,
   language: string,
 ): string {
-  // 获取当前语言
   const currentLanguage = language || "en";
 
   if (currentLanguage === "en") {
@@ -891,7 +894,7 @@ function createUserMessage(
   } else {
     let message = `用户需求: ${request.message}\n`;
 
-    // 添加其他条件
+    // Add other conditions
     const conditions = [];
     if (request.alcohol_level !== AlcoholLevel.ANY) {
       conditions.push(`酒精浓度: ${request.alcohol_level}`);
@@ -915,33 +918,28 @@ function createUserMessage(
 }
 
 /**
- * 解析完成结果为鸡尾酒对象
+ * Parse completion result to cocktail object
  */
 function parseCocktailFromCompletion(completion: string): Cocktail {
   try {
-    logDetail("DEBUG", "解析模型返回的鸡尾酒数据", {
+    logDetail("DEBUG", "Parsing cocktail data from model response", {
       completionLength: completion.length,
       completionPreview: completion.substring(0, 200) + "...",
     });
 
     const jsonMatch = completion.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      logDetail("ERROR", "无法从返回中提取JSON数据", {
+      logDetail("ERROR", "Cannot extract JSON data from response", {
         completionPreview: completion.substring(0, 300) + "...",
       });
       throw new Error("No JSON found in completion");
     }
 
     const jsonString = jsonMatch[0];
-    logDetail("DEBUG", "提取的JSON字符串", {
-      jsonLength: jsonString.length,
-      jsonPreview: jsonString.substring(0, 200) + "...",
-    });
-
     const cocktail = JSON.parse(jsonString) as Cocktail;
 
-    // 记录解析结果
-    logDetail("INFO", "成功解析鸡尾酒数据", {
+    // Log parsing result
+    logDetail("INFO", "Successfully parsed cocktail data", {
       name: cocktail.name,
       english_name: cocktail.english_name,
       ingredientsCount: cocktail.ingredients?.length || 0,
@@ -949,7 +947,7 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       toolsCount: cocktail.tools?.length || 0,
     });
 
-    // 确保所有必填字段都存在
+    // Ensure all required fields exist
     return {
       name: cocktail.name || "Unknown Cocktail",
       english_name: cocktail.english_name || "",
@@ -966,14 +964,10 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       steps: cocktail.steps || [],
     };
   } catch (error) {
-    logDetail("ERROR", "解析鸡尾酒数据失败", {
+    logDetail("ERROR", "Failed to parse cocktail data", {
       error:
         error instanceof Error
-          ? {
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-            }
+          ? { name: error.name, message: error.message }
           : String(error),
       completionPreview: completion.substring(0, 300) + "...",
     });
@@ -995,7 +989,7 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
 }
 
 /**
- * 生成鸡尾酒推荐
+ * Generate cocktail recommendation
  */
 export async function requestCocktailRecommendation(
   request: BartenderRequest,
@@ -1004,7 +998,7 @@ export async function requestCocktailRecommendation(
   const requestId = `cocktail_${Math.random().toString(36).substring(2, 15)}`;
   const startTime = Date.now();
   try {
-    // 检查本地缓存
+    // Check local cache
     const cacheKey = `${agentType}-${request.alcohol_level}-${request.difficulty_level}-${request.message.substring(
       0,
       20,
@@ -1016,20 +1010,24 @@ export async function requestCocktailRecommendation(
       if (cachedResult) {
         try {
           const parsed = JSON.parse(cachedResult);
-          logDetail("INFO", `找到缓存的鸡尾酒推荐 [${requestId}]`, {
-            cacheKey,
-            cocktailName: parsed.name,
-          });
+          logDetail(
+            "INFO",
+            `Found cached cocktail recommendation [${requestId}]`,
+            {
+              cacheKey,
+              cocktailName: parsed.name,
+            },
+          );
           return parsed;
         } catch (e) {
-          logDetail("DEBUG", `缓存解析失败 [${requestId}]`, {
+          logDetail("DEBUG", `Cache parsing failed [${requestId}]`, {
             error: e instanceof Error ? e.message : String(e),
           });
         }
       }
     }
 
-    // 获取当前语言
+    // Get current language
     const currentLanguage =
       typeof window !== "undefined"
         ? localStorage.getItem("moodshaker-language") || "cn"
@@ -1038,11 +1036,9 @@ export async function requestCocktailRecommendation(
     const systemPrompt = createSystemPrompt(agentType, currentLanguage);
     const userMessage = createUserMessage(request, currentLanguage);
 
-    logDetail("DEBUG", `准备发送请求 [${requestId}]`, {
+    logDetail("DEBUG", `Preparing request [${requestId}]`, {
       systemPromptLength: systemPrompt.length,
       userMessageLength: userMessage.length,
-      systemPromptPreview: systemPrompt.substring(0, 100) + "...",
-      userMessagePreview: userMessage.substring(0, 100) + "...",
       language: currentLanguage,
     });
 
@@ -1057,9 +1053,8 @@ export async function requestCocktailRecommendation(
       },
     );
 
-    logDetail("DEBUG", `收到模型响应 [${requestId}]`, {
+    logDetail("DEBUG", `Received model response [${requestId}]`, {
       completionLength: completion.length,
-      completionPreview: completion.substring(0, 100) + "...",
     });
 
     const cocktail = parseCocktailFromCompletion(completion);
@@ -1067,25 +1062,31 @@ export async function requestCocktailRecommendation(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    logDetail("INFO", `鸡尾酒推荐完成 [${requestId}] (${duration}ms)`, {
-      cocktailName: cocktail.name,
-      englishName: cocktail.english_name,
-      baseSpirit: cocktail.base_spirit,
-      ingredientsCount: cocktail.ingredients.length,
-      stepsCount: cocktail.steps.length,
-      language: currentLanguage,
-    });
+    logDetail(
+      "INFO",
+      `Cocktail recommendation completed [${requestId}] (${duration}ms)`,
+      {
+        cocktailName: cocktail.name,
+        englishName: cocktail.english_name,
+        baseSpirit: cocktail.base_spirit,
+        ingredientsCount: cocktail.ingredients.length,
+        stepsCount: cocktail.steps.length,
+        language: currentLanguage,
+      },
+    );
 
-    // 缓存结果
+    // Cache result
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem(
           `moodshaker-cocktail-${cacheKey}`,
           JSON.stringify(cocktail),
         );
-        logDetail("DEBUG", `已缓存鸡尾酒推荐 [${requestId}]`, { cacheKey });
+        logDetail("DEBUG", `Cached cocktail recommendation [${requestId}]`, {
+          cacheKey,
+        });
       } catch (e) {
-        logDetail("DEBUG", `缓存鸡尾酒失败 [${requestId}]`, {
+        logDetail("DEBUG", `Failed to cache cocktail [${requestId}]`, {
           error: e instanceof Error ? e.message : String(e),
         });
       }
@@ -1096,16 +1097,16 @@ export async function requestCocktailRecommendation(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    logDetail("ERROR", `鸡尾酒推荐失败 [${requestId}] (${duration}ms)`, {
-      error:
-        error instanceof Error
-          ? {
-              name: error.name,
-              message: error.message,
-              stack: error.stack,
-            }
-          : String(error),
-    });
+    logDetail(
+      "ERROR",
+      `Cocktail recommendation failed [${requestId}] (${duration}ms)`,
+      {
+        error:
+          error instanceof Error
+            ? { name: error.name, message: error.message }
+            : String(error),
+      },
+    );
 
     throw error;
   }

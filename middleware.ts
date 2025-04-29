@@ -43,12 +43,16 @@ export function middleware(request: NextRequest) {
   // If no language in pathname, redirect based on user preference or default
   let language = defaultLanguage;
 
-
   // Check for language in cookie
   const languageCookie = request.cookies.get("moodshaker-language");
 
-  if (languageCookie && supportedLanguages.includes(languageCookie.value as typeof supportedLanguages[number])) {
-    language = languageCookie.value as typeof supportedLanguages[number];
+  if (
+    languageCookie &&
+    supportedLanguages.includes(
+      languageCookie.value as (typeof supportedLanguages)[number],
+    )
+  ) {
+    language = languageCookie.value as (typeof supportedLanguages)[number];
   } else {
     const acceptLanguage = request.headers.get("accept-language");
     if (acceptLanguage) {
@@ -80,7 +84,7 @@ export function middleware(request: NextRequest) {
 
   // Set a cookie to remember the language preference
   response.cookies.set("moodshaker-language", language, {
-    maxAge: 60 * 60 * 24, 
+    maxAge: 60 * 60 * 24,
     path: "/",
   });
   console.log("设置Cookie:", language);

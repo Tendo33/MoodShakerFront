@@ -18,7 +18,7 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   ({ icon: Icon, label, error, className, ...props }, ref) => {
     return (
-      <div className="space-y-1">
+      <div className="space-y-1 w-full">
         {label && (
           <label
             htmlFor={props.id}
@@ -60,7 +60,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
     const [showPassword, setShowPassword] = React.useState(false);
 
     return (
-      <div className="space-y-1">
+      <div className="space-y-1 w-full">
         {label && (
           <label
             htmlFor={props.id}

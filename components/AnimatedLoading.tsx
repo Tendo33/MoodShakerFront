@@ -15,7 +15,7 @@ export default function AnimatedLoading({
 }: AnimatedLoadingProps) {
   const [dots, setDots] = useState("");
 
-  // 动态加载点
+  // Dynamic loading dots
   useEffect(() => {
     const interval = setInterval(() => {
       setDots((prev) => {
@@ -27,7 +27,7 @@ export default function AnimatedLoading({
     return () => clearInterval(interval);
   }, []);
 
-  // 尺寸类
+  // Size classes
   const sizeClasses = {
     sm: "w-8 h-8",
     md: "w-12 h-12",
@@ -43,18 +43,18 @@ export default function AnimatedLoading({
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="relative">
-        {/* 静态环 */}
+        {/* Static ring */}
         <div
           className={`${sizeClasses[size]} rounded-full absolute border-4 border-solid border-gray-700/30`}
         ></div>
 
-        {/* 动画环 */}
+        {/* Animated ring */}
         <div
           className={`${sizeClasses[size]} rounded-full animate-spin absolute border-4 border-solid border-transparent bg-gradient-to-r ${colorClass} border-t-current opacity-75`}
           style={{ borderRadius: "50%" }}
         ></div>
 
-        {/* 脉冲效果 */}
+        {/* Pulse effect */}
         <div
           className={`${sizeClasses[size]} absolute animate-ping opacity-20 bg-gradient-to-r ${colorClass} rounded-full`}
         ></div>

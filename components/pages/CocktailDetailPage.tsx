@@ -13,20 +13,19 @@ import {
   BookmarkPlus,
   ChevronDown,
   ChevronUp,
+  Lightbulb,
 } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Cocktail } from "@/api/cocktail";
 import { getCocktailById } from "@/services/cocktailService";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CocktailImage from "@/components/CocktailImage";
-import CocktailStep from "@/components/CocktailStep";
 
 // Static cocktail images mapping
 const staticCocktailImages = {
-  mojito: "/cocktail-mojito.png",
-  margarita: "/cocktail-margarita.png",
-  cosmopolitan: "/cocktail-cosmopolitan.png",
+  mojito: "/cocktails/cocktail-mojito.png",
+  margarita: "/cocktails/cocktail-margarita.png",
+  cosmopolitan: "/cocktails/cocktail-cosmopolitan.png",
 };
 
 interface CocktailDetailPageProps {
@@ -35,7 +34,6 @@ interface CocktailDetailPageProps {
 
 export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
   const router = useRouter();
-  const { theme } = useTheme();
   const { t, getPathWithLanguage } = useLanguage();
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,12 +44,10 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
-  // Computed properties for styling
-  const textColorClass = theme === "dark" ? "text-white" : "text-gray-900";
-  const cardClasses =
-    theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900";
-  const borderClasses =
-    theme === "dark" ? "border-gray-700" : "border-gray-200";
+  // Fixed style classes
+  const textColorClass = "text-white";
+  const cardClasses = "bg-gray-800 text-white";
+  const borderClasses = "border-gray-700";
   const gradientText =
     "bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent";
 
@@ -596,7 +592,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
               )}
             </motion.div>
 
-            {/* Steps Section */}
+            {/* Steps Section - Always expanded on mobile */}
             <motion.div
               className={`border ${borderClasses} rounded-xl shadow-lg overflow-hidden ${cardClasses}`}
               variants={{
@@ -604,34 +600,56 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                 visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
               }}
             >
-              <button
-                className="w-full p-5 flex justify-between items-center bg-gradient-to-r from-pink-500/20 to-purple-500/20"
-                onClick={() => toggleSection("steps")}
-              >
+              <div className="p-5 bg-gradient-to-r from-pink-500/20 to-purple-500/20">
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
                   {t("recommendation.steps")}
                 </h3>
-                {expandedSection === "steps" ? (
-                  <ChevronUp className="h-5 w-5" />
-                ) : (
-                  <ChevronDown className="h-5 w-5" />
-                )}
-              </button>
-              {expandedSection === "steps" && (
-                <div className="p-5">
-                  <ol className="space-y-8">
-                    {cocktail?.steps?.map((step) => (
-                      <CocktailStep
-                        key={step.step_number}
-                        step={step}
-                        isLast={step.step_number === cocktail.steps.length}
-                        theme={theme}
-                        textColorClass={textColorClass}
-                      />
-                    ))}
-                  </ol>
-                </div>
-              )}
+              </div>
+              <div className="p-5">
+                <ol className="space-y-8">
+                  {cocktail?.steps?.map((step) => (
+                    <motion.li
+                      key={step.step_number}
+                      className="flex gap-4"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: step.step_number * 0.1 }}
+                      onMouseEnter={() => setActiveStep(step.step_number)}
+                      onMouseLeave={() => setActiveStep(null)}
+                    >
+                      <motion.div
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
+                        animate={{
+                          scale: activeStep === step.step_number ? 1.1 : 1,
+                        }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {step.step_number}
+                      </motion.div>
+                      <div className="flex-1">
+                        <p
+                          className={`${textColorClass} text-base leading-relaxed`}
+                        >
+                          {step.description}
+                        </p>
+                        {step.tips && (
+                          <motion.div
+                            className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                          >
+                            <p className="text-amber-400/70 text-xs flex items-center gap-2">
+                              <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                              <span>{step.tips}</span>
+                            </p>
+                          </motion.div>
+                        )}
+                      </div>
+                    </motion.li>
+                  ))}
+                </ol>
+              </div>
             </motion.div>
           </div>
 
@@ -731,19 +749,78 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                 <div className="p-5">
                   <ol className="space-y-8">
                     {cocktail?.steps?.map((step) => (
-                      <CocktailStep
+                      <motion.li
                         key={step.step_number}
-                        step={step}
-                        isLast={step.step_number === cocktail.steps.length}
-                        theme={theme}
-                        textColorClass={textColorClass}
-                      />
+                        className="relative"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: step.step_number * 0.1 }}
+                        onMouseEnter={() => setActiveStep(step.step_number)}
+                        onMouseLeave={() => setActiveStep(null)}
+                      >
+                        <div className="flex gap-4">
+                          <motion.div
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
+                            animate={{
+                              scale: activeStep === step.step_number ? 1.1 : 1,
+                              boxShadow:
+                                activeStep === step.step_number
+                                  ? "0 0 15px rgba(236, 72, 153, 0.5)"
+                                  : "0 0 0 rgba(0, 0, 0, 0)",
+                            }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            {step.step_number}
+                          </motion.div>
+                          <div className="flex-1">
+                            <p
+                              className={`${textColorClass} text-lg leading-relaxed`}
+                            >
+                              {step.description}
+                            </p>
+                            {step.tips && (
+                              <motion.div
+                                className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
+                                initial={{ opacity: 1 }} // Changed from 0 to 1 to make tips always visible
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                <p className="text-amber-400/70 text-sm flex items-center gap-2">
+                                  <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                                  <span>{step.tips}</span>
+                                </p>
+                              </motion.div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Step progress line */}
+                        {step.step_number < (cocktail?.steps?.length || 0) && (
+                          <div className="absolute left-5 top-14 bottom-0 w-0.5 bg-gradient-to-b from-pink-500/50 to-amber-500/20 h-[calc(100%-3.5rem)]"></div>
+                        )}
+                      </motion.li>
                     ))}
                   </ol>
                 </div>
               </motion.div>
             </div>
           </div>
+        </motion.div>
+
+        {/* Action buttons with animation */}
+        <motion.div
+          className="mt-12 flex flex-col sm:flex-row gap-4 justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
+          <button
+            onClick={handleBack}
+            className="flex items-center justify-center gap-2 px-6 py-3 border border-gray-700/50 rounded-full transition-all duration-300 hover:bg-white/5"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span>{t("recommendation.back")}</span>
+          </button>
         </motion.div>
       </div>
 

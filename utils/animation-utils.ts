@@ -59,7 +59,7 @@ export const animations = {
   },
 };
 
-// Floating animation for background elements
+// Common animation presets
 export const floatAnimation = {
   y: [0, -10, 0],
   transition: {
@@ -69,7 +69,6 @@ export const floatAnimation = {
   },
 };
 
-// Pulse animation for attention-grabbing elements
 export const pulseAnimation = {
   scale: [1, 1.05, 1],
   opacity: [1, 0.8, 1],
@@ -80,17 +79,6 @@ export const pulseAnimation = {
   },
 };
 
-// Wave animation for interactive elements
-export const waveAnimation = {
-  rotate: [0, 15, -10, 5, 0],
-  transition: {
-    duration: 1.5,
-    repeat: 1,
-    repeatType: "reverse" as const,
-  },
-};
-
-// Shimmer animation for loading states
 export const shimmerAnimation = {
   x: ["-100%", "100%"],
   transition: {
@@ -142,11 +130,6 @@ export function useInViewAnimation(
   }, [threshold]);
 
   return [ref, isInView];
-}
-
-// Function to generate staggered animation classes
-export function getStaggeredDelay(index: number, baseDelay = 100): string {
-  return `[animation-delay:${index * baseDelay}ms]`;
 }
 
 // Function to create custom animation variants

@@ -197,11 +197,11 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     setError(null);
 
     try {
-      // 获取当前语言
+      // Get current language
       const currentLanguage =
         localStorage.getItem("moodshaker-language") || "cn";
 
-      // 构建请求
+      // Build request
       const request: BartenderRequest = {
         message: userFeedback,
         alcohol_level: answers["2"] as AlcoholLevel,
@@ -211,27 +211,25 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         session_id: sessionId,
       };
 
-      // 保存请求到本地存储
+      // Save request to local storage
       saveToStorage(STORAGE_KEYS.REQUEST, request);
 
-      // 根据语言选择调酒师类型
+      // Choose bartender type based on language
       const agentType =
         currentLanguage === "en"
           ? AgentType.CLASSIC_BARTENDER
           : AgentType.CREATIVE_BARTENDER;
 
-      // 发送请求
+      // Send request
       const cocktail = await requestCocktailRecommendation(request, agentType);
 
-      // 保存推荐结果
+      // Save recommendation result
       setRecommendation(cocktail);
       saveToStorage(STORAGE_KEYS.RECOMMENDATION, cocktail);
 
-      // 生成图片
-      const imagePrompt = generateImagePrompt(cocktail);
-      const image = await generateCocktailImage(imagePrompt, sessionId);
-      setImageData(image);
-      setImageVersion(Date.now());
+      // Start image generation in the background
+      setIsImageLoading(true);
+      generateCocktailImageInBackground(cocktail);
 
       return cocktail;
     } catch (err) {
@@ -243,6 +241,26 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       setIsLoading(false);
     }
   }, [answers, baseSpirits, sessionId, userFeedback]);
+
+  // Add a new function to generate the image in the background
+  const generateCocktailImageInBackground = useCallback(
+    async (cocktail: Cocktail) => {
+      try {
+        const imagePrompt = generateImagePrompt(cocktail);
+        const image = await generateCocktailImage(imagePrompt, sessionId);
+        setImageData(image);
+        setImageVersion(Date.now());
+        saveToStorage(STORAGE_KEYS.IMAGE_DATA, image);
+      } catch (err) {
+        console.error("Failed to generate cocktail image:", err);
+        // Don't set error state here as it would disrupt the user experience
+        // Just log the error and continue
+      } finally {
+        setIsImageLoading(false);
+      }
+    },
+    [sessionId],
+  );
 
   // 刷新图片
   const refreshImage = useCallback(async () => {

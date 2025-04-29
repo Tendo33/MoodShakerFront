@@ -1,6 +1,6 @@
 import type { Cocktail } from "@/api/cocktail";
 
-// 示例热门鸡尾酒数据
+// Sample popular cocktail data
 const popularCocktails: Record<string, Cocktail> = {
   mojito: {
     name: "莫吉托",
@@ -36,14 +36,17 @@ const popularCocktails: Record<string, Cocktail> = {
       {
         step_number: 2,
         description: "加入新鲜青柠汁和白朗姆酒。",
+        tips: "先加入青柠汁可以更好地溶解糖分。",
       },
       {
         step_number: 3,
         description: "加入冰块，用调酒勺轻轻搅拌。",
+        tips: "使用碎冰可以让饮品更快冷却。",
       },
       {
         step_number: 4,
         description: "最后加入苏打水至杯口，轻轻搅拌。",
+        tips: "缓慢倒入苏打水以保留气泡。",
       },
       {
         step_number: 5,
@@ -86,22 +89,22 @@ const popularCocktails: Record<string, Cocktail> = {
       {
         step_number: 2,
         description: "将龙舌兰酒、君度橙酒、青柠汁和冰块放入雪克杯中。",
-        tips: "冰块要适量，以免影响口感。",
+        tips: "使用新鲜青柠汁可以获得最佳风味。",
       },
       {
         step_number: 3,
         description: "用力摇晃约15秒，直到雪克杯外壁结霜。",
-        tips: "摇晃时力度要适中，以免酒液溢出。",
+        tips: "充分摇晃可以确保酒液充分混合和冷却。",
       },
       {
         step_number: 4,
         description: "将调好的酒液过滤倒入已经沾好盐的玛格丽特杯中。",
-        tips: "过滤时动作要轻柔，以免破坏酒液的气泡。",
+        tips: "倒酒时动作要轻柔，以免破坏杯口的盐圈。",
       },
       {
         step_number: 5,
         description: "用青柠片装饰杯口，即可享用。",
-        tips: "装饰时不要过度，以免影响口感。",
+        tips: "可以根据个人喜好调整酸甜度，增减糖浆或青柠汁。",
       },
     ],
   },
@@ -138,41 +141,38 @@ const popularCocktails: Record<string, Cocktail> = {
       {
         step_number: 1,
         description: "将伏特加、君度橙酒、蔓越莓汁、青柠汁和冰块放入雪克杯中。",
-        tips: "冰块要适量，以免影响口感。",
+        tips: "使用冰冷的杯具可以保持饮品的低温。",
       },
       {
         step_number: 2,
         description: "用力摇晃约15秒，直到雪克杯外壁结霜。",
-        tips: "摇晃时力度要适中，以免酒液溢出。",
+        tips: "充分摇晃可以使酒液充分混合，并达到理想的稀释度。",
       },
       {
         step_number: 3,
         description: "将调好的酒液过滤倒入预先冰镇的马天尼杯中。",
-        tips: "过滤时动作要轻柔，以免破坏酒液的气泡。",
+        tips: "使用冰镇过的杯子可以保持饮品更长时间的低温。",
       },
       {
         step_number: 4,
         description: "用橙皮或柠檬皮装饰，即可享用。",
-        tips: "也可以用蔓越莓或青柠片装饰。",
+        tips: "轻轻挤压柑橘皮可以释放精油，增添香气。",
       },
     ],
   },
 };
 
-// 根据ID获取鸡尾酒
+// Get cocktail by ID
 export const getCocktailById = async (id: string): Promise<Cocktail | null> => {
-  // 在实际应用中，这将是一个API调用
-  // 现在，我们只返回模拟数据
   return popularCocktails[id] || null;
 };
 
-// 获取所有热门鸡尾酒
+// Get all popular cocktails
 export const getPopularCocktails = async (): Promise<Cocktail[]> => {
-  // 在实际应用中，这将是一个API调用
   return Object.values(popularCocktails);
 };
 
-// 获取热门鸡尾酒的ID
+// Get popular cocktail IDs
 export const getPopularCocktailIds = (): string[] => {
   return Object.keys(popularCocktails);
 };

@@ -4,13 +4,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, CoffeeIcon as Cocktail } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/core";
 
 export default function Header() {
-  const { theme } = useTheme();
   const { t, language, getPathWithLanguage } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

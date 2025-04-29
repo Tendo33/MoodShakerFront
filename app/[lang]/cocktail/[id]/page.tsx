@@ -51,7 +51,7 @@ export function generateStaticParams() {
 
 export default async function CocktailPage({ params }: CocktailPageProps) {
   const { lang, id } = await params;
-  
+
   // Validate language parameter
   if (lang !== "en" && lang !== "cn") {
     redirect("/cn/cocktail/" + id);
