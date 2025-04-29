@@ -11,6 +11,7 @@ import {
   MapPin,
   Github,
   Heart,
+  Martini as Cocktail,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Container, Divider } from "@/components/ui/core";
@@ -87,7 +88,7 @@ export default function Footer() {
               className="flex items-center gap-2 mb-4"
             >
               <div className="w-10 h-10 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 flex items-center justify-center">
-                <span className="text-white text-sm">🍹</span>
+                <Cocktail className="h-5 w-5 text-white" />
               </div>
               <span className="font-bold text-xl bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent">
                 MoodShaker
