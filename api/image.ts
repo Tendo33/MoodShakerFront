@@ -12,29 +12,21 @@ export function generateImagePrompt(cocktail: {
   return `Create a high-resolution product photo of a cocktail named ${wine_name} with these specifications:
 
 Composition:
-
-Center the cocktail perfectly in frame using a top-down perspective
-Elevate the glass on an invisible stand for dimensional emphasis
-Include elegant garnishes arranged in [suggest placement: spiral/radial/asymmetrical] pattern
+cocktail  prominently in the center, elegantly garnished.
 Optical Characteristics:
-
 Use a Canon EOS 5D Mark IV with 50mm f/1.8 lens
 Technical Settings → ISO 100 | 1/200s | f/1.8
 Achieve bokeh background with foreground/background separation
 Lighting & Texture:
-
-Soft directional lighting from [choose: left/right/top] to create:
+oft directional lighting from top to create:
 Gentle liquid refraction patterns
 Condensation beads on glass surface
-Garnish texture details (salt rims, herb veins, fruit pulp)
+Garnish texture details (salt rims etc)
 Color Treatment:
-
 Boost saturation selectively on:
 Liquid hues (emphasize layered colors if present)
-Garnish elements (citrus zest, edible flowers, etc.)
 Maintain neutral white balance (5500K)
 Style Consistency:
-
 Commercial food photography aesthetic
 Focus stacking for full liquid clarity
 Negative space ratio: 30% around subject
