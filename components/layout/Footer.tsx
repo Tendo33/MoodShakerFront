@@ -119,7 +119,7 @@ export default function Footer() {
 
           {/* Contact Us Column */}
           <motion.div
-            className="md:col-span-1"
+            className="md:col-span-1 md:ml-auto"
             initial="hidden"
             animate="visible"
             variants={staggerAnimation}
