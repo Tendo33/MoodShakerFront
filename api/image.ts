@@ -9,7 +9,7 @@ export function generateImagePrompt(cocktail: {
 }): string {
   const wine_name = cocktail.english_name || cocktail.name;
 
-  return `A high-resolution product photo featuring a cocktail named Margarita, centered elegantly garnished. The Canon EOS 5D Mark IV with a 50mm f/1.8 lens captures the scene at ISO 100, 1/200s, f/1.8, creating a bokeh background with distinct foreground/background separation. Soft directional lighting from above highlights gentle liquid refraction patterns, condensation beads on the glass, and intricate garnish textures like a salt rim. Selective saturation boost on liquid hues emphasizes layered colors, while maintaining a neutral white balance at 5500K. The commercial food photography aesthetic is enhanced with focus stacking for full liquid clarity, surrounded by 30% negative space. Variant handling ensures identical framing across different cocktail names, with only liquid colors and garnish elements changing.`;
+  return `Create a high-resolution image showcasing a cocktail named ${wine_name},Think carefully about the appearance of ${wine_name},centered and elegantly garnished. The background should be softly blurred to highlight the cocktail. Use a top-down perspective for consistency across different names, focusing on the cocktail’s charm. Simulate a Canon EOS 5D Mark IV camera with a 50mm prime lens, set at ISO 100, shutter speed 1/200 sec, and aperture f/1.8 for a shallow depth of field. The style should be vivid and clear, emphasizing the cocktail’s intricate details and vibrant colors.`;
 }
 
 /**
