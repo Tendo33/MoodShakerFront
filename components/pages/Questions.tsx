@@ -102,12 +102,12 @@ export default function Questions() {
           },
           {
             id: "medium",
-            text: t("questions.options.medium"),
+            text: t("questions.options.alcohol_medium"),
             image: images.medium,
           },
           {
             id: "high",
-            text: t("questions.options.high"),
+            text: t("questions.options.alcohol_high"),
             image: images.high,
           },
           {
@@ -246,11 +246,13 @@ export default function Questions() {
           }, 100);
         }
       } else if (questionId === questions.length && !showBaseSpirits) {
+        // 只在最后一个问题回答完且基酒选择部分还未显示时，显示基酒选择部分
         setShowBaseSpirits(true);
         setTimeout(() => {
           scrollToElement(baseSpiritsRef.current, 80);
         }, 300);
       }
+      // 移除了自动跳转到反馈表单的逻辑，现在只会在用户点击继续按钮时跳转
     },
     [
       answers,
@@ -270,17 +272,17 @@ export default function Questions() {
   const handleBaseSpiritsToggle = useCallback(
     (spiritId: string) => {
       toggleBaseSpirit(spiritId, baseSpiritsOptions);
-
-      // 选择基酒后自动显示反馈表单
-      setShowFeedbackForm(true);
-
-      // Scroll to feedback form after a short delay
-      setTimeout(() => {
-        scrollToElement(feedbackFormRef.current, 80);
-      }, 300);
     },
-    [toggleBaseSpirit, baseSpiritsOptions, scrollToElement],
+    [toggleBaseSpirit, baseSpiritsOptions],
   );
+
+  // Add new function to handle continuing after base spirits selection
+  const handleContinueAfterBaseSpirits = useCallback(() => {
+    setShowFeedbackForm(true);
+    setTimeout(() => {
+      scrollToElement(feedbackFormRef.current, 80);
+    }, 300);
+  }, [scrollToElement]);
 
   // Update the handleSubmitFeedback function to navigate immediately after getting the cocktail
   const handleSubmitFeedback = useCallback(async () => {
@@ -596,6 +598,20 @@ export default function Questions() {
                         </p>
                       </div>
                     ))}
+                  </div>
+                  {/* Add continue button */}
+                  <div className="mt-6 flex justify-end">
+                    <button
+                      onClick={handleContinueAfterBaseSpirits}
+                      disabled={baseSpirits.length === 0}
+                      className={`bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full flex items-center ${
+                        baseSpirits.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      <span className="font-medium">
+                        {t("questions.continue")}
+                      </span>
+                    </button>
                   </div>
                 </div>
               </div>
