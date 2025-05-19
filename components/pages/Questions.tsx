@@ -12,12 +12,14 @@ const images = {
   // 问题选项图片
   classic: "/classic.png",
   custom: "/custom.png",
-  low: "/low.png",
-  medium: "/medium.png",
-  high: "/high.png",
+  alcohol_low: "/alcohol_low.png",
+  alcohol_medium: "/alcohol_medium.png",
+  alcohol_high: "/alcohol_high.png",
   any: "/any.png",
-  easy: "/easy.png",
-  hard: "/hard.png",
+
+  skill_easy: "/skill_easy.png",
+  skill_medium: "/skill_medium.png",
+  skill_hard: "/skill_hard.png",
 
   // 基酒图片
   gin: "/gin.png",
@@ -97,18 +99,18 @@ export default function Questions() {
         options: [
           {
             id: "low",
-            text: t("questions.options.low"),
-            image: images.low,
+            text: t("questions.options.alcohol_low"),
+            image: images.alcohol_low,
           },
           {
             id: "medium",
             text: t("questions.options.alcohol_medium"),
-            image: images.medium,
+            image: images.alcohol_medium,
           },
           {
             id: "high",
             text: t("questions.options.alcohol_high"),
-            image: images.high,
+            image: images.alcohol_high,
           },
           {
             id: "any",
@@ -124,18 +126,18 @@ export default function Questions() {
         options: [
           {
             id: "easy",
-            text: t("questions.options.easy"),
-            image: images.easy,
+            text: t("questions.options.skill_easy"),
+            image: images.skill_easy,
           },
           {
             id: "medium",
-            text: t("questions.options.medium"),
-            image: images.medium,
+            text: t("questions.options.skill_medium"),
+            image: images.skill_medium,
           },
           {
             id: "hard",
-            text: t("questions.options.hard"),
-            image: images.hard,
+            text: t("questions.options.skill_hard"),
+            image: images.skill_hard,
           },
           {
             id: "any",

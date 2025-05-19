@@ -83,13 +83,13 @@ const translations: TranslationDictionary = {
     // Question options
     "questions.options.classic": "经典特调",
     "questions.options.custom": "来点惊喜",
-    "questions.options.low": "低酒精度",
+    "questions.options.alcohol_low": "低酒精度",
     "questions.options.alcohol_medium": "中酒精度",
     "questions.options.alcohol_high": "高酒精度",
     "questions.options.any": "我无所谓",
-    "questions.options.easy": "简单混合",
-    "questions.options.medium": "中等难度",
-    "questions.options.hard": "调酒大师",
+    "questions.options.skill_easy": "简单混合",
+    "questions.options.skill_medium": "中等难度",
+    "questions.options.skill_hard": "调酒大师",
     "questions.continue": "快完成了😀",
 
     // Base spirits
