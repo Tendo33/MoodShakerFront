@@ -77,12 +77,12 @@ export default function Questions() {
         id: 1,
         title:
           locale === "en"
-            ? "How would you like to drink today?"
-            : "今天想怎么喝？",
+            ? "Ready to shake things up? 🍸"
+            : "准备好摇一摇了吗？🍸",
         description:
           locale === "en"
-            ? "Choose your preferred drinking style"
-            : "选择您喜欢的饮用方式",
+            ? "Let's find your perfect cocktail match! Are you feeling classic or adventurous today?"
+            : "让我们找到你的完美鸡尾酒！今天是想来点经典款还是想尝试新花样？",
         options: [
           {
             id: "classic",
@@ -91,7 +91,7 @@ export default function Questions() {
           },
           {
             id: "custom",
-            text: locale === "en" ? "Custom mix" : "随机创意",
+            text: locale === "en" ? "Surprise Me!" : "来点惊喜",
             image: images.custom,
           },
         ],
@@ -99,60 +99,60 @@ export default function Questions() {
       {
         id: 2,
         title:
-          locale === "en" ? "Preferred alcohol level?" : "喜欢什么酒精浓度？",
+          locale === "en" ? "How strong do you want it? 💪" : "想要多上头？💪",
         description:
           locale === "en"
-            ? "Select your preferred alcohol strength"
-            : "选择您偏好的酒精浓度",
+            ? "Choose your power level - from a gentle buzz to a full-on party starter!"
+            : "选择你的酒精等级 - 从微醺到派对启动器！",
         options: [
           {
             id: "low",
-            text: locale === "en" ? "Low" : "低酒精度",
+            text: locale === "en" ? "Just a Sip" : "低酒精度",
             image: images.low,
           },
           {
             id: "medium",
-            text: locale === "en" ? "Medium" : "中等酒精度",
+            text: locale === "en" ? "Balanced Buzz" : "中酒精度",
             image: images.medium,
           },
           {
             id: "high",
-            text: locale === "en" ? "High" : "高酒精度",
+            text: locale === "en" ? "Party Mode" : "高酒精度",
             image: images.high,
           },
           {
             id: "any",
-            text: locale === "en" ? "Any" : "无所谓",
+            text: locale === "en" ? "Surprise Me!" : "我无所谓",
             image: images.any,
           },
         ],
       },
       {
         id: 3,
-        title: locale === "en" ? "Preparation difficulty" : "制作难度偏好",
+        title: locale === "en" ? "Mixology Level? 🎯" : "调酒技能点？🎯",
         description:
           locale === "en"
-            ? "Select your acceptable preparation difficulty"
-            : "选择您能接受的制作难度",
+            ? "How fancy do you want to get with your cocktail making? We've got options for every skill level!"
+            : "想要多花哨的调酒方式？我们为每个技能等级都准备了选项！",
         options: [
           {
             id: "easy",
-            text: locale === "en" ? "Easy" : "简单",
+            text: locale === "en" ? "Mix & Pour" : "简单混合",
             image: images.easy,
           },
           {
             id: "medium",
-            text: locale === "en" ? "Medium" : "中等",
+            text: locale === "en" ? "Shake & Stir" : "中等难度",
             image: images.medium,
           },
           {
             id: "hard",
-            text: locale === "en" ? "Complex" : "复杂",
+            text: locale === "en" ? "Master Mixologist" : "调酒大师",
             image: images.hard,
           },
           {
             id: "any",
-            text: locale === "en" ? "Any" : "无所谓",
+            text: locale === "en" ? "Surprise Me!" : "我无所谓",
             image: images.any,
           },
         ],
@@ -166,42 +166,42 @@ export default function Questions() {
     () => [
       {
         id: "all",
-        name: locale === "en" ? "All" : "全部",
+        name: locale === "en" ? "All" : "全部🎉",
         description: locale === "en" ? "Use all base spirits" : "使用所有基酒",
       },
       {
         id: "gin",
-        name: locale === "en" ? "Gin" : "金酒",
+        name: locale === "en" ? "Gin" : "金酒🌿",
         description: "Gin",
         image: images.gin,
       },
       {
         id: "rum",
-        name: locale === "en" ? "Rum" : "朗姆酒",
+        name: locale === "en" ? "Rum" : "朗姆酒🏝️",
         description: "Rum",
         image: images.rum,
       },
       {
         id: "vodka",
-        name: locale === "en" ? "Vodka" : "伏特加",
+        name: locale === "en" ? "Vodka" : "伏特加❄️",
         description: "Vodka",
         image: images.vodka,
       },
       {
         id: "whiskey",
-        name: locale === "en" ? "Whiskey" : "威士忌",
+        name: locale === "en" ? "Whiskey" : "威士忌🥃",
         description: "Whiskey",
         image: images.whiskey,
       },
       {
         id: "tequila",
-        name: locale === "en" ? "Tequila" : "龙舌兰",
+        name: locale === "en" ? "Tequila" : "龙舌兰🌵",
         description: "Tequila",
         image: images.tequila,
       },
       {
         id: "brandy",
-        name: locale === "en" ? "Brandy" : "白兰地",
+        name: locale === "en" ? "Brandy" : "白兰地🍇",
         description: "Brandy",
         image: images.brandy,
       },
@@ -628,17 +628,21 @@ export default function Questions() {
             >
               <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
                 <h3 className={`text-xl font-bold mb-2 ${textColorClass}`}>
-                  {t("questions.feedback.title")}
+                  {locale === "en" ? "Last Step: Share Your Mood! 🎯" : "最后一步：分享你的心情！🎯"}
                 </h3>
                 <p className="text-gray-400">
-                  {t("questions.feedback.description")}
+                  {locale === "en" 
+                    ? "Tell us what you're in the mood for - we'll craft the perfect cocktail just for you!"
+                    : "告诉我们你现在的心情 - 我们会为你调制一杯完美的鸡尾酒！"}
                 </p>
               </div>
               <div className="p-6">
                 <textarea
                   value={localUserFeedback}
                   onChange={(e) => setLocalUserFeedback(e.target.value)}
-                  placeholder={t("questions.feedback.placeholder")}
+                  placeholder={locale === "en" 
+                    ? "Feeling adventurous? Celebrating something special? Just want to relax? Let us know! ✨"
+                    : "想要冒险？在庆祝什么？还是只想放松一下？今天的心情？告诉我们吧！✨"}
                   className={`w-full min-h-[150px] border ${borderClasses} rounded-xl p-4 bg-transparent focus:border-pink-500 focus:ring-1 focus:ring-pink-500 focus:outline-none ${textColorClass}`}
                 ></textarea>
               </div>
@@ -656,12 +660,12 @@ export default function Questions() {
                     <>
                       <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
                       <span className="font-medium">
-                        {t("questions.loading")}
+                        {locale === "en" ? "Mixing your perfect drink..." : "正在调制你的完美饮品..."}
                       </span>
                     </>
                   ) : (
                     <span className="font-medium inline-flex items-center">
-                      {t("questions.submit")}
+                      {locale === "en" ? "Shake It Up! 🍸" : "开始摇一摇！🍸"}
                     </span>
                   )}
                 </button>
