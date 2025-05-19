@@ -11,16 +11,25 @@ interface PageTransitionProps {
 export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const [transitionStage, setTransitionStage] = useState("fadeIn");
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (pathname) {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (pathname && isMounted) {
       setTransitionStage("fadeOut");
       const timeout = setTimeout(() => {
         setTransitionStage("fadeIn");
       }, 300);
       return () => clearTimeout(timeout);
     }
-  }, [pathname]);
+  }, [pathname, isMounted]);
+
+  if (!isMounted) {
+    return <div className="w-full">{children}</div>;
+  }
 
   return (
     <div

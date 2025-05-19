@@ -22,7 +22,7 @@ export default function Footer() {
   const socialLinks = [
     { icon: <Facebook size={18} />, href: "#", label: "Facebook" },
     { icon: <Instagram size={18} />, href: "#", label: "Instagram" },
-    { icon: <Twitter size={18} />, href: "#", label: "Twitter" },
+    { icon: <Twitter size={18} />, href: "https://x.com/SimonSun33", label: "Twitter" },
     {
       icon: <Github size={18} />,
       href: "https://github.com/Tendo33",
