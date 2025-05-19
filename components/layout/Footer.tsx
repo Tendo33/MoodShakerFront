@@ -75,17 +75,17 @@ export default function Footer() {
   return (
     <footer className="bg-gray-800/90 backdrop-blur-sm border-t border-gray-700/50 pt-12 pb-6">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 gap-8 mb-8">
           {/* MoodShaker Column */}
           <motion.div
-            className="md:col-span-1"
+            className="md:col-span-1 max-w-2xl mx-auto text-center"
             initial="hidden"
             animate="visible"
             variants={staggerAnimation}
           >
             <motion.div
               variants={itemAnimation}
-              className="flex items-center gap-2 mb-4"
+              className="flex items-center justify-center gap-2 mb-4"
             >
               <div className="w-10 h-10 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 flex items-center justify-center">
                 <Cocktail className="h-5 w-5 text-white" />
@@ -96,13 +96,13 @@ export default function Footer() {
             </motion.div>
             <motion.p
               variants={itemAnimation}
-              className="text-sm text-gray-400 mb-6 max-w-md"
+              className="text-sm text-gray-400 mb-6 max-w-md mx-auto"
             >
               {language === "en"
                 ? "Find the perfect cocktail for your mood and make every tasting experience memorable. Our AI-powered recommendation system helps you discover new flavors tailored to your preferences."
                 : "找到适合您心情的鸡尾酒，让每一次品尝都成为难忘的体验。我们的AI驱动推荐系统帮助您发现适合您口味的新风味。"}
             </motion.p>
-            <motion.div variants={itemAnimation} className="flex space-x-3">
+            <motion.div variants={itemAnimation} className="flex justify-center space-x-3">
               {socialLinks.map((link, index) => (
                 <Link
                   key={index}
@@ -115,29 +115,6 @@ export default function Footer() {
                 </Link>
               ))}
             </motion.div>
-          </motion.div>
-
-          {/* Contact Us Column */}
-          <motion.div
-            className="md:col-span-1 md:ml-auto"
-            initial="hidden"
-            animate="visible"
-            variants={staggerAnimation}
-          >
-            <motion.h3
-              variants={itemAnimation}
-              className="font-bold text-lg mb-4 text-white"
-            >
-              {t("footer.contact")}
-            </motion.h3>
-            <motion.ul variants={itemAnimation} className="space-y-3">
-              {contactInfo.map((item, index) => (
-                <li key={index} className="flex items-center text-gray-400">
-                  {item.icon}
-                  <span>{item.text}</span>
-                </li>
-              ))}
-            </motion.ul>
           </motion.div>
         </div>
 
