@@ -102,7 +102,10 @@ export default function Footer() {
                 ? "Find the perfect cocktail for your mood and make every tasting experience memorable. Our AI-powered recommendation system helps you discover new flavors tailored to your preferences."
                 : "找到适合您心情的鸡尾酒，让每一次品尝都成为难忘的体验。我们的AI驱动推荐系统帮助您发现适合您口味的新风味。"}
             </motion.p>
-            <motion.div variants={itemAnimation} className="flex justify-center space-x-3">
+            <motion.div
+              variants={itemAnimation}
+              className="flex justify-center space-x-3"
+            >
               {socialLinks.map((link, index) => (
                 <Link
                   key={index}

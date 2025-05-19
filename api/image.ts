@@ -7,7 +7,38 @@ export function generateImagePrompt(cocktail: {
   english_name?: string;
   name: string;
 }): string {
-  return `Create a high-resolution image featuring a cocktail named ${cocktail.english_name || cocktail.name} prominently in the center, elegantly garnished. The background should be intentionally blurred to draw attention to the ${cocktail.english_name || cocktail.name} cocktail. Maintain a consistent top-down perspective for various name variations, ensuring the cocktail's allure is always showcased. Capture the image using a Canon EOS 5D Mark IV camera with a 50mm prime lens, set at ISO 100, shutter speed 1/200 sec, and aperture f/1.8 to create a shallow depth of field. The photo should have a vivid and clear style, highlighting the intricate details and vibrant colors of the ${cocktail.english_name || cocktail.name} cocktail.`;
+  const wine_name = cocktail.english_name || cocktail.name;
+
+  return `Create a high-resolution product photo of a cocktail named ${wine_name} with these specifications:
+
+Composition:
+
+Center the cocktail perfectly in frame using a top-down perspective
+Elevate the glass on an invisible stand for dimensional emphasis
+Include elegant garnishes arranged in [suggest placement: spiral/radial/asymmetrical] pattern
+Optical Characteristics:
+
+Use a Canon EOS 5D Mark IV with 50mm f/1.8 lens
+Technical Settings → ISO 100 | 1/200s | f/1.8
+Achieve bokeh background with foreground/background separation
+Lighting & Texture:
+
+Soft directional lighting from [choose: left/right/top] to create:
+Gentle liquid refraction patterns
+Condensation beads on glass surface
+Garnish texture details (salt rims, herb veins, fruit pulp)
+Color Treatment:
+
+Boost saturation selectively on:
+Liquid hues (emphasize layered colors if present)
+Garnish elements (citrus zest, edible flowers, etc.)
+Maintain neutral white balance (5500K)
+Style Consistency:
+
+Commercial food photography aesthetic
+Focus stacking for full liquid clarity
+Negative space ratio: 30% around subject
+For variant handling: Maintain identical framing/composition across different cocktail names, only changing liquid colors and garnish elements.`;
 }
 
 /**

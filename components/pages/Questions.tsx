@@ -531,11 +531,7 @@ export default function Questions() {
             {/* 基酒选择 - Updated for consistent width */}
             <div
               ref={baseSpiritsRef}
-              className={
-                showBaseSpirits
-                  ? "w-full scroll-mt-24"
-                  : "hidden"
-              }
+              className={showBaseSpirits ? "w-full scroll-mt-24" : "hidden"}
               id="base-spirits-section"
             >
               <div
@@ -570,12 +566,16 @@ export default function Questions() {
                                 alt={spirit.name}
                                 className="w-8 h-8 object-cover rounded-full mr-2"
                               />
-                              <span className={`text-base font-medium ${textColorClass}`}>
+                              <span
+                                className={`text-base font-medium ${textColorClass}`}
+                              >
                                 {spirit.name}
                               </span>
                             </div>
                           ) : (
-                            <span className={`text-base font-medium ${textColorClass}`}>
+                            <span
+                              className={`text-base font-medium ${textColorClass}`}
+                            >
                               {spirit.name}
                             </span>
                           )}
@@ -604,11 +604,7 @@ export default function Questions() {
             {/* 反馈表单 - Updated for consistent width */}
             <div
               ref={feedbackFormRef}
-              className={
-                showFeedbackForm
-                  ? "w-full scroll-mt-24"
-                  : "hidden"
-              }
+              className={showFeedbackForm ? "w-full scroll-mt-24" : "hidden"}
             >
               <div
                 className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} w-full`}

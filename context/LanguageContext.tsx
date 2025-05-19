@@ -65,17 +65,21 @@ const translations: TranslationDictionary = {
     "questions.availableSpirits": "可用的基酒（可选）✨",
     "questions.selectSpirits": "请选择您家中有的基酒",
     "questions.feedback.title": "最后一步：分享你的心情！🥳",
-    "questions.feedback.description": "告诉我们你现在的心情 - 我们会为你调制一杯完美的鸡尾酒！",
-    "questions.feedback.placeholder": "想要冒险？在庆祝什么？还是只想放松一下？今天的心情？告诉我们吧！✨",
+    "questions.feedback.description":
+      "告诉我们你现在的心情 - 我们会为你调制一杯完美的鸡尾酒！",
+    "questions.feedback.placeholder":
+      "想要冒险？在庆祝什么？还是只想放松一下？今天的心情？告诉我们吧！✨",
     "questions.submit": "查看推荐鸡尾酒",
     "questions.loading": "正在为您匹配...",
     "questions.ready.title": "准备好摇一摇了吗？🍸",
-    "questions.ready.description": "让我们找到你的完美鸡尾酒！今天是想来点经典款还是想尝试新花样？",
+    "questions.ready.description":
+      "让我们找到你的完美鸡尾酒！今天是想来点经典款还是想尝试新花样？",
     "questions.strength.title": "想要多上头？💪",
     "questions.strength.description": "选择你的酒精等级 - 从微醺到派对启动器！",
     "questions.skill.title": "调酒技能点？🎯",
-    "questions.skill.description": "想要多花哨的调酒方式？我们为每个技能等级都准备了选项！",
-    
+    "questions.skill.description":
+      "想要多花哨的调酒方式？我们为每个技能等级都准备了选项！",
+
     // Question options
     "questions.options.classic": "经典特调",
     "questions.options.custom": "来点惊喜",
@@ -175,17 +179,22 @@ const translations: TranslationDictionary = {
     "questions.availableSpirits": "Available Spirits (Optional) ✨",
     "questions.selectSpirits": "Please select the spirits you have at home",
     "questions.feedback.title": "Last Step: Share Your Mood! 🥳",
-    "questions.feedback.description": "Tell us what you're in the mood for - we'll craft the perfect cocktail just for you!",
-    "questions.feedback.placeholder": "Feeling adventurous? Celebrating something special? Just want to relax? Let us know! ✨",
+    "questions.feedback.description":
+      "Tell us what you're in the mood for - we'll craft the perfect cocktail just for you!",
+    "questions.feedback.placeholder":
+      "Feeling adventurous? Celebrating something special? Just want to relax? Let us know! ✨",
     "questions.submit": "View Recommended Cocktail",
     "questions.loading": "Finding your perfect match...",
     "questions.ready.title": "Ready to shake things up? 🍸",
-    "questions.ready.description": "Let's find your perfect cocktail match! Are you feeling classic or adventurous today?",
+    "questions.ready.description":
+      "Let's find your perfect cocktail match! Are you feeling classic or adventurous today?",
     "questions.strength.title": "How strong do you want it? 💪",
-    "questions.strength.description": "Choose your power level - from a gentle buzz to a full-on party starter!",
+    "questions.strength.description":
+      "Choose your power level - from a gentle buzz to a full-on party starter!",
     "questions.skill.title": "Mixology Level? 🎯",
-    "questions.skill.description": "How fancy do you want to get with your cocktail making? We've got options for every skill level!",
-    
+    "questions.skill.description":
+      "How fancy do you want to get with your cocktail making? We've got options for every skill level!",
+
     // Question options
     "questions.options.classic": "Choose from classics",
     "questions.options.custom": "Surprise Me!",

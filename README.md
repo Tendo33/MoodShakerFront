@@ -21,10 +21,10 @@ MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的调
 
 ```bash
 # 1. 克隆仓库
-git clone [你的仓库地址]
+git clone [[你的仓库地址]](https://github.com/Tendo33/MoodShakerFront)
 cd MoodShakerFront
 
-# 2. 安装依赖（我们使用 pnpm，因为它比 npm 快，就像调酒师的动作一样利落）
+# 2. 安装依赖
 pnpm install
 
 # 3. 启动开发服务器
@@ -78,8 +78,8 @@ MoodShakerFront/
 
 ## 📝 许可证
 
-[你的许可证信息]
+[MIT](https://opensource.org/licenses/MIT)
 
 ---
 
-> "生活就像一杯鸡尾酒，重要的不是它的成分，而是调制它的心情。" - MoodShaker 团队
+> "生活就像一杯鸡尾酒，重要的不是它的成分，而是调制它的心情。"

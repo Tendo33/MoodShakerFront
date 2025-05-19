@@ -4,7 +4,8 @@ import Home from "@/components/pages/Home";
 
 export const metadata: Metadata = {
   title: "MoodShaker - Find Your Perfect Cocktail",
-  description: "Answer a few simple questions and let us recommend the perfect cocktail for you",
+  description:
+    "Answer a few simple questions and let us recommend the perfect cocktail for you",
   icons: {
     icon: "logo.png",
   },

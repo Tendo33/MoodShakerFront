@@ -38,7 +38,9 @@ export default function CocktailImage({
 
         // If we have a cocktail ID, try to get the static image first
         if (cocktailId && cocktailId in cocktailImages) {
-          setImageSrc(cocktailImages[cocktailId as keyof typeof cocktailImages]);
+          setImageSrc(
+            cocktailImages[cocktailId as keyof typeof cocktailImages],
+          );
           return;
         }
 
@@ -63,12 +65,7 @@ export default function CocktailImage({
     };
 
     loadImage();
-  }, [
-    cocktailId,
-    imageData,
-    cocktailName,
-    placeholderUrl,
-  ]);
+  }, [cocktailId, imageData, cocktailName, placeholderUrl]);
 
   return (
     <>

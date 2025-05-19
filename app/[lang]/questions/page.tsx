@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export default async function QuestionsPage({ params }: PageProps) {
   // Validate language parameter
   const validLangs = ["en", "cn"];
-  
+
   const { lang } = await params;
 
   if (!validLangs.includes(lang)) {

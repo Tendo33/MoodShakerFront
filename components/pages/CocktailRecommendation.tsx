@@ -24,7 +24,6 @@ import type { Cocktail } from "@/api/cocktail";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CocktailImage from "@/components/CocktailImage";
 
-
 // Animation variants for framer-motion
 const fadeIn = {
   hidden: { opacity: 0 },
