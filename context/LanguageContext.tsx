@@ -120,6 +120,26 @@ const translations: TranslationDictionary = {
     "common.loading": "加载中...",
     "common.error": "出错了",
     "common.tryAgain": "重试",
+
+    // Recommendation page
+    "recommendation.back": "返回首页",
+    "recommendation.share": "分享配方",
+    "recommendation.copied": "链接已复制到剪贴板",
+    "recommendation.yourRequirements": "您的需求",
+    "recommendation.recommendationReason": "为什么推荐这款",
+    "recommendation.ingredients": "配料",
+    "recommendation.prepareIngredients": "准备以下配料",
+    "recommendation.tools": "工具",
+    "recommendation.toolsNeeded": "需要的工具",
+    "recommendation.alternative": "替代方案",
+    "recommendation.steps": "制作步骤",
+    "recommendation.followSteps": "按照以下步骤制作您的鸡尾酒",
+    "recommendation.tip": "小贴士",
+    "recommendation.tryAgain": "重试",
+    "recommendation.notFound": "未找到鸡尾酒",
+    "recommendation.notFoundDesc": "抱歉，我们找不到您请求的鸡尾酒",
+    "recommendation.loading": "正在加载鸡尾酒信息...",
+    "recommendation.imageLoading": "正在生成鸡尾酒图片...",
   },
   en: {
     // App title

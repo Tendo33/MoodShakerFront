@@ -27,11 +27,17 @@ export async function generateMetadata({
       description:
         cocktail?.description ||
         "Discover this delicious cocktail recipe on MoodShaker",
+      icons: {
+        icon: "logo.png",
+      },
     };
   } catch (error) {
     return {
       title: "Cocktail | MoodShaker",
       description: "Discover delicious cocktail recipes on MoodShaker",
+      icons: {
+        icon: "logo.png",
+      },
     };
   }
 }
