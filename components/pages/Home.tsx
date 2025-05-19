@@ -233,10 +233,11 @@ export default function Home() {
               ) : (
                 <motion.div variants={animations.slideUp}>
                   <Button
-                    size="md"
+                    size="lg"
                     iconPosition="right"
                     icon={<ArrowRight className="h-4 w-4" />}
                     href={questionsPath}
+                    className="ml-80"
                   >
                     {t("home.start")}
                   </Button>
@@ -513,7 +514,7 @@ export default function Home() {
                 : "立即开始，让我们为您推荐最适合您心情的饮品。"}
             </p>
             <Button
-              size="md"
+              size="lg"
               iconPosition="right"
               icon={<ArrowRight className="h-4 w-4" />}
               href={questionsPath}
