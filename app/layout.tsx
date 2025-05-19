@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description:
     "Answer a few simple questions and let us recommend the perfect cocktail for you",
   icons: {
-    icon: "/favicon.ico",
+    icon: "logo.png",
   },
 };
 

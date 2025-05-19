@@ -86,12 +86,12 @@ export default function Questions() {
         options: [
           {
             id: "classic",
-            text: locale === "en" ? "Choose from classics" : "从经典中选择",
+            text: locale === "en" ? "Choose from classics" : "经典特调",
             image: images.classic,
           },
           {
             id: "custom",
-            text: locale === "en" ? "Custom mix" : "自己调配",
+            text: locale === "en" ? "Custom mix" : "随机创意",
             image: images.custom,
           },
         ],
