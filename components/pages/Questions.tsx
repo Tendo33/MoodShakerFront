@@ -12,6 +12,7 @@ const images = {
   // 问题选项图片
   classic: "/classic.png",
   custom: "/custom.png",
+  
   alcohol_low: "/alcohol_low.png",
   alcohol_medium: "/alcohol_medium.png",
   alcohol_high: "/alcohol_high.png",
