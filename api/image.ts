@@ -9,28 +9,7 @@ export function generateImagePrompt(cocktail: {
 }): string {
   const wine_name = cocktail.english_name || cocktail.name;
 
-  return `Create a high-resolution product photo of a cocktail named ${wine_name} with these specifications:
-
-Composition:
-cocktail  prominently in the center, elegantly garnished.
-Optical Characteristics:
-Use a Canon EOS 5D Mark IV with 50mm f/1.8 lens
-Technical Settings → ISO 100 | 1/200s | f/1.8
-Achieve bokeh background with foreground/background separation
-Lighting & Texture:
-oft directional lighting from top to create:
-Gentle liquid refraction patterns
-Condensation beads on glass surface
-Garnish texture details (salt rims etc)
-Color Treatment:
-Boost saturation selectively on:
-Liquid hues (emphasize layered colors if present)
-Maintain neutral white balance (5500K)
-Style Consistency:
-Commercial food photography aesthetic
-Focus stacking for full liquid clarity
-Negative space ratio: 30% around subject
-For variant handling: Maintain identical framing/composition across different cocktail names, only changing liquid colors and garnish elements.`;
+  return `A high-resolution product photo featuring a cocktail named Margarita, centered elegantly garnished. The Canon EOS 5D Mark IV with a 50mm f/1.8 lens captures the scene at ISO 100, 1/200s, f/1.8, creating a bokeh background with distinct foreground/background separation. Soft directional lighting from above highlights gentle liquid refraction patterns, condensation beads on the glass, and intricate garnish textures like a salt rim. Selective saturation boost on liquid hues emphasizes layered colors, while maintaining a neutral white balance at 5500K. The commercial food photography aesthetic is enhanced with focus stacking for full liquid clarity, surrounded by 30% negative space. Variant handling ensures identical framing across different cocktail names, with only liquid colors and garnish elements changing.`;
 }
 
 /**
