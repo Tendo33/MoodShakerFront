@@ -62,7 +62,7 @@ const translations: TranslationDictionary = {
 
     // Questions page
     "questions.back": "返回",
-    "questions.availableSpirits": "可用的基酒（可选）",
+    "questions.availableSpirits": "可用的基酒（可选）✨",
     "questions.selectSpirits": "请选择您家中有的基酒",
     "questions.feedback.title": "还有什么想告诉我们的？",
     "questions.feedback.description": "请分享您的任何特殊需求或偏好",

@@ -441,7 +441,7 @@ export default function Questions() {
                 />
               </div>
               <h3
-                className={`font-medium ${textColorClass} text-center w-full`}
+                className={`text-base font-medium ${textColorClass} text-center w-full`}
               >
                 {option.text}
               </h3>
@@ -476,8 +476,9 @@ export default function Questions() {
         </div>
 
         <div className="flex-1" ref={containerRef}>
-          {/* 问题列表 */}
+          {/* 所有主要部分的容器 */}
           <div className="space-y-12 w-full max-w-5xl mx-auto">
+            {/* 问题列表 */}
             {questions.map((question) => (
               <div
                 key={question.id}
@@ -539,136 +540,136 @@ export default function Questions() {
                 </div>
               </div>
             ))}
-          </div>
 
-          {/* 基酒选择 - Updated for consistent width */}
-          <div
-            ref={baseSpiritsRef}
-            className={
-              showBaseSpirits
-                ? "mt-24 w-full max-w-5xl scroll-mt-24 mx-auto"
-                : "hidden"
-            }
-            id="base-spirits-section"
-          >
+            {/* 基酒选择 - Updated for consistent width */}
             <div
-              className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} w-full`}
+              ref={baseSpiritsRef}
+              className={
+                showBaseSpirits
+                  ? "w-full scroll-mt-24"
+                  : "hidden"
+              }
+              id="base-spirits-section"
             >
-              <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
-                <h3 className={`text-xl font-bold mb-2 ${textColorClass}`}>
-                  {t("questions.availableSpirits")}
-                </h3>
-                <p className="text-gray-400 mb-4">
-                  {t("questions.selectSpirits")}
-                </p>
-              </div>
-              <div className="p-6">
-                {/* Updated grid layout for base spirits with consistent sizing */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {baseSpiritsOptions.map((spirit) => (
-                    <div
-                      key={spirit.id}
-                      className={`cursor-pointer p-4 rounded-xl transition-all duration-300 border h-full flex flex-col justify-between ${
-                        baseSpirits.includes(spirit.id)
-                          ? "border-pink-500 bg-gradient-to-br from-amber-500/10 to-pink-500/10"
-                          : `${borderClasses} hover:border-white/30`
-                      }`}
-                      onClick={() => handleBaseSpiritsToggle(spirit.id)}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        {spirit.image ? (
-                          <div className="flex items-center">
-                            <img
-                              src={spirit.image || "/placeholder.svg"}
-                              alt={spirit.name}
-                              className="w-8 h-8 object-cover rounded-full mr-2"
-                            />
-                            <span className={`font-medium ${textColorClass}`}>
+              <div
+                className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} w-full`}
+              >
+                <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
+                  <h3 className={`text-2xl font-bold mb-2 ${textColorClass}`}>
+                    {t("questions.availableSpirits")}
+                  </h3>
+                  <p className="text-gray-400 mb-4">
+                    {t("questions.selectSpirits")}
+                  </p>
+                </div>
+                <div className="p-6">
+                  {/* Updated grid layout for base spirits with consistent sizing */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {baseSpiritsOptions.map((spirit) => (
+                      <div
+                        key={spirit.id}
+                        className={`cursor-pointer p-4 rounded-xl transition-all duration-300 border h-full flex flex-col justify-between ${
+                          baseSpirits.includes(spirit.id)
+                            ? "border-pink-500 bg-gradient-to-br from-amber-500/10 to-pink-500/10"
+                            : `${borderClasses} hover:border-white/30`
+                        }`}
+                        onClick={() => handleBaseSpiritsToggle(spirit.id)}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          {spirit.image ? (
+                            <div className="flex items-center">
+                              <img
+                                src={spirit.image || "/placeholder.svg"}
+                                alt={spirit.name}
+                                className="w-8 h-8 object-cover rounded-full mr-2"
+                              />
+                              <span className={`text-base font-medium ${textColorClass}`}>
+                                {spirit.name}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className={`text-base font-medium ${textColorClass}`}>
                               {spirit.name}
                             </span>
-                          </div>
-                        ) : (
-                          <span className={`font-medium ${textColorClass}`}>
-                            {spirit.name}
-                          </span>
-                        )}
-                        <div
-                          className={
-                            baseSpirits.includes(spirit.id)
-                              ? "h-5 w-5 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 flex items-center justify-center"
-                              : "h-5 w-5 rounded-full bg-white/10 flex items-center justify-center"
-                          }
-                        >
-                          {baseSpirits.includes(spirit.id) && (
-                            <Check className="h-3 w-3 text-white" />
                           )}
+                          <div
+                            className={
+                              baseSpirits.includes(spirit.id)
+                                ? "h-5 w-5 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 flex items-center justify-center"
+                                : "h-5 w-5 rounded-full bg-white/10 flex items-center justify-center"
+                            }
+                          >
+                            {baseSpirits.includes(spirit.id) && (
+                              <Check className="h-3 w-3 text-white" />
+                            )}
+                          </div>
                         </div>
+                        <p className="text-base text-gray-400">
+                          {spirit.description}
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-400">
-                        {spirit.description}
-                      </p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* 反馈表单 - Updated for consistent width */}
-          <div
-            ref={feedbackFormRef}
-            className={
-              showFeedbackForm
-                ? "mt-24 w-full max-w-5xl scroll-mt-24 mx-auto"
-                : "hidden"
-            }
-          >
+            {/* 反馈表单 - Updated for consistent width */}
             <div
-              className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} w-full`}
+              ref={feedbackFormRef}
+              className={
+                showFeedbackForm
+                  ? "w-full scroll-mt-24"
+                  : "hidden"
+              }
             >
-              <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
-                <h3 className={`text-xl font-bold mb-2 ${textColorClass}`}>
-                  {locale === "en" ? "Last Step: Share Your Mood! 🎯" : "最后一步：分享你的心情！🎯"}
-                </h3>
-                <p className="text-gray-400">
-                  {locale === "en" 
-                    ? "Tell us what you're in the mood for - we'll craft the perfect cocktail just for you!"
-                    : "告诉我们你现在的心情 - 我们会为你调制一杯完美的鸡尾酒！"}
-                </p>
-              </div>
-              <div className="p-6">
-                <textarea
-                  value={localUserFeedback}
-                  onChange={(e) => setLocalUserFeedback(e.target.value)}
-                  placeholder={locale === "en" 
-                    ? "Feeling adventurous? Celebrating something special? Just want to relax? Let us know! ✨"
-                    : "想要冒险？在庆祝什么？还是只想放松一下？今天的心情？告诉我们吧！✨"}
-                  className={`w-full min-h-[150px] border ${borderClasses} rounded-xl p-4 bg-transparent focus:border-pink-500 focus:ring-1 focus:ring-pink-500 focus:outline-none ${textColorClass}`}
-                ></textarea>
-              </div>
-              <div className="px-6 py-4 flex justify-end border-t border-gray-700">
-                <button
-                  onClick={handleSubmitFeedback}
-                  className={`bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full flex items-center ${
-                    isLoading || localLoading
-                      ? "opacity-70 cursor-not-allowed"
-                      : ""
-                  }`}
-                  disabled={isLoading || localLoading}
-                >
-                  {isLoading || localLoading ? (
-                    <>
-                      <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
-                      <span className="font-medium">
-                        {locale === "en" ? "Mixing your perfect drink..." : "正在调制你的完美饮品..."}
+              <div
+                className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} w-full`}
+              >
+                <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
+                  <h3 className={`text-2xl font-bold mb-2 ${textColorClass}`}>
+                    {locale === "en" ? "Last Step: Share Your Mood! 🥳" : "最后一步：分享你的心情！🥳"}
+                  </h3>
+                  <p className="text-gray-400">
+                    {locale === "en" 
+                      ? "Tell us what you're in the mood for - we'll craft the perfect cocktail just for you!"
+                      : "告诉我们你现在的心情 - 我们会为你调制一杯完美的鸡尾酒！"}
+                  </p>
+                </div>
+                <div className="p-6">
+                  <textarea
+                    value={localUserFeedback}
+                    onChange={(e) => setLocalUserFeedback(e.target.value)}
+                    placeholder={locale === "en" 
+                      ? "Feeling adventurous? Celebrating something special? Just want to relax? Let us know! ✨"
+                      : "想要冒险？在庆祝什么？还是只想放松一下？今天的心情？告诉我们吧！✨"}
+                    className={`w-full min-h-[150px] border ${borderClasses} rounded-xl p-4 bg-transparent focus:border-pink-500 focus:ring-1 focus:ring-pink-500 focus:outline-none ${textColorClass}`}
+                  ></textarea>
+                </div>
+                <div className="px-6 py-4 flex justify-end border-t border-gray-700">
+                  <button
+                    onClick={handleSubmitFeedback}
+                    className={`bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full flex items-center ${
+                      isLoading || localLoading
+                        ? "opacity-70 cursor-not-allowed"
+                        : ""
+                    }`}
+                    disabled={isLoading || localLoading}
+                  >
+                    {isLoading || localLoading ? (
+                      <>
+                        <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
+                        <span className="font-medium">
+                          {locale === "en" ? "Mixing your perfect drink..." : "正在调制你的完美饮品..."}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="font-medium inline-flex items-center">
+                        {locale === "en" ? "Shake It Up! 🍸" : "开始摇一摇！🍸"}
                       </span>
-                    </>
-                  ) : (
-                    <span className="font-medium inline-flex items-center">
-                      {locale === "en" ? "Shake It Up! 🍸" : "开始摇一摇！🍸"}
-                    </span>
-                  )}
-                </button>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
