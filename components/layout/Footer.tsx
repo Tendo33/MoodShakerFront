@@ -25,7 +25,7 @@ export default function Footer() {
     { icon: <Twitter size={18} />, href: "https://x.com/SimonSun33", label: "Twitter" },
     {
       icon: <Github size={18} />,
-      href: "https://github.com/Tendo33",
+      href: "https://github.com/Tendo33/MoodShakerFront",
       label: "Github",
     },
   ];

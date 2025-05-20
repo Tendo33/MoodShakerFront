@@ -19,7 +19,7 @@ MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的调
 
 ### 环境变量配置
 
-在开始之前，你需要配置以下环境变量。创建 `.env` 文件并填写相应的值：
+在开始之前，你需要配置以下环境变量。将 `.env.example` 文件重命名为 `.env`，然后填写相应的值：
 
 ```bash
 # OpenAI Configuration
@@ -41,21 +41,25 @@ PORT=3000
 
 ```bash
 # 1. 克隆仓库
-git clone [[你的仓库地址]](https://github.com/Tendo33/MoodShakerFront)
+git clone https://github.com/Tendo33/MoodShakerFront
 cd MoodShakerFront
 
-# 2. 安装依赖
+# 2. 配置环境变量
+mv .env.example .env
+# 编辑 .env 文件，填写必要的环境变量
+
+# 3. 安装依赖
 pnpm install
 
-# 3. 启动开发服务器
+# 4. 启动开发服务器
 pnpm dev
 ```
 
 ### 方法二：Docker 部署（适合专业调酒师）
 
 ```bash
-# 1. 创建并配置 .env 文件
-touch .env
+# 1. 配置环境变量
+mv .env.example .env
 # 编辑 .env 文件，填写必要的环境变量
 
 # 2. 一键启动所有服务
@@ -86,16 +90,10 @@ MoodShakerFront/
 
 ## 🛠️ 技术栈
 
-- **框架**: Next.js 15（我们的调酒台）
-- **语言**: TypeScript（精确的配方）
-- **样式**: Tailwind CSS（优雅的装饰）
-- **UI组件**: Radix UI（专业的调酒工具）
-- **表单处理**: React Hook Form（订单系统）
-- **数据可视化**: Recharts（调酒数据展示）
-- **通知系统**: Sonner（服务铃）
-- **动画效果**: Framer Motion（调酒表演）
-- **主题支持**: next-themes（灯光控制）
-
+- **框架**: Next.js 15
+- **语言**: TypeScript
+- **样式**: Tailwind CSS
+- **UI组件**: Radix UI
 ## 🤝 加入我们
 
 想要成为我们的调酒师吗？欢迎提交 Pull Request！让我们一起调制出更多精彩的心情鸡尾酒！
