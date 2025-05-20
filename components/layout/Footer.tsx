@@ -140,7 +140,6 @@ export default function Footer() {
                 className="h-3.5 w-3.5 mx-1 text-pink-500 inline"
                 fill="currentColor"
               />
-              {t("footer.inShanghai")}
             </p>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4 md:mt-0">
               {footerLinks.map((link, index) => (

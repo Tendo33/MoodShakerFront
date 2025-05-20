@@ -114,8 +114,7 @@ const translations: TranslationDictionary = {
     "footer.privacy": "隐私政策",
     "footer.terms": "使用条款",
     "footer.contact": "联系我们",
-    "footer.madeWith": "用",
-    "footer.inShanghai": "在上海制作",
+    "footer.madeWith": "AI生成的回答未必正确无误，请仔细核查",
 
     // Language selector
     "language.select": "选择语言",
@@ -250,8 +249,7 @@ const translations: TranslationDictionary = {
     "footer.privacy": "Privacy Policy",
     "footer.terms": "Terms of Use",
     "footer.contact": "Contact Us",
-    "footer.madeWith": "Made with",
-    "footer.inShanghai": "in Shanghai",
+    "footer.madeWith": "AI Generated answers may not be accurate, please verify carefully",
 
     // Language selector
     "language.select": "Select Language",
