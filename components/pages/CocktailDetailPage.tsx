@@ -16,7 +16,7 @@ import {
   Lightbulb,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import type { Cocktail } from "@/api/cocktail";
+import type { Cocktail, Ingredient, Tool, Step } from "@/api/cocktail";
 import { getCocktailById } from "@/services/cocktailService";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CocktailImage from "@/components/CocktailImage";
@@ -34,13 +34,11 @@ interface CocktailDetailPageProps {
 
 export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
   const router = useRouter();
-  const { t, getPathWithLanguage } = useLanguage();
+  const { t, getPathWithLanguage, language } = useLanguage();
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string | null>(
-    "steps",
-  );
+  const [expandedSection, setExpandedSection] = useState<string | null>("steps");
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
@@ -50,6 +48,44 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
   const borderClasses = "border-gray-700";
   const gradientText =
     "bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent";
+
+  // Helper function to get localized content
+  const getLocalizedContent = (field: string, englishField: string): string | undefined => {
+    if (language === "en" && cocktail?.[englishField as keyof Cocktail]) {
+      return cocktail[englishField as keyof Cocktail] as string;
+    }
+    return cocktail?.[field as keyof Cocktail] as string;
+  };
+
+  // Helper function to get localized ingredient name
+  const getLocalizedIngredientName = (ingredient: Ingredient): string => {
+    if (language === "en" && ingredient.english_name) {
+      return ingredient.english_name;
+    }
+    return ingredient.name;
+  };
+
+  // Helper function to get localized tool name
+  const getLocalizedToolName = (tool: Tool): string => {
+    if (language === "en" && tool.english_name) {
+      return tool.english_name;
+    }
+    return tool.name;
+  };
+
+  // Helper function to get localized step content
+  const getLocalizedStepContent = (step: Step): { description: string; tips?: string } => {
+    if (language === "en") {
+      return {
+        description: step.english_description || step.description,
+        tips: step.english_tips || step.tips,
+      };
+    }
+    return {
+      description: step.description,
+      tips: step.tips,
+    };
+  };
 
   // Fetch cocktail data
   useEffect(() => {
@@ -202,13 +238,15 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
             visible: { opacity: 1, transition: { duration: 0.5 } },
           }}
         >
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/10 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>{t("recommendation.back")}</span>
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>{t("recommendation.back")}</span>
+            </button>
+          </div>
 
           <div className="flex items-center gap-2">
             <motion.button
@@ -311,9 +349,9 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                 <h1
                   className={`text-4xl md:text-5xl font-bold mb-2 ${gradientText} inline-block`}
                 >
-                  {cocktail?.name}
+                  {getLocalizedContent("name", "english_name")}
                 </h1>
-                {cocktail?.english_name && (
+                {cocktail?.english_name && language === "cn" && (
                   <p className="text-gray-400 text-xl mb-4">
                     {cocktail.english_name}
                   </p>
@@ -328,7 +366,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                 }}
               >
                 <p className="text-gray-400 leading-relaxed text-lg">
-                  {cocktail?.description}
+                  {getLocalizedContent("description", "english_description")}
                 </p>
               </motion.div>
 
@@ -379,7 +417,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                     <p className="text-sm text-gray-400">Base Spirit</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {cocktail?.base_spirit}
+                    {getLocalizedContent("base_spirit", "english_base_spirit")}
                   </p>
                 </motion.div>
                 <motion.div
@@ -398,7 +436,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                     <p className="text-sm text-gray-400">Alcohol Level</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {cocktail?.alcohol_level}
+                    {getLocalizedContent("alcohol_level", "english_alcohol_level")}
                   </p>
                 </motion.div>
                 <motion.div
@@ -417,7 +455,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                     <p className="text-sm text-gray-400">Prep Time</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {cocktail?.time_required || "5 minutes"}
+                    {getLocalizedContent("time_required", "english_time_required") || "5 minutes"}
                   </p>
                 </motion.div>
                 <motion.div
@@ -436,7 +474,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                     <p className="text-sm text-gray-400">Serving Glass</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {cocktail?.serving_glass}
+                    {getLocalizedContent("serving_glass", "english_serving_glass")}
                   </p>
                 </motion.div>
               </motion.div>
@@ -452,7 +490,10 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                 >
                   <p className="text-sm text-gray-400 mb-2">Flavor Profile</p>
                   <div className="flex flex-wrap gap-2">
-                    {cocktail.flavor_profiles.map((flavor, index) => (
+                    {(language === "en" && cocktail.english_flavor_profiles
+                      ? cocktail.english_flavor_profiles
+                      : cocktail.flavor_profiles
+                    ).map((flavor, index) => (
                       <motion.span
                         key={index}
                         className="px-3 py-1 backdrop-blur-sm rounded-full text-xs border border-gray-700/50"
@@ -531,7 +572,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         transition={{ delay: index * 0.1 }}
                       >
                         <span className={`${textColorClass} font-medium`}>
-                          {ingredient.name}
+                          {getLocalizedIngredientName(ingredient)}
                         </span>
                         <span className="text-amber-400 font-medium">
                           {ingredient.amount}
@@ -577,11 +618,14 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         transition={{ delay: index * 0.1 }}
                       >
                         <span className={`${textColorClass} font-medium`}>
-                          {tool.name}
+                          {getLocalizedToolName(tool)}
                         </span>
                         {tool.alternative && (
                           <span className="text-sm text-gray-400 mt-1">
-                            Alternative: {tool.alternative}
+                            {t("recommendation.alternative")}:{" "}
+                            {language === "en" && tool.english_alternative
+                              ? tool.english_alternative
+                              : tool.alternative}
                           </span>
                         )}
                       </motion.li>
@@ -606,47 +650,50 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
               </div>
               <div className="p-5">
                 <ol className="space-y-8">
-                  {cocktail?.steps?.map((step) => (
-                    <motion.li
-                      key={step.step_number}
-                      className="flex gap-4"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: step.step_number * 0.1 }}
-                      onMouseEnter={() => setActiveStep(step.step_number)}
-                      onMouseLeave={() => setActiveStep(null)}
-                    >
-                      <motion.div
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
-                        animate={{
-                          scale: activeStep === step.step_number ? 1.1 : 1,
-                        }}
-                        transition={{ duration: 0.3 }}
+                  {cocktail?.steps?.map((step) => {
+                    const localizedStep = getLocalizedStepContent(step);
+                    return (
+                      <motion.li
+                        key={step.step_number}
+                        className="flex gap-4"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: step.step_number * 0.1 }}
+                        onMouseEnter={() => setActiveStep(step.step_number)}
+                        onMouseLeave={() => setActiveStep(null)}
                       >
-                        {step.step_number}
-                      </motion.div>
-                      <div className="flex-1">
-                        <p
-                          className={`${textColorClass} text-base leading-relaxed`}
+                        <motion.div
+                          className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
+                          animate={{
+                            scale: activeStep === step.step_number ? 1.1 : 1,
+                          }}
+                          transition={{ duration: 0.3 }}
                         >
-                          {step.description}
-                        </p>
-                        {step.tips && (
-                          <motion.div
-                            className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.3 }}
+                          {step.step_number}
+                        </motion.div>
+                        <div className="flex-1">
+                          <p
+                            className={`${textColorClass} text-base leading-relaxed`}
                           >
-                            <p className="text-amber-400/70 text-xs flex items-center gap-2">
-                              <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
-                              <span>{step.tips}</span>
-                            </p>
-                          </motion.div>
-                        )}
-                      </div>
-                    </motion.li>
-                  ))}
+                            {localizedStep.description}
+                          </p>
+                          {localizedStep.tips && (
+                            <motion.div
+                              className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.3 }}
+                            >
+                              <p className="text-amber-400/70 text-xs flex items-center gap-2">
+                                <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                                <span>{localizedStep.tips}</span>
+                              </p>
+                            </motion.div>
+                          )}
+                        </div>
+                      </motion.li>
+                    );
+                  })}
                 </ol>
               </div>
             </motion.div>
@@ -681,7 +728,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         whileHover={{ x: 5 }}
                       >
                         <span className={`${textColorClass} font-medium`}>
-                          {ingredient.name}
+                          {getLocalizedIngredientName(ingredient)}
                         </span>
                         <span className="text-amber-400 font-medium">
                           {ingredient.amount}
@@ -717,11 +764,14 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         transition={{ delay: index * 0.1 }}
                       >
                         <span className={`${textColorClass} font-medium`}>
-                          {tool.name}
+                          {getLocalizedToolName(tool)}
                         </span>
                         {tool.alternative && (
                           <span className="text-sm text-gray-400 mt-1">
-                            Alternative: {tool.alternative}
+                            {t("recommendation.alternative")}:{" "}
+                            {language === "en" && tool.english_alternative
+                              ? tool.english_alternative
+                              : tool.alternative}
                           </span>
                         )}
                       </motion.li>
@@ -747,58 +797,61 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                 </div>
                 <div className="p-5">
                   <ol className="space-y-8">
-                    {cocktail?.steps?.map((step) => (
-                      <motion.li
-                        key={step.step_number}
-                        className="relative"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: step.step_number * 0.1 }}
-                        onMouseEnter={() => setActiveStep(step.step_number)}
-                        onMouseLeave={() => setActiveStep(null)}
-                      >
-                        <div className="flex gap-4">
-                          <motion.div
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
-                            animate={{
-                              scale: activeStep === step.step_number ? 1.1 : 1,
-                              boxShadow:
-                                activeStep === step.step_number
-                                  ? "0 0 15px rgba(236, 72, 153, 0.5)"
-                                  : "0 0 0 rgba(0, 0, 0, 0)",
-                            }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            {step.step_number}
-                          </motion.div>
-                          <div className="flex-1">
-                            <p
-                              className={`${textColorClass} text-lg leading-relaxed`}
+                    {cocktail?.steps?.map((step) => {
+                      const localizedStep = getLocalizedStepContent(step);
+                      return (
+                        <motion.li
+                          key={step.step_number}
+                          className="relative"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: step.step_number * 0.1 }}
+                          onMouseEnter={() => setActiveStep(step.step_number)}
+                          onMouseLeave={() => setActiveStep(null)}
+                        >
+                          <div className="flex gap-4">
+                            <motion.div
+                              className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
+                              animate={{
+                                scale: activeStep === step.step_number ? 1.1 : 1,
+                                boxShadow:
+                                  activeStep === step.step_number
+                                    ? "0 0 15px rgba(236, 72, 153, 0.5)"
+                                    : "0 0 0 rgba(0, 0, 0, 0)",
+                              }}
+                              transition={{ duration: 0.3 }}
                             >
-                              {step.description}
-                            </p>
-                            {step.tips && (
-                              <motion.div
-                                className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
-                                initial={{ opacity: 1 }} // Changed from 0 to 1 to make tips always visible
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.3 }}
+                              {step.step_number}
+                            </motion.div>
+                            <div className="flex-1">
+                              <p
+                                className={`${textColorClass} text-lg leading-relaxed`}
                               >
-                                <p className="text-amber-400/70 text-sm flex items-center gap-2">
-                                  <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
-                                  <span>{step.tips}</span>
-                                </p>
-                              </motion.div>
-                            )}
+                                {localizedStep.description}
+                              </p>
+                              {localizedStep.tips && (
+                                <motion.div
+                                  className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
+                                  initial={{ opacity: 1 }}
+                                  animate={{ opacity: 1 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  <p className="text-amber-400/70 text-sm flex items-center gap-2">
+                                    <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                                    <span>{localizedStep.tips}</span>
+                                  </p>
+                                </motion.div>
+                              )}
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Step progress line */}
-                        {step.step_number < (cocktail?.steps?.length || 0) && (
-                          <div className="absolute left-5 top-14 bottom-0 w-0.5 bg-gradient-to-b from-pink-500/50 to-amber-500/20 h-[calc(100%-3.5rem)]"></div>
-                        )}
-                      </motion.li>
-                    ))}
+                          {/* Step progress line */}
+                          {step.step_number < (cocktail?.steps?.length || 0) && (
+                            <div className="absolute left-5 top-14 bottom-0 w-0.5 bg-gradient-to-b from-pink-500/50 to-amber-500/20 h-[calc(100%-3.5rem)]"></div>
+                          )}
+                        </motion.li>
+                      );
+                    })}
                   </ol>
                 </div>
               </motion.div>

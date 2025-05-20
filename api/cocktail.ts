@@ -24,20 +24,28 @@ export enum AgentType {
 // Interface definitions
 export interface Ingredient {
   name: string;
+  english_name?: string;
   amount: string;
+  english_amount?: string;
   unit?: string;
+  english_unit?: string;
   substitute?: string;
+  english_substitute?: string;
 }
 
 export interface Tool {
   name: string;
+  english_name?: string;
   alternative?: string;
+  english_alternative?: string;
 }
 
 export interface Step {
   step_number: number;
   description: string;
+  english_description?: string;
   tips?: string;
+  english_tips?: string;
 }
 
 export interface Cocktail {
@@ -45,12 +53,19 @@ export interface Cocktail {
   name: string;
   english_name?: string;
   description: string;
+  english_description?: string;
   match_reason: string;
+  english_match_reason?: string;
   base_spirit: string;
+  english_base_spirit?: string;
   alcohol_level: string;
+  english_alcohol_level?: string;
   serving_glass: string;
+  english_serving_glass?: string;
   time_required?: string;
+  english_time_required?: string;
   flavor_profiles: string[];
+  english_flavor_profiles?: string[];
   ingredients: Ingredient[];
   tools: Tool[];
   steps: Step[];
@@ -952,13 +967,20 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       name: cocktail.name || "Unknown Cocktail",
       english_name: cocktail.english_name || "",
       description: cocktail.description || "No description available",
+      english_description: cocktail.english_description || "",
       match_reason:
         cocktail.match_reason || "This cocktail matches your preferences",
+      english_match_reason: cocktail.english_match_reason || "",
       base_spirit: cocktail.base_spirit || "Various",
+      english_base_spirit: cocktail.english_base_spirit || "",
       alcohol_level: cocktail.alcohol_level || "medium",
+      english_alcohol_level: cocktail.english_alcohol_level || "",
       serving_glass: cocktail.serving_glass || "Cocktail glass",
+      english_serving_glass: cocktail.english_serving_glass || "",
       time_required: cocktail.time_required || "5 minutes",
+      english_time_required: cocktail.english_time_required || "",
       flavor_profiles: cocktail.flavor_profiles || ["balanced"],
+      english_flavor_profiles: cocktail.english_flavor_profiles || [],
       ingredients: cocktail.ingredients || [],
       tools: cocktail.tools || [],
       steps: cocktail.steps || [],
@@ -976,11 +998,19 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       name: "Parsing Error Cocktail",
       description:
         "Sorry, there was an error parsing the cocktail recommendation.",
+      english_description: "",
       match_reason: "This is a fallback recommendation due to a parsing error.",
+      english_match_reason: "",
       base_spirit: "Various",
+      english_base_spirit: "",
       alcohol_level: "medium",
+      english_alcohol_level: "",
       serving_glass: "Cocktail glass",
+      english_serving_glass: "",
+      time_required: "5 minutes",
+      english_time_required: "",
       flavor_profiles: ["balanced"],
+      english_flavor_profiles: [],
       ingredients: [],
       tools: [],
       steps: [],
