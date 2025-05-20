@@ -21,7 +21,6 @@ import { getCocktailById } from "@/services/cocktailService";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CocktailImage from "@/components/CocktailImage";
 
-
 // Static cocktail images mapping
 export const cocktailImages = {
   mojito: "/vibrant-mojito.png",
@@ -39,7 +38,9 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string | null>("steps");
+  const [expandedSection, setExpandedSection] = useState<string | null>(
+    "steps",
+  );
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
@@ -51,7 +52,10 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
     "bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent";
 
   // Helper function to get localized content
-  const getLocalizedContent = (field: string, englishField: string): string | undefined => {
+  const getLocalizedContent = (
+    field: string,
+    englishField: string,
+  ): string | undefined => {
     if (language === "en" && cocktail?.[englishField as keyof Cocktail]) {
       return cocktail[englishField as keyof Cocktail] as string;
     }
@@ -91,7 +95,9 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
   };
 
   // Helper function to get localized step content
-  const getLocalizedStepContent = (step: Step): { description: string; tips?: string } => {
+  const getLocalizedStepContent = (
+    step: Step,
+  ): { description: string; tips?: string } => {
     if (language === "en") {
       return {
         description: step.english_description || step.description,
@@ -107,9 +113,10 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
   // Set page title based on language
   useEffect(() => {
     if (cocktail) {
-      const title = language === "en" && cocktail.english_name 
-        ? `${cocktail.english_name} - MoodShaker`
-        : `${cocktail.name} - MoodShaker`;
+      const title =
+        language === "en" && cocktail.english_name
+          ? `${cocktail.english_name} - MoodShaker`
+          : `${cocktail.name} - MoodShaker`;
       document.title = title;
     }
   }, [cocktail, language]);
@@ -463,7 +470,10 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                     <p className="text-sm text-gray-400">Alcohol Level</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {getLocalizedContent("alcohol_level", "english_alcohol_level")}
+                    {getLocalizedContent(
+                      "alcohol_level",
+                      "english_alcohol_level",
+                    )}
                   </p>
                 </motion.div>
                 <motion.div
@@ -482,7 +492,10 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                     <p className="text-sm text-gray-400">Prep Time</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {getLocalizedContent("time_required", "english_time_required") || "5 minutes"}
+                    {getLocalizedContent(
+                      "time_required",
+                      "english_time_required",
+                    ) || "5 minutes"}
                   </p>
                 </motion.div>
                 <motion.div
@@ -501,7 +514,10 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                     <p className="text-sm text-gray-400">Serving Glass</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {getLocalizedContent("serving_glass", "english_serving_glass")}
+                    {getLocalizedContent(
+                      "serving_glass",
+                      "english_serving_glass",
+                    )}
                   </p>
                 </motion.div>
               </motion.div>
@@ -603,7 +619,9 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         </span>
                         <span className="text-amber-400 font-medium">
                           {getLocalizedIngredientAmount(ingredient)}
-                          {getLocalizedIngredientUnit(ingredient) ? ` ${getLocalizedIngredientUnit(ingredient)}` : ""}
+                          {getLocalizedIngredientUnit(ingredient)
+                            ? ` ${getLocalizedIngredientUnit(ingredient)}`
+                            : ""}
                         </span>
                       </motion.li>
                     ))}
@@ -759,7 +777,9 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         </span>
                         <span className="text-amber-400 font-medium">
                           {getLocalizedIngredientAmount(ingredient)}
-                          {getLocalizedIngredientUnit(ingredient) ? ` ${getLocalizedIngredientUnit(ingredient)}` : ""}
+                          {getLocalizedIngredientUnit(ingredient)
+                            ? ` ${getLocalizedIngredientUnit(ingredient)}`
+                            : ""}
                         </span>
                       </motion.li>
                     ))}
@@ -840,7 +860,8 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                             <motion.div
                               className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
                               animate={{
-                                scale: activeStep === step.step_number ? 1.1 : 1,
+                                scale:
+                                  activeStep === step.step_number ? 1.1 : 1,
                                 boxShadow:
                                   activeStep === step.step_number
                                     ? "0 0 15px rgba(236, 72, 153, 0.5)"
@@ -873,7 +894,8 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                           </div>
 
                           {/* Step progress line */}
-                          {step.step_number < (cocktail?.steps?.length || 0) && (
+                          {step.step_number <
+                            (cocktail?.steps?.length || 0) && (
                             <div className="absolute left-5 top-14 bottom-0 w-0.5 bg-gradient-to-b from-pink-500/50 to-amber-500/20 h-[calc(100%-3.5rem)]"></div>
                           )}
                         </motion.li>

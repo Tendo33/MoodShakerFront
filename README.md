@@ -94,6 +94,7 @@ MoodShakerFront/
 - **语言**: TypeScript
 - **样式**: Tailwind CSS
 - **UI组件**: Radix UI
+
 ## 🤝 加入我们
 
 想要成为我们的调酒师吗？欢迎提交 Pull Request！让我们一起调制出更多精彩的心情鸡尾酒！

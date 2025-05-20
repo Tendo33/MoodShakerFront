@@ -12,7 +12,7 @@ const images = {
   // 问题选项图片
   classic: "/classic.png",
   custom: "/custom.png",
-  
+
   alcohol_low: "/alcohol_low.png",
   alcohol_medium: "/alcohol_medium.png",
   alcohol_high: "/alcohol_high.png",
@@ -608,7 +608,9 @@ export default function Questions() {
                       onClick={handleContinueAfterBaseSpirits}
                       disabled={baseSpirits.length === 0}
                       className={`bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full flex items-center ${
-                        baseSpirits.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+                        baseSpirits.length === 0
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
                       }`}
                     >
                       <span className="font-medium">
