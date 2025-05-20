@@ -338,6 +338,7 @@ export default function Questions() {
         setShowBaseSpirits(false);
         setShowFeedbackForm(false);
         setActiveQuestionId(1);
+        setLocalUserFeedback("");
         return;
       }
 
