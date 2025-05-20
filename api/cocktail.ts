@@ -115,7 +115,7 @@ function logDetail(
  */
 function createSystemPrompt(agentType: AgentType, language: string): string {
   // English prompts
-  const english_classic_bartender_prompt = `You are a classic bartender specializing in traditional cocktails. Your role is to recommend the perfect classic cocktail based on the user's mood and preferences.
+  const english_classic_bartender_prompt = `You are a classic bartender specializing in traditional cocktails. Your role is to recommend the perfect classic cocktail based on the user's mood and preferences, "user requirements" is the first priority, you need to ensure the user's requirements, then recommend the perfect classic cocktail based on the user's mood and preferences.
 
 # Input Information Processing
 User input will contain the following information:
@@ -284,7 +284,7 @@ You must strictly follow this JSON format for your response, do not include any 
     "serving_glass": "Highball Glass"
 }`;
 
-  const english_creative_bartender_prompt = `You are a creative bartender who creates unique cocktail recipes based on user's mood and preferences.
+  const english_creative_bartender_prompt = `You are a creative bartender who creates unique cocktail recipes based on user's mood and preferences, do not use classic cocktail recipes. "user requirements" is the first priority, you need to ensure the user's requirements, then create unique cocktail recipes based on the user's mood and preferences.
 
 # Input Information Processing
 User input will contain the following information:
@@ -464,7 +464,7 @@ You must strictly follow this JSON format for your response, do not include any 
 }`;
 
   // Chinese prompts (existing)
-  const chinese_classic_bartender_prompt = `你是一位专注于经典鸡尾酒的调酒师,需要根据用户的心情和偏好推荐合适的经典鸡尾酒，你在提供鸡尾酒配方时，确保鸡尾酒的配方是经典的。
+  const chinese_classic_bartender_prompt = `你是一位专注于经典鸡尾酒的调酒师,需要根据用户的心情和偏好推荐合适的经典鸡尾酒，你在提供鸡尾酒配方时，确保鸡尾酒的配方是经典的,"用户需求"是第一优先级，你要先保证用户的需求，然后根据用户的需求，推荐合适的经典鸡尾酒。
 
 # 输入信息处理
 用户输入将包含以下信息:
@@ -633,7 +633,7 @@ You must strictly follow this JSON format for your response, do not include any 
     "serving_glass": "高球杯"
 }`;
 
-  const chinese_creative_bartender_prompt = `你是一位创意调酒师,需要根据用户的心情和偏好创造独特的鸡尾酒配方，你在提供鸡尾酒配方时，确保生成的鸡尾酒的配方是有创意的,新颖的,不要使用经典鸡尾酒的配方。
+  const chinese_creative_bartender_prompt = `你是一位创意调酒师,需要根据用户的心情和偏好创造独特的鸡尾酒配方，你在提供鸡尾酒配方时，确保生成的鸡尾酒的配方是有创意的,新颖的,不要使用经典鸡尾酒的配方，"用户需求"是第一优先级，你要先保证用户的需求，然后根据用户的需求，创造独特的鸡尾酒配方。
 
   # 输入信息处理
   用户输入将包含以下信息:
@@ -988,8 +988,10 @@ export async function requestCocktailRecommendation(
     const systemPrompt = createSystemPrompt(agentType, currentLanguage);
     const userMessage = createUserMessage(request, currentLanguage);
 
-    logDetail("DEBUG", `Preparing request [${requestId}]`, {
+    logDetail("INFO", `Preparing request [${requestId}]`, {
+      systemPrompt: systemPrompt,
       systemPromptLength: systemPrompt.length,
+      userMessage: userMessage,
       userMessageLength: userMessage.length,
       language: currentLanguage,
     });
@@ -1000,7 +1002,7 @@ export async function requestCocktailRecommendation(
         { role: "user", content: userMessage },
       ],
       {
-        temperature: 0.7,
+        temperature: 0.8,
         max_tokens: 5000,
       },
     );
