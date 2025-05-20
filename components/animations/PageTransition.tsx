@@ -27,14 +27,12 @@ export default function PageTransition({ children }: PageTransitionProps) {
     }
   }, [pathname, isMounted]);
 
-  if (!isMounted) {
-    return <div className="w-full">{children}</div>;
-  }
-
   return (
     <div
       key={pathname}
-      className={`w-full transition-opacity duration-300 ${transitionStage === "fadeIn" ? "opacity-100" : "opacity-0"}`}
+      className={`w-full transition-opacity duration-300 ${
+        !isMounted || transitionStage === "fadeIn" ? "opacity-100" : "opacity-0"
+      }`}
     >
       {children}
     </div>

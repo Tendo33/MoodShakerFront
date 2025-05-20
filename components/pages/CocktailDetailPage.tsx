@@ -20,7 +20,7 @@ import type { Cocktail, Ingredient, Tool, Step } from "@/api/cocktail";
 import { getCocktailById } from "@/services/cocktailService";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CocktailImage from "@/components/CocktailImage";
-import Head from "next/head";
+
 
 // Static cocktail images mapping
 export const cocktailImages = {
