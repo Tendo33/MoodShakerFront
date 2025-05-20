@@ -17,6 +17,26 @@ MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的调
 
 ## 🚀 快速开始
 
+### 环境变量配置
+
+在开始之前，你需要配置以下环境变量。复制 `.env.example` 文件并重命名为 `.env.local`，然后填写相应的值：
+
+```bash
+# OpenAI Configuration
+NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key_here
+NEXT_PUBLIC_OPENAI_BASE_URL=https://api.openai.com/v1
+NEXT_PUBLIC_OPENAI_MODEL=deepseek-v3-250324
+
+# Image Generation Configuration
+NEXT_PUBLIC_IMAGE_API_URL=your_image_api_url_here
+NEXT_PUBLIC_IMAGE_API_KEY=your_image_api_key_here
+NEXT_PUBLIC_IMAGE_MODEL=Kwai-Kolors/Kolors
+
+# Application Configuration
+NODE_ENV=development
+PORT=3000
+```
+
 ### 方法一：本地开发（适合调酒师学徒）
 
 ```bash
@@ -34,7 +54,12 @@ pnpm dev
 ### 方法二：Docker 部署（适合专业调酒师）
 
 ```bash
-# 一键启动所有服务
+# 1. 配置环境变量
+cp .env.example .env
+
+# 2. 编辑 .env 文件，填写必要的环境变量
+
+# 3. 一键启动所有服务
 docker-compose up -d
 ```
 
