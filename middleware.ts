@@ -20,21 +20,26 @@ const staticFileExtensions = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Check if the pathname already has a language prefix
+  const pathnameHasLanguage = supportedLanguages.some(
+    (language) =>
+      pathname.startsWith(`/${language}/`) || pathname === `/${language}`,
+  );
+
+  // If path has language prefix, remove it for static file check
+  const pathToCheck = pathnameHasLanguage
+    ? pathname.replace(/^\/[a-z]{2}\//, "/")
+    : pathname;
+
   // Check if it's a static resource request
   const isStaticFile = staticFileExtensions.some((ext) =>
-    pathname.endsWith(ext),
+    pathToCheck.endsWith(ext),
   );
 
   // If it's a static resource request, proceed directly
   if (isStaticFile) {
     return NextResponse.next();
   }
-
-  // Check if the pathname already has a language prefix
-  const pathnameHasLanguage = supportedLanguages.some(
-    (language) =>
-      pathname.startsWith(`/${language}/`) || pathname === `/${language}`,
-  );
 
   if (pathnameHasLanguage) {
     return NextResponse.next();
