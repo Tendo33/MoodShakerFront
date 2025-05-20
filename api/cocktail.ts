@@ -75,7 +75,6 @@ export interface Cocktail {
 export interface BartenderRequest {
   message: string;
   alcohol_level: AlcoholLevel;
-  has_tools?: boolean | null;
   difficulty_level: DifficultyLevel;
   base_spirits: string[] | null;
   session_id?: string;
@@ -847,11 +846,6 @@ function createUserMessage(
     if (request.alcohol_level !== AlcoholLevel.ANY) {
       conditions.push(`Alcohol Level: ${request.alcohol_level}`);
     }
-    if (request.has_tools !== null && request.has_tools !== undefined) {
-      conditions.push(
-        `Has Bartending Tools: ${request.has_tools ? "Yes" : "No"}`,
-      );
-    }
     if (request.difficulty_level !== DifficultyLevel.ANY) {
       conditions.push(`Preparation Difficulty: ${request.difficulty_level}`);
     }
@@ -873,9 +867,6 @@ function createUserMessage(
     const conditions = [];
     if (request.alcohol_level !== AlcoholLevel.ANY) {
       conditions.push(`酒精浓度: ${request.alcohol_level}`);
-    }
-    if (request.has_tools !== null && request.has_tools !== undefined) {
-      conditions.push(`是否有调酒工具: ${request.has_tools ? "有" : "没有"}`);
     }
     if (request.difficulty_level !== DifficultyLevel.ANY) {
       conditions.push(`制作难度: ${request.difficulty_level}`);

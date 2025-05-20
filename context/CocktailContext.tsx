@@ -116,7 +116,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
   // 计算进度百分比
   const progressPercentage = useMemo(() => {
-    const totalQuestions = 4; // 问题总数
+    const totalQuestions = 3; // 问题总数
     const answeredCount = Object.keys(answers).length;
     return (answeredCount / totalQuestions) * 100;
   }, [answers]);
@@ -205,7 +205,6 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       const request: BartenderRequest = {
         message: userFeedback,
         alcohol_level: answers["2"] as AlcoholLevel,
-        has_tools: answers["1"] === "custom",
         difficulty_level: answers["3"] as DifficultyLevel,
         base_spirits: baseSpirits.filter((id) => id !== "all"),
         session_id: sessionId,
@@ -214,11 +213,16 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       // Save request to local storage
       saveToStorage(STORAGE_KEYS.REQUEST, request);
 
-      // Choose bartender type based on language
-      const agentType =
-        currentLanguage === "en"
-          ? AgentType.CLASSIC_BARTENDER
-          : AgentType.CREATIVE_BARTENDER;
+      // Choose bartender type based on user selection (question 1)
+      let agentType: AgentType;
+      if (answers["1"] === "classic") {
+        agentType = AgentType.CLASSIC_BARTENDER;
+      } else if (answers["1"] === "custom") {
+        agentType = AgentType.CREATIVE_BARTENDER;
+      } else {
+        // fallback: default to classic bartender
+        agentType = AgentType.CLASSIC_BARTENDER;
+      }
 
       // Send request
       const cocktail = await requestCocktailRecommendation(request, agentType);
