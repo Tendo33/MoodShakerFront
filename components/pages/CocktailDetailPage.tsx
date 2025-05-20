@@ -20,6 +20,7 @@ import type { Cocktail, Ingredient, Tool, Step } from "@/api/cocktail";
 import { getCocktailById } from "@/services/cocktailService";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CocktailImage from "@/components/CocktailImage";
+import Head from "next/head";
 
 // Static cocktail images mapping
 export const cocktailImages = {
@@ -65,6 +66,22 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
     return ingredient.name;
   };
 
+  // Helper function to get localized ingredient amount
+  const getLocalizedIngredientAmount = (ingredient: Ingredient): string => {
+    if (language === "en" && ingredient.english_amount) {
+      return ingredient.english_amount;
+    }
+    return ingredient.amount;
+  };
+
+  // Helper function to get localized ingredient unit
+  const getLocalizedIngredientUnit = (ingredient: Ingredient): string => {
+    if (language === "en" && ingredient.english_unit) {
+      return ingredient.english_unit;
+    }
+    return ingredient.unit || "";
+  };
+
   // Helper function to get localized tool name
   const getLocalizedToolName = (tool: Tool): string => {
     if (language === "en" && tool.english_name) {
@@ -86,6 +103,16 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
       tips: step.tips,
     };
   };
+
+  // Set page title based on language
+  useEffect(() => {
+    if (cocktail) {
+      const title = language === "en" && cocktail.english_name 
+        ? `${cocktail.english_name} - MoodShaker`
+        : `${cocktail.name} - MoodShaker`;
+      document.title = title;
+    }
+  }, [cocktail, language]);
 
   // Fetch cocktail data
   useEffect(() => {
@@ -575,8 +602,8 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                           {getLocalizedIngredientName(ingredient)}
                         </span>
                         <span className="text-amber-400 font-medium">
-                          {ingredient.amount}
-                          {ingredient.unit ? ` ${ingredient.unit}` : ""}
+                          {getLocalizedIngredientAmount(ingredient)}
+                          {getLocalizedIngredientUnit(ingredient) ? ` ${getLocalizedIngredientUnit(ingredient)}` : ""}
                         </span>
                       </motion.li>
                     ))}
@@ -731,8 +758,8 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                           {getLocalizedIngredientName(ingredient)}
                         </span>
                         <span className="text-amber-400 font-medium">
-                          {ingredient.amount}
-                          {ingredient.unit ? ` ${ingredient.unit}` : ""}
+                          {getLocalizedIngredientAmount(ingredient)}
+                          {getLocalizedIngredientUnit(ingredient) ? ` ${getLocalizedIngredientUnit(ingredient)}` : ""}
                         </span>
                       </motion.li>
                     ))}

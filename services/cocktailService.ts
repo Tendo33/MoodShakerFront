@@ -95,7 +95,7 @@ const popularCocktails: Record<string, Cocktail> = {
       { name: "龙舌兰酒", amount: "50", unit: "ml", english_name: "Tequila" },
       { name: "君度橙酒", amount: "20", unit: "ml", english_name: "Cointreau" },
       { name: "新鲜青柠汁", amount: "25", unit: "ml", english_name: "Fresh Lime Juice" },
-      { name: "细盐", amount: "适量", substitute: "粗海盐", english_name: "Fine Salt", english_substitute: "Coarse Sea Salt" },
+      { name: "细盐", amount: "适量", substitute: "粗海盐", english_name: "Fine Salt", english_substitute: "Coarse Sea Salt", english_amount: "to rim" },
       { name: "冰块", amount: "适量", english_name: "Ice Cubes", english_amount: "to fill" },
     ],
     tools: [

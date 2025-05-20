@@ -1,5 +1,5 @@
 import type React from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import { ErrorProvider } from "@/context/ErrorContext";
 import { CocktailProvider } from "@/context/CocktailContext";
@@ -17,6 +17,13 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#000000",
+};
+
 export const metadata: Metadata = {
   title: "MoodShaker",
   description:
@@ -31,6 +38,7 @@ export const metadata: Metadata = {
     ],
     shortcut: ["/favicon.ico"]
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
