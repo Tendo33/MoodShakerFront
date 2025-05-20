@@ -68,7 +68,7 @@ const translations: TranslationDictionary = {
     "questions.feedback.description":
       "告诉我们你现在的心情 - 我们会为你调制一杯完美的鸡尾酒！",
     "questions.feedback.placeholder":
-      "想要冒险？在庆祝什么？还是只想放松一下？今天的心情？告诉我们吧！✨",
+      "告诉我们任何事！想喝酸的？今天就是想喝金汤力？心情怎么样？告诉我们吧！✨",
     "questions.submit": "查看推荐鸡尾酒",
     "questions.loading": "正在为您匹配...",
     "questions.ready.title": "准备好摇一摇了吗？🍸",
@@ -184,7 +184,7 @@ const translations: TranslationDictionary = {
     "questions.feedback.description":
       "Tell us what you're in the mood for - we'll craft the perfect cocktail just for you!",
     "questions.feedback.placeholder":
-      "Feeling adventurous? Celebrating something special? Just want to relax? Let us know! ✨",
+      "Tell us anything! Want a sour? Today is the day for a gin and tonic? How are you feeling? Tell us! ✨",
     "questions.submit": "View Recommended Cocktail",
     "questions.loading": "Finding your perfect match...",
     "questions.ready.title": "Ready to shake things up? 🍸",
