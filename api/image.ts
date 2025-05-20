@@ -9,7 +9,7 @@ export function generateImagePrompt(cocktail: {
 }): string {
   const wine_name = cocktail.english_name || cocktail.name;
 
-  return `Create a high-resolution image showcasing a cocktail named ${wine_name},Think carefully about the appearance of ${wine_name},centered and elegantly garnished. The background should be softly blurred to highlight the cocktail. Use a top-down perspective for consistency across different names, focusing on the cocktail’s charm. Simulate a Canon EOS 5D Mark IV camera with a 50mm prime lens, set at ISO 100, shutter speed 1/200 sec, and aperture f/1.8 for a shallow depth of field. The style should be vivid and clear, emphasizing the cocktail’s intricate details and vibrant colors.`;
+  return `Create a high-resolution image showcasing a cocktail named ${wine_name},Think carefully about the appearance of ${wine_name},centered and elegantly garnished. The background should be softly blurred to highlight the cocktail. Use a top-down perspective for consistency across different names, focusing on the cocktail's charm. Simulate a Canon EOS 5D Mark IV camera with a 50mm prime lens, set at ISO 100, shutter speed 1/200 sec, and aperture f/1.8 for a shallow depth of field. The style should be vivid and clear, emphasizing the cocktail's intricate details and vibrant colors.`;
 }
 
 /**
@@ -48,47 +48,13 @@ export async function generateCocktailImage(
       `Cocktail image generation successful [${requestId}] (${duration}ms)`,
     );
 
-    // Store the image URL in memory for the current session
-    if (typeof window !== "undefined") {
-      // Add timestamp to the image URL to prevent caching
-      const timestampedUrl = imageUrl.includes("?")
-        ? `${imageUrl}&_t=${Date.now()}`
-        : `${imageUrl}?_t=${Date.now()}`;
-
-      // Store in memory for the current session only
-      window.__currentCocktailImage = {
-        url: timestampedUrl,
-        sessionId,
-        timestamp: Date.now(),
-      };
-
-      console.log("DEBUG", `Generated new cocktail image [${requestId}]`, {
-        sessionId,
-        timestamp: Date.now(),
-      });
-    }
-
-    // Return the image URL with a timestamp to prevent caching
+    // Add timestamp to the image URL to prevent caching
     return imageUrl.includes("?")
       ? `${imageUrl}&_t=${Date.now()}`
       : `${imageUrl}?_t=${Date.now()}`;
   } catch (error) {
-    const endTime = Date.now();
-    const duration = endTime - startTime;
-
-    console.error(
-      "ERROR",
-      `Cocktail image generation failed [${requestId}] (${duration}ms)`,
-      {
-        error:
-          error instanceof Error
-            ? { name: error.name, message: error.message }
-            : String(error),
-      },
-    );
-
-    console.log("INFO", `Returning placeholder image [${requestId}]`);
-    return `/placeholder.svg?height=1024&width=1024&query=${encodeURIComponent("cocktail")}&_t=${Date.now()}`;
+    console.error("Error generating cocktail image:", error);
+    throw error;
   }
 }
 

@@ -1028,35 +1028,6 @@ export async function requestCocktailRecommendation(
   const requestId = `cocktail_${Math.random().toString(36).substring(2, 15)}`;
   const startTime = Date.now();
   try {
-    // Check local cache
-    const cacheKey = `${agentType}-${request.alcohol_level}-${request.difficulty_level}-${request.message.substring(
-      0,
-      20,
-    )}`;
-    if (typeof window !== "undefined") {
-      const cachedResult = localStorage.getItem(
-        `moodshaker-cocktail-${cacheKey}`,
-      );
-      if (cachedResult) {
-        try {
-          const parsed = JSON.parse(cachedResult);
-          logDetail(
-            "INFO",
-            `Found cached cocktail recommendation [${requestId}]`,
-            {
-              cacheKey,
-              cocktailName: parsed.name,
-            },
-          );
-          return parsed;
-        } catch (e) {
-          logDetail("DEBUG", `Cache parsing failed [${requestId}]`, {
-            error: e instanceof Error ? e.message : String(e),
-          });
-        }
-      }
-    }
-
     // Get current language
     const currentLanguage =
       typeof window !== "undefined"
@@ -1104,23 +1075,6 @@ export async function requestCocktailRecommendation(
         language: currentLanguage,
       },
     );
-
-    // Cache result
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem(
-          `moodshaker-cocktail-${cacheKey}`,
-          JSON.stringify(cocktail),
-        );
-        logDetail("DEBUG", `Cached cocktail recommendation [${requestId}]`, {
-          cacheKey,
-        });
-      } catch (e) {
-        logDetail("DEBUG", `Failed to cache cocktail [${requestId}]`, {
-          error: e instanceof Error ? e.message : String(e),
-        });
-      }
-    }
 
     return cocktail;
   } catch (error) {
