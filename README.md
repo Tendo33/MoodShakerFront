@@ -2,9 +2,19 @@
 
 > "生活就像一杯鸡尾酒，有时候需要一点调味，有时候需要一点摇晃，但最重要的是要找到属于自己的配方。"
 
+
 ## 🎨 这是什么？
 
 MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的调酒师，它能够根据你的心情，为你调制出最适合的"心情鸡尾酒"。无论是开心、难过、焦虑还是兴奋，MoodShaker 都能帮你找到最合适的解决方案。
+
+经过几道选择：
+![MoodShaker Banner](assert/img1.png)
+
+鸡尾酒配方详情页：
+![MoodShaker Features](assert/img2.png)
+
+鸡尾酒制作步骤：
+![Getting Started](assert/img3.png)
 
 ## ✨ 主要特点
 
@@ -16,6 +26,8 @@ MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的调
 - 🎬 流畅的动画效果，让你的心情转换更加丝滑
 
 ## 🚀 快速开始
+
+
 
 ### 环境变量配置
 
@@ -68,24 +80,24 @@ docker-compose up -d
 
 ## 🛠️ 开发工具箱
 
-- `pnpm dev` - 启动开发服务器（调酒师开始工作）
-- `pnpm build` - 构建生产版本（调制完美鸡尾酒）
-- `pnpm start` - 启动生产服务器（开始营业）
-- `pnpm lint` - 代码质量检查（确保每杯鸡尾酒都符合标准）
+- `pnpm dev` - 启动开发服务器
+- `pnpm build` - 构建生产版本
+- `pnpm start` - 启动生产服务器
+- `pnpm lint` - 代码质量检查
 
 ## 🏗️ 项目结构
 
 ```
 MoodShakerFront/
-├── app/              # 主应用区域（吧台）
-├── components/       # 可复用组件（调酒工具）
-├── context/         # 状态管理（调酒配方）
-├── hooks/           # 自定义钩子（调酒技巧）
-├── lib/             # 工具函数（调酒方法）
-├── public/          # 静态资源（装饰品）
-├── services/        # API 服务（原料供应商）
-├── styles/          # 全局样式（酒吧装修）
-└── utils/           # 辅助函数（调酒助手）
+├── app/              # 主应用区域
+├── components/       # 可复用组件
+├── context/         # 状态管理
+├── hooks/           # 自定义钩子
+├── lib/             # 工具函数
+├── public/          # 静态资源
+├── services/        # API 服务
+├── styles/          # 全局样式
+└── utils/           # 辅助函数
 ```
 
 ## 🛠️ 技术栈
@@ -103,6 +115,7 @@ MoodShakerFront/
 
 [MIT](https://opensource.org/licenses/MIT)
 
----
+## 👨‍💻 作者
 
-> "生活就像一杯鸡尾酒，重要的不是它的成分，而是调制它的心情。"
+  [Tendo33](https://simonsun.cc)
+---
