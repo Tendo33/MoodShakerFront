@@ -36,14 +36,13 @@ NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key_here
 NEXT_PUBLIC_OPENAI_BASE_URL=https://api.openai.com/v1
 NEXT_PUBLIC_OPENAI_MODEL=deepseek-v3-250324
 
-# Image Generation Configuration
-NEXT_PUBLIC_IMAGE_API_URL=your_image_api_url_here
+# Image Generation Configuration(siliconflow)
+NEXT_PUBLIC_IMAGE_API_URL=https://api.siliconflow.cn/v1/images/generations
 NEXT_PUBLIC_IMAGE_API_KEY=your_image_api_key_here
 NEXT_PUBLIC_IMAGE_MODEL=Kwai-Kolors/Kolors
 
 # Application Configuration
-NODE_ENV=development
-PORT=3000
+HOST_PORT=3000
 ```
 
 ### 方法一：本地开发（适合调酒师学徒）
