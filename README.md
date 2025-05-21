@@ -46,7 +46,7 @@ NODE_ENV=development
 PORT=3000
 ```
 
-### 方法一：本地开发（适合调酒师学徒）
+### 方法一：本地开发
 
 ```bash
 # 1. 克隆仓库
@@ -64,8 +64,7 @@ pnpm install
 pnpm dev
 ```
 
-### 方法二：Docker 部署（适合专业调酒师）
-
+### 方法二：Docker 部署
 ```bash
 # 1. 配置环境变量
 mv .env.example .env
