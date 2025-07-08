@@ -3,8 +3,7 @@
 // Environment variables
 const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.NEXT_PUBLIC_OPENAI_BASE_URL;
-const OPENAI_MODEL =
-  process.env.NEXT_PUBLIC_OPENAI_MODEL || "deepseek-v3-250324";
+const OPENAI_MODEL = process.env.NEXT_PUBLIC_OPENAI_MODEL;
 
 // Image generation API
 const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
