@@ -12,16 +12,18 @@ export default function Header() {
   const { t, language, getPathWithLanguage } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
 
   // Handle scroll effect - only run on client side
   useEffect(() => {
-    setIsMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    // Only add scroll listener on client side
+    if (typeof window !== 'undefined') {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
   }, []);
 
   // Animation variants
@@ -49,11 +51,6 @@ export default function Header() {
   const homeLink = getPathWithLanguage("/");
   const questionsLink = getPathWithLanguage("/questions");
 
-  // Don't render anything until client-side hydration is complete
-  if (!isMounted) {
-    return null;
-  }
-
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
@@ -61,6 +58,7 @@ export default function Header() {
           ? "bg-gray-900/95 backdrop-blur-md shadow-md"
           : "bg-transparent"
       }`}
+      suppressHydrationWarning
     >
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
