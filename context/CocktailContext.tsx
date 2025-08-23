@@ -23,6 +23,7 @@ import {
   clearStorageWithPrefix,
 } from "@/utils/localStorage";
 import { generateCocktailImage, generateImagePrompt } from "@/api/image";
+import { generateSessionId } from "@/utils/generateId";
 
 // 存储键常量
 const STORAGE_KEYS = {
@@ -88,7 +89,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     if (typeof window === "undefined") return "server-session";
     return getFromStorage(
       STORAGE_KEYS.SESSION_ID,
-      `session-${Math.random().toString(36).substring(2, 15)}`,
+      generateSessionId(),
     );
   });
   const [imageVersion, setImageVersion] = useState<number>(() => {
@@ -107,7 +108,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       if (savedSessionId) {
         setSessionId(savedSessionId);
       } else {
-        const newSessionId = `session-${Math.random().toString(36).substring(2, 15)}`;
+        const newSessionId = generateSessionId();
         setSessionId(newSessionId);
         saveToStorage(STORAGE_KEYS.SESSION_ID, newSessionId);
       }

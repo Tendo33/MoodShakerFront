@@ -1,4 +1,5 @@
 import { generateImage } from "./openai";
+import { generateImageId } from "@/utils/generateId";
 
 /**
  * Generate an image prompt for the cocktail
@@ -22,7 +23,7 @@ export async function generateCocktailImage(
   prompt: string,
   sessionId: string,
 ): Promise<string> {
-  const requestId = `cocktail_img_${Math.random().toString(36).substring(2, 15)}`;
+  const requestId = generateImageId();
   const startTime = Date.now();
   const negativePrompt =
     "low quality, blurry, out of focus, low resolution, bad anatomy, worst quality, low quality";
