@@ -59,7 +59,11 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               We're sorry, but there was an error rendering this component.
             </p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.reload();
+                }
+              }}
               className="px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-full hover:from-amber-600 hover:to-pink-600 transition-all"
             >
               Refresh the page

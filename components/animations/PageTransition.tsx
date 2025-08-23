@@ -11,28 +11,24 @@ interface PageTransitionProps {
 export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const [transitionStage, setTransitionStage] = useState("fadeIn");
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (pathname && isMounted) {
+    if (pathname) {
       setTransitionStage("fadeOut");
       const timeout = setTimeout(() => {
         setTransitionStage("fadeIn");
       }, 300);
       return () => clearTimeout(timeout);
     }
-  }, [pathname, isMounted]);
+  }, [pathname]);
 
   return (
     <div
       key={pathname}
       className={`w-full transition-opacity duration-300 ${
-        !isMounted || transitionStage === "fadeIn" ? "opacity-100" : "opacity-0"
+        transitionStage === "fadeIn" ? "opacity-100" : "opacity-0"
       }`}
+      suppressHydrationWarning
     >
       {children}
     </div>
