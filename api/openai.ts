@@ -1,5 +1,8 @@
 // OpenAI API integration for direct model interactions
 
+import { openaiLogger } from "@/utils/logger";
+import { generateRequestId, generateImageId } from "@/utils/generateId";
+
 // Environment variables
 const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 const OPENAI_BASE_URL = process.env.NEXT_PUBLIC_OPENAI_BASE_URL;
@@ -10,35 +13,7 @@ const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
 const IMAGE_API_KEY = process.env.NEXT_PUBLIC_IMAGE_API_KEY;
 const IMAGE_MODEL = process.env.NEXT_PUBLIC_IMAGE_MODEL || "Kwai-Kolors/Kolors";
 
-/**
- * Log details with consistent formatting
- */
-function logDetail(
-  type: "INFO" | "ERROR" | "DEBUG",
-  message: string,
-  data?: any,
-): void {
-  const timestamp = new Date().toISOString();
-  const prefix = `[${type}][OpenAI API]`;
 
-  let logMessage = `${prefix} ${message}`;
-  if (data) {
-    try {
-      if (typeof data === "object") {
-        const stringified = JSON.stringify(data);
-        logMessage += `\n${stringified.length > 500 ? stringified.substring(0, 500) + "..." : stringified}`;
-      } else {
-        logMessage += `\n${data}`;
-      }
-    } catch (e) {
-      logMessage += `\n[Object cannot be stringified]`;
-    }
-  }
-
-  console[type === "ERROR" ? "error" : type === "DEBUG" ? "debug" : "log"](
-    logMessage,
-  );
-}
 
 /**
  * Send a chat completion request to the OpenAI API
@@ -50,11 +25,11 @@ export async function getChatCompletion(
     max_tokens?: number;
   } = {},
 ): Promise<string> {
-  const requestId = `req_${Math.random().toString(36).substring(2, 15)}`;
+  const requestId = generateRequestId();
   const startTime = Date.now();
   const model = OPENAI_MODEL;
 
-  logDetail("INFO", `Starting model request [${requestId}]`, {
+  openaiLogger.info(`Starting model request [${requestId}]`, {
     model,
     temperature: options.temperature || 0.7,
     max_tokens: options.max_tokens || 1000,
@@ -81,7 +56,7 @@ export async function getChatCompletion(
 
     if (!response.ok) {
       const errorText = await response.text();
-      logDetail("ERROR", `Request failed [${requestId}] (${duration}ms)`, {
+      openaiLogger.error(`Request failed [${requestId}] (${duration}ms)`, {
         status: response.status,
         statusText: response.statusText,
         errorText,
@@ -91,7 +66,7 @@ export async function getChatCompletion(
 
     const data = await response.json();
 
-    logDetail("INFO", `Request successful [${requestId}] (${duration}ms)`, {
+    openaiLogger.info(`Request successful [${requestId}] (${duration}ms)`, {
       status: response.status,
       model: data.model,
       usage: data.usage,
@@ -103,7 +78,7 @@ export async function getChatCompletion(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    logDetail("ERROR", `Request exception [${requestId}] (${duration}ms)`, {
+    openaiLogger.error(`Request exception [${requestId}] (${duration}ms)`, {
       error:
         error instanceof Error
           ? { name: error.name, message: error.message }
@@ -126,10 +101,10 @@ export async function generateImage(
     image?: string | null;
   } = {},
 ): Promise<string> {
-  const requestId = `img_${Math.random().toString(36).substring(2, 15)}`;
+  const requestId = generateImageId();
   const startTime = Date.now();
 
-  logDetail("INFO", `Starting image generation [${requestId}]`, {
+  openaiLogger.info(`Starting image generation [${requestId}]`, {
     promptLength: prompt.length,
     imageSize: options.image_size || "1024x1024",
     hasSeed: !!options.seed,
@@ -139,7 +114,7 @@ export async function generateImage(
 
   try {
     if (!IMAGE_API_KEY) {
-      logDetail("ERROR", `Missing API key [${requestId}]`);
+      openaiLogger.error(`Missing API key [${requestId}]`);
       throw new Error("Image API Key is required");
     }
 
@@ -174,8 +149,7 @@ export async function generateImage(
 
     if (!response.ok) {
       const responseText = await response.text();
-      logDetail(
-        "ERROR",
+      openaiLogger.error(
         `Image generation failed [${requestId}] (${duration}ms)`,
         {
           status: response.status,
@@ -194,14 +168,13 @@ export async function generateImage(
       const responseText = await response.text();
       data = JSON.parse(responseText);
     } catch (e) {
-      logDetail("ERROR", `Failed to parse response JSON [${requestId}]`, {
+      openaiLogger.error(`Failed to parse response JSON [${requestId}]`, {
         error: e instanceof Error ? e.message : String(e),
       });
       throw new Error("Failed to parse response as JSON");
     }
 
-    logDetail(
-      "INFO",
+    openaiLogger.info(
       `Image generation successful [${requestId}] (${duration}ms)`,
       {
         status: response.status,
@@ -212,8 +185,7 @@ export async function generateImage(
 
     // Check response format
     if (!data.images || !data.images[0] || !data.images[0].url) {
-      logDetail(
-        "ERROR",
+      openaiLogger.error(
         `Invalid response format from image API [${requestId}]`,
         data,
       );
@@ -225,8 +197,7 @@ export async function generateImage(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    logDetail(
-      "ERROR",
+    openaiLogger.error(
       `Image generation exception [${requestId}] (${duration}ms)`,
       {
         error:

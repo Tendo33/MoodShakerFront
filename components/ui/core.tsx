@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock, Loader2, ExternalLink } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { generateComponentId } from "@/utils/generateId";
 
 // Button Component with improved flexibility and consistency
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -192,7 +193,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         ref={ref}
         initial="hidden"
         animate="visible"
-        variants={variants}
+        variants={variants as any}
         className={`
           relative overflow-hidden rounded-xl 
           ${bordered ? "border border-gray-700" : ""} 
@@ -284,7 +285,7 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   ({ icon: Icon, label, error, helperText, className, id, ...props }, ref) => {
-    const inputId = id || `input-${Math.random().toString(36).substring(2, 9)}`;
+    const inputId = id || generateComponentId("input");
 
     return (
       <div className="space-y-1.5">
@@ -350,7 +351,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ label, error, helperText, className, id, ...props }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false);
     const inputId =
-      id || `password-${Math.random().toString(36).substring(2, 9)}`;
+      id || generateComponentId("password");
 
     return (
       <div className="space-y-1.5">
@@ -452,7 +453,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
 
     return (
       <div
-        ref={ref}
+        ref={ref as React.Ref<HTMLDivElement>}
         className={`inline-flex items-center rounded-full font-medium ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
         {...props}
       >

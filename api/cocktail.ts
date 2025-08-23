@@ -1,4 +1,6 @@
 import { getChatCompletion } from "./openai";
+import { cocktailLogger } from "@/utils/logger";
+import { generateCocktailId } from "@/utils/generateId";
 
 // Simplified enums
 export enum AlcoholLevel {
@@ -80,35 +82,7 @@ export interface BartenderRequest {
   session_id?: string;
 }
 
-/**
- * Log details with consistent formatting
- */
-function logDetail(
-  type: "INFO" | "ERROR" | "DEBUG",
-  message: string,
-  data?: any,
-): void {
-  const timestamp = new Date().toISOString();
-  const prefix = `[${type}][Cocktail API][${timestamp}]`;
-  let logMessage = `${prefix} ${message}`;
 
-  if (data) {
-    try {
-      if (typeof data === "object") {
-        const stringified = JSON.stringify(data);
-        logMessage += `\n${stringified.length > 500 ? stringified.substring(0, 500) + "..." : stringified}`;
-      } else {
-        logMessage += `\n${data}`;
-      }
-    } catch (e) {
-      logMessage += `\n[Object cannot be stringified]`;
-    }
-  }
-
-  console[type === "ERROR" ? "error" : type === "DEBUG" ? "debug" : "log"](
-    logMessage,
-  );
-}
 
 /**
  * Create system prompt
@@ -888,14 +862,14 @@ function createUserMessage(
  */
 function parseCocktailFromCompletion(completion: string): Cocktail {
   try {
-    logDetail("DEBUG", "Parsing cocktail data from model response", {
+    cocktailLogger.debug("Parsing cocktail data from model response", {
       completionLength: completion.length,
       completionPreview: completion.substring(0, 200) + "...",
     });
 
     const jsonMatch = completion.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      logDetail("ERROR", "Cannot extract JSON data from response", {
+      cocktailLogger.error("Cannot extract JSON data from response", {
         completionPreview: completion.substring(0, 300) + "...",
       });
       throw new Error("No JSON found in completion");
@@ -905,7 +879,7 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
     const cocktail = JSON.parse(jsonString) as Cocktail;
 
     // Log parsing result
-    logDetail("INFO", "Successfully parsed cocktail data", {
+    cocktailLogger.info("Successfully parsed cocktail data", {
       name: cocktail.name,
       english_name: cocktail.english_name,
       ingredientsCount: cocktail.ingredients?.length || 0,
@@ -937,7 +911,7 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       steps: cocktail.steps || [],
     };
   } catch (error) {
-    logDetail("ERROR", "Failed to parse cocktail data", {
+    cocktailLogger.error("Failed to parse cocktail data", {
       error:
         error instanceof Error
           ? { name: error.name, message: error.message }
@@ -976,7 +950,7 @@ export async function requestCocktailRecommendation(
   request: BartenderRequest,
   agentType: AgentType = AgentType.CLASSIC_BARTENDER,
 ): Promise<Cocktail> {
-  const requestId = `cocktail_${Math.random().toString(36).substring(2, 15)}`;
+  const requestId = generateCocktailId();
   const startTime = Date.now();
   try {
     // Get current language
@@ -988,13 +962,7 @@ export async function requestCocktailRecommendation(
     const systemPrompt = createSystemPrompt(agentType, currentLanguage);
     const userMessage = createUserMessage(request, currentLanguage);
 
-    // logDetail("INFO", `Preparing request [${requestId}]`, {
-    //   systemPrompt: systemPrompt,
-    //   systemPromptLength: systemPrompt.length,
-    //   userMessage: userMessage,
-    //   userMessageLength: userMessage.length,
-    //   language: currentLanguage,
-    // });
+
 
     const completion = await getChatCompletion(
       [
@@ -1007,7 +975,7 @@ export async function requestCocktailRecommendation(
       },
     );
 
-    logDetail("DEBUG", `Received model response [${requestId}]`, {
+    cocktailLogger.debug(`Received model response [${requestId}]`, {
       completionLength: completion.length,
     });
 
@@ -1016,8 +984,7 @@ export async function requestCocktailRecommendation(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    logDetail(
-      "INFO",
+    cocktailLogger.info(
       `Cocktail recommendation completed [${requestId}] (${duration}ms)`,
       {
         cocktailName: cocktail.name,
@@ -1034,8 +1001,7 @@ export async function requestCocktailRecommendation(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    logDetail(
-      "ERROR",
+    cocktailLogger.error(
       `Cocktail recommendation failed [${requestId}] (${duration}ms)`,
       {
         error:
