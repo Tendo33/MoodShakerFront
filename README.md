@@ -7,13 +7,13 @@
 MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的调酒师，它能够根据你的心情，为你调制出最适合的"心情鸡尾酒"。无论是开心、难过、焦虑还是兴奋，MoodShaker 都能帮你找到最合适的解决方案。
 
 1. 经过几道选择：
-![MoodShaker Banner](assert/img1.png)
+![MoodShaker Banner](docs/assets/img1.png)
 
 2. 鸡尾酒配方详情页：
-![MoodShaker Features](assert/img2.png)
+![MoodShaker Features](docs/assets/img2.png)
 
 3. 鸡尾酒制作步骤：
-![Getting Started](assert/img3.png)
+![Getting Started](docs/assets/img3.png)
 
 ## ✨ 主要特点
 

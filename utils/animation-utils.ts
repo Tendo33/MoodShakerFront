@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { Variants } from "framer-motion";
 
 // Animation variants for common use
@@ -14,22 +13,7 @@ export const animations = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   },
-  slideDown: {
-    hidden: { opacity: 0, y: -30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-  },
-  slideLeft: {
-    hidden: { opacity: 0, x: 30 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
-  },
-  slideRight: {
-    hidden: { opacity: 0, x: -30 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
-  },
-  scale: {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.6 } },
-  },
+
   staggerContainer: {
     hidden: { opacity: 0 },
     visible: {
@@ -39,24 +23,7 @@ export const animations = {
       },
     },
   },
-  staggerFast: {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.05,
-      },
-    },
-  },
-  staggerSlow: {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  },
+
 };
 
 // Common animation presets
@@ -132,64 +99,4 @@ export function useInViewAnimation(
   return [ref, isInView];
 }
 
-// Function to create custom animation variants
-export function createAnimationVariants(
-  type: "fade" | "slide" | "scale" | "custom",
-  options?: {
-    direction?: "up" | "down" | "left" | "right";
-    duration?: number;
-    delay?: number;
-    custom?: Variants;
-  },
-): Variants {
-  const { direction = "up", duration = 0.6, delay = 0 } = options || {};
 
-  switch (type) {
-    case "fade":
-      return {
-        hidden: { opacity: 0 },
-        visible: {
-          opacity: 1,
-          transition: {
-            duration,
-            delay,
-          },
-        },
-      };
-    case "slide":
-      const offset = 30;
-      const directionMap = {
-        up: { y: offset },
-        down: { y: -offset },
-        left: { x: offset },
-        right: { x: -offset },
-      };
-      return {
-        hidden: { opacity: 0, ...directionMap[direction] },
-        visible: {
-          opacity: 1,
-          ...(direction === "up" || direction === "down" ? { y: 0 } : { x: 0 }),
-          transition: {
-            duration,
-            delay,
-          },
-        },
-      };
-    case "scale":
-      return {
-        hidden: { opacity: 0, scale: 0.8 },
-        visible: {
-          opacity: 1,
-          scale: 1,
-          transition: {
-            duration,
-            delay,
-          },
-        },
-      };
-    case "custom":
-      return options?.custom || {};
-    default:
-      return animations.fadeIn;
-  }
-}
