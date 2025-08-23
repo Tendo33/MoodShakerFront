@@ -988,13 +988,13 @@ export async function requestCocktailRecommendation(
     const systemPrompt = createSystemPrompt(agentType, currentLanguage);
     const userMessage = createUserMessage(request, currentLanguage);
 
-    logDetail("INFO", `Preparing request [${requestId}]`, {
-      systemPrompt: systemPrompt,
-      systemPromptLength: systemPrompt.length,
-      userMessage: userMessage,
-      userMessageLength: userMessage.length,
-      language: currentLanguage,
-    });
+    // logDetail("INFO", `Preparing request [${requestId}]`, {
+    //   systemPrompt: systemPrompt,
+    //   systemPromptLength: systemPrompt.length,
+    //   userMessage: userMessage,
+    //   userMessageLength: userMessage.length,
+    //   language: currentLanguage,
+    // });
 
     const completion = await getChatCompletion(
       [
