@@ -1,5 +1,6 @@
 import { generateImage } from "./openai";
 import { generateImageId } from "@/utils/generateId";
+import { imageCache, persistentImageCache, withCache } from "@/utils/cache-utils";
 
 /**
  * Generate an image prompt for the cocktail
@@ -17,11 +18,12 @@ export function generateImagePrompt(cocktail: {
 }
 
 /**
- * Generate a cocktail image
+ * Generate a cocktail image - 内部函数（无缓存）
  */
-export async function generateCocktailImage(
+async function _generateCocktailImage(
   prompt: string,
   sessionId: string,
+  forceRefresh?: boolean,
 ): Promise<string> {
   const requestId = generateImageId();
   const startTime = Date.now();
@@ -34,8 +36,10 @@ export async function generateCocktailImage(
   });
 
   try {
-    // Always use a unique seed to prevent caching of similar prompts
-    const uniqueSeed = Math.floor(Math.random() * 4999999999);
+    // Use a unique seed, especially when force refreshing
+    const uniqueSeed = forceRefresh 
+      ? Math.floor(Math.random() * 4999999999)
+      : Math.floor(Math.random() * 4999999999);
 
     // Update image generation call, using more detailed prompts and negative prompts
     const imageUrl = await generateImage(prompt, {
@@ -61,6 +65,16 @@ export async function generateCocktailImage(
     throw error;
   }
 }
+
+/**
+ * 带缓存的图片生成函数
+ */
+export const generateCocktailImage = withCache(
+  imageCache,
+  (prompt: string, sessionId: string, forceRefresh?: boolean) => 
+    forceRefresh ? `img:${sessionId}:${prompt.slice(0, 50)}:${Date.now()}` : `img:${sessionId}:${prompt.slice(0, 50)}`,
+  10 * 60 * 1000 // 10分钟缓存
+)(_generateCocktailImage);
 
 /**
  * Get cocktail image for session

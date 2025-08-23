@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Button,
   Card,
@@ -29,6 +30,7 @@ import {
   pulseAnimation,
   useInViewAnimation,
 } from "@/utils/animation-utils";
+import { useIntersectionObserver, useImagePreload } from "@/utils/performance-utils";
 
 // Import cocktail images
 import { cocktailImages } from "@/components/pages/CocktailDetailPage";
@@ -90,6 +92,13 @@ export default function Home() {
           : ["时尚", "果味", "伏特加"],
     },
   ];
+
+  // 性能优化：预加载关键图片
+  const imageUrls = useMemo(() => 
+    featuredCocktails.map(cocktail => cocktail.image).filter(Boolean),
+    [featuredCocktails]
+  );
+  const preloadedImages = useImagePreload(imageUrls);
 
   useEffect(() => {
     setIsClient(true);
@@ -272,13 +281,16 @@ export default function Home() {
                             className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 to-pink-500/20 rounded-full blur-xl"
                             animate={pulseAnimation}
                           />
-                          <img
+                          <Image
                             src={
                               cocktail.image ||
                               `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(cocktail.name) || "/placeholder.svg"}`
                             }
                             alt={cocktail.name}
-                            className="relative rounded-3xl shadow-2xl w-full h-full object-cover cursor-pointer transition-transform duration-300 hover:scale-[1.02]"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            priority={index === currentCocktailIndex}
+                            className="relative rounded-3xl shadow-2xl object-cover cursor-pointer transition-transform duration-300 hover:scale-[1.02]"
                             onError={(e) => {
                               e.currentTarget.src = `/placeholder.svg?height=500&width=500&query=${encodeURIComponent(
                                 cocktail.name,
@@ -460,13 +472,16 @@ export default function Home() {
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.5 }}
                       >
-                        <img
+                        <Image
                           src={
                             cocktail.image ||
                             `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name) || "/placeholder.svg"}`
                           }
                           alt={cocktail.name}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                          className="object-cover"
+                          loading="lazy"
                           onError={(e) => {
                             e.currentTarget.src = `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(
                               cocktail.name,

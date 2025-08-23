@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { ArrowLeft, Check } from "lucide-react";
 import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { commonStyles, componentStyles, combineStyles } from "@/lib/styles";
 
 // 优化：合并图片对象
 const images = {
@@ -66,11 +68,11 @@ export default function Questions() {
   // Add ref for the container to calculate scroll position
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 使用useMemo优化计算属性
-  const themeClasses = "bg-gray-900 text-white";
-  const textColorClass = "text-white";
-  const cardClasses = "bg-gray-800/80 text-white";
-  const borderClasses = "border-gray-700";
+  // 使用useMemo优化计算属性 - 从公共样式库获取
+  const themeClasses = commonStyles.theme.background;
+  const textColorClass = commonStyles.theme.textColor;
+  const cardClasses = commonStyles.theme.card;
+  const borderClasses = commonStyles.theme.border;
 
   // 优化：简化问题数据结构
   const questions = useMemo(
@@ -218,6 +220,7 @@ export default function Questions() {
     [],
   );
 
+  // 优化：使用 useCallback 防止不必要的重渲染
   const handleOptionSelect = useCallback(
     (questionId: number, optionId: string) => {
       // 如果已经选择了相同的选项，不做任何操作
@@ -405,7 +408,7 @@ export default function Questions() {
     }
   }, [activeQuestionId, scrollToElement]);
 
-  // 问题选项组件
+  // 问题选项组件 - 优化渲染性能
   const QuestionOption = React.memo(
     ({
       option,
@@ -418,18 +421,24 @@ export default function Questions() {
     }) => (
       <div className="h-full w-full">
         <div
-          className={`cursor-pointer transition-all duration-300 hover:scale-105 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} ${
-            isSelected ? "ring-2 ring-pink-500 shadow-lg" : ""
-          } h-full flex flex-col`}
+          className={combineStyles(
+            componentStyles.question.option,
+            borderClasses,
+            cardClasses,
+            isSelected ? componentStyles.question.optionSelected : ""
+          )}
           onClick={onSelect}
         >
           <div className="p-4 flex flex-col items-center justify-center flex-1">
             <div className="flex flex-col items-center text-center w-full">
-              <div className="mb-3 rounded-full overflow-hidden bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-2 w-24 h-24 flex items-center justify-center">
-                <img
+              <div className="mb-3 rounded-full overflow-hidden bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-2 w-24 h-24 flex items-center justify-center relative">
+                <Image
                   src={option.image || "/placeholder.svg"}
                   alt={option.text}
-                  className="w-20 h-20 object-cover rounded-full"
+                  width={80}
+                  height={80}
+                  className="object-cover rounded-full"
+                  loading="lazy"
                 />
               </div>
               <h3
@@ -566,10 +575,13 @@ export default function Questions() {
                         <div className="flex items-center justify-between mb-2">
                           {spirit.image ? (
                             <div className="flex items-center">
-                              <img
+                              <Image
                                 src={spirit.image || "/placeholder.svg"}
                                 alt={spirit.name}
-                                className="w-8 h-8 object-cover rounded-full mr-2"
+                                width={32}
+                                height={32}
+                                className="object-cover rounded-full mr-2"
+                                loading="lazy"
                               />
                               <span
                                 className={`text-base font-medium ${textColorClass}`}

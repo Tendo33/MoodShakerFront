@@ -252,7 +252,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     async (cocktail: Cocktail) => {
       try {
         const imagePrompt = generateImagePrompt(cocktail);
-        const image = await generateCocktailImage(imagePrompt, sessionId);
+        const image = await generateCocktailImage(imagePrompt, sessionId, false); // 使用缓存
         setImageData(image);
         setImageVersion(Date.now());
         saveToStorage(STORAGE_KEYS.IMAGE_DATA, image);
@@ -279,7 +279,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
       // 生成新的图片提示
       const imagePrompt = generateImagePrompt(recommendation);
-      const image = await generateCocktailImage(imagePrompt, sessionId);
+      const image = await generateCocktailImage(imagePrompt, sessionId, true); // 强制刷新
       setImageData(image);
       setImageVersion(Date.now());
       return image;
