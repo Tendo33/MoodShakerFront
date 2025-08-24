@@ -6,7 +6,22 @@ import Image from "next/image";
 import { ArrowLeft, Check } from "lucide-react";
 import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { commonStyles, componentStyles, combineStyles } from "@/lib/styles";
+// 内联样式定义 - 简化从 @/lib/styles 中提取的必要样式
+const localStyles = {
+  theme: {
+    background: "bg-gray-900 text-white",
+    textColor: "text-white", 
+    card: "bg-gray-800/80 text-white",
+    border: "border-gray-700",
+  },
+  questionOption: "cursor-pointer transition-all duration-300 hover:scale-105 border-gray-700 rounded-xl overflow-hidden h-full flex flex-col",
+  questionOptionSelected: "ring-2 ring-pink-500 shadow-lg",
+};
+
+// 简化的样式组合函数
+const combineStyles = (...classes: (string | undefined | false)[]): string => {
+  return classes.filter(Boolean).join(' ');
+};
 
 // 优化：合并图片对象
 const images = {
@@ -68,11 +83,11 @@ export default function Questions() {
   // Add ref for the container to calculate scroll position
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 使用useMemo优化计算属性 - 从公共样式库获取
-  const themeClasses = commonStyles.theme.background;
-  const textColorClass = commonStyles.theme.textColor;
-  const cardClasses = commonStyles.theme.card;
-  const borderClasses = commonStyles.theme.border;
+  // 使用简化的本地样式
+  const themeClasses = localStyles.theme.background;
+  const textColorClass = localStyles.theme.textColor;
+  const cardClasses = localStyles.theme.card;
+  const borderClasses = localStyles.theme.border;
 
   // 优化：简化问题数据结构
   const questions = useMemo(
@@ -422,10 +437,10 @@ export default function Questions() {
       <div className="h-full w-full">
         <div
           className={combineStyles(
-            componentStyles.question.option,
+            localStyles.questionOption,
             borderClasses,
             cardClasses,
-            isSelected ? componentStyles.question.optionSelected : ""
+            isSelected ? localStyles.questionOptionSelected : ""
           )}
           onClick={onSelect}
         >
