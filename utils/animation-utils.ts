@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import type { Variants } from "framer-motion";
+
 
 // Animation variants for common use
 export const animations = {

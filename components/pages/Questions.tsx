@@ -49,14 +49,14 @@ export default function Questions() {
         {
           value: "classic",
           label: t("questions.cocktail_type.classic"),
-          image: "/classic-cocktail-bar.png",
+          image: "/classic.png",
           description:
             locale === "cn" ? "经典马提尼、威士忌酸等传统鸡尾酒" : "Traditional cocktails like Martini, Whiskey Sour",
         },
         {
           value: "creative",
           label: t("questions.cocktail_type.creative"),
-          image: "/creative-cocktail-mixing.png",
+          image: "/custom.png",
           description:
             locale === "cn"
               ? "创新口味和独特配方的现代鸡尾酒"
@@ -72,25 +72,25 @@ export default function Questions() {
         {
           value: "light",
           label: t("questions.alcohol_strength.light"),
-          image: "/light-cocktail.png",
+          image: "/alcohol_low.png",
           description: locale === "cn" ? "酒精度较低，口感清爽" : "Lower alcohol content, refreshing taste",
         },
         {
           value: "medium",
           label: t("questions.alcohol_strength.medium"),
-          image: "/medium-strength-cocktail.png",
+          image: "/alcohol_medium.png",
           description: locale === "cn" ? "适中的酒精浓度，平衡口感" : "Moderate alcohol content, balanced flavor",
         },
         {
           value: "strong",
           label: t("questions.alcohol_strength.strong"),
-          image: "/strong-cocktail.png",
+          image: "/alcohol_high.png",
           description: locale === "cn" ? "高酒精度，浓烈口感" : "High alcohol content, bold flavor",
         },
         {
           value: "surprise",
           label: t("questions.alcohol_strength.surprise"),
-          image: "/surprise-cocktail.png",
+          image: "/any.png",
           description: locale === "cn" ? "让我们为您选择合适的浓度" : "Let us choose the perfect strength for you",
         },
       ],
@@ -103,20 +103,20 @@ export default function Questions() {
         {
           value: "beginner",
           label: t("questions.skill_level.beginner"),
-          image: "/simple-cocktail-mixing.png",
+          image: "/skill_easy.png",
           description: locale === "cn" ? "简单易做，无需复杂工具" : "Easy to make, no complex tools required",
         },
         {
           value: "intermediate",
           label: t("questions.skill_level.intermediate"),
-          image: "/intermediate-bartending.png",
+          image: "/skill_medium.png",
           description:
             locale === "cn" ? "需要一些调酒技巧和基本工具" : "Requires some bartending skills and basic tools",
         },
         {
           value: "advanced",
           label: t("questions.skill_level.advanced"),
-          image: "/advanced-mixology.png",
+          image: "/skill_hard.png",
           description:
             locale === "cn" ? "复杂制作工艺，专业调酒技术" : "Complex preparation, professional bartending techniques",
         },
@@ -125,12 +125,12 @@ export default function Questions() {
   ]
 
   const baseSpiritsOptions = [
-    { value: "gin", label: t("spirits.gin"), image: "/gin-bottle.png" },
-    { value: "rum", label: t("spirits.rum"), image: "/rum-bottle.png" },
-    { value: "vodka", label: t("spirits.vodka"), image: "/vodka-bottle.png" },
-    { value: "whiskey", label: t("spirits.whiskey"), image: "/whiskey-bottle.png" },
-    { value: "tequila", label: t("spirits.tequila"), image: "/tequila-bottle.png" },
-    { value: "brandy", label: t("spirits.brandy"), image: "/brandy-bottle.png" },
+    { value: "gin", label: t("spirits.gin"), image: "/gin.png" },
+    { value: "rum", label: t("spirits.rum"), image: "/rum.png" },
+    { value: "vodka", label: t("spirits.vodka"), image: "/vodka.png" },
+    { value: "whiskey", label: t("spirits.whiskey"), image: "/whiskey.png" },
+    { value: "tequila", label: t("spirits.tequila"), image: "/tequila.png" },
+    { value: "brandy", label: t("spirits.brandy"), image: "/brandy.png" },
   ]
 
   useEffect(() => {

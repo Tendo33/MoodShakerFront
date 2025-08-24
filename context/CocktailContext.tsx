@@ -149,7 +149,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     } finally {
       setIsLoading(false)
     }
-  }, [answers, baseSpirits])
+  }, [userFeedback, baseSpirits]) // 修复依赖：使用userFeedback而不是answers
 
   const isQuestionAnswered = useCallback((questionId: string) => !!answers[questionId], [answers])
 

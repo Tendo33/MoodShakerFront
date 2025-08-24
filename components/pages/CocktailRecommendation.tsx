@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -165,7 +165,7 @@ export default function CocktailRecommendation() {
     }
   }
 
-  // Load cocktail data
+  // Load cocktail data - 修复无限循环问题
   useEffect(() => {
     if (cocktailId) {
       setIsLoading(true)
@@ -180,17 +180,22 @@ export default function CocktailRecommendation() {
     } else if (!cocktail) {
       // Always load fresh data from storage
       loadSavedData()
-      setCocktail(contextCocktail)
+      // 只在没有cocktail时设置，避免循环
+      if (contextCocktail) {
+        setCocktail(contextCocktail)
+      }
       setTimeout(() => setIsPageLoaded(true), 100)
     }
-  }, [cocktailId, contextCocktail, loadSavedData, cocktail])
+  }, [cocktailId, loadSavedData]) // 移除cocktail和contextCocktail依赖以避免循环
 
-  // Update cocktail when context changes
+  // Update cocktail when context changes - 使用 useRef 来跟踪更新
+  const previousContextCocktailRef = useRef<Cocktail | null>(null)
   useEffect(() => {
-    if (!cocktailId && contextCocktail && contextCocktail !== cocktail) {
+    if (!cocktailId && contextCocktail && contextCocktail !== previousContextCocktailRef.current) {
       setCocktail(contextCocktail)
+      previousContextCocktailRef.current = contextCocktail
     }
-  }, [contextCocktail, cocktail, cocktailId])
+  }, [contextCocktail, cocktailId])
 
   useEffect(() => {
     if ((cocktailId && isLoading) || (!cocktailId && isContextLoading)) {
