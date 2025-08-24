@@ -6,11 +6,11 @@
 import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 
 // 防抖 Hook - 减少频繁触发
-export const useDebounce = <T extends (...args: any[]) => any>(
+export const useDebounce = <T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): T => {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   return useCallback((...args: Parameters<T>) => {
     if (timeoutRef.current) {
@@ -24,7 +24,7 @@ export const useDebounce = <T extends (...args: any[]) => any>(
 };
 
 // 节流 Hook - 限制执行频率
-export const useThrottle = <T extends (...args: any[]) => any>(
+export const useThrottle = <T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): T => {
@@ -79,8 +79,8 @@ export const useImagePreload = (imageSources: string[]) => {
 };
 
 // 虚拟化滚动 Hook - 对于长列表
-export const useVirtualization = (
-  items: any[],
+export const useVirtualization = <T>(
+  items: T[],
   itemHeight: number,
   containerHeight: number
 ) => {

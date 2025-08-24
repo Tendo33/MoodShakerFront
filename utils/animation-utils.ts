@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { Variants } from "framer-motion";
 
 // Animation variants for common use
@@ -75,7 +75,7 @@ export function useInViewAnimation(
   threshold = 0.1,
 ): [React.RefObject<HTMLDivElement>, boolean] {
   const [isInView, setIsInView] = useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!ref.current) return;

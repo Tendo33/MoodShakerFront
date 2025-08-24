@@ -33,7 +33,6 @@ export default function Footer() {
       label: "Github",
     },
   ];
-  // TODO: 修改联系信息
   const contactInfo = [
     {
       icon: <Mail className="h-5 w-5 mr-2 text-amber-500" />,

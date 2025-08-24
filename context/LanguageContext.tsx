@@ -7,6 +7,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
+import { appLogger } from "@/utils/logger";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -317,7 +318,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       if (pathname) {
         const pathLang = extractLanguageFromPathname(pathname);
         if (pathLang) {
-          console.log("从URL检测到语言:", pathLang);
+          appLogger.debug("Language detected from URL:", pathLang);
           setLanguageState(pathLang);
           // Save to localStorage to maintain consistency (only on client)
           if (typeof window !== "undefined") {
@@ -332,7 +333,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       if (typeof window !== "undefined") {
         const savedLanguage = localStorage.getItem("moodshaker-language");
         if (savedLanguage && (savedLanguage === "en" || savedLanguage === "cn")) {
-          console.log("使用localStorage中的语言:", savedLanguage);
+          appLogger.debug("Using language from localStorage:", savedLanguage);
           setLanguageState(savedLanguage as Language);
           setIsLoading(false);
           return;

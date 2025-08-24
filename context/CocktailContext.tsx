@@ -24,6 +24,7 @@ import {
 } from "@/utils/localStorage";
 import { generateCocktailImage, generateImagePrompt } from "@/api/image";
 import { generateSessionId } from "@/utils/generateId";
+import { cocktailLogger } from "@/utils/logger";
 
 // 存储键常量
 const STORAGE_KEYS = {
@@ -257,7 +258,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         setImageVersion(Date.now());
         saveToStorage(STORAGE_KEYS.IMAGE_DATA, image);
       } catch (err) {
-        console.error("Failed to generate cocktail image:", err);
+        cocktailLogger.error("Failed to generate cocktail image", err);
         // Don't set error state here as it would disrupt the user experience
         // Just log the error and continue
       } finally {
@@ -284,7 +285,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       setImageVersion(Date.now());
       return image;
     } catch (err) {
-      console.error("Failed to refresh image:", err);
+      cocktailLogger.error("Failed to refresh image", err);
       return null;
     } finally {
       setIsImageLoading(false);

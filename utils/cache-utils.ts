@@ -78,18 +78,18 @@ class SimpleCache<T> {
 }
 
 // 全局缓存实例
-export const cocktailCache = new SimpleCache<any>();
+export const cocktailCache = new SimpleCache<unknown>();
 export const imageCache = new SimpleCache<string>();
-export const apiCache = new SimpleCache<any>();
+export const apiCache = new SimpleCache<unknown>();
 
 // 缓存装饰器函数
 export const withCache = <T>(
   cache: SimpleCache<T>,
-  keyGenerator: (...args: any[]) => string,
+  keyGenerator: (...args: unknown[]) => string,
   ttl?: number
 ) => {
-  return (fn: (...args: any[]) => Promise<T>) => {
-    return async (...args: any[]): Promise<T> => {
+  return (fn: (...args: unknown[]) => Promise<T>) => {
+    return async (...args: unknown[]): Promise<T> => {
       const key = keyGenerator(...args);
       
       // 尝试从缓存获取
@@ -177,7 +177,7 @@ export class PersistentCache<T> {
 
 // 预定义的持久化缓存实例
 export const persistentImageCache = new PersistentCache<string>('moodshaker-img');
-export const persistentDataCache = new PersistentCache<any>('moodshaker-data');
+export const persistentDataCache = new PersistentCache<unknown>('moodshaker-data');
 
 // 性能监控
 export const cacheMetrics = {
