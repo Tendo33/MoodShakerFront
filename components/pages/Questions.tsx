@@ -1,56 +1,16 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
-import { ArrowLeft, Check } from "lucide-react";
-import { useCocktail } from "@/context/CocktailContext";
-import { useLanguage } from "@/context/LanguageContext";
-// 内联样式定义 - 简化从 @/lib/styles 中提取的必要样式
-const localStyles = {
-  theme: {
-    background: "bg-gray-900 text-white",
-    textColor: "text-white", 
-    card: "bg-gray-800/80 text-white",
-    border: "border-gray-700",
-  },
-  questionOption: "cursor-pointer transition-all duration-300 hover:scale-105 border-gray-700 rounded-xl overflow-hidden h-full flex flex-col",
-  questionOptionSelected: "ring-2 ring-pink-500 shadow-lg",
-};
-
-// 简化的样式组合函数
-const combineStyles = (...classes: (string | undefined | false)[]): string => {
-  return classes.filter(Boolean).join(' ');
-};
-
-// 优化：合并图片对象
-const images = {
-  // 问题选项图片
-  classic: "/classic.png",
-  custom: "/custom.png",
-
-  alcohol_low: "/alcohol_low.png",
-  alcohol_medium: "/alcohol_medium.png",
-  alcohol_high: "/alcohol_high.png",
-  any: "/any.png",
-
-  skill_easy: "/skill_easy.png",
-  skill_medium: "/skill_medium.png",
-  skill_hard: "/skill_hard.png",
-
-  // 基酒图片
-  gin: "/gin.png",
-  rum: "/rum.png",
-  vodka: "/vodka.png",
-  whiskey: "/whiskey.png",
-  tequila: "/tequila.png",
-  brandy: "/brandy.png",
-};
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useCocktail } from "@/context/CocktailContext"
+import { useLanguage } from "@/context/LanguageContext"
+import { Container, Card, Button, GradientText, Badge } from "@/components/ui/core"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function Questions() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { t, locale, getPathWithLanguage } = useLanguage();
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { t, locale, getPathWithLanguage } = useLanguage()
   const {
     answers,
     userFeedback,
@@ -64,644 +24,366 @@ export default function Questions() {
     submitRequest,
     isQuestionAnswered,
     resetAll,
-  } = useCocktail();
+  } = useCocktail()
 
-  // Add local loading state instead of using setIsLoading from context
-  const [localLoading, setLocalLoading] = useState(false);
-  const [visibleQuestions, setVisibleQuestions] = useState<number[]>([1]);
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
-  const [showBaseSpirits, setShowBaseSpirits] = useState(false);
-  const questionRefs = useRef<Record<number, HTMLDivElement | null>>({});
-  const baseSpiritsRef = useRef<HTMLDivElement | null>(null);
-  const feedbackFormRef = useRef<HTMLDivElement | null>(null);
-  const [localUserFeedback, setLocalUserFeedback] = useState("");
-  const [animateProgress, setAnimateProgress] = useState(false);
-  const initialSetupDone = useRef(false);
+  const [currentQuestion, setCurrentQuestion] = useState(1)
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false)
+  const [showBaseSpirits, setShowBaseSpirits] = useState(false)
+  const [feedback, setFeedback] = useState("")
 
-  // Add state to track the currently active question for better scrolling
-  const [activeQuestionId, setActiveQuestionId] = useState(1);
-  // Add ref for the container to calculate scroll position
-  const containerRef = useRef<HTMLDivElement>(null);
+  const totalSteps = 5 // 3 questions + base spirits + feedback
+  const getCurrentStep = () => {
+    if (showFeedbackForm) return 5
+    if (showBaseSpirits) return 4
+    return currentQuestion
+  }
+  const currentStep = getCurrentStep()
+  const calculatedProgress = (currentStep / totalSteps) * 100
 
-  // 使用简化的本地样式
-  const themeClasses = localStyles.theme.background;
-  const textColorClass = localStyles.theme.textColor;
-  const cardClasses = localStyles.theme.card;
-  const borderClasses = localStyles.theme.border;
-
-  // 优化：简化问题数据结构
-  const questions = useMemo(
-    () => [
-      {
-        id: 1,
-        title: t("questions.ready.title"),
-        description: t("questions.ready.description"),
-        options: [
-          {
-            id: "classic",
-            text: t("questions.options.classic"),
-            image: images.classic,
-          },
-          {
-            id: "custom",
-            text: t("questions.options.custom"),
-            image: images.custom,
-          },
-        ],
-      },
-      {
-        id: 2,
-        title: t("questions.strength.title"),
-        description: t("questions.strength.description"),
-        options: [
-          {
-            id: "low",
-            text: t("questions.options.alcohol_low"),
-            image: images.alcohol_low,
-          },
-          {
-            id: "medium",
-            text: t("questions.options.alcohol_medium"),
-            image: images.alcohol_medium,
-          },
-          {
-            id: "high",
-            text: t("questions.options.alcohol_high"),
-            image: images.alcohol_high,
-          },
-          {
-            id: "any",
-            text: t("questions.options.any"),
-            image: images.any,
-          },
-        ],
-      },
-      {
-        id: 3,
-        title: t("questions.skill.title"),
-        description: t("questions.skill.description"),
-        options: [
-          {
-            id: "easy",
-            text: t("questions.options.skill_easy"),
-            image: images.skill_easy,
-          },
-          {
-            id: "medium",
-            text: t("questions.options.skill_medium"),
-            image: images.skill_medium,
-          },
-          {
-            id: "hard",
-            text: t("questions.options.skill_hard"),
-            image: images.skill_hard,
-          },
-          {
-            id: "any",
-            text: t("questions.options.any"),
-            image: images.any,
-          },
-        ],
-      },
-    ],
-    [t],
-  );
-
-  // 优化：简化基酒选项
-  const baseSpiritsOptions = useMemo(
-    () => [
-      {
-        id: "all",
-        name: t("spirits.all"),
-        description: t("spirits.all.desc"),
-      },
-      {
-        id: "gin",
-        name: t("spirits.gin"),
-        description: t("spirits.gin.desc"),
-        image: images.gin,
-      },
-      {
-        id: "rum",
-        name: t("spirits.rum"),
-        description: t("spirits.rum.desc"),
-        image: images.rum,
-      },
-      {
-        id: "vodka",
-        name: t("spirits.vodka"),
-        description: t("spirits.vodka.desc"),
-        image: images.vodka,
-      },
-      {
-        id: "whiskey",
-        name: t("spirits.whiskey"),
-        description: t("spirits.whiskey.desc"),
-        image: images.whiskey,
-      },
-      {
-        id: "tequila",
-        name: t("spirits.tequila"),
-        description: t("spirits.tequila.desc"),
-        image: images.tequila,
-      },
-      {
-        id: "brandy",
-        name: t("spirits.brandy"),
-        description: t("spirits.brandy.desc"),
-        image: images.brandy,
-      },
-    ],
-    [t],
-  );
-
-  // Improved scroll function with offset calculation and better timing
-  const scrollToElement = useCallback(
-    (element: HTMLElement | null, offset = 20) => {
-      if (!element) return;
-
-      // Calculate the element's position relative to the viewport
-      const rect = element.getBoundingClientRect();
-
-      // Calculate the scroll position that would place the element at the top with offset
-      const scrollPosition = window.pageYOffset + rect.top - offset;
-
-      // Animate the scroll with a smoother easing
-      window.scrollTo({
-        top: scrollPosition,
-        behavior: "smooth",
-      });
-    },
-    [],
-  );
-
-  // 优化：使用 useCallback 防止不必要的重渲染
-  const handleOptionSelect = useCallback(
-    (questionId: number, optionId: string) => {
-      // 如果已经选择了相同的选项，不做任何操作
-      if (answers[questionId] === optionId) return;
-
-      saveAnswer(questionId.toString(), optionId);
-      setAnimateProgress(true);
-      setTimeout(() => setAnimateProgress(false), 1000);
-
-      // 显示下一个问题或基酒选择部分
-      const nextQuestionId = questionId + 1;
-      if (nextQuestionId <= questions.length) {
-        setActiveQuestionId(nextQuestionId);
-
-        if (!visibleQuestions.includes(nextQuestionId)) {
-          setVisibleQuestions((prev) => [...prev, nextQuestionId]);
-
-          // Use a longer timeout to ensure DOM updates are complete
-          setTimeout(() => {
-            const nextElement = questionRefs.current[nextQuestionId];
-            scrollToElement(nextElement, 80); // Use a larger offset for better visibility
-          }, 300);
-        } else {
-          // If question is already visible, just scroll to it
-          setTimeout(() => {
-            const nextElement = questionRefs.current[nextQuestionId];
-            scrollToElement(nextElement, 80);
-          }, 100);
-        }
-      } else if (questionId === questions.length && !showBaseSpirits) {
-        // 只在最后一个问题回答完且基酒选择部分还未显示时，显示基酒选择部分
-        setShowBaseSpirits(true);
-        setTimeout(() => {
-          scrollToElement(baseSpiritsRef.current, 80);
-        }, 300);
-      }
-      // 移除了自动跳转到反馈表单的逻辑，现在只会在用户点击继续按钮时跳转
-    },
-    [
-      answers,
-      saveAnswer,
-      visibleQuestions,
-      questions.length,
-      showBaseSpirits,
-      scrollToElement,
-    ],
-  );
-
-  // Fixed: Now using getPathWithLanguage from the top-level hook call
-  const handleBack = () => {
-    router.push(getPathWithLanguage("/"));
-  };
-
-  const handleBaseSpiritsToggle = useCallback(
-    (spiritId: string) => {
-      toggleBaseSpirit(spiritId, baseSpiritsOptions);
-    },
-    [toggleBaseSpirit, baseSpiritsOptions],
-  );
-
-  // Add new function to handle continuing after base spirits selection
-  const handleContinueAfterBaseSpirits = useCallback(() => {
-    setShowFeedbackForm(true);
-    setTimeout(() => {
-      scrollToElement(feedbackFormRef.current, 80);
-    }, 300);
-  }, [scrollToElement]);
-
-  // Update the handleSubmitFeedback function to navigate immediately after getting the cocktail
-  const handleSubmitFeedback = useCallback(async () => {
-    try {
-      // Use local loading state
-      setLocalLoading(true);
-
-      // First save the feedback
-      saveFeedback(localUserFeedback);
-
-      // Then submit the request and wait for the cocktail data only
-      const result = await submitRequest();
-
-      // Log the result for debugging
-      console.log(
-        "Request submitted successfully, navigating to recommendation page",
+  const questions = [
+    {
+      id: 1,
+      key: "cocktail_type",
+      title: t("questions.cocktail_type.title"),
+      options: [
         {
-          resultName: result.name,
+          value: "classic",
+          label: t("questions.cocktail_type.classic"),
+          image: "/classic-cocktail-bar.png",
+          description:
+            locale === "cn" ? "经典马提尼、威士忌酸等传统鸡尾酒" : "Traditional cocktails like Martini, Whiskey Sour",
         },
-      );
+        {
+          value: "creative",
+          label: t("questions.cocktail_type.creative"),
+          image: "/creative-cocktail-mixing.png",
+          description:
+            locale === "cn"
+              ? "创新口味和独特配方的现代鸡尾酒"
+              : "Modern cocktails with innovative flavors and unique recipes",
+        },
+      ],
+    },
+    {
+      id: 2,
+      key: "alcohol_strength",
+      title: t("questions.alcohol_strength.title"),
+      options: [
+        {
+          value: "light",
+          label: t("questions.alcohol_strength.light"),
+          image: "/light-cocktail.png",
+          description: locale === "cn" ? "酒精度较低，口感清爽" : "Lower alcohol content, refreshing taste",
+        },
+        {
+          value: "medium",
+          label: t("questions.alcohol_strength.medium"),
+          image: "/medium-strength-cocktail.png",
+          description: locale === "cn" ? "适中的酒精浓度，平衡口感" : "Moderate alcohol content, balanced flavor",
+        },
+        {
+          value: "strong",
+          label: t("questions.alcohol_strength.strong"),
+          image: "/strong-cocktail.png",
+          description: locale === "cn" ? "高酒精度，浓烈口感" : "High alcohol content, bold flavor",
+        },
+        {
+          value: "surprise",
+          label: t("questions.alcohol_strength.surprise"),
+          image: "/surprise-cocktail.png",
+          description: locale === "cn" ? "让我们为您选择合适的浓度" : "Let us choose the perfect strength for you",
+        },
+      ],
+    },
+    {
+      id: 3,
+      key: "skill_level",
+      title: t("questions.skill_level.title"),
+      options: [
+        {
+          value: "beginner",
+          label: t("questions.skill_level.beginner"),
+          image: "/simple-cocktail-mixing.png",
+          description: locale === "cn" ? "简单易做，无需复杂工具" : "Easy to make, no complex tools required",
+        },
+        {
+          value: "intermediate",
+          label: t("questions.skill_level.intermediate"),
+          image: "/intermediate-bartending.png",
+          description:
+            locale === "cn" ? "需要一些调酒技巧和基本工具" : "Requires some bartending skills and basic tools",
+        },
+        {
+          value: "advanced",
+          label: t("questions.skill_level.advanced"),
+          image: "/advanced-mixology.png",
+          description:
+            locale === "cn" ? "复杂制作工艺，专业调酒技术" : "Complex preparation, professional bartending techniques",
+        },
+      ],
+    },
+  ]
 
-      // Navigate immediately after getting the cocktail data
-      // Don't wait for image generation
-      router.push(getPathWithLanguage("/cocktail/recommendation"));
-    } catch (error) {
-      console.error("Error submitting request:", error);
-      // Reset loading state on error
-      setLocalLoading(false);
-    }
-  }, [
-    saveFeedback,
-    submitRequest,
-    router,
-    localUserFeedback,
-    getPathWithLanguage,
-  ]);
+  const baseSpiritsOptions = [
+    { value: "gin", label: t("spirits.gin"), image: "/gin-bottle.png" },
+    { value: "rum", label: t("spirits.rum"), image: "/rum-bottle.png" },
+    { value: "vodka", label: t("spirits.vodka"), image: "/vodka-bottle.png" },
+    { value: "whiskey", label: t("spirits.whiskey"), image: "/whiskey-bottle.png" },
+    { value: "tequila", label: t("spirits.tequila"), image: "/tequila-bottle.png" },
+    { value: "brandy", label: t("spirits.brandy"), image: "/brandy-bottle.png" },
+  ]
 
-  // 初始化函数 - 只在组件挂载时执行一次
   useEffect(() => {
-    if (typeof window !== "undefined" && !initialSetupDone.current) {
-      initialSetupDone.current = true;
+    loadSavedData()
+  }, [])
 
-      // 检查是否有 URL 参数指示新会话
-      const isNewSession = searchParams?.get("new") === "true";
-
-      // 如果是新会话，清除之前的数据
-      if (isNewSession) {
-        resetAll();
-        setVisibleQuestions([1]);
-        setShowBaseSpirits(false);
-        setShowFeedbackForm(false);
-        setActiveQuestionId(1);
-        setLocalUserFeedback("");
-        return;
-      }
-
-      // 加载保存的数据
-      loadSavedData();
-
-      // 设置本地反馈
-      if (userFeedback) {
-        setLocalUserFeedback(userFeedback);
-      }
-
-      // 根据已保存的答案设置可见问题
-      const answeredQuestionIds = Object.keys(answers).map(Number);
-      if (answeredQuestionIds.length > 0) {
-        const maxAnsweredId = Math.max(...answeredQuestionIds);
-        const nextVisible = [
-          ...new Set([...answeredQuestionIds, maxAnsweredId + 1]),
-        ].filter((id) => id <= questions.length);
-
-        setVisibleQuestions(nextVisible);
-        setActiveQuestionId(
-          maxAnsweredId + 1 <= questions.length
-            ? maxAnsweredId + 1
-            : maxAnsweredId,
-        );
-
-        // 如果已回答最后一个问题，显示基酒选择部分
-        if (maxAnsweredId >= questions.length) {
-          setShowBaseSpirits(true);
-
-          // 如果已选择基酒，显示反馈表单
-          if (baseSpirits.length > 0) {
-            setShowFeedbackForm(true);
-          }
-        }
-      }
+  const handleAnswer = (questionId: number, option: string) => {
+    saveAnswer(questionId, option)
+    if (questionId < questions.length) {
+      setCurrentQuestion(questionId + 1)
+    } else {
+      setShowBaseSpirits(true)
     }
-  }, [
-    searchParams,
-    resetAll,
-    loadSavedData,
-    userFeedback,
-    answers,
-    baseSpirits,
-    questions.length,
-  ]);
+  }
 
-  // 当 userFeedback 变化时更新本地状态
-  useEffect(() => {
-    if (userFeedback && localUserFeedback === "") {
-      setLocalUserFeedback(userFeedback);
+  const handleBaseSpiritsDone = () => {
+    setShowBaseSpirits(false)
+    setShowFeedbackForm(true)
+  }
+
+  const handleFeedbackSubmit = () => {
+    if (feedback.trim()) {
+      saveFeedback(feedback)
     }
-  }, [userFeedback, localUserFeedback]);
+    submitRequest()
+    router.push(getPathWithLanguage("/cocktail/recommendation"))
+  }
 
-  // Add effect to handle initial scroll position based on active question
-  useEffect(() => {
-    if (initialSetupDone.current && activeQuestionId > 0) {
-      const activeElement = questionRefs.current[activeQuestionId];
-      if (activeElement) {
-        // Small delay to ensure DOM is ready
-        setTimeout(() => {
-          scrollToElement(activeElement, 80);
-        }, 300);
-      }
-    }
-  }, [activeQuestionId, scrollToElement]);
-
-  // 问题选项组件 - 优化渲染性能
-  const QuestionOption = React.memo(
-    ({
-      option,
-      isSelected,
-      onSelect,
-    }: {
-      option: { id: string; text: string; image: string };
-      isSelected: boolean;
-      onSelect: () => void;
-    }) => (
-      <div className="h-full w-full">
-        <div
-          className={combineStyles(
-            localStyles.questionOption,
-            borderClasses,
-            cardClasses,
-            isSelected ? localStyles.questionOptionSelected : ""
-          )}
-          onClick={onSelect}
-        >
-          <div className="p-4 flex flex-col items-center justify-center flex-1">
-            <div className="flex flex-col items-center text-center w-full">
-              <div className="mb-3 rounded-full overflow-hidden bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-2 w-24 h-24 flex items-center justify-center relative">
-                <Image
-                  src={option.image || "/placeholder.svg"}
-                  alt={option.text}
-                  width={80}
-                  height={80}
-                  className="object-cover rounded-full"
-                  loading="lazy"
-                />
-              </div>
-              <h3
-                className={`text-base font-medium ${textColorClass} text-center w-full`}
-              >
-                {option.text}
-              </h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-  );
-  QuestionOption.displayName = "QuestionOption";
+  const handleReset = () => {
+    resetAll()
+    setCurrentQuestion(1)
+    setShowFeedbackForm(false)
+    setShowBaseSpirits(false)
+    setFeedback("")
+  }
 
   return (
-    <div className={`w-full px-4 py-8 ${themeClasses}`}>
-      <div className="flex">
-        {/* 垂直进度条 */}
-        <div className="mr-6 sticky top-8 self-start">
-          <button
-            className="flex items-center px-4 py-2 rounded-full hover:bg-white/10 transition-colors mb-6"
-            onClick={handleBack}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" /> {t("questions.back")}
-          </button>
-
-          <div className="h-64 w-2 bg-gray-700/30 rounded-full overflow-hidden relative">
-            <div
-              className={`w-full bg-gradient-to-b from-amber-500 to-pink-500 rounded-full transition-all duration-500 absolute top-0 ${
-                animateProgress ? "animate-pulse" : ""
-              }`}
-              style={{ height: `${progressPercentage}%` }}
-            ></div>
-          </div>
-        </div>
-
-        <div className="flex-1" ref={containerRef}>
-          {/* 所有主要部分的容器 */}
-          <div className="space-y-12 w-full max-w-5xl mx-auto">
-            {/* 问题列表 */}
-            {questions.map((question) => (
-              <div
-                key={question.id}
-                ref={(el) => {
-                  questionRefs.current[question.id] = el;
-                }}
-                className={`transition-all duration-500 scroll-mt-24 w-full ${
-                  visibleQuestions.includes(question.id)
-                    ? "opacity-100 transform translate-y-0"
-                    : "opacity-0 transform translate-y-8 h-0 overflow-hidden"
-                }`}
-                id={`question-${question.id}`}
-              >
-                <div
-                  className={`mb-6 border ${borderClasses} rounded-xl overflow-hidden ${cardClasses}`}
-                >
-                  <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10 relative">
-                    <div
-                      className={
-                        isQuestionAnswered(question.id.toString())
-                          ? "absolute right-6 top-6"
-                          : "hidden"
-                      }
-                    >
-                      <div className="bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-full p-1.5 animate-pulse">
-                        <Check className="h-4 w-4" />
-                      </div>
-                    </div>
-                    <h3 className={`text-2xl font-bold mb-3 ${textColorClass}`}>
-                      {question.title}
-                    </h3>
-                    <p className="text-gray-400">{question.description}</p>
-                  </div>
-                </div>
-
-                {/* Updated grid layout with fixed column widths and consistent spacing */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
-                  {question.options.map((option, index) => (
-                    <div
-                      key={option.id}
-                      className="transition-all duration-300 h-full"
-                      style={{
-                        animationDelay: `${index * 100}ms`,
-                        animation: visibleQuestions.includes(question.id)
-                          ? "fadeIn 0.5s ease-in-out forwards"
-                          : "none",
-                        opacity: visibleQuestions.includes(question.id) ? 1 : 0,
-                      }}
-                    >
-                      <QuestionOption
-                        option={option}
-                        isSelected={answers[question.id] === option.id}
-                        onSelect={() =>
-                          handleOptionSelect(question.id, option.id)
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            {/* 基酒选择 - Updated for consistent width */}
-            <div
-              ref={baseSpiritsRef}
-              className={showBaseSpirits ? "w-full scroll-mt-24" : "hidden"}
-              id="base-spirits-section"
-            >
-              <div
-                className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} w-full`}
-              >
-                <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
-                  <h3 className={`text-2xl font-bold mb-2 ${textColorClass}`}>
-                    {t("questions.availableSpirits")}
-                  </h3>
-                  <p className="text-gray-400 mb-4">
-                    {t("questions.selectSpirits")}
-                  </p>
-                </div>
-                <div className="p-6">
-                  {/* Updated grid layout for base spirits with consistent sizing */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {baseSpiritsOptions.map((spirit) => (
-                      <div
-                        key={spirit.id}
-                        className={`cursor-pointer p-4 rounded-xl transition-all duration-300 border h-full flex flex-col justify-between ${
-                          baseSpirits.includes(spirit.id)
-                            ? "border-pink-500 bg-gradient-to-br from-amber-500/10 to-pink-500/10"
-                            : `${borderClasses} hover:border-white/30`
-                        }`}
-                        onClick={() => handleBaseSpiritsToggle(spirit.id)}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          {spirit.image ? (
-                            <div className="flex items-center">
-                              <Image
-                                src={spirit.image || "/placeholder.svg"}
-                                alt={spirit.name}
-                                width={32}
-                                height={32}
-                                className="object-cover rounded-full mr-2"
-                                loading="lazy"
-                              />
-                              <span
-                                className={`text-base font-medium ${textColorClass}`}
-                              >
-                                {spirit.name}
-                              </span>
-                            </div>
-                          ) : (
-                            <span
-                              className={`text-base font-medium ${textColorClass}`}
-                            >
-                              {spirit.name}
-                            </span>
-                          )}
-                          <div
-                            className={
-                              baseSpirits.includes(spirit.id)
-                                ? "h-5 w-5 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 flex items-center justify-center"
-                                : "h-5 w-5 rounded-full bg-white/10 flex items-center justify-center"
-                            }
-                          >
-                            {baseSpirits.includes(spirit.id) && (
-                              <Check className="h-3 w-3 text-white" />
-                            )}
-                          </div>
-                        </div>
-                        <p className="text-base text-gray-400">
-                          {spirit.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Add continue button */}
-                  <div className="mt-6 flex justify-end">
-                    <button
-                      onClick={handleContinueAfterBaseSpirits}
-                      disabled={baseSpirits.length === 0}
-                      className={`bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full flex items-center ${
-                        baseSpirits.length === 0
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                    >
-                      <span className="font-medium">
-                        {t("questions.continue")}
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 反馈表单 - Updated for consistent width */}
-            <div
-              ref={feedbackFormRef}
-              className={showFeedbackForm ? "w-full scroll-mt-24" : "hidden"}
-            >
-              <div
-                className={`border ${borderClasses} rounded-xl overflow-hidden ${cardClasses} w-full`}
-              >
-                <div className="p-6 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
-                  <h3 className={`text-2xl font-bold mb-2 ${textColorClass}`}>
-                    {t("questions.feedback.title")}
-                  </h3>
-                  <p className="text-gray-400">
-                    {t("questions.feedback.description")}
-                  </p>
-                </div>
-                <div className="p-6">
-                  <textarea
-                    value={localUserFeedback}
-                    onChange={(e) => setLocalUserFeedback(e.target.value)}
-                    placeholder={t("questions.feedback.placeholder")}
-                    className={`w-full min-h-[150px] border ${borderClasses} rounded-xl p-4 bg-transparent focus:border-pink-500 focus:ring-1 focus:ring-pink-500 focus:outline-none ${textColorClass}`}
-                  ></textarea>
-                </div>
-                <div className="px-6 py-4 flex justify-end border-t border-gray-700">
-                  <button
-                    onClick={handleSubmitFeedback}
-                    className={`bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full flex items-center ${
-                      isLoading || localLoading
-                        ? "opacity-70 cursor-not-allowed"
-                        : ""
-                    }`}
-                    disabled={isLoading || localLoading}
-                  >
-                    {isLoading || localLoading ? (
-                      <>
-                        <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
-                        <span className="font-medium">
-                          {t("questions.loading")}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="font-medium inline-flex items-center">
-                        {t("questions.submit")}
-                      </span>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-amber-500/15 to-pink-500/15 rounded-full blur-xl animate-pulse" />
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-pink-500/15 to-purple-500/15 rounded-full blur-lg animate-pulse delay-1000" />
+        <div className="absolute bottom-40 left-1/4 w-40 h-40 bg-gradient-to-br from-blue-500/8 to-teal-500/8 rounded-full blur-2xl animate-pulse delay-2000" />
+        <div className="absolute top-1/2 right-1/3 w-20 h-20 bg-gradient-to-br from-green-500/12 to-blue-500/12 rounded-full blur-lg animate-pulse delay-3000" />
       </div>
+
+      <Container className="relative z-10 py-8">
+        <div className="mb-10">
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-sm font-semibold text-gray-300 tracking-wide">{t("questions.progress")}</span>
+            <span className="text-sm font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+              {Math.round(calculatedProgress)}%
+            </span>
+          </div>
+          <div className="w-full bg-gray-800/60 rounded-full h-2 backdrop-blur-sm border border-gray-700/30">
+            <motion.div
+              className="bg-gradient-to-r from-amber-500 to-pink-500 h-2 rounded-full shadow-lg shadow-amber-500/30 relative overflow-hidden"
+              initial={{ width: 0 }}
+              animate={{ width: `${calculatedProgress}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+            </motion.div>
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {!showBaseSpirits && !showFeedbackForm && (
+            <motion.div
+              key={currentQuestion}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="space-y-10"
+            >
+              <div className="text-center space-y-6">
+                <Badge
+                  variant="outline"
+                  className="border-amber-500/30 text-amber-300 bg-amber-500/8 backdrop-blur-sm px-4 py-2 text-sm font-medium tracking-wide"
+                >
+                  {t("questions.step")} {currentStep} / {totalSteps}
+                </Badge>
+                <GradientText className="text-3xl md:text-5xl font-bold leading-tight tracking-tight">
+                  {questions[currentQuestion - 1]?.title}
+                </GradientText>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                {questions[currentQuestion - 1]?.options.map((option, index) => (
+                  <motion.div
+                    key={option.value}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.08 }}
+                    whileHover={{ scale: 1.02, y: -3 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Card
+                      className="cursor-pointer h-full transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/15 group bg-gray-800/40 backdrop-blur-md border-gray-700/40 hover:border-amber-500/40 hover:bg-amber-500/5 relative overflow-hidden"
+                      onClick={() => handleAnswer(currentQuestion, option.value)}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 via-transparent to-pink-500/0 group-hover:from-amber-500/5 group-hover:to-pink-500/5 transition-all duration-500" />
+
+                      <div className="aspect-video relative overflow-hidden rounded-xl mb-6">
+                        <img
+                          src={option.image || "/placeholder.svg?height=200&width=300&query=cocktail"}
+                          alt={option.label}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        <div className="absolute bottom-4 left-4 right-4">
+                          <h3 className="text-xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors duration-300">
+                            {option.label}
+                          </h3>
+                          {option.description && (
+                            <p className="text-sm text-gray-300/90 leading-relaxed">{option.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {showBaseSpirits && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-10"
+            >
+              <div className="text-center space-y-6">
+                <Badge
+                  variant="outline"
+                  className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-4 py-2 font-medium"
+                >
+                  {t("questions.step")} {currentStep} / {totalSteps}
+                </Badge>
+                <GradientText className="text-3xl md:text-4xl font-bold tracking-tight">
+                  {t("questions.base_spirits.title")}
+                </GradientText>
+                <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                  {t("questions.base_spirits.description")}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+                {baseSpiritsOptions.map((spirit, index) => (
+                  <motion.div
+                    key={spirit.value}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <Card
+                      className={`cursor-pointer transition-all duration-300 relative overflow-hidden ${
+                        baseSpirits.includes(spirit.value)
+                          ? "ring-2 ring-amber-500/60 bg-amber-500/10 shadow-lg shadow-amber-500/20"
+                          : "hover:shadow-lg hover:shadow-amber-500/10 bg-gray-800/40 backdrop-blur-sm border-gray-700/40 hover:border-amber-500/30"
+                      }`}
+                      onClick={() => toggleBaseSpirit(spirit.value)}
+                    >
+                      {baseSpirits.includes(spirit.value) && (
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                      <div className="aspect-square relative overflow-hidden rounded-lg mb-4">
+                        <img
+                          src={spirit.image || "/placeholder.svg"}
+                          alt={spirit.label}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                        />
+                      </div>
+                      <h3 className="text-center font-semibold text-gray-200">{spirit.label}</h3>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="text-center">
+                <Button onClick={handleBaseSpiritsDone} className="px-10 py-3 font-semibold tracking-wide">
+                  {t("questions.continue")}
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {showFeedbackForm && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-10 max-w-2xl mx-auto"
+            >
+              <div className="text-center space-y-6">
+                <Badge
+                  variant="outline"
+                  className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-4 py-2 font-medium"
+                >
+                  {t("questions.step")} {currentStep} / {totalSteps}
+                </Badge>
+                <GradientText className="text-3xl md:text-4xl font-bold tracking-tight">
+                  {t("questions.feedback.title")}
+                </GradientText>
+                <p className="text-gray-400 leading-relaxed">{t("questions.feedback.description")}</p>
+              </div>
+
+              <Card className="p-8 bg-gray-800/40 backdrop-blur-md border-gray-700/40">
+                <textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder={t("questions.feedback.placeholder")}
+                  className="w-full h-36 bg-gray-900/50 border border-gray-600/50 rounded-xl p-5 text-white placeholder-gray-500 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/20 resize-none transition-all duration-300 backdrop-blur-sm"
+                />
+              </Card>
+
+              <div className="flex gap-4 justify-center">
+                <Button variant="outline" onClick={() => setShowFeedbackForm(false)} className="px-8 py-3 font-medium">
+                  {t("questions.skip")}
+                </Button>
+                <Button
+                  onClick={handleFeedbackSubmit}
+                  disabled={isLoading}
+                  className="px-10 py-3 font-semibold tracking-wide"
+                >
+                  {isLoading ? t("questions.generating") : t("questions.get_recommendation")}
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="fixed bottom-8 right-8 z-20">
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            className="rounded-full bg-gray-800/70 backdrop-blur-md border-gray-600/40 hover:border-amber-500/50 hover:bg-amber-500/10 transition-all duration-300 px-6 py-3 font-medium shadow-lg"
+          >
+            {t("questions.reset")}
+          </Button>
+        </div>
+      </Container>
     </div>
-  );
+  )
 }

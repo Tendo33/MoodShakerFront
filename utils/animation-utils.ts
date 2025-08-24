@@ -98,5 +98,3 @@ export function useInViewAnimation(
 
   return [ref, isInView];
 }
-
-
