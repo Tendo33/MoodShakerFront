@@ -163,6 +163,9 @@ const translations: TranslationDictionary = {
     "recommendation.finalizing": "正在完善最后细节...",
     "recommendation.loadingDesc": "我们正在为您量身定制完美的鸡尾酒",
     "recommendation.complete": "完成",
+    "recommendation.error": "出现错误",
+    "recommendation.errorDesc": "抱歉，生成鸡尾酒推荐时出现了问题。请重试或返回首页。",
+    "recommendation.startQuestions": "开始问卷",
   },
   en: {
     // App title
@@ -307,6 +310,10 @@ const translations: TranslationDictionary = {
     "recommendation.finalizing": "Adding finishing touches...",
     "recommendation.loadingDesc": "We're crafting the perfect cocktail just for you",
     "recommendation.complete": "complete",
+    "recommendation.error": "Something Went Wrong",
+    "recommendation.errorDesc":
+      "Sorry, there was an issue generating your cocktail recommendation. Please try again or return to the homepage.",
+    "recommendation.startQuestions": "Start Questions",
   },
 }
 
@@ -428,7 +435,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const setLanguage = useCallback(
     (lang: Language) => {
       setLanguageState(lang)
-      // console.log("Setting language to:", lang);
+
 
       // Save to localStorage
       if (typeof window !== "undefined") {

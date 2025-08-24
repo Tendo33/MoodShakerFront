@@ -138,7 +138,7 @@ export default function Questions() {
   }, [])
 
   const handleAnswer = (questionId: number, option: string) => {
-    saveAnswer(questionId, option)
+    saveAnswer(questionId.toString(), option)
     if (questionId < questions.length) {
       setCurrentQuestion(questionId + 1)
     } else {
@@ -170,23 +170,22 @@ export default function Questions() {
   return (
     <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-amber-500/15 to-pink-500/15 rounded-full blur-xl animate-pulse" />
-        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-pink-500/15 to-purple-500/15 rounded-full blur-lg animate-pulse delay-1000" />
-        <div className="absolute bottom-40 left-1/4 w-40 h-40 bg-gradient-to-br from-blue-500/8 to-teal-500/8 rounded-full blur-2xl animate-pulse delay-2000" />
-        <div className="absolute top-1/2 right-1/3 w-20 h-20 bg-gradient-to-br from-green-500/12 to-blue-500/12 rounded-full blur-lg animate-pulse delay-3000" />
+        <div className="absolute top-10 left-5 w-16 h-16 bg-gradient-to-br from-amber-500/10 to-pink-500/10 rounded-full blur-lg animate-pulse" />
+        <div className="absolute top-20 right-10 w-12 h-12 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-full blur-md animate-pulse delay-1000" />
+        <div className="absolute bottom-20 left-1/4 w-20 h-20 bg-gradient-to-br from-blue-500/5 to-teal-500/5 rounded-full blur-xl animate-pulse delay-2000" />
       </div>
 
-      <Container className="relative z-10 py-8">
-        <div className="mb-10">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-sm font-semibold text-gray-300 tracking-wide">{t("questions.progress")}</span>
-            <span className="text-sm font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+      <Container className="relative z-10 py-4">
+        <div className="mb-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-semibold text-gray-300 tracking-wide">{t("questions.progress")}</span>
+            <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20">
               {Math.round(calculatedProgress)}%
             </span>
           </div>
-          <div className="w-full bg-gray-800/60 rounded-full h-2 backdrop-blur-sm border border-gray-700/30">
+          <div className="w-full bg-gray-800/60 rounded-full h-1.5 backdrop-blur-sm border border-gray-700/30">
             <motion.div
-              className="bg-gradient-to-r from-amber-500 to-pink-500 h-2 rounded-full shadow-lg shadow-amber-500/30 relative overflow-hidden"
+              className="bg-gradient-to-r from-amber-500 to-pink-500 h-1.5 rounded-full shadow-lg shadow-amber-500/30 relative overflow-hidden"
               initial={{ width: 0 }}
               animate={{ width: `${calculatedProgress}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
@@ -204,21 +203,21 @@ export default function Questions() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="space-y-10"
+              className="space-y-4"
             >
-              <div className="text-center space-y-6">
+              <div className="text-center space-y-3">
                 <Badge
-                  variant="outline"
-                  className="border-amber-500/30 text-amber-300 bg-amber-500/8 backdrop-blur-sm px-4 py-2 text-sm font-medium tracking-wide"
+                  variant="secondary"
+                  className="border-amber-500/30 text-amber-300 bg-amber-500/8 backdrop-blur-sm px-3 py-1 text-xs font-medium tracking-wide"
                 >
                   {t("questions.step")} {currentStep} / {totalSteps}
                 </Badge>
-                <GradientText className="text-3xl md:text-5xl font-bold leading-tight tracking-tight">
+                <GradientText className="text-2xl md:text-3xl font-bold leading-tight tracking-tight">
                   {questions[currentQuestion - 1]?.title}
                 </GradientText>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-4xl mx-auto">
                 {questions[currentQuestion - 1]?.options.map((option, index) => (
                   <motion.div
                     key={option.value}
@@ -234,19 +233,19 @@ export default function Questions() {
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 via-transparent to-pink-500/0 group-hover:from-amber-500/5 group-hover:to-pink-500/5 transition-all duration-500" />
 
-                      <div className="aspect-video relative overflow-hidden rounded-xl mb-6">
+                      <div className="aspect-[4/3] relative overflow-hidden rounded-xl mb-3">
                         <img
                           src={option.image || "/placeholder.svg?height=200&width=300&query=cocktail"}
                           alt={option.label}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                        <div className="absolute bottom-4 left-4 right-4">
-                          <h3 className="text-xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors duration-300">
+                        <div className="absolute bottom-2 left-3 right-3">
+                          <h3 className="text-lg font-bold text-white mb-1 group-hover:text-amber-300 transition-colors duration-300">
                             {option.label}
                           </h3>
                           {option.description && (
-                            <p className="text-sm text-gray-300/90 leading-relaxed">{option.description}</p>
+                            <p className="text-xs text-gray-300/90 leading-relaxed">{option.description}</p>
                           )}
                         </div>
                       </div>
@@ -262,24 +261,24 @@ export default function Questions() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-10"
+              className="space-y-4"
             >
-              <div className="text-center space-y-6">
+              <div className="text-center space-y-3">
                 <Badge
-                  variant="outline"
-                  className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-4 py-2 font-medium"
+                  variant="secondary"
+                  className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium"
                 >
                   {t("questions.step")} {currentStep} / {totalSteps}
                 </Badge>
-                <GradientText className="text-3xl md:text-4xl font-bold tracking-tight">
+                <GradientText className="text-2xl md:text-3xl font-bold tracking-tight">
                   {t("questions.base_spirits.title")}
                 </GradientText>
-                <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-sm text-gray-400 max-w-2xl mx-auto leading-relaxed">
                   {t("questions.base_spirits.description")}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
                 {baseSpiritsOptions.map((spirit, index) => (
                   <motion.div
                     key={spirit.value}
@@ -295,11 +294,11 @@ export default function Questions() {
                           ? "ring-2 ring-amber-500/60 bg-amber-500/10 shadow-lg shadow-amber-500/20"
                           : "hover:shadow-lg hover:shadow-amber-500/10 bg-gray-800/40 backdrop-blur-sm border-gray-700/40 hover:border-amber-500/30"
                       }`}
-                      onClick={() => toggleBaseSpirit(spirit.value)}
+                      onClick={() => toggleBaseSpirit(spirit.value, baseSpiritsOptions)}
                     >
                       {baseSpirits.includes(spirit.value) && (
-                        <div className="absolute top-2 right-2 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
-                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="absolute top-1 right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path
                               fillRule="evenodd"
                               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -308,21 +307,21 @@ export default function Questions() {
                           </svg>
                         </div>
                       )}
-                      <div className="aspect-square relative overflow-hidden rounded-lg mb-4">
+                      <div className="aspect-square relative overflow-hidden rounded-lg mb-2">
                         <img
                           src={spirit.image || "/placeholder.svg"}
                           alt={spirit.label}
                           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                         />
                       </div>
-                      <h3 className="text-center font-semibold text-gray-200">{spirit.label}</h3>
+                      <h3 className="text-center text-sm font-medium text-gray-200">{spirit.label}</h3>
                     </Card>
                   </motion.div>
                 ))}
               </div>
 
-              <div className="text-center">
-                <Button onClick={handleBaseSpiritsDone} className="px-10 py-3 font-semibold tracking-wide">
+              <div className="flex justify-end">
+                <Button onClick={handleBaseSpiritsDone} className="px-8 py-2 font-semibold tracking-wide">
                   {t("questions.continue")}
                 </Button>
               </div>
@@ -334,38 +333,38 @@ export default function Questions() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-10 max-w-2xl mx-auto"
+              className="space-y-4 max-w-2xl mx-auto"
             >
-              <div className="text-center space-y-6">
+              <div className="text-center space-y-3">
                 <Badge
-                  variant="outline"
-                  className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-4 py-2 font-medium"
+                  variant="secondary"
+                  className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium"
                 >
                   {t("questions.step")} {currentStep} / {totalSteps}
                 </Badge>
-                <GradientText className="text-3xl md:text-4xl font-bold tracking-tight">
+                <GradientText className="text-2xl md:text-3xl font-bold tracking-tight">
                   {t("questions.feedback.title")}
                 </GradientText>
-                <p className="text-gray-400 leading-relaxed">{t("questions.feedback.description")}</p>
+                <p className="text-sm text-gray-400 leading-relaxed">{t("questions.feedback.description")}</p>
               </div>
 
-              <Card className="p-8 bg-gray-800/40 backdrop-blur-md border-gray-700/40">
+              <Card className="p-4 bg-gray-800/40 backdrop-blur-md border-gray-700/40">
                 <textarea
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder={t("questions.feedback.placeholder")}
-                  className="w-full h-36 bg-gray-900/50 border border-gray-600/50 rounded-xl p-5 text-white placeholder-gray-500 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/20 resize-none transition-all duration-300 backdrop-blur-sm"
+                  className="w-full h-24 bg-gray-900/50 border border-gray-600/50 rounded-xl p-3 text-sm text-white placeholder-gray-500 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/20 resize-none transition-all duration-300 backdrop-blur-sm"
                 />
               </Card>
 
-              <div className="flex gap-4 justify-center">
-                <Button variant="outline" onClick={() => setShowFeedbackForm(false)} className="px-8 py-3 font-medium">
+              <div className="flex gap-4 justify-between">
+                <Button variant="outline" onClick={() => setShowFeedbackForm(false)} className="px-6 py-2 font-medium">
                   {t("questions.skip")}
                 </Button>
                 <Button
                   onClick={handleFeedbackSubmit}
                   disabled={isLoading}
-                  className="px-10 py-3 font-semibold tracking-wide"
+                  className="px-8 py-2 font-semibold tracking-wide"
                 >
                   {isLoading ? t("questions.generating") : t("questions.get_recommendation")}
                 </Button>
@@ -374,11 +373,11 @@ export default function Questions() {
           )}
         </AnimatePresence>
 
-        <div className="fixed bottom-8 right-8 z-20">
+        <div className="fixed bottom-4 left-4 z-20">
           <Button
             variant="outline"
             onClick={handleReset}
-            className="rounded-full bg-gray-800/70 backdrop-blur-md border-gray-600/40 hover:border-amber-500/50 hover:bg-amber-500/10 transition-all duration-300 px-6 py-3 font-medium shadow-lg"
+            className="rounded-full bg-gray-800/70 backdrop-blur-md border-gray-600/40 hover:border-amber-500/50 hover:bg-amber-500/10 transition-all duration-300 px-4 py-2 text-sm font-medium shadow-lg"
           >
             {t("questions.reset")}
           </Button>

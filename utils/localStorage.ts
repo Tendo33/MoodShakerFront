@@ -3,22 +3,26 @@
  * 提供类型安全的本地存储操作
  */
 
+import { appLogger } from '@/utils/logger';
+
 /**
  * 从localStorage获取数据并解析
  * @param key 存储键名
  * @param defaultValue 默认值
  * @returns 解析后的数据或默认值
  */
-export function getFromStorage<T>(key: string, defaultValue: T): T {
+export function getFromStorage<T>(key: string, defaultValue: T): T;
+export function getFromStorage(key: string): any;
+export function getFromStorage<T>(key: string, defaultValue?: T): T | any {
   if (typeof window === "undefined") return defaultValue;
 
   try {
     const item = localStorage.getItem(key);
     if (!item) return defaultValue;
 
-    return JSON.parse(item) as T;
+    return JSON.parse(item);
   } catch (error) {
-    console.error(`Error reading ${key} from localStorage:`, error);
+    appLogger.error(`Error reading ${key} from localStorage`, error);
     return defaultValue;
   }
 }
@@ -34,7 +38,7 @@ export function saveToStorage<T>(key: string, value: T): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error(`Error saving ${key} to localStorage:`, error);
+    appLogger.error(`Error saving ${key} to localStorage`, error);
   }
 }
 
@@ -48,7 +52,7 @@ export function removeFromStorage(key: string): void {
   try {
     localStorage.removeItem(key);
   } catch (error) {
-    console.error(`Error removing ${key} from localStorage:`, error);
+    appLogger.error(`Error removing ${key} from localStorage`, error);
   }
 }
 
@@ -74,13 +78,8 @@ export function clearStorageWithPrefix(prefix: string): void {
       localStorage.removeItem(key);
     });
 
-    console.log(
-      `Cleared ${keysToRemove.length} localStorage items with prefix ${prefix}`,
-    );
+    appLogger.info(`Cleared ${keysToRemove.length} localStorage items with prefix ${prefix}`);
   } catch (error) {
-    console.error(
-      `Error clearing localStorage items with prefix ${prefix}:`,
-      error,
-    );
+    appLogger.error(`Error clearing localStorage items with prefix ${prefix}`, error);
   }
 }

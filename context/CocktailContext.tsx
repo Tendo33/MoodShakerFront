@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, useMemo } from "react"
 import type { ReactNode } from "react"
-import { requestCocktailRecommendation, type Cocktail, type BartenderRequest, AlcoholLevel, DifficultyLevel } from "@/api/cocktail"
+import { requestCocktailRecommendation, type Cocktail, type BartenderRequest } from "@/api/cocktail"
 import { getFromStorage, saveToStorage, clearStorageWithPrefix } from "@/utils/localStorage"
 import { generateCocktailImage, generateImagePrompt } from "@/api/image"
 import { generateSessionId } from "@/utils/generateId"
@@ -65,22 +65,34 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   const [progressPercentage, setProgressPercentage] = useState(0)
 
   const loadSavedData = useCallback(() => {
-    const savedAnswers = getFromStorage(STORAGE_KEYS.ANSWERS, {})
-    const savedFeedback = getFromStorage(STORAGE_KEYS.FEEDBACK, "")
-    const savedBaseSpirits = getFromStorage(STORAGE_KEYS.BASE_SPIRITS, [])
-    const savedRecommendation = getFromStorage(STORAGE_KEYS.RECOMMENDATION, null)
-    const savedImageData = getFromStorage(STORAGE_KEYS.IMAGE_DATA, null)
+    try {
+      // 使用正确的 getFromStorage 调用方式，提供默认值
+      const savedAnswers = getFromStorage(STORAGE_KEYS.ANSWERS, {})
+      const savedFeedback = getFromStorage(STORAGE_KEYS.FEEDBACK, "")
+      const savedBaseSpirits = getFromStorage(STORAGE_KEYS.BASE_SPIRITS, [])
+      const savedRecommendation = getFromStorage(STORAGE_KEYS.RECOMMENDATION, null)
+      const savedImageData = getFromStorage(STORAGE_KEYS.IMAGE_DATA, null)
 
-    setAnswers(savedAnswers)
-    setUserFeedback(savedFeedback)
-    setBaseSpirits(savedBaseSpirits)
-    setRecommendation(savedRecommendation)
-    setImageData(savedImageData)
+      setAnswers(savedAnswers)
+      setUserFeedback(savedFeedback)
+      setBaseSpirits(savedBaseSpirits)
+      // getFromStorage 已经处理了 JSON 解析，无需再次解析
+      setRecommendation(savedRecommendation)
+      setImageData(savedImageData)
+    } catch (error) {
+      cocktailLogger.error("Error loading saved data:", error)
+      // 如果读取失败，设置默认值
+      setAnswers({})
+      setUserFeedback("")
+      setBaseSpirits([])
+      setRecommendation(null)
+      setImageData(null)
+    }
   }, [])
 
   const saveAnswer = useCallback(
     (questionId: string, optionId: string) => {
-      setAnswers((prevAnswers: Record<string, string>) => ({
+      setAnswers((prevAnswers) => ({
         ...prevAnswers,
         [questionId]: optionId,
       }))
@@ -103,9 +115,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   }, [])
 
   const toggleBaseSpirit = useCallback((spiritId: string, allSpiritsOptions: SpiritOption[]) => {
-    setBaseSpirits((prevSpirits: string[]) => {
+    setBaseSpirits((prevSpirits) => {
       const updatedSpirits = prevSpirits.includes(spiritId)
-        ? prevSpirits.filter((id: string) => id !== spiritId)
+        ? prevSpirits.filter((id) => id !== spiritId)
         : [...prevSpirits, spiritId]
       saveToStorage(STORAGE_KEYS.BASE_SPIRITS, updatedSpirits)
       return updatedSpirits
@@ -116,27 +128,27 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     setIsLoading(true)
     setError(null)
     setProgressPercentage(0)
+    
+    let recommendation: Cocktail | null = null
 
     try {
       const sessionId = generateSessionId()
       saveToStorage(STORAGE_KEYS.SESSION_ID, sessionId)
 
       const request: BartenderRequest = {
-        message: userFeedback || "Please recommend a cocktail based on my preferences",
-        alcohol_level: AlcoholLevel.ANY,
-        difficulty_level: DifficultyLevel.ANY,
-        base_spirits: baseSpirits.length > 0 ? baseSpirits : null,
-        session_id: sessionId,
+        answers,
+        baseSpirits,
+        sessionId,
       }
 
       saveToStorage(STORAGE_KEYS.REQUEST, JSON.stringify(request))
 
-      const recommendation = await requestCocktailRecommendation(request)
+      recommendation = await requestCocktailRecommendation(request)
       setRecommendation(recommendation)
-      saveToStorage(STORAGE_KEYS.RECOMMENDATION, recommendation)
+      saveToStorage(STORAGE_KEYS.RECOMMENDATION, JSON.stringify(recommendation))
 
       const prompt = generateImagePrompt(recommendation)
-      const imageData = await generateCocktailImage(prompt)
+      const imageData = await generateCocktailImage(prompt, sessionId)
       setImageData(imageData)
       saveToStorage(STORAGE_KEYS.IMAGE_DATA, imageData)
 
@@ -149,7 +161,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     } finally {
       setIsLoading(false)
     }
-  }, [userFeedback, baseSpirits]) // 修复依赖：使用userFeedback而不是answers
+  }, [answers, baseSpirits])
 
   const isQuestionAnswered = useCallback((questionId: string) => !!answers[questionId], [answers])
 
@@ -164,33 +176,11 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     setProgressPercentage(0)
   }, [])
 
-  // 清理损坏的localStorage数据
-  const cleanupCorruptedData = useCallback(() => {
-    try {
-      const keys = Object.keys(localStorage).filter(key => key.startsWith("moodshaker-"))
-      
-      keys.forEach(key => {
-        try {
-          const value = localStorage.getItem(key)
-          if (value) {
-            // 尝试解析JSON以检查数据是否损坏
-            JSON.parse(value)
-          }
-        } catch (e) {
-          console.warn(`Removing corrupted data for key: ${key}`)
-          localStorage.removeItem(key)
-        }
-      })
-    } catch (e) {
-      console.error("Error during cleanup:", e)
-    }
-  }, [])
-
   const setIsImageLoading = useCallback((loading: boolean) => {
     setIsImageLoadingState(loading)
   }, [])
 
-  const refreshImage = useCallback(async () => {
+  const refreshImage = useCallback(async (): Promise<string | null> => {
     setIsImageLoading(true)
     setError(null)
 
@@ -199,8 +189,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         throw new Error("No cocktail recommendation available.")
       }
 
+      const sessionId = getFromStorage(STORAGE_KEYS.SESSION_ID, "")
       const prompt = generateImagePrompt(recommendation)
-      const imageData = await generateCocktailImage(prompt)
+      const imageData = await generateCocktailImage(prompt, sessionId, true) // Force refresh
       setImageData(imageData)
       saveToStorage(STORAGE_KEYS.IMAGE_DATA, imageData)
 
@@ -208,17 +199,15 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     } catch (err) {
       setError("Failed to refresh cocktail image.")
       cocktailLogger.error("Error refreshing cocktail image:", err)
+      return null
     } finally {
       setIsImageLoading(false)
     }
-
-    return null
   }, [recommendation])
 
   useEffect(() => {
-    cleanupCorruptedData()
     loadSavedData()
-  }, [loadSavedData, cleanupCorruptedData])
+  }, [loadSavedData])
 
   const contextValue = useMemo(() => {
     return {

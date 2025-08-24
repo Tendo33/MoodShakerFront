@@ -7,6 +7,7 @@ import { Menu, X, Martini as Cocktail } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/core";
+import { gradientStyles } from "@/utils/style-constants";
 
 export default function Header() {
   const { t, language, getPathWithLanguage } = useLanguage();
@@ -67,14 +68,14 @@ export default function Header() {
           className="flex items-center gap-2 font-bold text-xl"
         >
           <motion.div
-            className="w-10 h-10 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 flex items-center justify-center"
+            className={`w-10 h-10 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center`}
             whileHover={{ scale: 1.1, rotate: 5 }}
             transition={{ duration: 0.2 }}
           >
             <Cocktail className="h-5 w-5 text-white" />
           </motion.div>
           <motion.span
-            className="bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent"
+            className={`${gradientStyles.primaryText}`}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -114,7 +115,7 @@ export default function Header() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            variants={mobileMenuVariants}
+            variants={mobileMenuVariants as any}
           >
             <div className="px-4 py-3 space-y-1 bg-gray-800/95 backdrop-blur-md shadow-lg border-t border-gray-700/50">
               <div className="pt-2 pb-1">

@@ -1,6 +1,8 @@
 "use client";
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { appLogger } from "@/utils/logger";
+import { gradientStyles } from "@/utils/style-constants";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -28,8 +30,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // You can log the error to an error reporting service
-    console.error("Error caught by ErrorBoundary:", error);
-    console.error("Component stack:", errorInfo.componentStack);
+    appLogger.error("Error caught by ErrorBoundary", { error, componentStack: errorInfo.componentStack });
   }
 
   render(): ReactNode {
@@ -64,7 +65,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                   window.location.reload();
                 }
               }}
-              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-pink-500 text-white rounded-full hover:from-amber-600 hover:to-pink-600 transition-all"
+              className={`px-4 py-2 ${gradientStyles.primaryButton} text-white rounded-full transition-all`}
             >
               Refresh the page
             </button>

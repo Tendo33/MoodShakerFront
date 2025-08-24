@@ -25,8 +25,7 @@ import {
 } from "@/utils/animation-utils"
 import { useImagePreload } from "@/utils/performance-utils"
 
-// Import cocktail images
-import { cocktailImages } from "@/components/pages/CocktailDetailPage"
+import { cocktailImages } from "@/utils/cocktail-images"
 
 export default function Home() {
   const { t, language } = useLanguage()
@@ -41,7 +40,14 @@ export default function Home() {
   const [ctaRef, ctaInView] = useInViewAnimation()
 
   // Featured cocktails for the hero section with translations
-  const featuredCocktails = [
+  const featuredCocktails: Array<{
+    id: string;
+    name: string;
+    englishName: string;
+    description: string;
+    image: string;
+    tags: string[];
+  }> = [
     {
       id: "mojito",
       name: language === "en" ? "Mojito" : "莫吉托",
@@ -250,7 +256,7 @@ export default function Home() {
                             <Image
                               src={
                                 cocktail.image ||
-                                `/placeholder.svg?height=600&width=500&query=${encodeURIComponent(cocktail.name) || "/placeholder.svg"}`
+                                `/placeholder.svg?height=600&width=500&query=${encodeURIComponent(cocktail.name)}`
                               }
                               alt={cocktail.name}
                               fill
@@ -427,7 +433,7 @@ export default function Home() {
                         <Image
                           src={
                             cocktail.image ||
-                            `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name) || "/placeholder.svg"}`
+                            `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name)}`
                           }
                           alt={cocktail.name}
                           fill

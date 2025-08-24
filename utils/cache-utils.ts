@@ -3,6 +3,8 @@
 // Action: [Added]; Timestamp: [2025-08-23 14:51:20]; Reason: 性能优化 - 添加缓存机制减少重复请求; Principle_Applied: 缓存优先原则;
 // }}
 
+import { appLogger } from '@/utils/logger';
+
 interface CacheItem<T> {
   data: T;
   timestamp: number;
@@ -80,32 +82,33 @@ class SimpleCache<T> {
 // 全局缓存实例
 export const cocktailCache = new SimpleCache<unknown>();
 export const imageCache = new SimpleCache<string>();
+export const apiCache = new SimpleCache<unknown>();
 
 // 缓存装饰器函数
-export const withCache = <T>(
+export const withCache = <T, Args extends unknown[]>(
   cache: SimpleCache<T>,
-  keyGenerator: (...args: unknown[]) => string,
+  keyGenerator: (...args: Args) => string,
   ttl?: number
 ) => {
-  return (fn: (...args: unknown[]) => Promise<T>) => {
-    return async (...args: unknown[]): Promise<T> => {
+  return (fn: (...args: Args) => Promise<T>) => {
+    return async (...args: Args): Promise<T> => {
       const key = keyGenerator(...args);
       
       // 尝试从缓存获取
       const cached = cache.get(key);
       if (cached !== null) {
-        console.log(`Cache hit for key: ${key}`);
+        appLogger.debug(`Cache hit for key: ${key}`);
         return cached;
       }
 
       // 缓存未命中，执行原函数
-      console.log(`Cache miss for key: ${key}`);
+      appLogger.debug(`Cache miss for key: ${key}`);
       try {
         const result = await fn(...args);
         cache.set(key, result, ttl);
         return result;
       } catch (error) {
-        console.error(`Function execution failed for key: ${key}`, error);
+        appLogger.error(`Function execution failed for key: ${key}`, error);
         throw error;
       }
     };
@@ -132,7 +135,7 @@ export class PersistentCache<T> {
     try {
       localStorage.setItem(this.getKey(key), JSON.stringify(item));
     } catch (error) {
-      console.warn('Failed to save to localStorage:', error);
+      appLogger.warn('Failed to save to localStorage', error);
     }
   }
 
@@ -152,7 +155,7 @@ export class PersistentCache<T> {
 
       return item.data;
     } catch (error) {
-      console.warn('Failed to read from localStorage:', error);
+      appLogger.warn('Failed to read from localStorage', error);
       return null;
     }
   }
@@ -176,6 +179,7 @@ export class PersistentCache<T> {
 
 // 预定义的持久化缓存实例
 export const persistentImageCache = new PersistentCache<string>('moodshaker-img');
+export const persistentDataCache = new PersistentCache<unknown>('moodshaker-data');
 
 // 性能监控
 export const cacheMetrics = {

@@ -113,15 +113,93 @@
   }
 }
 
-/* Enhanced step line with design system colors */
-.step-line {
-  position: absolute;
-  left: 1.25rem;
-  top: 3.5rem;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, hsl(var(--secondary) / 0.6), hsl(var(--primary) / 0.3), transparent);
-  height: calc(100% - 3.5rem);
+/* Enhanced spacing utilities for better breathing room */
+.section-spacing {
+  /* Reduced section padding for more compact layout */
+  @apply py-8 md:py-12 lg:py-16;
+}
+
+.content-spacing {
+  /* Reduced content spacing for tighter layout */
+  @apply space-y-4 md:space-y-6 lg:space-y-8;
+}
+
+.card-spacing {
+  /* Reduced card padding for more compact design */
+  @apply p-4 md:p-6 lg:p-8;
+}
+
+/* Improved container max-widths for better content distribution */
+.container-narrow {
+  @apply max-w-4xl mx-auto;
+}
+
+.container-content {
+  @apply max-w-6xl mx-auto;
+}
+
+/* Better responsive spacing for mobile devices */
+@media (max-width: 640px) {
+  .section-spacing {
+    /* Further reduced mobile section spacing */
+    @apply py-6;
+  }
+
+  .content-spacing {
+    /* Tighter mobile content spacing */
+    @apply space-y-3;
+  }
+
+  .card-spacing {
+    /* More compact mobile card padding */
+    @apply p-3;
+  }
+}
+
+/* Refined hero section to prevent overwhelming screen space */
+.hero-height {
+  /* Reduced hero height for more compact layout */
+  min-height: 70vh;
+}
+
+@media (max-width: 768px) {
+  .hero-height {
+    /* Further reduced mobile hero height */
+    min-height: 60vh;
+  }
+}
+
+/* Better grid spacing for cards */
+.card-grid {
+  /* Reduced grid gaps for tighter card layout */
+  @apply grid gap-4 md:gap-6 lg:gap-8;
+}
+
+/* Improved text spacing for better readability */
+.text-spacing {
+  /* Reduced text spacing for more compact content */
+  @apply space-y-3 md:space-y-4;
+}
+
+.text-spacing p {
+  /* Tighter paragraph spacing */
+  @apply mb-3 last:mb-0;
+}
+
+/* Enhanced button spacing */
+.button-group {
+  /* Reduced button group spacing */
+  @apply flex flex-col sm:flex-row gap-2 md:gap-3;
+}
+
+/* Enhanced focus states for better accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background;
+}
+
+/* Smooth page transitions */
+.page-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Improved responsive typography with better hierarchy */
@@ -143,73 +221,6 @@
   }
 }
 
-/* Enhanced spacing utilities for better breathing room */
-.section-spacing {
-  @apply py-16 md:py-20 lg:py-24;
-}
-
-.content-spacing {
-  @apply space-y-6 md:space-y-8 lg:space-y-10;
-}
-
-.card-spacing {
-  @apply p-6 md:p-8 lg:p-10;
-}
-
-/* Improved container max-widths for better content distribution */
-.container-narrow {
-  @apply max-w-4xl mx-auto;
-}
-
-.container-content {
-  @apply max-w-6xl mx-auto;
-}
-
-/* Better responsive spacing for mobile devices */
-@media (max-width: 640px) {
-  .section-spacing {
-    @apply py-12;
-  }
-
-  .content-spacing {
-    @apply space-y-4;
-  }
-
-  .card-spacing {
-    @apply p-4;
-  }
-}
-
-/* Refined hero section to prevent overwhelming screen space */
-.hero-height {
-  min-height: 85vh;
-}
-
-@media (max-width: 768px) {
-  .hero-height {
-    min-height: 75vh;
-  }
-}
-
-/* Better grid spacing for cards */
-.card-grid {
-  @apply grid gap-6 md:gap-8 lg:gap-10;
-}
-
-/* Improved text spacing for better readability */
-.text-spacing {
-  @apply space-y-4 md:space-y-6;
-}
-
-.text-spacing p {
-  @apply mb-4 last:mb-0;
-}
-
-/* Enhanced button spacing */
-.button-group {
-  @apply flex flex-col sm:flex-row gap-3 md:gap-4;
-}
-
 @media (max-width: 640px) {
   h1 {
     font-size: 2rem !important;
@@ -227,14 +238,4 @@
     font-size: 0.95rem !important;
     line-height: 1.6 !important;
   }
-}
-
-/* Enhanced focus states for better accessibility */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background;
-}
-
-/* Smooth page transitions */
-.page-transition {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

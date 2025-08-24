@@ -3,7 +3,43 @@
 // Action: [Added]; Timestamp: [2025-08-23 14:51:20]; Reason: 性能优化 - 提供性能优化工具函数; Principle_Applied: 性能优先原则;
 // }}
 
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
+import { appLogger } from '@/utils/logger';
+
+// 防抖 Hook - 减少频繁触发
+export const useDebounce = <T extends (...args: unknown[]) => unknown>(
+  callback: T,
+  delay: number
+): T => {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  return useCallback((...args: Parameters<T>) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  }, [callback, delay]) as T;
+};
+
+// 节流 Hook - 限制执行频率
+export const useThrottle = <T extends (...args: unknown[]) => unknown>(
+  callback: T,
+  delay: number
+): T => {
+  const lastRun = useRef<number>(0);
+  
+  return useCallback((...args: Parameters<T>) => {
+    const now = Date.now();
+    
+    if (now - lastRun.current >= delay) {
+      callback(...args);
+      lastRun.current = now;
+    }
+  }, [callback, delay]) as T;
+};
 
 // 图片预加载 Hook
 export const useImagePreload = (imageSources: string[]) => {
@@ -31,7 +67,7 @@ export const useImagePreload = (imageSources: string[]) => {
           
         setLoadedImages(new Set(successful));
       } catch (error) {
-        console.warn('Image preload failed:', error);
+        appLogger.warn('Image preload failed', error);
       }
     };
 
@@ -41,4 +77,88 @@ export const useImagePreload = (imageSources: string[]) => {
   }, [imageSources]);
 
   return loadedImages;
+};
+
+// 虚拟化滚动 Hook - 对于长列表
+export const useVirtualization = <T>(
+  items: T[],
+  itemHeight: number,
+  containerHeight: number
+) => {
+  const [scrollTop, setScrollTop] = useState(0);
+  
+  const visibleItems = useMemo(() => {
+    const start = Math.floor(scrollTop / itemHeight);
+    const end = Math.min(
+      start + Math.ceil(containerHeight / itemHeight) + 1,
+      items.length
+    );
+    
+    return {
+      start,
+      end,
+      items: items.slice(start, end),
+      totalHeight: items.length * itemHeight,
+      offsetY: start * itemHeight,
+    };
+  }, [items, itemHeight, containerHeight, scrollTop]);
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLElement>) => {
+    setScrollTop(e.currentTarget.scrollTop);
+  }, []);
+
+  return { visibleItems, handleScroll };
+};
+
+// 组件懒加载可见性检测
+export const useIntersectionObserver = (
+  threshold = 0.1,
+  rootMargin = '100px'
+) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const elementRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold, rootMargin }
+    );
+
+    observer.observe(element);
+
+    return () => {
+      observer.unobserve(element);
+    };
+  }, [threshold, rootMargin]);
+
+  return [elementRef, isVisible] as const;
+};
+
+// 性能监控
+export const usePerformanceMonitor = (componentName: string) => {
+  const renderStart = useRef<number>(0);
+  
+  useEffect(() => {
+    renderStart.current = performance.now();
+  });
+
+  useEffect(() => {
+    const renderTime = performance.now() - renderStart.current;
+    
+    if (renderTime > 16) { // 超过一帧时间 (16ms)
+      appLogger.warn(`${componentName} render took ${renderTime.toFixed(2)}ms`);
+    }
+  });
+};
+
+// 内存泄漏预防
+export const useCleanup = (cleanup: () => void) => {
+  useEffect(() => {
+    return cleanup;
+  }, [cleanup]);
 };
