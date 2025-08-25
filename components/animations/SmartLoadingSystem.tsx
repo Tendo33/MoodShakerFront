@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import LiquidMixingAnimation from "./LiquidMixingAnimation"
 
@@ -77,7 +77,7 @@ export default function SmartLoadingSystem({
   useEffect(() => {
     if (!isShowing || !loadingConfig) return
 
-    let startTime = Date.now()
+    const startTime = Date.now()
     let animationFrame: number
 
     const updateProgress = () => {
@@ -127,7 +127,7 @@ export function useSmartLoading() {
   const [isLoading, setIsLoading] = useState(false)
   const [progress, setProgress] = useState(0)
 
-  const startLoading = (type?: SmartLoadingSystemProps['type']) => {
+  const startLoading = () => {
     setIsLoading(true)
     setProgress(0)
   }

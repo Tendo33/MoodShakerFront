@@ -6,4 +6,3 @@ export {
   InlineLoading 
 } from './QuickLoadingDots'
 export { default as PageTransition } from './PageTransition'
-export { default as SophisticatedTransition } from './SophisticatedTransition'
