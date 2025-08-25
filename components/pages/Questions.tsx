@@ -255,7 +255,7 @@ export default function Questions() {
 
       <Container className="relative z-10 py-6 md:py-8 lg:py-10">
         <div className="mb-8 md:mb-10">
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-center mb-3">
             <span className="text-xs font-semibold text-gray-300 tracking-wide">
               {t("questions.progress")}
             </span>
@@ -263,13 +263,22 @@ export default function Questions() {
               {Math.round(calculatedProgress)}%
             </span>
           </div>
-          <div className="w-full bg-white/5 rounded-full h-px overflow-hidden">
+          
+          {/* 优化后的进度栏 - 符合项目aesthetic */}
+          <div className="relative w-full bg-white/8 rounded-full h-2 overflow-hidden shadow-inner">
+            {/* 背景渐变提示 */}
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-pink-500/10 to-amber-500/10 opacity-30" />
+            
+            {/* 主进度条 - 美丽的渐变 */}
             <motion.div
-              className="h-full bg-white rounded-full"
+              className="h-full bg-gradient-to-r from-amber-400 via-pink-400 to-amber-500 rounded-full shadow-lg relative overflow-hidden"
               initial={{ width: "0%" }}
               animate={{ width: `${calculatedProgress}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-            />
+            >
+              {/* 添加闪亮效果 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+            </motion.div>
           </div>
         </div>
 
