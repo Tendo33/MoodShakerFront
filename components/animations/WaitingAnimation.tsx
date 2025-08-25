@@ -2,21 +2,31 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface WaitingAnimationProps {
   isShowing?: boolean;
   onComplete?: () => void;
   message?: string;
+  messageKey?: string;
+  subtitleKey?: string;
   progress?: number;
 }
 
 export default function WaitingAnimation({
   isShowing = true,
   onComplete,
-  message = "正在调制中",
+  message,
+  messageKey = "loading.default",
+  subtitleKey = "loading.subtitle",
   progress: externalProgress,
 }: WaitingAnimationProps) {
+  const { t } = useLanguage();
   const [animationProgress, setAnimationProgress] = useState(0);
+
+  // Get display text: custom message > translated message > fallback
+  const displayMessage = message || t(messageKey) || t("loading.default");
+  const displaySubtitle = t(subtitleKey) || t("loading.subtitle");
 
   useEffect(() => {
     let animationFrame: number;
@@ -105,7 +115,7 @@ export default function WaitingAnimation({
             transition={{ delay: 0.3, duration: 0.6 }}
           >
             <h2 className="text-4xl font-medium bg-gradient-to-r from-amber-300 via-orange-300 to-pink-300 bg-clip-text text-transparent tracking-wide">
-              {message}
+              {displayMessage}
             </h2>
             <motion.p
               className="text-lg text-slate-300 font-light"
@@ -119,7 +129,7 @@ export default function WaitingAnimation({
               }}
               transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
             >
-              为您精心调配完美口感
+              {displaySubtitle}
             </motion.p>
           </motion.div>
 

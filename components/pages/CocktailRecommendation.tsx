@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -47,7 +49,6 @@ export default function CocktailRecommendation() {
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
-  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
   const textColorClass = "text-white";
   const cardClasses = "bg-gray-800 text-white";
@@ -200,21 +201,7 @@ export default function CocktailRecommendation() {
     }
   };
 
-  const loadingMessages = [
-    t("recommendation.loadingMessage1"),
-    t("recommendation.loadingMessage2"),
-    t("recommendation.loadingMessage3"),
-  ];
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setLoadingMessageIndex(
-        (prevIndex) => (prevIndex + 1) % loadingMessages.length,
-      );
-    }, 3000); // Change message every 3 seconds
-
-    return () => clearInterval(intervalId); // Clean up interval on unmount
-  }, [loadingMessages.length]);
 
   if (isLoading || isContextLoading) {
     return (

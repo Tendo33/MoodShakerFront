@@ -182,6 +182,16 @@ const translations: TranslationDictionary = {
     "recommendation.errorDesc":
       "抱歉，生成鸡尾酒推荐时出现了问题。请重试或返回首页。",
     "recommendation.startQuestions": "开始问卷",
+
+    // Loading animations
+    "loading.mixing": "正在为您调制专属鸡尾酒...",
+    "loading.analyzing": "正在分析您的口味偏好...",
+    "loading.generating": "正在生成精美图片...",
+    "loading.connecting": "正在连接服务器...",
+    "loading.navigating": "正在切换页面...",
+    "loading.default": "正在调制中",
+    "loading.subtitle": "为您精心调配完美口感",
+    "loading.dots": "加载中",
   },
   en: {
     // App title
@@ -339,6 +349,16 @@ const translations: TranslationDictionary = {
     "recommendation.errorDesc":
       "Sorry, there was an issue generating your cocktail recommendation. Please try again or return to the homepage.",
     "recommendation.startQuestions": "Start Questions",
+
+    // Loading animations
+    "loading.mixing": "Crafting your perfect cocktail...",
+    "loading.analyzing": "Analyzing your taste preferences...",
+    "loading.generating": "Generating beautiful images...",
+    "loading.connecting": "Connecting to server...",
+    "loading.navigating": "Switching pages...",
+    "loading.default": "Mixing...",
+    "loading.subtitle": "Crafting the perfect flavor for you",
+    "loading.dots": "Loading",
   },
 };
 

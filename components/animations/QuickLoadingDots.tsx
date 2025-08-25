@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface QuickLoadingDotsProps {
   size?: "sm" | "md" | "lg";
@@ -95,13 +96,19 @@ export function PulseRingLoader({
 
 interface InlineLoadingProps {
   text?: string;
+  textKey?: string;
   className?: string;
 }
 
 export function InlineLoading({
-  text = "加载中",
+  text,
+  textKey = "loading.dots",
   className = "",
 }: InlineLoadingProps) {
+  const { t } = useLanguage();
+  
+  // Get display text: custom text > translated > fallback
+  const displayText = text || t(textKey) || t("loading.dots");
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
       <QuickLoadingDots size="sm" speed="fast" />
@@ -114,7 +121,7 @@ export function InlineLoading({
           ease: "easeInOut",
         }}
       >
-        {text}
+        {displayText}
       </motion.span>
     </div>
   );

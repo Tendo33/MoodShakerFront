@@ -15,13 +15,8 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Button,
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
   Container,
   GradientText,
-  Badge,
 } from "@/components/ui/core";
 import {
   animations,
@@ -188,11 +183,11 @@ export default function Home() {
               className="content-spacing-compact"
             >
               <motion.div variants={animations.slideUp} className="mb-6">
-                <Badge variant="primary" size="md" className="glass-effect">
+                <div className="inline-flex items-center bg-primary/20 text-primary border border-primary/30 px-3 py-1.5 text-sm rounded-full font-medium glass-effect">
                   {language === "en"
                     ? "✨ AI-Powered Cocktail Recommendations"
                     : "✨ AI 驱动的鸡尾酒推荐"}
-                </Badge>
+                </div>
               </motion.div>
 
               <motion.h1
@@ -332,20 +327,18 @@ export default function Home() {
 
                               <div className="flex flex-wrap gap-2">
                                 {cocktail.tags.map((tag, tagIndex) => (
-                                  <Badge
+                                  <div
                                     key={tagIndex}
-                                    variant={
+                                    className={`inline-flex items-center px-2.5 py-1 text-xs rounded-full font-medium backdrop-blur-sm ${
                                       tagIndex % 3 === 0
-                                        ? "primary"
+                                        ? "bg-primary/20 text-primary border border-primary/30"
                                         : tagIndex % 3 === 1
-                                          ? "info"
-                                          : "success"
-                                    }
-                                    size="sm"
-                                    className="backdrop-blur-sm"
+                                          ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                                          : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                    }`}
                                   >
                                     {tag}
-                                  </Badge>
+                                  </div>
                                 ))}
                               </div>
                             </motion.div>
@@ -420,15 +413,9 @@ export default function Home() {
                 }
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
-                <Card
-                  gradient={true}
-                  hoverEffect={true}
-                  bordered={true}
-                  glass={true}
-                  className="h-full text-center group"
-                  padding="lg"
-                >
-                  <CardContent className="text-spacing">
+                <div className="relative overflow-hidden rounded-xl border border-border glass-effect card-hover h-full text-center group p-8">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 pointer-events-none" />
+                  <div className="relative z-10 text-spacing">
                     <motion.div
                       className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mx-auto shadow-lg mb-6 group-hover:shadow-xl transition-all duration-300"
                       whileHover={{
@@ -445,14 +432,14 @@ export default function Home() {
                         {feature.icon}
                       </motion.div>
                     </motion.div>
-                    <CardTitle className="text-xl lg:text-2xl mb-4 tracking-tight">
+                    <h3 className="text-xl lg:text-2xl font-bold font-playfair mb-4 tracking-tight">
                       {feature.title}
-                    </CardTitle>
-                    <CardDescription className="text-sm md:text-base leading-relaxed text-muted-foreground/90">
+                    </h3>
+                    <p className="text-sm md:text-base leading-relaxed text-muted-foreground/90 font-source-sans">
                       {feature.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
+                    </p>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -493,14 +480,7 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
                 <Link href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}>
-                  <Card
-                    gradient={false}
-                    hoverEffect={true}
-                    bordered={true}
-                    glass={true}
-                    className="overflow-hidden border-border/30 h-full group hover:border-primary/20 transition-all duration-500"
-                    padding="lg"
-                  >
+                  <div className="relative overflow-hidden rounded-xl border border-border/30 glass-effect card-hover h-full group hover:border-primary/20 transition-all duration-500 p-8">
                     <div className="relative h-40 md:h-48 overflow-hidden mb-4 rounded-xl">
                       <motion.div
                         className="w-full h-full relative"
@@ -526,15 +506,15 @@ export default function Home() {
                       </motion.div>
                       <div className="absolute inset-0 bg-gradient-to-t from-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
-                    <CardContent className="text-spacing">
-                      <CardTitle className="text-xl lg:text-2xl font-bold mb-3 tracking-tight group-hover:text-primary transition-colors duration-300">
+                    <div className="text-spacing">
+                      <h3 className="text-xl lg:text-2xl font-bold font-playfair mb-3 tracking-tight group-hover:text-primary transition-colors duration-300">
                         {cocktail.name}
-                      </CardTitle>
-                      <CardDescription className="text-sm md:text-base leading-relaxed text-muted-foreground/90">
+                      </h3>
+                      <p className="text-sm md:text-base leading-relaxed text-muted-foreground/90 font-source-sans">
                         {cocktail.description}
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
+                      </p>
+                    </div>
+                  </div>
                 </Link>
               </motion.div>
             ))}

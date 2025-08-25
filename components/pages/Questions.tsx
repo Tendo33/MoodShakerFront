@@ -6,10 +6,8 @@ import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
 import {
   Container,
-  Card,
   Button,
   GradientText,
-  Badge,
 } from "@/components/ui/core";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
@@ -287,12 +285,9 @@ export default function Questions() {
             >
               <div className="text-center space-y-6 md:space-y-8">
                 <div className="flex items-center justify-center gap-4">
-                  <Badge
-                    variant="secondary"
-                    className="border-amber-500/30 text-amber-300 bg-amber-500/8 backdrop-blur-sm px-3 py-1 text-xs font-medium tracking-wide"
-                  >
+                  <div className="border border-amber-500/30 text-amber-300 bg-amber-500/8 backdrop-blur-sm px-3 py-1 text-xs font-medium tracking-wide rounded-full">
                     {t("questions.step")} {currentStep} / {totalSteps}
-                  </Badge>
+                  </div>
                   <GradientText className="text-xl md:text-2xl font-bold leading-tight tracking-tight">
                     {questions[currentQuestion - 1]?.title}
                   </GradientText>
@@ -357,12 +352,9 @@ export default function Questions() {
             >
               <div className="text-center space-y-6 md:space-y-8">
                 <div className="flex items-center justify-center gap-4">
-                  <Badge
-                    variant="secondary"
-                    className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium"
-                  >
+                  <div className="border border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium rounded-full">
                     {t("questions.step")} {currentStep} / {totalSteps}
-                  </Badge>
+                  </div>
                   <GradientText className="text-xl md:text-2xl font-bold tracking-tight">
                     {t("questions.base_spirits.title")}
                   </GradientText>
@@ -448,12 +440,9 @@ export default function Questions() {
             >
               <div className="text-center space-y-6 md:space-y-8">
                 <div className="flex items-center justify-center gap-4">
-                  <Badge
-                    variant="secondary"
-                    className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium"
-                  >
+                  <div className="border border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium rounded-full">
                     {t("questions.step")} {currentStep} / {totalSteps}
-                  </Badge>
+                  </div>
                   <GradientText className="text-xl md:text-2xl font-bold tracking-tight">
                     {t("questions.feedback.title")}
                   </GradientText>

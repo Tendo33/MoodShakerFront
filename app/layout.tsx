@@ -8,6 +8,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ErrorAlert from "@/components/ErrorAlert";
 import PageTransition from "@/components/animations/PageTransition";
+import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 const playfairDisplay = Playfair_Display({
@@ -61,6 +62,7 @@ export default function RootLayout({
                   <PageTransition>{children}</PageTransition>
                 </main>
                 <Footer />
+                <Toaster />
               </div>
             </LanguageProvider>
           </CocktailProvider>

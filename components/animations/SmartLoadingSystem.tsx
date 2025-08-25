@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 import WaitingAnimation from "./WaitingAnimation";
 
 interface SmartLoadingSystemProps {
@@ -20,7 +21,7 @@ interface SmartLoadingSystemProps {
 
 interface LoadingConfig {
   variant: "cocktail" | "martini" | "wine" | "shot";
-  message: string;
+  messageKey: string;
   glassStyle: string;
   ambientColor: string;
   duration: number;
@@ -34,6 +35,7 @@ export default function SmartLoadingSystem({
   actualProgress = 0,
   estimatedDuration = 3000,
 }: SmartLoadingSystemProps) {
+  const { t } = useLanguage();
   const [simulatedProgress, setSimulatedProgress] = useState(0);
   const [loadingConfig, setLoadingConfig] = useState<LoadingConfig>();
 
@@ -41,35 +43,35 @@ export default function SmartLoadingSystem({
     const configs: Record<string, LoadingConfig> = {
       "cocktail-mixing": {
         variant: "cocktail",
-        message: message || "正在为您调制专属鸡尾酒...",
+        messageKey: "loading.mixing",
         glassStyle: "elegant",
         ambientColor: "amber-pink",
         duration: 3500,
       },
       recommendation: {
         variant: "martini",
-        message: message || "正在分析您的口味偏好...",
+        messageKey: "loading.analyzing",
         glassStyle: "sophisticated",
         ambientColor: "blue-purple",
         duration: 2800,
       },
       "image-generation": {
         variant: "wine",
-        message: message || "正在生成精美图片...",
+        messageKey: "loading.generating",
         glassStyle: "artistic",
         ambientColor: "rose-gold",
         duration: 4000,
       },
       "api-call": {
         variant: "shot",
-        message: message || "正在连接服务器...",
+        messageKey: "loading.connecting",
         glassStyle: "minimal",
         ambientColor: "cool-blue",
         duration: 1500,
       },
       navigation: {
         variant: "cocktail",
-        message: message || "正在切换页面...",
+        messageKey: "loading.navigating",
         glassStyle: "smooth",
         ambientColor: "warm-amber",
         duration: 800,
@@ -121,11 +123,14 @@ export default function SmartLoadingSystem({
 
   if (!loadingConfig) return null;
 
+  // Get display message: custom prop > translated > fallback
+  const displayMessage = message || t(loadingConfig.messageKey);
+
   return (
     <WaitingAnimation
       isShowing={isShowing}
       onComplete={onComplete}
-      message={loadingConfig.message}
+      message={displayMessage}
       progress={simulatedProgress}
     />
   );
