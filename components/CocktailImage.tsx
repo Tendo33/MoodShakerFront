@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { getCocktailImage } from "@/api/image";
-import { cocktailImages } from "./pages/CocktailDetailPage";
+import { cocktailImages } from "@/utils/cocktail-images";
+import { imageLogger } from "@/utils/logger";
 
 interface CocktailImageProps {
   cocktailId?: string;
@@ -56,7 +57,7 @@ export default function CocktailImage({
         // Fallback to placeholder
         setImageSrc(placeholderUrl);
       } catch (err) {
-        console.error("Error loading cocktail image:", err);
+        imageLogger.error("Error loading cocktail image", err);
         setError("Failed to load image");
         setImageSrc(placeholderUrl);
       } finally {
@@ -106,3 +107,5 @@ export default function CocktailImage({
     </>
   );
 }
+
+export { CocktailImage };

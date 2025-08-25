@@ -3,6 +3,8 @@
 // Action: [Added]; Timestamp: [2025-08-23 14:51:20]; Reason: 性能优化 - 添加缓存机制减少重复请求; Principle_Applied: 缓存优先原则;
 // }}
 
+import { appLogger } from "@/utils/logger";
+
 interface CacheItem<T> {
   data: T;
   timestamp: number;
@@ -11,7 +13,7 @@ interface CacheItem<T> {
 
 class SimpleCache<T> {
   private cache = new Map<string, CacheItem<T>>();
-  
+
   set(key: string, data: T, ttl: number = 5 * 60 * 1000): void {
     const timestamp = Date.now();
     this.cache.set(key, {
@@ -23,7 +25,7 @@ class SimpleCache<T> {
 
   get(key: string): T | null {
     const item = this.cache.get(key);
-    
+
     if (!item) {
       return null;
     }
@@ -78,35 +80,34 @@ class SimpleCache<T> {
 }
 
 // 全局缓存实例
-export const cocktailCache = new SimpleCache<any>();
+export const cocktailCache = new SimpleCache<unknown>();
 export const imageCache = new SimpleCache<string>();
-export const apiCache = new SimpleCache<any>();
+export const apiCache = new SimpleCache<unknown>();
 
 // 缓存装饰器函数
-export const withCache = <T>(
+export const withCache = <T, Args extends unknown[]>(
   cache: SimpleCache<T>,
-  keyGenerator: (...args: any[]) => string,
-  ttl?: number
+  keyGenerator: (...args: Args) => string,
+  ttl?: number,
 ) => {
-  return (fn: (...args: any[]) => Promise<T>) => {
-    return async (...args: any[]): Promise<T> => {
+  return (fn: (...args: Args) => Promise<T>) => {
+    return async (...args: Args): Promise<T> => {
       const key = keyGenerator(...args);
-      
+
       // 尝试从缓存获取
       const cached = cache.get(key);
       if (cached !== null) {
-        console.log(`Cache hit for key: ${key}`);
+        appLogger.debug(`Cache hit for key: ${key}`);
         return cached;
       }
 
-      // 缓存未命中，执行原函数
-      console.log(`Cache miss for key: ${key}`);
+      appLogger.debug(`Cache miss for key: ${key}`);
       try {
         const result = await fn(...args);
         cache.set(key, result, ttl);
         return result;
       } catch (error) {
-        console.error(`Function execution failed for key: ${key}`, error);
+        appLogger.error(`Function execution failed for key: ${key}`, error);
         throw error;
       }
     };
@@ -122,7 +123,7 @@ export class PersistentCache<T> {
   }
 
   set(key: string, data: T, ttl: number = 24 * 60 * 60 * 1000): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     const item: CacheItem<T> = {
       data,
@@ -133,19 +134,19 @@ export class PersistentCache<T> {
     try {
       localStorage.setItem(this.getKey(key), JSON.stringify(item));
     } catch (error) {
-      console.warn('Failed to save to localStorage:', error);
+      appLogger.warn("Failed to save to localStorage", error);
     }
   }
 
   get(key: string): T | null {
-    if (typeof window === 'undefined') return null;
+    if (typeof window === "undefined") return null;
 
     try {
       const stored = localStorage.getItem(this.getKey(key));
       if (!stored) return null;
 
       const item: CacheItem<T> = JSON.parse(stored);
-      
+
       if (Date.now() > item.expiry) {
         localStorage.removeItem(this.getKey(key));
         return null;
@@ -153,22 +154,22 @@ export class PersistentCache<T> {
 
       return item.data;
     } catch (error) {
-      console.warn('Failed to read from localStorage:', error);
+      appLogger.warn("Failed to read from localStorage", error);
       return null;
     }
   }
 
   delete(key: string): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     localStorage.removeItem(this.getKey(key));
   }
 
   clear(): void {
-    if (typeof window === 'undefined') return;
-    
+    if (typeof window === "undefined") return;
+
     const keys = Object.keys(localStorage);
-    keys.forEach(key => {
-      if (key.startsWith(this.prefix + ':')) {
+    keys.forEach((key) => {
+      if (key.startsWith(this.prefix + ":")) {
         localStorage.removeItem(key);
       }
     });
@@ -176,32 +177,36 @@ export class PersistentCache<T> {
 }
 
 // 预定义的持久化缓存实例
-export const persistentImageCache = new PersistentCache<string>('moodshaker-img');
-export const persistentDataCache = new PersistentCache<any>('moodshaker-data');
+export const persistentImageCache = new PersistentCache<string>(
+  "moodshaker-img",
+);
+export const persistentDataCache = new PersistentCache<unknown>(
+  "moodshaker-data",
+);
 
 // 性能监控
 export const cacheMetrics = {
   hits: 0,
   misses: 0,
-  
+
   recordHit() {
     this.hits++;
   },
-  
+
   recordMiss() {
     this.misses++;
   },
-  
+
   getHitRate() {
     const total = this.hits + this.misses;
     return total > 0 ? this.hits / total : 0;
   },
-  
+
   reset() {
     this.hits = 0;
     this.misses = 0;
   },
-  
+
   getStats() {
     return {
       hits: this.hits,

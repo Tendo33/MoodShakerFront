@@ -17,16 +17,29 @@ interface LoggerOptions {
  * @param options 日志选项
  */
 export function createLogger(moduleName: string, options: LoggerOptions = {}) {
-  const {
-    timestamp = true,
-    maxDataLength = 500,
-  } = options;
+  const { timestamp = true, maxDataLength = 500 } = options;
 
   return {
-    info: (message: string, data?: any) => logDetail("INFO", message, data, moduleName, { timestamp, maxDataLength }),
-    error: (message: string, data?: any) => logDetail("ERROR", message, data, moduleName, { timestamp, maxDataLength }),
-    debug: (message: string, data?: any) => logDetail("DEBUG", message, data, moduleName, { timestamp, maxDataLength }),
-    warn: (message: string, data?: any) => logDetail("WARN", message, data, moduleName, { timestamp, maxDataLength }),
+    info: (message: string, data?: any) =>
+      logDetail("INFO", message, data, moduleName, {
+        timestamp,
+        maxDataLength,
+      }),
+    error: (message: string, data?: any) =>
+      logDetail("ERROR", message, data, moduleName, {
+        timestamp,
+        maxDataLength,
+      }),
+    debug: (message: string, data?: any) =>
+      logDetail("DEBUG", message, data, moduleName, {
+        timestamp,
+        maxDataLength,
+      }),
+    warn: (message: string, data?: any) =>
+      logDetail("WARN", message, data, moduleName, {
+        timestamp,
+        maxDataLength,
+      }),
   };
 }
 
@@ -43,15 +56,15 @@ export function logDetail(
   message: string,
   data?: any,
   moduleName = "App",
-  options: { timestamp?: boolean; maxDataLength?: number } = {}
+  options: { timestamp?: boolean; maxDataLength?: number } = {},
 ): void {
   const { timestamp = true, maxDataLength = 500 } = options;
-  
+
   const timestampStr = timestamp ? new Date().toISOString() : "";
-  const prefix = timestamp 
+  const prefix = timestamp
     ? `[${type}][${moduleName}][${timestampStr}]`
     : `[${type}][${moduleName}]`;
-  
+
   let logMessage = `${prefix} ${message}`;
 
   if (data) {
@@ -67,9 +80,15 @@ export function logDetail(
     }
   }
 
-  console[type === "ERROR" ? "error" : type === "DEBUG" ? "debug" : type === "WARN" ? "warn" : "log"](
-    logMessage,
-  );
+  console[
+    type === "ERROR"
+      ? "error"
+      : type === "DEBUG"
+        ? "debug"
+        : type === "WARN"
+          ? "warn"
+          : "log"
+  ](logMessage);
 }
 
 // 预定义的常用日志记录器

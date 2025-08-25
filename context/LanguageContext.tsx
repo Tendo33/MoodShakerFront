@@ -7,6 +7,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
+import { appLogger } from "@/utils/logger";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -61,14 +62,41 @@ const translations: TranslationDictionary = {
       "您有一个未完成的鸡尾酒推荐问卷。您想继续之前的问卷还是开始一个新的？",
 
     // Questions page
+    "questions.progress": "进度",
+    "questions.step": "步骤",
+    "questions.continue": "继续",
+    "questions.skip": "跳过",
+    "questions.reset": "重置",
+    "questions.generating": "生成中...",
+    "questions.get_recommendation": "获取推荐",
+
+    // Question content
+    "questions.cocktail_type.title": "您想要什么类型的鸡尾酒？🍸",
+    "questions.cocktail_type.classic": "经典鸡尾酒",
+    "questions.cocktail_type.creative": "创意特调",
+
+    "questions.alcohol_strength.title": "您希望酒精浓度如何？💪",
+    "questions.alcohol_strength.light": "轻度酒精",
+    "questions.alcohol_strength.medium": "中度酒精",
+    "questions.alcohol_strength.strong": "高度酒精",
+    "questions.alcohol_strength.surprise": "随机惊喜",
+
+    "questions.skill_level.title": "您的调酒技能水平？🎯",
+    "questions.skill_level.beginner": "初学者",
+    "questions.skill_level.intermediate": "中级",
+    "questions.skill_level.advanced": "高级",
+
+    "questions.base_spirits.title": "选择您拥有的基酒",
+    "questions.base_spirits.description": "请选择您家中现有的基酒（可选多个）",
+
+    "questions.feedback.title": "分享您的心情和偏好",
+    "questions.feedback.description": "告诉我们您现在的心情或任何特殊要求",
+    "questions.feedback.placeholder":
+      "例如：我想要酸甜口味的鸡尾酒，今天心情很好...",
+
     "questions.back": "返回",
     "questions.availableSpirits": "可用的基酒（可选）✨",
     "questions.selectSpirits": "请选择您家中有的基酒",
-    "questions.feedback.title": "最后一步：分享你的心情！🥳",
-    "questions.feedback.description":
-      "告诉我们你现在的心情 - 我们会为你调制一杯完美的鸡尾酒！",
-    "questions.feedback.placeholder":
-      "告诉我们任何事！想喝酸的？今天就是想喝金汤力？心情怎么样？告诉我们吧！✨",
     "questions.submit": "查看推荐鸡尾酒",
     "questions.loading": "正在为您匹配...",
     "questions.ready.title": "准备好摇一摇了吗？🍸",
@@ -90,7 +118,6 @@ const translations: TranslationDictionary = {
     "questions.options.skill_easy": "简单混合",
     "questions.options.skill_medium": "中等难度",
     "questions.options.skill_hard": "调酒大师",
-    "questions.continue": "快完成了😀",
 
     // Base spirits
     "spirits.all": "全部🎉",
@@ -145,6 +172,26 @@ const translations: TranslationDictionary = {
     "recommendation.notFoundDesc": "抱歉，我们找不到您请求的鸡尾酒",
     "recommendation.loading": "正在加载鸡尾酒信息...",
     "recommendation.imageLoading": "正在生成鸡尾酒图片...",
+    "recommendation.analyzing": "正在分析您的偏好...",
+    "recommendation.mixing": "正在调配完美配方...",
+    "recommendation.crafting": "正在精心制作推荐...",
+    "recommendation.finalizing": "正在完善最后细节...",
+    "recommendation.loadingDesc": "我们正在为您量身定制完美的鸡尾酒",
+    "recommendation.complete": "完成",
+    "recommendation.error": "出现错误",
+    "recommendation.errorDesc":
+      "抱歉，生成鸡尾酒推荐时出现了问题。请重试或返回首页。",
+    "recommendation.startQuestions": "开始问卷",
+
+    // Loading animations
+    "loading.mixing": "正在为您调制专属鸡尾酒...",
+    "loading.analyzing": "正在分析您的口味偏好...",
+    "loading.generating": "正在生成精美图片...",
+    "loading.connecting": "正在连接服务器...",
+    "loading.navigating": "正在切换页面...",
+    "loading.default": "正在调制中",
+    "loading.subtitle": "为您精心调配完美口感",
+    "loading.dots": "加载中",
   },
   en: {
     // App title
@@ -176,14 +223,43 @@ const translations: TranslationDictionary = {
       "You have an unfinished cocktail recommendation survey. Would you like to continue your previous survey or start a new one?",
 
     // Questions page
+    "questions.progress": "Progress",
+    "questions.step": "Step",
+    "questions.continue": "Continue",
+    "questions.skip": "Skip",
+    "questions.reset": "Reset",
+    "questions.generating": "Generating...",
+    "questions.get_recommendation": "Get Recommendation",
+
+    // Question content
+    "questions.cocktail_type.title": "What type of cocktail do you want? 🍸",
+    "questions.cocktail_type.classic": "Classic Cocktails",
+    "questions.cocktail_type.creative": "Creative Specials",
+
+    "questions.alcohol_strength.title": "How strong do you want it? 💪",
+    "questions.alcohol_strength.light": "Light Alcohol",
+    "questions.alcohol_strength.medium": "Medium Alcohol",
+    "questions.alcohol_strength.strong": "Strong Alcohol",
+    "questions.alcohol_strength.surprise": "Surprise Me",
+
+    "questions.skill_level.title": "What's your bartending skill level? 🎯",
+    "questions.skill_level.beginner": "Beginner",
+    "questions.skill_level.intermediate": "Intermediate",
+    "questions.skill_level.advanced": "Advanced",
+
+    "questions.base_spirits.title": "Select Your Available Spirits",
+    "questions.base_spirits.description":
+      "Choose the base spirits you have at home (optional)",
+
+    "questions.feedback.title": "Share Your Mood & Preferences",
+    "questions.feedback.description":
+      "Tell us about your current mood or any special requests",
+    "questions.feedback.placeholder":
+      "e.g., I want something sweet and sour, feeling great today...",
+
     "questions.back": "Back",
     "questions.availableSpirits": "Available Spirits (Optional) ✨",
     "questions.selectSpirits": "Please select the spirits you have at home",
-    "questions.feedback.title": "Last Step: Share Your Mood! 🥳",
-    "questions.feedback.description":
-      "Tell us what you're in the mood for - we'll craft the perfect cocktail just for you!",
-    "questions.feedback.placeholder":
-      "Tell us anything! Want a sour? Today is the day for a gin and tonic? How are you feeling? Tell us! ✨",
     "questions.submit": "View Recommended Cocktail",
     "questions.loading": "Finding your perfect match...",
     "questions.ready.title": "Ready to shake things up? 🍸",
@@ -203,9 +279,10 @@ const translations: TranslationDictionary = {
     "questions.options.medium": "Balanced Buzz",
     "questions.options.high": "Party Mode",
     "questions.options.any": "Surprise Me!",
-    "questions.options.easy": "Mix & Pour",
-    "questions.options.hard": "Master Mixologist",
-    "questions.continue": "Almost Done! 😀",
+    "questions.options.skill_easy": "Mix & Pour",
+    "questions.options.skill_medium": "Intermediate",
+    "questions.options.skill_hard": "Advanced",
+
     // Base spirits
     "spirits.all": "All",
     "spirits.all.desc": "Use all base spirits",
@@ -221,6 +298,25 @@ const translations: TranslationDictionary = {
     "spirits.tequila.desc": "Tequila",
     "spirits.brandy": "Brandy",
     "spirits.brandy.desc": "Brandy",
+
+    // Footer
+    "footer.quickLinks": "Quick Links",
+    "footer.about": "About Us",
+    "footer.privacy": "Privacy Policy",
+    "footer.terms": "Terms of Use",
+    "footer.contact": "Contact Us",
+    "footer.madeWith":
+      "AI Generated answers may not be accurate, please verify carefully",
+
+    // Language selector
+    "language.select": "Select Language",
+    "language.en": "English",
+    "language.cn": "中文",
+
+    // Common
+    "common.loading": "Loading...",
+    "common.error": "Error",
+    "common.tryAgain": "Try Again",
 
     // Recommendation page
     "recommendation.back": "Back to Home",
@@ -242,24 +338,27 @@ const translations: TranslationDictionary = {
       "Sorry, we couldn't find the cocktail you requested",
     "recommendation.loading": "Loading cocktail information...",
     "recommendation.imageLoading": "Generating cocktail image...",
+    "recommendation.analyzing": "Analyzing your preferences...",
+    "recommendation.mixing": "Mixing the perfect recipe...",
+    "recommendation.crafting": "Crafting your recommendation...",
+    "recommendation.finalizing": "Adding finishing touches...",
+    "recommendation.loadingDesc":
+      "We're crafting the perfect cocktail just for you",
+    "recommendation.complete": "complete",
+    "recommendation.error": "Something Went Wrong",
+    "recommendation.errorDesc":
+      "Sorry, there was an issue generating your cocktail recommendation. Please try again or return to the homepage.",
+    "recommendation.startQuestions": "Start Questions",
 
-    // Footer
-    "footer.quickLinks": "Quick Links",
-    "footer.about": "About Us",
-    "footer.privacy": "Privacy Policy",
-    "footer.terms": "Terms of Use",
-    "footer.contact": "Contact Us",
-    "footer.madeWith": "AI Generated answers may not be accurate, please verify carefully",
-
-    // Language selector
-    "language.select": "Select Language",
-    "language.en": "English",
-    "language.cn": "中文",
-
-    // Common
-    "common.loading": "Loading...",
-    "common.error": "Error",
-    "common.tryAgain": "Try Again",
+    // Loading animations
+    "loading.mixing": "Crafting your perfect cocktail...",
+    "loading.analyzing": "Analyzing your taste preferences...",
+    "loading.generating": "Generating beautiful images...",
+    "loading.connecting": "Connecting to server...",
+    "loading.navigating": "Switching pages...",
+    "loading.default": "Mixing...",
+    "loading.subtitle": "Crafting the perfect flavor for you",
+    "loading.dots": "Loading",
   },
 };
 
@@ -272,6 +371,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const pathname = usePathname();
   const [language, setLanguageState] = useState<Language>("cn");
   const [isLoading, setIsLoading] = useState(true);
+  const [isClient, setIsClient] = useState(false);
 
   const availableLanguages: Record<string, string> = {
     en: "English",
@@ -308,6 +408,10 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     [language, getPathWithoutLanguage],
   );
 
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Initialize language from URL or localStorage
   useEffect(() => {
     const initializeLanguage = () => {
@@ -317,10 +421,10 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       if (pathname) {
         const pathLang = extractLanguageFromPathname(pathname);
         if (pathLang) {
-          console.log("从URL检测到语言:", pathLang);
+          appLogger.debug("Language detected from URL:", pathLang);
           setLanguageState(pathLang);
           // Save to localStorage to maintain consistency (only on client)
-          if (typeof window !== "undefined") {
+          if (isClient) {
             localStorage.setItem("moodshaker-language", pathLang);
           }
           setIsLoading(false);
@@ -329,10 +433,13 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       }
 
       // Then check localStorage (only on client)
-      if (typeof window !== "undefined") {
+      if (isClient) {
         const savedLanguage = localStorage.getItem("moodshaker-language");
-        if (savedLanguage && (savedLanguage === "en" || savedLanguage === "cn")) {
-          console.log("使用localStorage中的语言:", savedLanguage);
+        if (
+          savedLanguage &&
+          (savedLanguage === "en" || savedLanguage === "cn")
+        ) {
+          appLogger.debug("Using language from localStorage:", savedLanguage);
           setLanguageState(savedLanguage as Language);
           setIsLoading(false);
           return;
@@ -341,19 +448,21 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
       // Default to Chinese
       setLanguageState("cn");
-      if (typeof window !== "undefined") {
+      if (isClient) {
         localStorage.setItem("moodshaker-language", "cn");
       }
       setIsLoading(false);
     };
 
-    // Always initialize, even on server side
-    initializeLanguage();
-  }, [pathname, extractLanguageFromPathname]);
+    // Only initialize when we know we're on client or when we have pathname
+    if (isClient || pathname) {
+      initializeLanguage();
+    }
+  }, [pathname, extractLanguageFromPathname, isClient]);
 
   // Set custom header for middleware when language changes
   useEffect(() => {
-    if (typeof window !== "undefined" && !isLoading) {
+    if (isClient && !isLoading) {
       // This is a client-side effect to help with back navigation
       // Create a custom event that can be listened to by navigation handlers
       const event = new CustomEvent("languageChanged", { detail: language });
@@ -388,22 +497,21 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const setLanguage = useCallback(
     (lang: Language) => {
       setLanguageState(lang);
-      // console.log("Setting language to:", lang);
 
       // Save to localStorage
-      if (typeof window !== "undefined") {
+      if (isClient) {
         localStorage.setItem("moodshaker-language", lang);
       }
 
       // Update URL path if we're on the client side
-      if (typeof window !== "undefined" && pathname) {
+      if (isClient && pathname) {
         const pathWithoutLang = getPathWithoutLanguage(pathname);
         const newPath =
           pathWithoutLang === "/" ? `/${lang}` : `/${lang}${pathWithoutLang}`;
         router.push(newPath);
       }
     },
-    [pathname, router, getPathWithoutLanguage],
+    [pathname, router, getPathWithoutLanguage, isClient],
   );
 
   // Translation function

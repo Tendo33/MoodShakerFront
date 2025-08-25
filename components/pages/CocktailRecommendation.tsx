@@ -7,49 +7,29 @@ import {
   ArrowLeft,
   Clock,
   Droplet,
-  RefreshCw,
-  Beaker,
   GlassWater,
+  Printer,
   Share2,
+  BookmarkPlus,
   ChevronDown,
   ChevronUp,
-  Printer,
-  BookmarkPlus,
+  Lightbulb,
   RefreshCcw,
 } from "lucide-react";
-import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { getCocktailById } from "@/services/cocktailService";
-import type { Cocktail } from "@/api/cocktail";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import CocktailImage from "@/components/CocktailImage";
-
-// Animation variants for framer-motion
-const fadeIn = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.5 } },
-};
-
-const slideUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
+import { useCocktail } from "@/context/CocktailContext";
+import { getCocktailById } from "@/api/cocktail";
+import type { Cocktail, Ingredient, Tool, Step } from "@/api/cocktail";
+import { CocktailImage } from "@/components/CocktailImage";
+import { cocktailLogger, imageLogger } from "@/utils/logger";
+import { commonStyles } from "@/utils/style-constants";
+import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem";
 
 export default function CocktailRecommendation() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const cocktailId = searchParams?.get("id");
-  const { t, getPathWithLanguage } = useLanguage();
+  const { t, getPathWithLanguage, language } = useLanguage();
   const {
     recommendation: contextCocktail,
     userFeedback,
@@ -61,36 +41,115 @@ export default function CocktailRecommendation() {
   } = useCocktail();
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
-  const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(
     "steps",
-  ); // Default expanded section
+  );
+  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
 
-  // Constants
-  const themeClasses = "bg-gray-900 text-white";
   const textColorClass = "text-white";
   const cardClasses = "bg-gray-800 text-white";
   const borderClasses = "border-gray-700";
   const gradientText =
     "bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent";
 
-  const handleBack = () => {
-    router.push(getPathWithLanguage("/"));
+  const getLocalizedContent = (
+    field: string,
+    englishField: string,
+  ): string | undefined => {
+    if (language === "en" && cocktail?.[englishField as keyof Cocktail]) {
+      return cocktail[englishField as keyof Cocktail] as string;
+    }
+    return cocktail?.[field as keyof Cocktail] as string;
   };
 
-  const handleTryAgain = () => {
-    // Clear local storage and restart the question flow
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("moodshaker-answers");
-      localStorage.removeItem("moodshaker-feedback");
-      localStorage.removeItem("moodshaker-recommendation");
-      localStorage.removeItem("moodshaker-base-spirits");
+  const getLocalizedIngredientName = (ingredient: Ingredient): string => {
+    if (language === "en" && ingredient.english_name) {
+      return ingredient.english_name;
     }
-    router.push(getPathWithLanguage("/questions"));
+    return ingredient.name;
+  };
+
+  const getLocalizedIngredientAmount = (ingredient: Ingredient): string => {
+    if (language === "en" && ingredient.english_amount) {
+      return ingredient.english_amount;
+    }
+    return ingredient.amount;
+  };
+
+  const getLocalizedIngredientUnit = (ingredient: Ingredient): string => {
+    if (language === "en" && ingredient.english_unit) {
+      return ingredient.english_unit;
+    }
+    return ingredient.unit || "";
+  };
+
+  const getLocalizedToolName = (tool: Tool): string => {
+    if (language === "en" && tool.english_name) {
+      return tool.english_name;
+    }
+    return tool.name;
+  };
+
+  const getLocalizedStepContent = (
+    step: Step,
+  ): { description: string; tips?: string } => {
+    if (language === "en") {
+      return {
+        description: step.english_description || step.description,
+        tips: step.english_tips || step.tips,
+      };
+    }
+    return {
+      description: step.description,
+      tips: step.tips,
+    };
+  };
+
+  // Set page title based on language
+  useEffect(() => {
+    if (cocktail) {
+      const title =
+        language === "en" && cocktail.english_name
+          ? `${cocktail.english_name} - MoodShaker`
+          : `${cocktail.name} - MoodShaker`;
+      document.title = title;
+    }
+  }, [cocktail, language]);
+
+  useEffect(() => {
+    const fetchCocktail = async () => {
+      setIsLoading(true);
+      try {
+        if (cocktailId) {
+          const data = await getCocktailById(cocktailId);
+          setCocktail(data);
+        } else if (contextCocktail) {
+          setCocktail(contextCocktail);
+        } else {
+          loadSavedData();
+          if (contextCocktail) {
+            setCocktail(contextCocktail);
+          }
+        }
+
+        // Add a small delay before showing animations
+        setTimeout(() => setIsPageLoaded(true), 100);
+      } catch (error) {
+        cocktailLogger.error("Error fetching cocktail", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCocktail();
+  }, [cocktailId, contextCocktail, loadSavedData]);
+
+  const handleBack = () => {
+    router.push(getPathWithLanguage("/"));
   };
 
   const handleShare = () => {
@@ -129,68 +188,37 @@ export default function CocktailRecommendation() {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
-  // Handle image refresh
   const handleRefreshImage = async () => {
-    if (isRefreshingImage) return;
-
-    setIsRefreshingImage(true);
-    try {
-      await refreshImage();
-    } catch (error) {
-      console.error("Failed to refresh image:", error);
-    } finally {
-      setIsRefreshingImage(false);
+    if (refreshImage && cocktail) {
+      setIsRefreshingImage(true);
+      try {
+        await refreshImage();
+      } catch (error) {
+        imageLogger.error("Error refreshing image", error);
+      } finally {
+        setIsRefreshingImage(false);
+      }
     }
   };
 
-  // Load cocktail data
-  useEffect(() => {
-    if (cocktailId) {
-      setIsLoading(true);
-      getCocktailById(cocktailId)
-        .then((data) => {
-          if (data) setCocktail(data);
-          setIsLoading(false);
-          // Add a small delay before showing animations
-          setTimeout(() => setIsPageLoaded(true), 100);
-        })
-        .catch(() => setIsLoading(false));
-    } else if (!cocktail) {
-      // Always load fresh data from storage
-      loadSavedData();
-      setCocktail(contextCocktail);
-      setTimeout(() => setIsPageLoaded(true), 100);
-    }
-  }, [cocktailId, contextCocktail, loadSavedData, cocktail]);
 
-  // Update cocktail when context changes
-  useEffect(() => {
-    if (!cocktailId && contextCocktail && contextCocktail !== cocktail) {
-      setCocktail(contextCocktail);
-    }
-  }, [contextCocktail, cocktail, cocktailId]);
 
-  // Show loading state
-  if ((cocktailId && isLoading) || (!cocktailId && isContextLoading)) {
+  if (isLoading || isContextLoading) {
     return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${themeClasses}`}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <LoadingSpinner text={t("recommendation.loading")} />
-        </motion.div>
-      </div>
+      <SmartLoadingSystem
+        isShowing={true}
+        type="recommendation"
+        message={t("recommendation.loading")}
+        estimatedDuration={4000}
+        onComplete={() => setIsLoading(false)}
+      />
     );
   }
 
   // If no cocktail found
   if (!cocktail) {
     return (
-      <div className={`min-h-screen ${themeClasses}`}>
+      <div className="min-h-screen">
         <div className="container mx-auto py-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -206,7 +234,7 @@ export default function CocktailRecommendation() {
             </p>
             <button
               onClick={handleBack}
-              className="bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105"
+              className={commonStyles.primaryButtonFull}
             >
               {t("recommendation.back")}
             </button>
@@ -217,7 +245,7 @@ export default function CocktailRecommendation() {
   }
 
   return (
-    <div className={`min-h-screen ${themeClasses}`}>
+    <div className="min-h-screen">
       {/* Animated background */}
       <motion.div
         className="fixed inset-0 overflow-hidden opacity-10 pointer-events-none"
@@ -258,15 +286,20 @@ export default function CocktailRecommendation() {
           className="flex flex-wrap justify-between items-center mb-8"
           initial="hidden"
           animate={isPageLoaded ? "visible" : "hidden"}
-          variants={fadeIn}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { duration: 0.5 } },
+          }}
         >
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/10 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>{t("recommendation.back")}</span>
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>{t("recommendation.back")}</span>
+            </button>
+          </div>
 
           <div className="flex items-center gap-2">
             <motion.button
@@ -305,7 +338,7 @@ export default function CocktailRecommendation() {
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="absolute right-0 top-full mt-2 px-3 py-1.5 bg-black/80 text-white text-xs rounded whitespace-nowrap"
+                  className={commonStyles.tooltipFull}
                 >
                   {t("recommendation.copied")}
                 </motion.div>
@@ -314,33 +347,30 @@ export default function CocktailRecommendation() {
           </div>
         </motion.div>
 
-        {/* User feedback section with animation */}
-        {!cocktailId && userFeedback && (
-          <motion.div
-            initial="hidden"
-            animate={isPageLoaded ? "visible" : "hidden"}
-            variants={slideUp}
-            className={`mb-8 border ${borderClasses} rounded-xl shadow-lg ${cardClasses}`}
-          >
-            <div className="p-4 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
-              <h3 className={`text-lg font-bold mb-1 ${textColorClass}`}>
-                {t("recommendation.yourRequirements")}
-              </h3>
-              <p className="text-gray-400">{userFeedback}</p>
-            </div>
-          </motion.div>
-        )}
-
         {/* Hero section with cocktail image and basic info */}
         <motion.div
           className="mb-12"
           initial="hidden"
           animate={isPageLoaded ? "visible" : "hidden"}
-          variants={staggerContainer}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1,
+              },
+            },
+          }}
         >
           <div className="flex flex-col lg:flex-row gap-8 items-center">
             {/* Cocktail image with animation */}
-            <motion.div className="w-full lg:w-2/5" variants={slideUp}>
+            <motion.div
+              className="w-full lg:w-2/5"
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+              }}
+            >
               <motion.div
                 className={`rounded-2xl overflow-hidden shadow-xl border ${borderClasses} relative aspect-square`}
                 whileHover={{ scale: 1.02 }}
@@ -352,28 +382,27 @@ export default function CocktailRecommendation() {
                   cocktailName={cocktail?.name}
                 />
 
-                {/* Add refresh image button */}
-                <motion.button
-                  className="absolute bottom-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/70 transition-colors"
-                  onClick={handleRefreshImage}
-                  disabled={isRefreshingImage || isImageLoading}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
-                >
-                  <RefreshCcw
-                    className={`h-5 w-5 ${isRefreshingImage || isImageLoading ? "animate-spin" : ""}`}
-                  />
-                </motion.button>
+                {!cocktailId && (
+                  <motion.div className="absolute bottom-4 right-4">
+                    <button
+                      onClick={handleRefreshImage}
+                      disabled={isRefreshingImage || isImageLoading}
+                      className="p-2.5 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors"
+                    >
+                      <RefreshCcw
+                        className={`h-5 w-5 ${isRefreshingImage || isImageLoading ? "animate-spin" : ""}`}
+                      />
+                    </button>
+                  </motion.div>
+                )}
 
-                {/* Loading overlay for image */}
                 {(isRefreshingImage || isImageLoading) && (
                   <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mx-auto mb-2"></div>
-                      <p>{t("recommendation.imageLoading")}</p>
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mx-auto mb-2" />
+                      <p className="text-sm text-white">
+                        {t("recommendation.imageLoading")}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -383,91 +412,175 @@ export default function CocktailRecommendation() {
             {/* Cocktail info with animation */}
             <motion.div
               className="w-full lg:w-3/5 flex flex-col"
-              variants={slideUp}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+              }}
             >
               <motion.div
                 className="text-center lg:text-left"
-                variants={fadeIn}
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: { opacity: 1, transition: { duration: 0.5 } },
+                }}
               >
                 <h1
                   className={`text-4xl md:text-5xl font-bold mb-2 ${gradientText} inline-block`}
                 >
-                  {cocktail?.name}
+                  {getLocalizedContent("name", "english_name")}
                 </h1>
-                {cocktail?.english_name && (
+                {cocktail?.english_name && language === "cn" && (
                   <p className="text-gray-400 text-xl mb-4">
                     {cocktail.english_name}
                   </p>
                 )}
               </motion.div>
 
-              <motion.div className="mt-4 mb-6" variants={fadeIn}>
+              <motion.div
+                className="mt-4 mb-6"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: { opacity: 1, transition: { duration: 0.5 } },
+                }}
+              >
                 <p className="text-gray-400 leading-relaxed text-lg">
-                  {cocktail?.description}
+                  {getLocalizedContent("description", "english_description")}
                 </p>
               </motion.div>
 
               {/* Specs grid with animation */}
               <motion.div
                 className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-auto"
-                variants={staggerContainer}
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.1,
+                    },
+                  },
+                }}
               >
                 <motion.div
                   className="flex flex-col items-center md:items-start"
-                  variants={slideUp}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { duration: 0.5 },
+                    },
+                  }}
                 >
                   <div className="flex items-center mb-1">
-                    <Beaker className="mr-2 h-5 w-5 text-pink-500" />
+                    <div className="mr-2 h-5 w-5 text-pink-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M10 2v7.31"></path>
+                        <path d="M14 9.3V1.99"></path>
+                        <path d="M8.5 2h7"></path>
+                        <path d="M14 9.3a6 6 0 1 1-4 0"></path>
+                        <path d="M5.52 16h12.96"></path>
+                      </svg>
+                    </div>
                     <p className="text-sm text-gray-400">Base Spirit</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {cocktail?.base_spirit}
+                    {getLocalizedContent("base_spirit", "english_base_spirit")}
                   </p>
                 </motion.div>
                 <motion.div
                   className="flex flex-col items-center md:items-start"
-                  variants={slideUp}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { duration: 0.5 },
+                    },
+                  }}
                 >
                   <div className="flex items-center mb-1">
                     <Droplet className="mr-2 h-5 w-5 text-blue-500" />
                     <p className="text-sm text-gray-400">Alcohol Level</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {cocktail?.alcohol_level}
+                    {getLocalizedContent(
+                      "alcohol_level",
+                      "english_alcohol_level",
+                    )}
                   </p>
                 </motion.div>
                 <motion.div
                   className="flex flex-col items-center md:items-start"
-                  variants={slideUp}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { duration: 0.5 },
+                    },
+                  }}
                 >
                   <div className="flex items-center mb-1">
                     <Clock className="mr-2 h-5 w-5 text-amber-500" />
                     <p className="text-sm text-gray-400">Prep Time</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {cocktail?.time_required || "5 minutes"}
+                    {getLocalizedContent(
+                      "time_required",
+                      "english_time_required",
+                    ) || "5 minutes"}
                   </p>
                 </motion.div>
                 <motion.div
                   className="flex flex-col items-center md:items-start"
-                  variants={slideUp}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { duration: 0.5 },
+                    },
+                  }}
                 >
                   <div className="flex items-center mb-1">
                     <GlassWater className="mr-2 h-5 w-5 text-emerald-500" />
                     <p className="text-sm text-gray-400">Serving Glass</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {cocktail?.serving_glass}
+                    {getLocalizedContent(
+                      "serving_glass",
+                      "english_serving_glass",
+                    )}
                   </p>
                 </motion.div>
               </motion.div>
 
               {/* Flavor tags with animation */}
               {cocktail?.flavor_profiles?.length > 0 && (
-                <motion.div className="mt-6" variants={fadeIn}>
+                <motion.div
+                  className="mt-6"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: { opacity: 1, transition: { duration: 0.5 } },
+                  }}
+                >
                   <p className="text-sm text-gray-400 mb-2">Flavor Profile</p>
                   <div className="flex flex-wrap gap-2">
-                    {cocktail.flavor_profiles.map((flavor, index) => (
+                    {(language === "en" && cocktail.english_flavor_profiles
+                      ? cocktail.english_flavor_profiles
+                      : cocktail.flavor_profiles
+                    ).map((flavor, index) => (
                       <motion.span
                         key={index}
                         className="px-3 py-1 backdrop-blur-sm rounded-full text-xs border border-gray-700/50"
@@ -486,37 +599,27 @@ export default function CocktailRecommendation() {
           </div>
         </motion.div>
 
-        {/* Recommendation reason with animation */}
-        {!cocktailId && cocktail?.match_reason && (
-          <motion.div
-            initial="hidden"
-            animate={isPageLoaded ? "visible" : "hidden"}
-            variants={slideUp}
-            className={`mb-12 border ${borderClasses} rounded-xl shadow-lg ${cardClasses}`}
-          >
-            <div className="p-5 bg-gradient-to-r from-amber-500/10 to-pink-500/10">
-              <h3 className="text-xl font-bold mb-1 text-amber-400">
-                {t("recommendation.recommendationReason")}
-              </h3>
-            </div>
-            <div className="p-5">
-              <p className="text-gray-400 leading-relaxed">
-                {cocktail.match_reason}
-              </p>
-            </div>
-          </motion.div>
-        )}
-
         {/* Recipe section with animation */}
         <motion.div
           className="mb-12"
           initial="hidden"
           animate={isPageLoaded ? "visible" : "hidden"}
-          variants={staggerContainer}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1,
+              },
+            },
+          }}
         >
           <motion.h2
             className={`text-2xl font-bold mb-6 ${gradientText} inline-block`}
-            variants={fadeIn}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { duration: 0.5 } },
+            }}
           >
             Recipe
           </motion.h2>
@@ -526,7 +629,10 @@ export default function CocktailRecommendation() {
             {/* Ingredients Section */}
             <motion.div
               className={`border ${borderClasses} rounded-xl shadow-lg overflow-hidden ${cardClasses}`}
-              variants={slideUp}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+              }}
             >
               <button
                 className="w-full p-5 flex justify-between items-center bg-gradient-to-r from-amber-500/20 to-pink-500/20"
@@ -553,11 +659,13 @@ export default function CocktailRecommendation() {
                         transition={{ delay: index * 0.1 }}
                       >
                         <span className={`${textColorClass} font-medium`}>
-                          {ingredient.name}
+                          {getLocalizedIngredientName(ingredient)}
                         </span>
                         <span className="text-amber-400 font-medium">
-                          {ingredient.amount}
-                          {ingredient.unit ? ` ${ingredient.unit}` : ""}
+                          {getLocalizedIngredientAmount(ingredient)}
+                          {getLocalizedIngredientUnit(ingredient)
+                            ? ` ${getLocalizedIngredientUnit(ingredient)}`
+                            : ""}
                         </span>
                       </motion.li>
                     ))}
@@ -569,7 +677,10 @@ export default function CocktailRecommendation() {
             {/* Tools Section */}
             <motion.div
               className={`border ${borderClasses} rounded-xl shadow-lg overflow-hidden ${cardClasses}`}
-              variants={slideUp}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+              }}
             >
               <button
                 className="w-full p-5 flex justify-between items-center bg-gradient-to-r from-pink-500/20 to-amber-500/20"
@@ -596,11 +707,14 @@ export default function CocktailRecommendation() {
                         transition={{ delay: index * 0.1 }}
                       >
                         <span className={`${textColorClass} font-medium`}>
-                          {tool.name}
+                          {getLocalizedToolName(tool)}
                         </span>
                         {tool.alternative && (
                           <span className="text-sm text-gray-400 mt-1">
-                            Alternative: {tool.alternative}
+                            {t("recommendation.alternative")}:{" "}
+                            {language === "en" && tool.english_alternative
+                              ? tool.english_alternative
+                              : tool.alternative}
                           </span>
                         )}
                       </motion.li>
@@ -610,28 +724,24 @@ export default function CocktailRecommendation() {
               )}
             </motion.div>
 
-            {/* Steps Section */}
+            {/* Steps Section - Always expanded on mobile */}
             <motion.div
               className={`border ${borderClasses} rounded-xl shadow-lg overflow-hidden ${cardClasses}`}
-              variants={slideUp}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+              }}
             >
-              <button
-                className="w-full p-5 flex justify-between items-center bg-gradient-to-r from-pink-500/20 to-purple-500/20"
-                onClick={() => toggleSection("steps")}
-              >
+              <div className="p-5 bg-gradient-to-r from-pink-500/20 to-purple-500/20">
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
                   {t("recommendation.steps")}
                 </h3>
-                {expandedSection === "steps" ? (
-                  <ChevronUp className="h-5 w-5" />
-                ) : (
-                  <ChevronDown className="h-5 w-5" />
-                )}
-              </button>
-              {expandedSection === "steps" && (
-                <div className="p-5">
-                  <ol className="space-y-8">
-                    {cocktail?.steps?.map((step) => (
+              </div>
+              <div className="p-5">
+                <ol className="space-y-8">
+                  {cocktail?.steps?.map((step) => {
+                    const localizedStep = getLocalizedStepContent(step);
+                    return (
                       <motion.li
                         key={step.step_number}
                         className="flex gap-4"
@@ -642,7 +752,7 @@ export default function CocktailRecommendation() {
                         onMouseLeave={() => setActiveStep(null)}
                       >
                         <motion.div
-                          className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
+                          className={commonStyles.circleIcon}
                           animate={{
                             scale: activeStep === step.step_number ? 1.1 : 1,
                           }}
@@ -654,9 +764,9 @@ export default function CocktailRecommendation() {
                           <p
                             className={`${textColorClass} text-base leading-relaxed`}
                           >
-                            {step.description}
+                            {localizedStep.description}
                           </p>
-                          {step.tips && (
+                          {localizedStep.tips && (
                             <motion.div
                               className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
                               initial={{ opacity: 0 }}
@@ -664,17 +774,17 @@ export default function CocktailRecommendation() {
                               transition={{ delay: 0.3 }}
                             >
                               <p className="text-amber-400/70 text-xs flex items-center gap-2">
-                                <span className="font-medium">💡 Tip:</span>{" "}
-                                {step.tips}
+                                <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                                <span>{localizedStep.tips}</span>
                               </p>
                             </motion.div>
                           )}
                         </div>
                       </motion.li>
-                    ))}
-                  </ol>
-                </div>
-              )}
+                    );
+                  })}
+                </ol>
+              </div>
             </motion.div>
           </div>
 
@@ -685,7 +795,10 @@ export default function CocktailRecommendation() {
               {/* Ingredients with animation */}
               <motion.div
                 className={`border ${borderClasses} rounded-xl shadow-lg overflow-hidden ${cardClasses}`}
-                variants={slideUp}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                }}
               >
                 <div className="p-5 bg-gradient-to-r from-amber-500/20 to-pink-500/20">
                   <h3 className={`text-xl font-bold ${textColorClass}`}>
@@ -704,11 +817,13 @@ export default function CocktailRecommendation() {
                         whileHover={{ x: 5 }}
                       >
                         <span className={`${textColorClass} font-medium`}>
-                          {ingredient.name}
+                          {getLocalizedIngredientName(ingredient)}
                         </span>
                         <span className="text-amber-400 font-medium">
-                          {ingredient.amount}
-                          {ingredient.unit ? ` ${ingredient.unit}` : ""}
+                          {getLocalizedIngredientAmount(ingredient)}
+                          {getLocalizedIngredientUnit(ingredient)
+                            ? ` ${getLocalizedIngredientUnit(ingredient)}`
+                            : ""}
                         </span>
                       </motion.li>
                     ))}
@@ -719,7 +834,10 @@ export default function CocktailRecommendation() {
               {/* Tools with animation */}
               <motion.div
                 className={`border ${borderClasses} rounded-xl shadow-lg overflow-hidden ${cardClasses}`}
-                variants={slideUp}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                }}
               >
                 <div className="p-5 bg-gradient-to-r from-pink-500/20 to-amber-500/20">
                   <h3 className={`text-xl font-bold ${textColorClass}`}>
@@ -737,11 +855,14 @@ export default function CocktailRecommendation() {
                         transition={{ delay: index * 0.1 }}
                       >
                         <span className={`${textColorClass} font-medium`}>
-                          {tool.name}
+                          {getLocalizedToolName(tool)}
                         </span>
                         {tool.alternative && (
                           <span className="text-sm text-gray-400 mt-1">
-                            Alternative: {tool.alternative}
+                            {t("recommendation.alternative")}:{" "}
+                            {language === "en" && tool.english_alternative
+                              ? tool.english_alternative
+                              : tool.alternative}
                           </span>
                         )}
                       </motion.li>
@@ -755,7 +876,10 @@ export default function CocktailRecommendation() {
             <div className="lg:col-span-8">
               <motion.div
                 className={`border ${borderClasses} rounded-xl shadow-lg overflow-hidden ${cardClasses}`}
-                variants={slideUp}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                }}
               >
                 <div className="p-5 bg-gradient-to-r from-pink-500/20 to-purple-500/20">
                   <h3 className={`text-xl font-bold ${textColorClass}`}>
@@ -764,58 +888,63 @@ export default function CocktailRecommendation() {
                 </div>
                 <div className="p-5">
                   <ol className="space-y-8">
-                    {cocktail?.steps?.map((step) => (
-                      <motion.li
-                        key={step.step_number}
-                        className="relative"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: step.step_number * 0.1 }}
-                        onMouseEnter={() => setActiveStep(step.step_number)}
-                        onMouseLeave={() => setActiveStep(null)}
-                      >
-                        <div className="flex gap-4">
-                          <motion.div
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
-                            animate={{
-                              scale: activeStep === step.step_number ? 1.1 : 1,
-                              boxShadow:
-                                activeStep === step.step_number
-                                  ? "0 0 15px rgba(236, 72, 153, 0.5)"
-                                  : "0 0 0 rgba(0, 0, 0, 0)",
-                            }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            {step.step_number}
-                          </motion.div>
-                          <div className="flex-1">
-                            <p
-                              className={`${textColorClass} text-lg leading-relaxed`}
+                    {cocktail?.steps?.map((step) => {
+                      const localizedStep = getLocalizedStepContent(step);
+                      return (
+                        <motion.li
+                          key={step.step_number}
+                          className="relative"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: step.step_number * 0.1 }}
+                          onMouseEnter={() => setActiveStep(step.step_number)}
+                          onMouseLeave={() => setActiveStep(null)}
+                        >
+                          <div className="flex gap-4">
+                            <motion.div
+                              className={commonStyles.circleIcon}
+                              animate={{
+                                scale:
+                                  activeStep === step.step_number ? 1.1 : 1,
+                                boxShadow:
+                                  activeStep === step.step_number
+                                    ? "0 0 15px rgba(236, 72, 153, 0.5)"
+                                    : "0 0 0 rgba(0, 0, 0, 0)",
+                              }}
+                              transition={{ duration: 0.3 }}
                             >
-                              {step.description}
-                            </p>
-                            {step.tips && (
-                              <motion.div
-                                className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.3 }}
+                              {step.step_number}
+                            </motion.div>
+                            <div className="flex-1">
+                              <p
+                                className={`${textColorClass} text-lg leading-relaxed`}
                               >
-                                <p className="text-amber-400/70 text-sm flex items-center gap-2">
-                                  <span className="font-medium">💡 Tip:</span>{" "}
-                                  {step.tips}
-                                </p>
-                              </motion.div>
-                            )}
+                                {localizedStep.description}
+                              </p>
+                              {localizedStep.tips && (
+                                <motion.div
+                                  className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
+                                  initial={{ opacity: 1 }}
+                                  animate={{ opacity: 1 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  <p className="text-amber-400/70 text-sm flex items-center gap-2">
+                                    <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                                    <span>{localizedStep.tips}</span>
+                                  </p>
+                                </motion.div>
+                              )}
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Step progress line */}
-                        {step.step_number < (cocktail?.steps?.length || 0) && (
-                          <div className="absolute left-5 top-14 bottom-0 w-0.5 bg-gradient-to-b from-pink-500/50 to-amber-500/20 h-[calc(100%-3.5rem)]"></div>
-                        )}
-                      </motion.li>
-                    ))}
+                          {/* Step progress line */}
+                          {step.step_number <
+                            (cocktail?.steps?.length || 0) && (
+                            <div className="absolute left-5 top-14 bottom-0 w-0.5 bg-gradient-to-b from-pink-500/50 to-amber-500/20 h-[calc(100%-3.5rem)]"></div>
+                          )}
+                        </motion.li>
+                      );
+                    })}
                   </ol>
                 </div>
               </motion.div>
@@ -837,16 +966,6 @@ export default function CocktailRecommendation() {
             <ArrowLeft className="h-5 w-5" />
             <span>{t("recommendation.back")}</span>
           </button>
-
-          {!cocktailId && (
-            <button
-              onClick={handleTryAgain}
-              className="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white shadow-lg px-6 py-3 rounded-full transition-all duration-300 hover:scale-105"
-            >
-              <RefreshCw className="h-5 w-5" />
-              <span>{t("recommendation.tryAgain")}</span>
-            </button>
-          )}
         </motion.div>
       </div>
 

@@ -75,14 +75,34 @@ export interface Cocktail {
 }
 
 export interface BartenderRequest {
-  message: string;
-  alcohol_level: AlcoholLevel;
-  difficulty_level: DifficultyLevel;
-  base_spirits: string[] | null;
-  session_id?: string;
+  answers: Record<string, string>;
+  baseSpirits: string[];
+  sessionId: string;
 }
 
+export async function getCocktailById(id: string): Promise<Cocktail | null> {
+  try {
+    // Try to get from session storage first
+    if (typeof window !== "undefined") {
+      const savedRecommendation = localStorage.getItem(
+        "moodshaker-recommendation",
+      );
+      if (savedRecommendation) {
+        const cocktail = JSON.parse(savedRecommendation);
+        if (cocktail && cocktail.id === id) {
+          return cocktail;
+        }
+      }
+    }
 
+    // If not found in storage, return null
+    // In a real app, this would make an API call to fetch by ID
+    return null;
+  } catch (error) {
+    cocktailLogger.error("Error getting cocktail by ID", error);
+    return null;
+  }
+}
 
 /**
  * Create system prompt
@@ -730,11 +750,6 @@ You must strictly follow this JSON format for your response, do not include any 
             "unit": "ml",
             "substitute": "柠檬汁"
         },
-        {  "青柠汁",
-            "amount": "15",
-            "unit": "ml",
-            "substitute": "柠檬汁"
-        },
         {
             "name": "薄荷叶",
             "amount": "6",
@@ -804,7 +819,7 @@ You must strictly follow this JSON format for your response, do not include any 
 }
 
 /**
- * Create user message
+ * Create user message from answers and base spirits
  */
 function createUserMessage(
   request: BartenderRequest,
@@ -812,45 +827,26 @@ function createUserMessage(
 ): string {
   const currentLanguage = language || "en";
 
+  // Convert answers object to a readable message
+  const answersText = Object.entries(request.answers)
+    .map(([questionId, answerId]) => `${questionId}: ${answerId}`)
+    .join(", ");
+
   if (currentLanguage === "en") {
-    let message = `User Requirements: ${request.message}\n`;
+    let message = `User Requirements based on mood questionnaire: ${answersText}\n`;
 
-    // Add other conditions
-    const conditions = [];
-    if (request.alcohol_level !== AlcoholLevel.ANY) {
-      conditions.push(`Alcohol Level: ${request.alcohol_level}`);
-    }
-    if (request.difficulty_level !== DifficultyLevel.ANY) {
-      conditions.push(`Preparation Difficulty: ${request.difficulty_level}`);
-    }
-    if (request.base_spirits && request.base_spirits.length > 0) {
-      conditions.push(
-        `Available Base Spirits: ${request.base_spirits.join(", ")}`,
-      );
-    }
-
-    if (conditions.length > 0) {
-      message += "Other Conditions:\n" + conditions.join("\n");
+    // Add base spirits if available
+    if (request.baseSpirits && request.baseSpirits.length > 0) {
+      message += `Available Base Spirits: ${request.baseSpirits.join(", ")}\n`;
     }
 
     return message;
   } else {
-    let message = `用户需求: ${request.message}\n`;
+    let message = `用户基于心情问卷的需求: ${answersText}\n`;
 
-    // Add other conditions
-    const conditions = [];
-    if (request.alcohol_level !== AlcoholLevel.ANY) {
-      conditions.push(`酒精浓度: ${request.alcohol_level}`);
-    }
-    if (request.difficulty_level !== DifficultyLevel.ANY) {
-      conditions.push(`制作难度: ${request.difficulty_level}`);
-    }
-    if (request.base_spirits && request.base_spirits.length > 0) {
-      conditions.push(`可用的基酒: ${request.base_spirits.join(", ")}`);
-    }
-
-    if (conditions.length > 0) {
-      message += "其他条件:\n" + conditions.join("\n");
+    // Add base spirits if available
+    if (request.baseSpirits && request.baseSpirits.length > 0) {
+      message += `可用的基酒: ${request.baseSpirits.join(", ")}\n`;
     }
 
     return message;
@@ -961,8 +957,6 @@ export async function requestCocktailRecommendation(
 
     const systemPrompt = createSystemPrompt(agentType, currentLanguage);
     const userMessage = createUserMessage(request, currentLanguage);
-
-
 
     const completion = await getChatCompletion(
       [

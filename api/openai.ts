@@ -13,8 +13,6 @@ const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
 const IMAGE_API_KEY = process.env.NEXT_PUBLIC_IMAGE_API_KEY;
 const IMAGE_MODEL = process.env.NEXT_PUBLIC_IMAGE_MODEL || "Kwai-Kolors/Kolors";
 
-
-
 /**
  * Send a chat completion request to the OpenAI API
  */

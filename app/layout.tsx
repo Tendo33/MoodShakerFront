@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 import { ErrorProvider } from "@/context/ErrorContext";
 import { CocktailProvider } from "@/context/CocktailContext";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -8,14 +8,23 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ErrorAlert from "@/components/ErrorAlert";
 import PageTransition from "@/components/animations/PageTransition";
+import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
-// Configure Montserrat font
-const montserrat = Montserrat({
+const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-montserrat",
+  variable: "--font-playfair",
   display: "swap",
+  weight: ["400", "700", "900"],
 });
+
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-source-sans",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "MoodShaker",
   description:
@@ -28,6 +37,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/favicon.ico", sizes: "180x180", type: "image/x-icon" }],
     shortcut: ["/favicon.ico"],
   },
+  generator: "v0.app",
 };
 
 export default function RootLayout({
@@ -36,18 +46,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning className={montserrat.variable}>
+    <html
+      lang="zh-CN"
+      suppressHydrationWarning
+      className={`${playfairDisplay.variable} ${sourceSans.variable} antialiased`}
+    >
       <body className="dark">
         <ErrorProvider>
           <CocktailProvider>
             <LanguageProvider>
-              <div className="min-h-screen flex flex-col">
+              <div className="min-h-screen flex flex-col bg-background text-foreground">
                 <Header />
                 <ErrorAlert />
                 <main className="flex-1">
                   <PageTransition>{children}</PageTransition>
                 </main>
                 <Footer />
+                <Toaster />
               </div>
             </LanguageProvider>
           </CocktailProvider>

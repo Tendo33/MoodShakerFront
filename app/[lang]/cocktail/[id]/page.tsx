@@ -74,7 +74,7 @@ export default async function CocktailPage({ params }: CocktailPageProps) {
       <Suspense
         fallback={
           <div className="flex justify-center items-center h-screen">
-            <LoadingSpinner />
+            <LoadingSpinner variant="modern" />
           </div>
         }
       >

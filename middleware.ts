@@ -75,14 +75,11 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  //console.log("最终选择的语言:", language);
-
   // Redirect to the appropriate language path
   const newUrl = new URL(
     `/${language}${pathname === "/" ? "" : pathname}`,
     request.url,
   );
-  //console.log("重定向到:", newUrl.toString());
 
   // Create a response with the redirect
   const response = NextResponse.redirect(newUrl);
@@ -92,7 +89,6 @@ export function middleware(request: NextRequest) {
     maxAge: 60 * 60 * 24,
     path: "/",
   });
-  //console.log("设置Cookie:", language);
 
   return response;
 }

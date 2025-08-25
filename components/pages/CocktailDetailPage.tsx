@@ -20,13 +20,8 @@ import type { Cocktail, Ingredient, Tool, Step } from "@/api/cocktail";
 import { getCocktailById } from "@/services/cocktailService";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import CocktailImage from "@/components/CocktailImage";
-
-// Static cocktail images mapping
-export const cocktailImages = {
-  mojito: "/vibrant-mojito.png",
-  margarita: "/vibrant-margarita.png",
-  cosmopolitan: "/city-lights-cocktail.png",
-};
+import { cocktailLogger } from "@/utils/logger";
+import { commonStyles } from "@/utils/style-constants";
 
 interface CocktailDetailPageProps {
   id: string;
@@ -132,7 +127,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
         // Add a small delay before showing animations
         setTimeout(() => setIsPageLoaded(true), 100);
       } catch (error) {
-        console.error("Error fetching cocktail:", error);
+        cocktailLogger.error("Error fetching cocktail", error);
       } finally {
         setIsLoading(false);
       }
@@ -190,7 +185,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <LoadingSpinner text={t("recommendation.loading")} />
+          <LoadingSpinner variant="modern" text={t("recommendation.loading")} />
         </motion.div>
       </div>
     );
@@ -215,7 +210,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
             </p>
             <button
               onClick={handleBack}
-              className="bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white px-8 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105"
+              className={commonStyles.primaryButtonFull}
             >
               {t("recommendation.back")}
             </button>
@@ -319,7 +314,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="absolute right-0 top-full mt-2 px-3 py-1.5 bg-black/80 text-white text-xs rounded whitespace-nowrap"
+                  className={commonStyles.tooltipFull}
                 >
                   {t("recommendation.copied")}
                 </motion.div>
@@ -708,7 +703,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         onMouseLeave={() => setActiveStep(null)}
                       >
                         <motion.div
-                          className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
+                          className={commonStyles.circleIcon}
                           animate={{
                             scale: activeStep === step.step_number ? 1.1 : 1,
                           }}
@@ -858,7 +853,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
                         >
                           <div className="flex gap-4">
                             <motion.div
-                              className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg flex-shrink-0"
+                              className={commonStyles.circleIcon}
                               animate={{
                                 scale:
                                   activeStep === step.step_number ? 1.1 : 1,

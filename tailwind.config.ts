@@ -68,11 +68,36 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
+        gentleFloat: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        pulse: {
+          "0%, 100%": { transform: "scale(1)", opacity: "1" },
+          "50%": { transform: "scale(1.03)", opacity: "0.85" },
+        },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+        slideUp: {
+          "0%": { transform: "translateY(30px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        scaleIn: {
+          "0%": { transform: "scale(0.8)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
       },
       animation: {
-        fadeIn: "fadeIn 0.5s ease-in-out forwards",
+        fadeIn: "fadeIn 0.8s ease-in-out forwards",
         fadeOut: "fadeOut 0.5s ease-in-out forwards",
-        float: "float 3s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
+        gentleFloat: "gentleFloat 4s ease-in-out infinite",
+        pulse: "pulse 3s ease-in-out infinite",
+        shimmer: "shimmer 2s linear infinite",
+        slideUp: "slideUp 0.8s ease-out forwards",
+        scaleIn: "scaleIn 0.6s ease-out forwards",
       },
     },
   },
