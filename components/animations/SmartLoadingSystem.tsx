@@ -9,8 +9,8 @@ interface SmartLoadingSystemProps {
   onComplete?: () => void
   message?: string
   type?: 'cocktail-mixing' | 'recommendation' | 'image-generation' | 'api-call' | 'navigation'
-  actualProgress?: number // 真实进度值 0-100
-  estimatedDuration?: number // 预估完成时间（毫秒）
+  actualProgress?: number
+  estimatedDuration?: number
 }
 
 interface LoadingConfig {
@@ -32,7 +32,6 @@ export default function SmartLoadingSystem({
   const [simulatedProgress, setSimulatedProgress] = useState(0)
   const [loadingConfig, setLoadingConfig] = useState<LoadingConfig>()
 
-  // 根据加载类型选择最合适的动画配置
   useEffect(() => {
     const configs: Record<string, LoadingConfig> = {
       'cocktail-mixing': {
@@ -75,7 +74,6 @@ export default function SmartLoadingSystem({
     setLoadingConfig(configs[type] || configs['cocktail-mixing'])
   }, [type, message])
 
-  // 智能进度模拟 - 结合真实进度和预估时间
   useEffect(() => {
     if (!isShowing || !loadingConfig) return
 
@@ -86,12 +84,10 @@ export default function SmartLoadingSystem({
       const elapsed = Date.now() - startTime
       const estimatedProgress = Math.min((elapsed / estimatedDuration) * 100, 95)
       
-      // 混合真实进度和预估进度，给用户更好的感知
       const combinedProgress = actualProgress > 0 
         ? Math.max(actualProgress, estimatedProgress * 0.7) 
         : estimatedProgress
 
-      // 添加轻微的波动使进度看起来更自然
       const naturalProgress = combinedProgress + Math.sin(elapsed * 0.01) * 2
 
       setSimulatedProgress(Math.min(naturalProgress, 100))
@@ -99,7 +95,6 @@ export default function SmartLoadingSystem({
       if (combinedProgress < 100) {
         animationFrame = requestAnimationFrame(updateProgress)
       } else {
-        // 进度达到100%后短暂延迟，让动画完整播放
         setTimeout(() => {
           onComplete?.()
         }, 500)
@@ -128,7 +123,6 @@ export default function SmartLoadingSystem({
   )
 }
 
-// 便捷的Hook用于不同场景
 export function useSmartLoading() {
   const [isLoading, setIsLoading] = useState(false)
   const [progress, setProgress] = useState(0)

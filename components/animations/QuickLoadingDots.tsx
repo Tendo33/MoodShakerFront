@@ -61,7 +61,7 @@ export default function QuickLoadingDots({
   )
 }
 
-// 脉冲圆环加载器 - 适合按钮内使用
+
 interface PulseRingLoaderProps {
   size?: number
   thickness?: number
@@ -95,7 +95,7 @@ export function PulseRingLoader({
   )
 }
 
-// 微妙的内联加载指示器
+
 interface InlineLoadingProps {
   text?: string
   className?: string

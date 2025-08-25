@@ -6,7 +6,7 @@ import { useCocktail } from "@/context/CocktailContext"
 import { useLanguage } from "@/context/LanguageContext"
 import { Container, Card, Button, GradientText, Badge } from "@/components/ui/core"
 import { motion, AnimatePresence } from "framer-motion"
-import SmartLoadingSystem, { useSmartLoading } from "@/components/animations/SmartLoadingSystem"
+import { useSmartLoading } from "@/components/animations/SmartLoadingSystem"
 
 export default function Questions() {
   const router = useRouter()
@@ -41,7 +41,7 @@ export default function Questions() {
     LoadingComponent 
   } = useSmartLoading()
 
-  const totalSteps = 5 // 3 questions + base spirits + feedback
+  const totalSteps = 5
   const getCurrentStep = () => {
     if (showFeedbackForm) return 5
     if (showBaseSpirits) return 4

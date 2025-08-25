@@ -7,7 +7,7 @@ interface LiquidMixingAnimationProps {
   isShowing: boolean
   onComplete?: () => void
   message?: string
-  progress?: number // 0-100 实际进度值
+  progress?: number
   variant?: 'cocktail' | 'martini' | 'wine' | 'shot'
 }
 
@@ -32,7 +32,7 @@ export default function LiquidMixingAnimation({
   const [isClient, setIsClient] = useState(false)
   const [animationPhase, setAnimationPhase] = useState<'initial' | 'mixing' | 'settling' | 'complete'>('initial')
 
-  // 玻璃杯几何配置
+
   const glassConfig = useMemo(() => {
     switch (variant) {
       case 'martini':
@@ -70,18 +70,18 @@ export default function LiquidMixingAnimation({
     }
   }, [variant])
 
-  // 生成液体粒子系统
+
   const generateLiquidParticles = useMemo(() => {
     const particleCount = 24
     const baseParticles: LiquidParticle[] = []
     
     for (let i = 0; i < particleCount; i++) {
-      // 创建amber和pink两种液体的粒子
+
       const isAmber = i < particleCount / 2
       baseParticles.push({
         id: i,
-        x: 20 + Math.random() * 60, // 在杯子宽度内
-        y: isAmber ? 60 + Math.random() * 20 : 40 + Math.random() * 20, // 分层起始位置
+        x: 20 + Math.random() * 60,
+        y: isAmber ? 60 + Math.random() * 20 : 40 + Math.random() * 20,
         size: 2 + Math.random() * 4,
         color: isAmber ? 'from-amber-400 to-amber-600' : 'from-pink-400 to-pink-600',
         velocity: {
@@ -95,13 +95,13 @@ export default function LiquidMixingAnimation({
     return baseParticles
   }, [])
 
-  // 液体混合的关键帧动画
+
   const liquidMixingKeyframes = useMemo(() => {
     const actualProgress = Math.min(progress / 100, 1)
-    const mixingIntensity = Math.sin(Date.now() * 0.003) * 0.3 + 0.7 // 0.4-1.0 的波动
+    const mixingIntensity = Math.sin(Date.now() * 0.003) * 0.3 + 0.7
     
     return {
-      // 底层液体 (amber) - 更重，沉在底部
+
       amberLiquid: {
         height: `${20 + actualProgress * 35}%`,
         background: `linear-gradient(180deg, 
