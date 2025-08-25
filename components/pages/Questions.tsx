@@ -195,6 +195,18 @@ export default function Questions() {
     completeGeneration()
   }
 
+  // 如果正在生成，显示全屏等待动画
+  if (isGenerating) {
+    return (
+      <LoadingComponent
+        type="cocktail-mixing"
+        message={t("questions.generating")}
+        estimatedDuration={3000}
+        onComplete={() => {}}
+      />
+    )
+  }
+
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Minimal sophisticated background */}
@@ -454,13 +466,6 @@ export default function Questions() {
           </motion.button>
         </div>
       </Container>
-    
-      <LoadingComponent
-        type="cocktail-mixing"
-        message={t("questions.generating")}
-        estimatedDuration={3000}
-        onComplete={() => {}}
-      />
     </div>
   )
 }

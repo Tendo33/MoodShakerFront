@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import LiquidMixingAnimation from "./LiquidMixingAnimation"
+import WaitingAnimation from "./WaitingAnimation"
 
 interface SmartLoadingSystemProps {
   isShowing: boolean
@@ -113,7 +113,7 @@ export default function SmartLoadingSystem({
   if (!loadingConfig) return null
 
   return (
-    <LiquidMixingAnimation
+    <WaitingAnimation
       isShowing={isShowing}
       onComplete={onComplete}
       message={loadingConfig.message}
