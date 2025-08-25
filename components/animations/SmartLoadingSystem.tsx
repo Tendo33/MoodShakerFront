@@ -118,7 +118,6 @@ export default function SmartLoadingSystem({
       onComplete={onComplete}
       message={loadingConfig.message}
       progress={simulatedProgress}
-      variant={loadingConfig.variant}
     />
   )
 }

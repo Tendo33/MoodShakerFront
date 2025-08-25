@@ -1,41 +1,36 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 
 interface WaitingAnimationProps {
   isShowing?: boolean
   onComplete?: () => void
   message?: string
   progress?: number
-  variant?: 'cocktail' | 'martini' | 'wine' | 'shot'
 }
 
 export default function WaitingAnimation({ 
   isShowing = true, 
   onComplete,
   message = "正在调制中",
-  progress: externalProgress,
-  variant = 'cocktail'
+  progress: externalProgress
 }: WaitingAnimationProps) {
   const [animationProgress, setAnimationProgress] = useState(0)
 
   useEffect(() => {
-    // 这只是一个纯视觉动画，与实际加载进度无关
     let animationFrame: number
     const startTime = Date.now()
-    const cycleDuration = 4000 // 每个周期4秒
+    const cycleDuration = 4000
 
     const updateAnimation = () => {
       const elapsed = (Date.now() - startTime) % cycleDuration
       const progress = (elapsed / cycleDuration) * 100
       setAnimationProgress(progress)
-      
       animationFrame = requestAnimationFrame(updateAnimation)
     }
 
     animationFrame = requestAnimationFrame(updateAnimation)
-
     return () => {
       if (animationFrame) {
         cancelAnimationFrame(animationFrame)
@@ -43,7 +38,6 @@ export default function WaitingAnimation({
     }
   }, [])
 
-  // 外部控制完成时机
   useEffect(() => {
     if (externalProgress && externalProgress >= 100 && onComplete) {
       const timer = setTimeout(() => {
