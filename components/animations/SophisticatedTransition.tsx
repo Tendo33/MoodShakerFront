@@ -14,212 +14,134 @@ export default function SophisticatedTransition({
   onComplete,
   message = "正在为您调制专属鸡尾酒..."
 }: SophisticatedTransitionProps) {
-  const [stage, setStage] = useState<"entering" | "holding" | "exiting">("entering")
+  const [particles, setParticles] = useState<Array<{id: number, x: number, y: number, delay: number}>>([])
 
   useEffect(() => {
     if (isShowing) {
-      setStage("entering")
+      // Generate sophisticated particles
+      const newParticles = Array.from({ length: 12 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        delay: i * 0.1
+      }))
+      setParticles(newParticles)
+
+      const timer = setTimeout(() => {
+        onComplete?.()
+      }, 2800)
       
-      // Enter stage duration
-      const enterTimer = setTimeout(() => {
-        setStage("holding")
-        
-        // Hold stage duration
-        const holdTimer = setTimeout(() => {
-          setStage("exiting")
-          
-          // Exit stage duration
-          const exitTimer = setTimeout(() => {
-            onComplete?.()
-          }, 800)
-          
-          return () => clearTimeout(exitTimer)
-        }, 2000)
-        
-        return () => clearTimeout(holdTimer)
-      }, 600)
-      
-      return () => clearTimeout(enterTimer)
+      return () => clearTimeout(timer)
     }
   }, [isShowing, onComplete])
 
   if (!isShowing) return null
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {isShowing && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ duration: 0.6 }}
         >
-          {/* Sophisticated background pattern */}
+          {/* Sophisticated particle system */}
           <div className="absolute inset-0 overflow-hidden">
-            {/* Elegant geometric grid */}
-            <div className="absolute inset-0 opacity-8">
-              <div
-                className="absolute inset-0"
-                style={{
-                  backgroundImage: `
-                    linear-gradient(rgba(245, 158, 11, 0.08) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(245, 158, 11, 0.08) 1px, transparent 1px)
-                  `,
-                  backgroundSize: "80px 80px",
-                }}
-              />
-            </div>
-
-            {/* Subtle floating orbs */}
-            {[...Array(6)].map((_, i) => (
+            {particles.map((particle) => (
               <motion.div
-                key={`orb-${i}`}
-                className="absolute rounded-full bg-gradient-to-br from-amber-500/10 to-pink-500/10 backdrop-blur-sm"
+                key={particle.id}
+                className="absolute w-1 h-1 bg-gradient-to-br from-amber-400 to-pink-400 rounded-full"
                 style={{
-                  width: `${60 + i * 20}px`,
-                  height: `${60 + i * 20}px`,
-                  left: `${10 + (i * 15) % 70}%`,
-                  top: `${20 + (i * 12) % 60}%`,
+                  left: `${particle.x}%`,
+                  top: `${particle.y}%`,
+                }}
+                initial={{ 
+                  opacity: 0, 
+                  scale: 0,
+                  x: 0,
+                  y: 0
                 }}
                 animate={{
-                  y: [0, -30, 0],
-                  x: [0, Math.sin(i) * 20, 0],
-                  scale: [1, 1.1, 1],
-                  opacity: [0.1, 0.3, 0.1],
+                  opacity: [0, 0.8, 0],
+                  scale: [0, 1, 0.5],
+                  x: [0, (Math.random() - 0.5) * 200],
+                  y: [0, (Math.random() - 0.5) * 200],
                 }}
                 transition={{
-                  duration: 8 + i * 2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  delay: i * 0.5,
-                  ease: "easeInOut",
+                  duration: 2.5,
+                  delay: particle.delay,
+                  ease: [0.23, 1, 0.32, 1]
                 }}
               />
             ))}
-
-            {/* Refined light rays */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              {[...Array(8)].map((_, i) => (
-                <motion.div
-                  key={`ray-${i}`}
-                  className="absolute origin-center"
-                  style={{
-                    width: "300px",
-                    height: "1px",
-                    background: `linear-gradient(90deg, transparent, ${
-                      i % 2 === 0 ? "rgba(245, 158, 11, 0.2)" : "rgba(236, 72, 153, 0.2)"
-                    }, transparent)`,
-                    transform: `rotate(${i * 45}deg)`,
-                    filter: "blur(0.5px)",
-                  }}
-                  animate={{
-                    opacity: [0.05, 0.4, 0.05],
-                    scaleX: [0.3, 1.1, 0.3],
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Number.POSITIVE_INFINITY,
-                    delay: i * 0.3,
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
-            </div>
           </div>
 
-          {/* Central sophisticated animation */}
+          {/* Elegant center animation */}
           <motion.div
             className="relative z-10 text-center"
-            initial={{ opacity: 0, scale: 0.9, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ 
+              duration: 0.8, 
+              delay: 0.3,
+              ease: [0.23, 1, 0.32, 1]
+            }}
           >
-            {/* Elegant cocktail glass silhouette */}
+            {/* Minimal cocktail glass */}
             <motion.div
-              className="relative mx-auto mb-8 w-16 h-24"
-              initial={{ rotateY: -25 }}
-              animate={{ rotateY: 0 }}
-              transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
+              className="relative mx-auto mb-8 w-12 h-16"
+              animate={{
+                rotateY: [0, 10, -10, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "easeInOut"
+              }}
             >
-              {/* Glass body */}
-              <motion.div
-                className="absolute inset-x-2 top-2 bottom-8 rounded-b-full backdrop-blur-lg border border-white/20 shadow-xl overflow-hidden"
-                style={{
-                  background: "linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))",
-                  clipPath: "polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)",
-                }}
-                animate={{
-                  opacity: [0.6, 1, 0.6],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-              >
-                {/* Subtle liquid gradient */}
-                <motion.div
-                  className="absolute bottom-0 left-0 right-0 h-1/2 rounded-b-full overflow-hidden opacity-60"
-                  style={{
-                    background: "linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6)",
-                    backgroundSize: "200% 200%",
-                  }}
+              {/* Glass */}
+              <div className="absolute inset-x-1 top-1 bottom-4 border-x border-b border-white/30 rounded-b-full">
+                {/* Liquid */}
+                <motion.div 
+                  className="absolute bottom-0 left-0 right-0 rounded-b-full bg-gradient-to-t from-amber-500/60 to-pink-500/60"
                   animate={{
-                    backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
-                    height: ["30%", "60%", "45%"],
+                    height: ["20%", "60%", "40%"]
                   }}
                   transition={{
-                    duration: 4,
+                    duration: 2,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut",
+                    ease: "easeInOut"
                   }}
                 />
-              </motion.div>
-
-              {/* Glass stem */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-1 h-6 bg-white/20 rounded-full backdrop-blur-sm" />
-              
-              {/* Glass base */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-white/20 rounded-full backdrop-blur-sm" />
+              </div>
+              {/* Stem */}
+              <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-px h-3 bg-white/30" />
             </motion.div>
 
-            {/* Elegant message */}
+            {/* Typography */}
             <motion.div
-              className="space-y-4"
-              initial={{ opacity: 0, y: 20 }}
+              className="space-y-6"
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
             >
-              <motion.p
-                className="text-lg font-light text-gray-300 tracking-wide"
-                animate={{
-                  opacity: [0.7, 1, 0.7],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
+              <motion.h2 
+                className="text-xl font-light text-white tracking-wide"
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
               >
                 {message}
-              </motion.p>
+              </motion.h2>
 
-              {/* Sophisticated progress indicator */}
-              <motion.div
-                className="w-48 h-0.5 bg-gray-700/50 rounded-full overflow-hidden mx-auto backdrop-blur-sm"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.3, duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
-              >
-                <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-500 to-pink-500"
+              {/* Minimal progress */}
+              <motion.div className="w-32 h-px bg-white/20 mx-auto overflow-hidden">
+                <motion.div 
+                  className="h-full bg-white"
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
-                  transition={{ 
-                    duration: 2.5, 
-                    ease: [0.23, 1, 0.32, 1],
-                    delay: 0.5
-                  }}
+                  transition={{ duration: 1.8, delay: 0.5 }}
                 />
               </motion.div>
             </motion.div>

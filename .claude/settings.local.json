@@ -3,7 +3,8 @@
     "allow": [
       "WebSearch",
       "Bash(pnpm:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

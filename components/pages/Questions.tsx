@@ -177,48 +177,25 @@ export default function Questions() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
-      {/* Sophisticated background elements */}
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Minimal sophisticated background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Elegant geometric pattern */}
-        <div className="absolute inset-0 opacity-5">
+        {/* Subtle gradient accent */}
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/3 via-transparent to-pink-500/3" />
+        
+        {/* Sophisticated line pattern */}
+        <div className="absolute inset-0 opacity-[0.03]">
           <div
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(245, 158, 11, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(245, 158, 11, 0.05) 1px, transparent 1px)
+                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
               `,
-              backgroundSize: "100px 100px",
+              backgroundSize: "120px 120px",
             }}
           />
         </div>
-        
-        {/* Subtle floating orbs */}
-        {[...Array(5)].map((_, i) => (
-          <motion.div
-            key={`bg-orb-${i}`}
-            className="absolute rounded-full bg-gradient-to-br from-amber-500/8 to-pink-500/8 backdrop-blur-sm"
-            style={{
-              width: `${80 + i * 30}px`,
-              height: `${80 + i * 30}px`,
-              left: `${5 + (i * 20) % 80}%`,
-              top: `${10 + (i * 15) % 70}%`,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              x: [0, Math.sin(i) * 15, 0],
-              scale: [1, 1.05, 1],
-              opacity: [0.05, 0.15, 0.05],
-            }}
-            transition={{
-              duration: 12 + i * 3,
-              repeat: Number.POSITIVE_INFINITY,
-              delay: i * 0.8,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
       </div>
 
       <Container className="relative z-10 py-6 md:py-8 lg:py-10">
@@ -229,34 +206,13 @@ export default function Questions() {
               {Math.round(calculatedProgress)}%
             </span>
           </div>
-          <div className="w-full bg-slate-800/40 rounded-full h-1 backdrop-blur-xl border border-white/10 shadow-lg overflow-hidden">
+          <div className="w-full bg-white/5 rounded-full h-px overflow-hidden">
             <motion.div
-              className="h-full rounded-full relative overflow-hidden"
-              style={{
-                background: "linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6)",
-                backgroundSize: "200% 100%",
-              }}
+              className="h-full bg-white rounded-full"
               initial={{ width: "0%" }}
-              animate={{ 
-                width: `${calculatedProgress}%`,
-                backgroundPosition: ["0% 0%", "100% 0%"]
-              }}
-              transition={{ 
-                width: { duration: 1.2, ease: [0.23, 1, 0.32, 1] },
-                backgroundPosition: { duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "linear" }
-              }}
-            >
-              {/* Elegant shimmer effect */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
-                animate={{ x: ["-100%", "200%"] }}
-                transition={{
-                  duration: 2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: [0.23, 1, 0.32, 1],
-                }}
-              />
-            </motion.div>
+              animate={{ width: `${calculatedProgress}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
           </div>
         </div>
 
@@ -288,46 +244,38 @@ export default function Questions() {
                 {questions[currentQuestion - 1]?.options.map((option, index) => (
                   <motion.div
                     key={option.value}
-                    initial={{ opacity: 0, y: 25, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.6, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
-                    whileHover={{ 
-                      scale: 1.02, 
-                      y: -5,
-                      transition: { duration: 0.3, ease: "easeOut" }
-                    }}
-                    whileTap={{ 
-                      scale: 0.97,
-                      transition: { duration: 0.1 }
-                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.08 }}
+                    whileHover={{ y: -8 }}
+                    whileTap={{ scale: 0.96 }}
                   >
-                    <Card
-                      className="cursor-pointer h-full transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/20 group bg-slate-800/40 backdrop-blur-xl border-slate-700/40 hover:border-amber-500/50 hover:bg-amber-500/8 relative overflow-hidden"
+                    <div
+                      className="cursor-pointer h-full group relative overflow-hidden bg-white/5 border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:bg-white/8 hover:border-white/20"
                       onClick={() => handleAnswer(currentQuestion, option.value)}
                     >
-                      {/* Sophisticated hover effect */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 via-transparent to-pink-500/0 group-hover:from-amber-500/8 group-hover:to-pink-500/8 transition-all duration-700" />
-                      
-                      {/* Elegant corner accent */}
-                      <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-amber-500/20 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      {/* Subtle hover accent */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
 
-                      <div className="aspect-[3/2] relative overflow-hidden rounded-xl mb-3">
+                      <div className="aspect-square relative overflow-hidden rounded-lg mb-4 bg-black/20">
                         <img
                           src={option.image || "/placeholder.svg?height=200&width=300&query=cocktail"}
                           alt={option.label}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          className="w-full h-full object-cover opacity-80"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                        <div className="absolute bottom-2 left-3 right-3">
-                          <h3 className="text-lg font-bold text-white mb-1 group-hover:text-amber-300 transition-colors duration-300">
-                            {option.label}
-                          </h3>
-                          {option.description && (
-                            <p className="text-xs text-gray-300/90 leading-relaxed">{option.description}</p>
-                          )}
-                        </div>
                       </div>
-                    </Card>
+                      
+                      <div className="relative z-10">
+                        <h3 className="text-lg font-light text-white mb-2">
+                          {option.label}
+                        </h3>
+                        {option.description && (
+                          <p className="text-sm text-white/60 leading-relaxed">
+                            {option.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -368,17 +316,17 @@ export default function Questions() {
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    <Card
+                    <div
                       className={`cursor-pointer transition-all duration-300 relative overflow-hidden ${
                         baseSpirits.includes(spirit.value)
-                          ? "ring-2 ring-amber-500/60 bg-amber-500/10 shadow-lg shadow-amber-500/20"
-                          : "hover:shadow-lg hover:shadow-amber-500/10 bg-gray-800/40 backdrop-blur-sm border-gray-700/40 hover:border-amber-500/30"
-                      }`}
+                          ? "bg-amber-500/20 border-amber-500/50"
+                          : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
+                      } border rounded-xl p-4 text-center`}
                       onClick={() => toggleBaseSpirit(spirit.value, baseSpiritsOptions.map(s => ({ id: s.value, name: s.label })))}
                     >
                       {baseSpirits.includes(spirit.value) && (
-                        <div className="absolute top-1 right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
-                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
                             <path
                               fillRule="evenodd"
                               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -387,15 +335,15 @@ export default function Questions() {
                           </svg>
                         </div>
                       )}
-                      <div className="aspect-square relative overflow-hidden rounded-lg mb-2">
+                      <div className="aspect-square relative overflow-hidden rounded-lg mb-3 bg-black/20">
                         <img
                           src={spirit.image || "/placeholder.svg"}
                           alt={spirit.label}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          className="w-full h-full object-cover opacity-70"
                         />
                       </div>
-                      <h3 className="text-center text-sm font-medium text-gray-200">{spirit.label}</h3>
-                    </Card>
+                      <h3 className="text-sm font-light text-white">{spirit.label}</h3>
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -430,14 +378,14 @@ export default function Questions() {
                 <p className="text-sm text-gray-400 leading-relaxed">{t("questions.feedback.description")}</p>
               </div>
 
-              <Card className="p-4 bg-gray-800/40 backdrop-blur-md border-gray-700/40">
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
                 <textarea
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder={t("questions.feedback.placeholder")}
-                  className="w-full h-24 bg-gray-900/50 border border-gray-600/50 rounded-xl p-3 text-sm text-white placeholder-gray-500 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/20 resize-none transition-all duration-300 backdrop-blur-sm"
+                  className="w-full h-24 bg-transparent border-none rounded-xl p-3 text-sm text-white placeholder-white/30 focus:outline-none resize-none"
                 />
-              </Card>
+              </div>
 
               <div className="flex gap-4 justify-between">
                 <Button variant="outline" onClick={() => setShowFeedbackForm(false)} className="px-6 py-2 font-medium">
@@ -455,14 +403,13 @@ export default function Questions() {
           )}
         </AnimatePresence>
 
-        <div className="fixed bottom-4 left-4 z-20">
-          <Button
-            variant="outline"
+        <div className="fixed bottom-6 left-6 z-20">
+          <button
             onClick={handleReset}
-            className="rounded-full bg-gray-800/70 backdrop-blur-md border-gray-600/40 hover:border-amber-500/50 hover:bg-amber-500/10 transition-all duration-300 px-4 py-2 text-sm font-medium shadow-lg"
+            className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-light hover:bg-white/10 hover:border-white/20 transition-all duration-300"
           >
             {t("questions.reset")}
-          </Button>
+          </button>
         </div>
       </Container>
     
