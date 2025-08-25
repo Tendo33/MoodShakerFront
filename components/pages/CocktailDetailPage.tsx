@@ -185,7 +185,7 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <LoadingSpinner text={t("recommendation.loading")} />
+          <LoadingSpinner variant="modern" text={t("recommendation.loading")} />
         </motion.div>
       </div>
     );

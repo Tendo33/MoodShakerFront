@@ -6,7 +6,7 @@ import { useCocktail } from "@/context/CocktailContext"
 import { useLanguage } from "@/context/LanguageContext"
 import { Container, Card, Button, GradientText, Badge } from "@/components/ui/core"
 import { motion, AnimatePresence } from "framer-motion"
-import SophisticatedTransition from "@/components/animations/SophisticatedTransition"
+import SmartLoadingSystem, { useSmartLoading } from "@/components/animations/SmartLoadingSystem"
 
 export default function Questions() {
   const router = useRouter()
@@ -31,7 +31,15 @@ export default function Questions() {
   const [showFeedbackForm, setShowFeedbackForm] = useState(false)
   const [showBaseSpirits, setShowBaseSpirits] = useState(false)
   const [feedback, setFeedback] = useState("")
-  const [showTransition, setShowTransition] = useState(false)
+  
+  const { 
+    isLoading: isGenerating, 
+    progress, 
+    startLoading: startGeneration, 
+    updateProgress, 
+    completeLoading: completeGeneration,
+    LoadingComponent 
+  } = useSmartLoading()
 
   const totalSteps = 5 // 3 questions + base spirits + feedback
   const getCurrentStep = () => {
@@ -153,19 +161,29 @@ export default function Questions() {
     setShowFeedbackForm(true)
   }
 
-  const handleFeedbackSubmit = () => {
+  const handleFeedbackSubmit = async () => {
     if (feedback.trim()) {
       saveFeedback(feedback)
     }
     
-    // Show sophisticated transition
-    setShowTransition(true)
+    startGeneration()
     
-    // Submit request and navigate after transition
-    setTimeout(async () => {
+    try {
+      updateProgress(20)
       await submitRequest()
-      router.push(getPathWithLanguage("/cocktail/recommendation"))
-    }, 3400) // Match the transition duration
+      updateProgress(70)
+      
+      setTimeout(() => {
+        updateProgress(100)
+        setTimeout(() => {
+          router.push(getPathWithLanguage("/cocktail/recommendation"))
+        }, 500)
+      }, 800)
+      
+    } catch (error) {
+      console.error('提交失败:', error)
+      completeGeneration()
+    }
   }
 
   const handleReset = () => {
@@ -174,6 +192,7 @@ export default function Questions() {
     setShowFeedbackForm(false)
     setShowBaseSpirits(false)
     setFeedback("")
+    completeGeneration()
   }
 
   return (
@@ -393,10 +412,10 @@ export default function Questions() {
                 </Button>
                 <Button
                   onClick={handleFeedbackSubmit}
-                  disabled={isLoading}
+                  disabled={isGenerating}
                   className="px-8 py-2 font-semibold tracking-wide"
                 >
-                  {isLoading ? t("questions.generating") : t("questions.get_recommendation")}
+                  {isGenerating ? t("questions.generating") : t("questions.get_recommendation")}
                 </Button>
               </div>
             </motion.div>
@@ -413,11 +432,12 @@ export default function Questions() {
         </div>
       </Container>
     
-    {/* Sophisticated transition overlay */}
-    <SophisticatedTransition 
-      isShowing={showTransition}
-      message={t("questions.generating")}
-    />
+      <LoadingComponent
+        type="cocktail-mixing"
+        message={t("questions.generating")}
+        estimatedDuration={3000}
+        onComplete={() => console.log('鸡尾酒调制完成！')}
+      />
     </div>
   )
 }

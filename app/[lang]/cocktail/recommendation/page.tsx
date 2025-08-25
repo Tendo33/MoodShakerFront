@@ -20,7 +20,7 @@ export default async function RecommendationPage({
       <Suspense
         fallback={
           <div className="flex justify-center items-center h-screen">
-            <LoadingSpinner />
+            <LoadingSpinner variant="modern" />
           </div>
         }
       >
