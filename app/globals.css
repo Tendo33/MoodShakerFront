@@ -24,7 +24,7 @@
     --secondary: 340 82% 62%; /* #FF4081 - Secondary accent color (pink) */
     --secondary-foreground: 0 0% 98%; /* #ffffff - Secondary button text */
     --muted: 220 9% 46%; /* #6b7280 - Muted text color */
-    --muted-foreground: 0 0% 98%; /* #ffffff - Muted text background */
+    --muted-foreground: 220 9% 70%; /* #9ca3af - Proper muted text color */
     --accent: 340 82% 62%; /* #FF4081 - Accent color for highlights */
     --accent-foreground: 220 26% 14%; /* #1f2937 - Accent text color */
     --destructive: 348 83% 47%; /* #be123c - Color for destructive actions */

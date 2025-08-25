@@ -125,7 +125,7 @@ export default function Home() {
 
   return (
     <div className="bg-background text-foreground">
-      <section className="relative hero-height flex items-center section-spacing-compact overflow-hidden">
+      <section className="relative hero-height flex items-center section-spacing-compact pt-16 md:pt-20 lg:pt-24 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
             className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
@@ -168,7 +168,7 @@ export default function Home() {
               </motion.h1>
 
               <motion.p
-                className="text-lg md:text-xl text-muted-foreground font-source-sans leading-relaxed max-w-xl mb-8"
+                className="text-lg md:text-xl text-foreground/80 font-source-sans leading-relaxed max-w-xl mb-8"
                 variants={animations.slideUp}
               >
                 {t("home.subtitle")}
@@ -189,7 +189,7 @@ export default function Home() {
                     </motion.div>
                     <h3 className="text-xl font-bold font-playfair">{t("home.savedSession")}</h3>
                   </div>
-                  <p className="mb-6 text-muted-foreground font-source-sans">{t("home.savedSessionDesc")}</p>
+                  <p className="mb-6 text-foreground/70 font-source-sans">{t("home.savedSessionDesc")}</p>
                   <div className="button-group">
                     <Button
                       size="lg"
@@ -331,7 +331,7 @@ export default function Home() {
         </Container>
       </section>
 
-      <section ref={featuresRef} className="section-spacing bg-gradient-to-b from-background to-card/50">
+      <section ref={featuresRef} className="section-spacing pt-24 md:pt-32 lg:pt-40 bg-gradient-to-b from-background to-card/50">
         <Container size="xl">
           <motion.div
             className="text-center mb-8 lg:mb-12 container-narrow"
@@ -342,7 +342,7 @@ export default function Home() {
             <GradientText as="h2" className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6">
               {language === "en" ? "Why Choose MoodShaker?" : "为什么选择 MoodShaker?"}
             </GradientText>
-            <p className="text-lg md:text-xl text-muted-foreground font-source-sans leading-relaxed">
+            <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed">
               {language === "en"
                 ? "Our intelligent recommendation system finds the perfect cocktail based on your preferences and mood"
                 : "我们的智能推荐系统会根据您的喜好和心情，为您找到完美的鸡尾酒"}
@@ -402,7 +402,7 @@ export default function Home() {
             <GradientText as="h2" className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6">
               {language === "en" ? "Popular Cocktails" : "热门鸡尾酒"}
             </GradientText>
-            <p className="text-lg md:text-xl text-muted-foreground font-source-sans leading-relaxed">
+            <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed">
               {language === "en" ? "Explore our users' favorite cocktails" : "探索我们用户最喜爱的鸡尾酒"}
             </p>
           </motion.div>
@@ -426,7 +426,7 @@ export default function Home() {
                   >
                     <div className="relative h-40 md:h-48 overflow-hidden mb-4 rounded-xl">
                       <motion.div
-                        className="w-full h-full"
+                        className="w-full h-full relative"
                         whileHover={{ scale: 1.08 }}
                         transition={{ duration: 0.6, ease: "easeOut" }}
                       >
@@ -476,7 +476,7 @@ export default function Home() {
             <GradientText as="h2" className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
               {language === "en" ? "Ready to discover your perfect cocktail?" : "准备好发现您的完美鸡尾酒了吗?"}
             </GradientText>
-            <p className="text-lg md:text-xl text-muted-foreground font-source-sans leading-relaxed mb-10">
+            <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed mb-10">
               {language === "en"
                 ? "Start now and let us recommend the perfect drink for your mood."
                 : "立即开始，让我们为您推荐最适合您心情的饮品。"}
