@@ -423,12 +423,35 @@ export default function Questions() {
         </AnimatePresence>
 
         <div className="fixed bottom-6 left-6 z-20">
-          <button
+          <motion.button
             onClick={handleReset}
-            className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-light hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="group relative overflow-hidden px-5 py-2.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/30 rounded-full text-white/90 text-sm font-medium shadow-lg backdrop-blur-sm transition-all duration-300 hover:from-red-500/30 hover:to-pink-500/30 hover:border-red-500/50 hover:shadow-red-500/20 hover:shadow-xl"
           >
-            {t("questions.reset")}
-          </button>
+            {/* 背景光晕效果 */}
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            
+            {/* 重置图标 */}
+            <div className="relative flex items-center gap-2">
+              <svg 
+                className="w-4 h-4 text-white/80 group-hover:text-white transition-colors duration-300" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+                />
+              </svg>
+              <span className="group-hover:text-white transition-colors duration-300">
+                {t("questions.reset")}
+              </span>
+            </div>
+          </motion.button>
         </div>
       </Container>
     
