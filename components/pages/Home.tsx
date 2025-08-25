@@ -31,6 +31,7 @@ export default function Home() {
   const { t, language } = useLanguage()
   const [hasSavedSession, setHasSavedSession] = useState(false)
   const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0)
+  const [isClient, setIsClient] = useState(false)
 
   const shouldAnimate = useDelayedAnimation(100)
 
@@ -81,10 +82,17 @@ export default function Home() {
   )
   useImagePreload(imageUrls)
 
+  // 检测客户端环境
   useEffect(() => {
-    const answers = localStorage.getItem("moodshaker-answers")
-    setHasSavedSession(!!answers)
+    setIsClient(true)
   }, [])
+
+  useEffect(() => {
+    if (isClient) {
+      const answers = localStorage.getItem("moodshaker-answers")
+      setHasSavedSession(!!answers)
+    }
+  }, [isClient])
 
   // Rotate featured cocktails
   useEffect(() => {

@@ -63,8 +63,17 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   const [isImageLoading, setIsImageLoadingState] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [progressPercentage, setProgressPercentage] = useState(0)
+  const [isClient, setIsClient] = useState(false)
+
+  // 检测客户端环境
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const loadSavedData = useCallback(() => {
+    // 只在客户端加载数据
+    if (!isClient) return
+
     try {
       // 使用正确的 getFromStorage 调用方式，提供默认值
       const savedAnswers = getFromStorage(STORAGE_KEYS.ANSWERS, {})
@@ -88,7 +97,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       setRecommendation(null)
       setImageData(null)
     }
-  }, [])
+  }, [isClient])
 
   const saveAnswer = useCallback(
     (questionId: string, optionId: string) => {

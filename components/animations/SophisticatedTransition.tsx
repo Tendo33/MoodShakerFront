@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 
 interface SophisticatedTransitionProps {
   isShowing: boolean
@@ -15,17 +15,32 @@ export default function SophisticatedTransition({
   message = "正在为您调制专属鸡尾酒..."
 }: SophisticatedTransitionProps) {
   const [particles, setParticles] = useState<Array<{id: number, x: number, y: number, delay: number}>>([])
+  const [isClient, setIsClient] = useState(false)
+
+  // 预定义粒子位置，避免服务器端和客户端不匹配
+  const predefinedParticles = useMemo(() => [
+    { id: 0, x: 25, y: 20, delay: 0 },
+    { id: 1, x: 75, y: 30, delay: 0.1 },
+    { id: 2, x: 45, y: 60, delay: 0.2 },
+    { id: 3, x: 85, y: 70, delay: 0.3 },
+    { id: 4, x: 15, y: 80, delay: 0.4 },
+    { id: 5, x: 65, y: 15, delay: 0.5 },
+    { id: 6, x: 35, y: 85, delay: 0.6 },
+    { id: 7, x: 90, y: 45, delay: 0.7 },
+    { id: 8, x: 10, y: 40, delay: 0.8 },
+    { id: 9, x: 55, y: 25, delay: 0.9 },
+    { id: 10, x: 80, y: 90, delay: 1.0 },
+    { id: 11, x: 30, y: 55, delay: 1.1 }
+  ], [])
+
+  // 检测是否在客户端
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   useEffect(() => {
-    if (isShowing) {
-      // Generate sophisticated particles
-      const newParticles = Array.from({ length: 12 }, (_, i) => ({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        delay: i * 0.1
-      }))
-      setParticles(newParticles)
+    if (isShowing && isClient) {
+      setParticles(predefinedParticles)
 
       const timer = setTimeout(() => {
         onComplete?.()
@@ -33,7 +48,7 @@ export default function SophisticatedTransition({
       
       return () => clearTimeout(timer)
     }
-  }, [isShowing, onComplete])
+  }, [isShowing, onComplete, isClient, predefinedParticles])
 
   if (!isShowing) return null
 
@@ -66,8 +81,8 @@ export default function SophisticatedTransition({
                 animate={{
                   opacity: [0, 0.8, 0],
                   scale: [0, 1, 0.5],
-                  x: [0, (Math.random() - 0.5) * 200],
-                  y: [0, (Math.random() - 0.5) * 200],
+                  x: [0, (particle.id % 2 === 0 ? 1 : -1) * (50 + particle.id * 10)],
+                  y: [0, (particle.id % 3 === 0 ? 1 : -1) * (30 + particle.id * 8)],
                 }}
                 transition={{
                   duration: 2.5,

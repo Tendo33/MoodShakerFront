@@ -326,6 +326,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const pathname = usePathname()
   const [language, setLanguageState] = useState<Language>("cn")
   const [isLoading, setIsLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   const availableLanguages: Record<string, string> = {
     en: "English",
@@ -359,6 +360,11 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     [language, getPathWithoutLanguage],
   )
 
+  // 检测客户端环境
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   // Initialize language from URL or localStorage
   useEffect(() => {
     const initializeLanguage = () => {
@@ -371,7 +377,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
           appLogger.debug("Language detected from URL:", pathLang)
           setLanguageState(pathLang)
           // Save to localStorage to maintain consistency (only on client)
-          if (typeof window !== "undefined") {
+          if (isClient) {
             localStorage.setItem("moodshaker-language", pathLang)
           }
           setIsLoading(false)
@@ -380,7 +386,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       }
 
       // Then check localStorage (only on client)
-      if (typeof window !== "undefined") {
+      if (isClient) {
         const savedLanguage = localStorage.getItem("moodshaker-language")
         if (savedLanguage && (savedLanguage === "en" || savedLanguage === "cn")) {
           appLogger.debug("Using language from localStorage:", savedLanguage)
@@ -392,19 +398,21 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
       // Default to Chinese
       setLanguageState("cn")
-      if (typeof window !== "undefined") {
+      if (isClient) {
         localStorage.setItem("moodshaker-language", "cn")
       }
       setIsLoading(false)
     }
 
-    // Always initialize, even on server side
-    initializeLanguage()
-  }, [pathname, extractLanguageFromPathname])
+    // Only initialize when we know we're on client or when we have pathname
+    if (isClient || pathname) {
+      initializeLanguage()
+    }
+  }, [pathname, extractLanguageFromPathname, isClient])
 
   // Set custom header for middleware when language changes
   useEffect(() => {
-    if (typeof window !== "undefined" && !isLoading) {
+    if (isClient && !isLoading) {
       // This is a client-side effect to help with back navigation
       // Create a custom event that can be listened to by navigation handlers
       const event = new CustomEvent("languageChanged", { detail: language })
@@ -438,18 +446,18 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
 
       // Save to localStorage
-      if (typeof window !== "undefined") {
+      if (isClient) {
         localStorage.setItem("moodshaker-language", lang)
       }
 
       // Update URL path if we're on the client side
-      if (typeof window !== "undefined" && pathname) {
+      if (isClient && pathname) {
         const pathWithoutLang = getPathWithoutLanguage(pathname)
         const newPath = pathWithoutLang === "/" ? `/${lang}` : `/${lang}${pathWithoutLang}`
         router.push(newPath)
       }
     },
-    [pathname, router, getPathWithoutLanguage],
+    [pathname, router, getPathWithoutLanguage, isClient],
   )
 
   // Translation function
