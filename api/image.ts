@@ -1,6 +1,10 @@
 import { generateImage } from "./openai";
 import { generateImageId } from "@/utils/generateId";
-import { imageCache, persistentImageCache, withCache } from "@/utils/cache-utils";
+import {
+  imageCache,
+  persistentImageCache,
+  withCache,
+} from "@/utils/cache-utils";
 import { imageLogger } from "@/utils/logger";
 
 /**
@@ -38,7 +42,7 @@ async function _generateCocktailImage(
 
   try {
     // Use a unique seed, especially when force refreshing
-    const uniqueSeed = forceRefresh 
+    const uniqueSeed = forceRefresh
       ? Math.floor(Math.random() * 4999999999)
       : Math.floor(Math.random() * 4999999999);
 
@@ -52,7 +56,9 @@ async function _generateCocktailImage(
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    imageLogger.info(`Cocktail image generation successful [${requestId}] (${duration}ms)`);
+    imageLogger.info(
+      `Cocktail image generation successful [${requestId}] (${duration}ms)`,
+    );
 
     // Add timestamp to the image URL to prevent caching
     return imageUrl.includes("?")
@@ -69,9 +75,11 @@ async function _generateCocktailImage(
  */
 export const generateCocktailImage = withCache(
   imageCache,
-  (prompt: string, sessionId: string, forceRefresh?: boolean) => 
-    forceRefresh ? `img:${sessionId}:${prompt.slice(0, 50)}:${Date.now()}` : `img:${sessionId}:${prompt.slice(0, 50)}`,
-  10 * 60 * 1000 // 10分钟缓存
+  (prompt: string, sessionId: string, forceRefresh?: boolean) =>
+    forceRefresh
+      ? `img:${sessionId}:${prompt.slice(0, 50)}:${Date.now()}`
+      : `img:${sessionId}:${prompt.slice(0, 50)}`,
+  10 * 60 * 1000, // 10分钟缓存
 )(_generateCocktailImage);
 
 /**

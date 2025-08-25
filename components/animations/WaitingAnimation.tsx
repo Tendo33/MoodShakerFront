@@ -1,53 +1,53 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 interface WaitingAnimationProps {
-  isShowing?: boolean
-  onComplete?: () => void
-  message?: string
-  progress?: number
+  isShowing?: boolean;
+  onComplete?: () => void;
+  message?: string;
+  progress?: number;
 }
 
-export default function WaitingAnimation({ 
-  isShowing = true, 
+export default function WaitingAnimation({
+  isShowing = true,
   onComplete,
   message = "正在调制中",
-  progress: externalProgress
+  progress: externalProgress,
 }: WaitingAnimationProps) {
-  const [animationProgress, setAnimationProgress] = useState(0)
+  const [animationProgress, setAnimationProgress] = useState(0);
 
   useEffect(() => {
-    let animationFrame: number
-    const startTime = Date.now()
-    const cycleDuration = 4000
+    let animationFrame: number;
+    const startTime = Date.now();
+    const cycleDuration = 4000;
 
     const updateAnimation = () => {
-      const elapsed = (Date.now() - startTime) % cycleDuration
-      const progress = (elapsed / cycleDuration) * 100
-      setAnimationProgress(progress)
-      animationFrame = requestAnimationFrame(updateAnimation)
-    }
+      const elapsed = (Date.now() - startTime) % cycleDuration;
+      const progress = (elapsed / cycleDuration) * 100;
+      setAnimationProgress(progress);
+      animationFrame = requestAnimationFrame(updateAnimation);
+    };
 
-    animationFrame = requestAnimationFrame(updateAnimation)
+    animationFrame = requestAnimationFrame(updateAnimation);
     return () => {
       if (animationFrame) {
-        cancelAnimationFrame(animationFrame)
+        cancelAnimationFrame(animationFrame);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   useEffect(() => {
     if (externalProgress && externalProgress >= 100 && onComplete) {
       const timer = setTimeout(() => {
-        onComplete()
-      }, 500)
-      return () => clearTimeout(timer)
+        onComplete();
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [externalProgress, onComplete])
+  }, [externalProgress, onComplete]);
 
-  if (!isShowing) return null
+  if (!isShowing) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6">
@@ -62,12 +62,17 @@ export default function WaitingAnimation({
           <motion.div
             className="absolute inset-0 rounded-full border-4 border-transparent"
             style={{
-              background: "conic-gradient(from 0deg, transparent, #FFB74D, #FF4081, #FF6B35, transparent)",
+              background:
+                "conic-gradient(from 0deg, transparent, #FFB74D, #FF4081, #FF6B35, transparent)",
               borderRadius: "50%",
               mask: "radial-gradient(circle at center, transparent 68%, black 72%, black 100%)",
             }}
             animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+            transition={{
+              duration: 2,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "linear",
+            }}
           />
           <motion.div
             className="absolute inset-4 rounded-full bg-gradient-to-br from-amber-400/25 to-pink-400/25 backdrop-blur-sm"
@@ -82,7 +87,11 @@ export default function WaitingAnimation({
             animate={{
               scale: [1, 1.05, 1],
             }}
-            transition={{ duration: 2.5, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+            transition={{
+              duration: 2.5,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "easeInOut",
+            }}
           >
             🍸
           </motion.div>
@@ -102,7 +111,11 @@ export default function WaitingAnimation({
               className="text-lg text-slate-300 font-light"
               animate={{
                 opacity: [0.6, 1, 0.6],
-                color: ["rgb(203 213 225)", "rgb(251 191 36)", "rgb(203 213 225)"],
+                color: [
+                  "rgb(203 213 225)",
+                  "rgb(251 191 36)",
+                  "rgb(203 213 225)",
+                ],
               }}
               transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
             >
@@ -119,5 +132,5 @@ export default function WaitingAnimation({
         </div>
       </motion.div>
     </div>
-  )
+  );
 }

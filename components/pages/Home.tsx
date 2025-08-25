@@ -1,11 +1,18 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ArrowRight, History, ChevronRight, Sparkles, BookOpen, Beaker } from "lucide-react"
-import { useLanguage } from "@/context/LanguageContext"
-import Link from "next/link"
-import Image from "next/image"
+import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowRight,
+  History,
+  ChevronRight,
+  Sparkles,
+  BookOpen,
+  Beaker,
+} from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import Link from "next/link";
+import Image from "next/image";
 import {
   Button,
   Card,
@@ -15,30 +22,30 @@ import {
   Container,
   GradientText,
   Badge,
-} from "@/components/ui/core"
+} from "@/components/ui/core";
 import {
   animations,
   useDelayedAnimation,
   floatAnimation,
   pulseAnimation,
   useInViewAnimation,
-} from "@/utils/animation-utils"
-import { useImagePreload } from "@/utils/performance-utils"
+} from "@/utils/animation-utils";
+import { useImagePreload } from "@/utils/performance-utils";
 
-import { cocktailImages } from "@/utils/cocktail-images"
+import { cocktailImages } from "@/utils/cocktail-images";
 
 export default function Home() {
-  const { t, language } = useLanguage()
-  const [hasSavedSession, setHasSavedSession] = useState(false)
-  const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0)
-  const [isClient, setIsClient] = useState(false)
+  const { t, language } = useLanguage();
+  const [hasSavedSession, setHasSavedSession] = useState(false);
+  const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
-  const shouldAnimate = useDelayedAnimation(100)
+  const shouldAnimate = useDelayedAnimation(100);
 
   // Use in-view animation hooks for sections
-  const [featuresRef, featuresInView] = useInViewAnimation()
-  const [popularRef, popularInView] = useInViewAnimation()
-  const [ctaRef, ctaInView] = useInViewAnimation()
+  const [featuresRef, featuresInView] = useInViewAnimation();
+  const [popularRef, popularInView] = useInViewAnimation();
+  const [ctaRef, ctaInView] = useInViewAnimation();
 
   // Featured cocktails for the hero section with translations
   const featuredCocktails: Array<{
@@ -53,55 +60,72 @@ export default function Home() {
       id: "mojito",
       name: language === "en" ? "Mojito" : "莫吉托",
       englishName: "Mojito",
-      description: language === "en" ? "A refreshing blend of mint and lime" : "清新薄荷与青柠的完美结合",
+      description:
+        language === "en"
+          ? "A refreshing blend of mint and lime"
+          : "清新薄荷与青柠的完美结合",
       image: cocktailImages.mojito,
-      tags: language === "en" ? ["Refreshing", "Mint", "Rum"] : ["清爽", "薄荷", "朗姆酒"],
+      tags:
+        language === "en"
+          ? ["Refreshing", "Mint", "Rum"]
+          : ["清爽", "薄荷", "朗姆酒"],
     },
     {
       id: "margarita",
       name: language === "en" ? "Margarita" : "玛格丽特",
       englishName: "Margarita",
-      description: language === "en" ? "Classic tequila cocktail with perfect balance" : "经典龙舌兰鸡尾酒，酸甜平衡",
+      description:
+        language === "en"
+          ? "Classic tequila cocktail with perfect balance"
+          : "经典龙舌兰鸡尾酒，酸甜平衡",
       image: cocktailImages.margarita,
-      tags: language === "en" ? ["Classic", "Tangy", "Tequila"] : ["经典", "酸甜", "龙舌兰"],
+      tags:
+        language === "en"
+          ? ["Classic", "Tangy", "Tequila"]
+          : ["经典", "酸甜", "龙舌兰"],
     },
     {
       id: "cosmopolitan",
       name: language === "en" ? "Cosmopolitan" : "大都会",
       englishName: "Cosmopolitan",
-      description: language === "en" ? "Stylish cranberry vodka cocktail" : "时尚优雅的蔓越莓伏特加鸡尾酒",
+      description:
+        language === "en"
+          ? "Stylish cranberry vodka cocktail"
+          : "时尚优雅的蔓越莓伏特加鸡尾酒",
       image: cocktailImages.cosmopolitan,
-      tags: language === "en" ? ["Stylish", "Fruity", "Vodka"] : ["时尚", "果味", "伏特加"],
+      tags:
+        language === "en"
+          ? ["Stylish", "Fruity", "Vodka"]
+          : ["时尚", "果味", "伏特加"],
     },
-  ]
+  ];
 
   // 性能优化：预加载关键图片
   const imageUrls = useMemo(
     () => featuredCocktails.map((cocktail) => cocktail.image).filter(Boolean),
-    [featuredCocktails]
-  )
-  useImagePreload(imageUrls)
-
+    [featuredCocktails],
+  );
+  useImagePreload(imageUrls);
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (isClient) {
-      const answers = localStorage.getItem("moodshaker-answers")
-      setHasSavedSession(!!answers)
+      const answers = localStorage.getItem("moodshaker-answers");
+      setHasSavedSession(!!answers);
     }
-  }, [isClient])
+  }, [isClient]);
 
   // Rotate featured cocktails
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentCocktailIndex((prev) => (prev + 1) % featuredCocktails.length)
-    }, 5000)
+      setCurrentCocktailIndex((prev) => (prev + 1) % featuredCocktails.length);
+    }, 5000);
 
-    return () => clearInterval(interval)
-  }, [featuredCocktails.length])
+    return () => clearInterval(interval);
+  }, [featuredCocktails.length]);
 
   // Features data with translations
   const features = [
@@ -120,16 +144,16 @@ export default function Home() {
       title: t("home.feature3.title"),
       description: t("home.feature3.description"),
     },
-  ]
+  ];
 
   // Get paths with language prefix
   const getPathWithLanguage = (path: string) => {
-    const langPrefix = language === "en" ? "en" : "cn"
-    return `/${langPrefix}${path}`
-  }
-  
-  const questionsPath = getPathWithLanguage("/questions")
-  const newQuestionPath = getPathWithLanguage("/questions?new=true")
+    const langPrefix = language === "en" ? "en" : "cn";
+    return `/${langPrefix}${path}`;
+  };
+
+  const questionsPath = getPathWithLanguage("/questions");
+  const newQuestionPath = getPathWithLanguage("/questions?new=true");
 
   return (
     <div className="bg-background text-foreground">
@@ -165,11 +189,16 @@ export default function Home() {
             >
               <motion.div variants={animations.slideUp} className="mb-6">
                 <Badge variant="primary" size="md" className="glass-effect">
-                  {language === "en" ? "✨ AI-Powered Cocktail Recommendations" : "✨ AI 驱动的鸡尾酒推荐"}
+                  {language === "en"
+                    ? "✨ AI-Powered Cocktail Recommendations"
+                    : "✨ AI 驱动的鸡尾酒推荐"}
                 </Badge>
               </motion.div>
 
-              <motion.h1 className="font-playfair font-bold text-shadow mb-6" variants={animations.slideUp}>
+              <motion.h1
+                className="font-playfair font-bold text-shadow mb-6"
+                variants={animations.slideUp}
+              >
                 <GradientText as="span" className="block leading-tight">
                   {t("home.title")}
                 </GradientText>
@@ -195,9 +224,13 @@ export default function Home() {
                     >
                       <History className="h-5 w-5 text-primary" />
                     </motion.div>
-                    <h3 className="text-xl font-bold font-playfair">{t("home.savedSession")}</h3>
+                    <h3 className="text-xl font-bold font-playfair">
+                      {t("home.savedSession")}
+                    </h3>
                   </div>
-                  <p className="mb-6 text-foreground/70 font-source-sans">{t("home.savedSessionDesc")}</p>
+                  <p className="mb-6 text-foreground/70 font-source-sans">
+                    {t("home.savedSessionDesc")}
+                  </p>
                   <div className="button-group">
                     <Button
                       size="lg"
@@ -258,7 +291,11 @@ export default function Home() {
                               scale: [1, 1.1, 1],
                               opacity: [0.6, 0.8, 0.6],
                             }}
-                            transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                            transition={{
+                              duration: 3,
+                              repeat: Number.POSITIVE_INFINITY,
+                              ease: "easeInOut",
+                            }}
                           />
                           <div className="relative h-full rounded-3xl overflow-hidden glass-effect border border-border/30 shadow-2xl shadow-primary/10 group-hover:shadow-primary/20 transition-all duration-500">
                             <Image
@@ -274,7 +311,7 @@ export default function Home() {
                               onError={(e) => {
                                 e.currentTarget.src = `/placeholder.svg?height=600&width=500&query=${encodeURIComponent(
                                   cocktail.name,
-                                )}`
+                                )}`;
                               }}
                             />
                             <motion.div
@@ -297,7 +334,13 @@ export default function Home() {
                                 {cocktail.tags.map((tag, tagIndex) => (
                                   <Badge
                                     key={tagIndex}
-                                    variant={tagIndex % 3 === 0 ? "primary" : tagIndex % 3 === 1 ? "info" : "success"}
+                                    variant={
+                                      tagIndex % 3 === 0
+                                        ? "primary"
+                                        : tagIndex % 3 === 1
+                                          ? "info"
+                                          : "success"
+                                    }
                                     size="sm"
                                     className="backdrop-blur-sm"
                                   >
@@ -339,16 +382,26 @@ export default function Home() {
         </Container>
       </section>
 
-      <section ref={featuresRef} className="section-spacing pt-24 md:pt-32 lg:pt-40 bg-gradient-to-b from-background to-card/50">
+      <section
+        ref={featuresRef}
+        className="section-spacing pt-24 md:pt-32 lg:pt-40 bg-gradient-to-b from-background to-card/50"
+      >
         <Container size="xl">
           <motion.div
             className="text-center mb-8 lg:mb-12 container-narrow"
             initial={{ opacity: 0, y: 20 }}
-            animate={featuresInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            animate={
+              featuresInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+            }
             transition={{ duration: 0.6 }}
           >
-            <GradientText as="h2" className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6">
-              {language === "en" ? "Why Choose MoodShaker?" : "为什么选择 MoodShaker?"}
+            <GradientText
+              as="h2"
+              className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6"
+            >
+              {language === "en"
+                ? "Why Choose MoodShaker?"
+                : "为什么选择 MoodShaker?"}
             </GradientText>
             <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed">
               {language === "en"
@@ -362,7 +415,9 @@ export default function Home() {
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
-                animate={featuresInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                animate={
+                  featuresInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
+                }
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
                 <Card
@@ -383,11 +438,16 @@ export default function Home() {
                       }}
                       transition={{ duration: 0.4, ease: "easeOut" }}
                     >
-                      <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }}>
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.2 }}
+                      >
                         {feature.icon}
                       </motion.div>
                     </motion.div>
-                    <CardTitle className="text-xl lg:text-2xl mb-4 tracking-tight">{feature.title}</CardTitle>
+                    <CardTitle className="text-xl lg:text-2xl mb-4 tracking-tight">
+                      {feature.title}
+                    </CardTitle>
                     <CardDescription className="text-sm md:text-base leading-relaxed text-muted-foreground/90">
                       {feature.description}
                     </CardDescription>
@@ -404,14 +464,21 @@ export default function Home() {
           <motion.div
             className="text-center mb-8 lg:mb-12 container-narrow"
             initial={{ opacity: 0, y: 20 }}
-            animate={popularInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            animate={
+              popularInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+            }
             transition={{ duration: 0.6 }}
           >
-            <GradientText as="h2" className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6">
+            <GradientText
+              as="h2"
+              className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6"
+            >
               {language === "en" ? "Popular Cocktails" : "热门鸡尾酒"}
             </GradientText>
             <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed">
-              {language === "en" ? "Explore our users' favorite cocktails" : "探索我们用户最喜爱的鸡尾酒"}
+              {language === "en"
+                ? "Explore our users' favorite cocktails"
+                : "探索我们用户最喜爱的鸡尾酒"}
             </p>
           </motion.div>
 
@@ -420,7 +487,9 @@ export default function Home() {
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
-                animate={popularInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                animate={
+                  popularInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
+                }
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
                 <Link href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}>
@@ -451,7 +520,7 @@ export default function Home() {
                           onError={(e) => {
                             e.currentTarget.src = `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(
                               cocktail.name,
-                            )}`
+                            )}`;
                           }}
                         />
                       </motion.div>
@@ -473,7 +542,10 @@ export default function Home() {
         </Container>
       </section>
 
-      <section ref={ctaRef} className="section-spacing bg-gradient-to-r from-background/90 to-card">
+      <section
+        ref={ctaRef}
+        className="section-spacing bg-gradient-to-r from-background/90 to-card"
+      >
         <Container size="xl">
           <motion.div
             className="text-center container-narrow"
@@ -481,8 +553,13 @@ export default function Home() {
             animate={ctaInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
             transition={{ duration: 0.7 }}
           >
-            <GradientText as="h2" className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
-              {language === "en" ? "Ready to discover your perfect cocktail?" : "准备好发现您的完美鸡尾酒了吗?"}
+            <GradientText
+              as="h2"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6"
+            >
+              {language === "en"
+                ? "Ready to discover your perfect cocktail?"
+                : "准备好发现您的完美鸡尾酒了吗?"}
             </GradientText>
             <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed mb-10">
               {language === "en"
@@ -503,5 +580,5 @@ export default function Home() {
         </Container>
       </section>
     </div>
-  )
+  );
 }

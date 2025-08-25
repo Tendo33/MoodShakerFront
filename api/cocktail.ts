@@ -1,6 +1,6 @@
-import { getChatCompletion } from "./openai"
-import { cocktailLogger } from "@/utils/logger"
-import { generateCocktailId } from "@/utils/generateId"
+import { getChatCompletion } from "./openai";
+import { cocktailLogger } from "@/utils/logger";
+import { generateCocktailId } from "@/utils/generateId";
 
 // Simplified enums
 export enum AlcoholLevel {
@@ -25,80 +25,82 @@ export enum AgentType {
 
 // Interface definitions
 export interface Ingredient {
-  name: string
-  english_name?: string
-  amount: string
-  english_amount?: string
-  unit?: string
-  english_unit?: string
-  substitute?: string
-  english_substitute?: string
+  name: string;
+  english_name?: string;
+  amount: string;
+  english_amount?: string;
+  unit?: string;
+  english_unit?: string;
+  substitute?: string;
+  english_substitute?: string;
 }
 
 export interface Tool {
-  name: string
-  english_name?: string
-  alternative?: string
-  english_alternative?: string
+  name: string;
+  english_name?: string;
+  alternative?: string;
+  english_alternative?: string;
 }
 
 export interface Step {
-  step_number: number
-  description: string
-  english_description?: string
-  tips?: string
-  english_tips?: string
+  step_number: number;
+  description: string;
+  english_description?: string;
+  tips?: string;
+  english_tips?: string;
 }
 
 export interface Cocktail {
-  id?: string | number
-  name: string
-  english_name?: string
-  description: string
-  english_description?: string
-  match_reason: string
-  english_match_reason?: string
-  base_spirit: string
-  english_base_spirit?: string
-  alcohol_level: string
-  english_alcohol_level?: string
-  serving_glass: string
-  english_serving_glass?: string
-  time_required?: string
-  english_time_required?: string
-  flavor_profiles: string[]
-  english_flavor_profiles?: string[]
-  ingredients: Ingredient[]
-  tools: Tool[]
-  steps: Step[]
-  image?: string
+  id?: string | number;
+  name: string;
+  english_name?: string;
+  description: string;
+  english_description?: string;
+  match_reason: string;
+  english_match_reason?: string;
+  base_spirit: string;
+  english_base_spirit?: string;
+  alcohol_level: string;
+  english_alcohol_level?: string;
+  serving_glass: string;
+  english_serving_glass?: string;
+  time_required?: string;
+  english_time_required?: string;
+  flavor_profiles: string[];
+  english_flavor_profiles?: string[];
+  ingredients: Ingredient[];
+  tools: Tool[];
+  steps: Step[];
+  image?: string;
 }
 
 export interface BartenderRequest {
-  answers: Record<string, string>
-  baseSpirits: string[]
-  sessionId: string
+  answers: Record<string, string>;
+  baseSpirits: string[];
+  sessionId: string;
 }
 
 export async function getCocktailById(id: string): Promise<Cocktail | null> {
   try {
     // Try to get from session storage first
     if (typeof window !== "undefined") {
-      const savedRecommendation = localStorage.getItem("moodshaker-recommendation")
+      const savedRecommendation = localStorage.getItem(
+        "moodshaker-recommendation",
+      );
       if (savedRecommendation) {
-        const cocktail = JSON.parse(savedRecommendation)
+        const cocktail = JSON.parse(savedRecommendation);
         if (cocktail && cocktail.id === id) {
-          return cocktail
+          return cocktail;
         }
       }
     }
 
     // If not found in storage, return null
     // In a real app, this would make an API call to fetch by ID
-    return null
+    return null;
   } catch (error) {
-    cocktailLogger.error("Error getting cocktail by ID", error)
-    return null
+    cocktailLogger.error("Error getting cocktail by ID", error);
+    return null;
   }
 }
 
@@ -274,7 +276,7 @@ You must strictly follow this JSON format for your response, do not include any 
         }
     ],
     "serving_glass": "Highball Glass"
-}`
+}`;
 
   const english_creative_bartender_prompt = `You are a creative bartender who creates unique cocktail recipes based on user's mood and preferences, do not use classic cocktail recipes. "user requirements" is the first priority, you need to ensure the user's requirements, then create unique cocktail recipes based on the user's mood and preferences.
 
@@ -453,7 +455,7 @@ You must strictly follow this JSON format for your response, do not include any 
         }
     ],
     "serving_glass": "Highball Glass"
-}`
+}`;
 
   // Chinese prompts (existing)
   const chinese_classic_bartender_prompt = `你是一位专注于经典鸡尾酒的调酒师,需要根据用户的心情和偏好推荐合适的经典鸡尾酒，你在提供鸡尾酒配方时，确保鸡尾酒的配方是经典的,"用户需求"是第一优先级，你要先保证用户的需求，然后根据用户的需求，推荐合适的经典鸡尾酒。
@@ -623,7 +625,7 @@ You must strictly follow this JSON format for your response, do not include any 
         }
     ],
     "serving_glass": "高球杯"
-}`
+}`;
 
   const chinese_creative_bartender_prompt = `你是一位创意调酒师,需要根据用户的心情和偏好创造独特的鸡尾酒配方，你在提供鸡尾酒配方时，确保生成的鸡尾酒的配方是有创意的,新颖的,不要使用经典鸡尾酒的配方，"用户需求"是第一优先级，你要先保证用户的需求，然后根据用户的需求，创造独特的鸡尾酒配方。
 
@@ -802,49 +804,52 @@ You must strictly follow this JSON format for your response, do not include any 
         }
     ],
     "serving_glass": "高球杯"
-}`
+}`;
 
   // Select prompt based on language and agent type
   if (language === "en") {
     return agentType === AgentType.CLASSIC_BARTENDER
       ? english_classic_bartender_prompt
-      : english_creative_bartender_prompt
+      : english_creative_bartender_prompt;
   } else {
     return agentType === AgentType.CLASSIC_BARTENDER
       ? chinese_classic_bartender_prompt
-      : chinese_creative_bartender_prompt
+      : chinese_creative_bartender_prompt;
   }
 }
 
 /**
  * Create user message from answers and base spirits
  */
-function createUserMessage(request: BartenderRequest, language: string): string {
-  const currentLanguage = language || "en"
-  
+function createUserMessage(
+  request: BartenderRequest,
+  language: string,
+): string {
+  const currentLanguage = language || "en";
+
   // Convert answers object to a readable message
   const answersText = Object.entries(request.answers)
     .map(([questionId, answerId]) => `${questionId}: ${answerId}`)
-    .join(", ")
+    .join(", ");
 
   if (currentLanguage === "en") {
-    let message = `User Requirements based on mood questionnaire: ${answersText}\n`
+    let message = `User Requirements based on mood questionnaire: ${answersText}\n`;
 
     // Add base spirits if available
     if (request.baseSpirits && request.baseSpirits.length > 0) {
-      message += `Available Base Spirits: ${request.baseSpirits.join(", ")}\n`
+      message += `Available Base Spirits: ${request.baseSpirits.join(", ")}\n`;
     }
 
-    return message
+    return message;
   } else {
-    let message = `用户基于心情问卷的需求: ${answersText}\n`
+    let message = `用户基于心情问卷的需求: ${answersText}\n`;
 
     // Add base spirits if available
     if (request.baseSpirits && request.baseSpirits.length > 0) {
-      message += `可用的基酒: ${request.baseSpirits.join(", ")}\n`
+      message += `可用的基酒: ${request.baseSpirits.join(", ")}\n`;
     }
 
-    return message
+    return message;
   }
 }
 
@@ -856,18 +861,18 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
     cocktailLogger.debug("Parsing cocktail data from model response", {
       completionLength: completion.length,
       completionPreview: completion.substring(0, 200) + "...",
-    })
+    });
 
-    const jsonMatch = completion.match(/\{[\s\S]*\}/)
+    const jsonMatch = completion.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       cocktailLogger.error("Cannot extract JSON data from response", {
         completionPreview: completion.substring(0, 300) + "...",
-      })
-      throw new Error("No JSON found in completion")
+      });
+      throw new Error("No JSON found in completion");
     }
 
-    const jsonString = jsonMatch[0]
-    const cocktail = JSON.parse(jsonString) as Cocktail
+    const jsonString = jsonMatch[0];
+    const cocktail = JSON.parse(jsonString) as Cocktail;
 
     // Log parsing result
     cocktailLogger.info("Successfully parsed cocktail data", {
@@ -876,7 +881,7 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       ingredientsCount: cocktail.ingredients?.length || 0,
       stepsCount: cocktail.steps?.length || 0,
       toolsCount: cocktail.tools?.length || 0,
-    })
+    });
 
     // Ensure all required fields exist
     return {
@@ -884,7 +889,8 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       english_name: cocktail.english_name || "",
       description: cocktail.description || "No description available",
       english_description: cocktail.english_description || "",
-      match_reason: cocktail.match_reason || "This cocktail matches your preferences",
+      match_reason:
+        cocktail.match_reason || "This cocktail matches your preferences",
       english_match_reason: cocktail.english_match_reason || "",
       base_spirit: cocktail.base_spirit || "Various",
       english_base_spirit: cocktail.english_base_spirit || "",
@@ -899,16 +905,20 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       ingredients: cocktail.ingredients || [],
       tools: cocktail.tools || [],
       steps: cocktail.steps || [],
-    }
+    };
   } catch (error) {
     cocktailLogger.error("Failed to parse cocktail data", {
-      error: error instanceof Error ? { name: error.name, message: error.message } : String(error),
+      error:
+        error instanceof Error
+          ? { name: error.name, message: error.message }
+          : String(error),
       completionPreview: completion.substring(0, 300) + "...",
-    })
+    });
 
     return {
       name: "Parsing Error Cocktail",
-      description: "Sorry, there was an error parsing the cocktail recommendation.",
+      description:
+        "Sorry, there was an error parsing the cocktail recommendation.",
       english_description: "",
       match_reason: "This is a fallback recommendation due to a parsing error.",
       english_match_reason: "",
@@ -925,7 +935,7 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       ingredients: [],
       tools: [],
       steps: [],
-    }
+    };
   }
 }
 
@@ -936,14 +946,17 @@ export async function requestCocktailRecommendation(
   request: BartenderRequest,
   agentType: AgentType = AgentType.CLASSIC_BARTENDER,
 ): Promise<Cocktail> {
-  const requestId = generateCocktailId()
-  const startTime = Date.now()
+  const requestId = generateCocktailId();
+  const startTime = Date.now();
   try {
     // Get current language
-    const currentLanguage = typeof window !== "undefined" ? localStorage.getItem("moodshaker-language") || "cn" : "en"
+    const currentLanguage =
+      typeof window !== "undefined"
+        ? localStorage.getItem("moodshaker-language") || "cn"
+        : "en";
 
-    const systemPrompt = createSystemPrompt(agentType, currentLanguage)
-    const userMessage = createUserMessage(request, currentLanguage)
+    const systemPrompt = createSystemPrompt(agentType, currentLanguage);
+    const userMessage = createUserMessage(request, currentLanguage);
 
     const completion = await getChatCompletion(
       [
@@ -954,35 +967,44 @@ export async function requestCocktailRecommendation(
         temperature: 0.8,
         max_tokens: 5000,
       },
-    )
+    );
 
     cocktailLogger.debug(`Received model response [${requestId}]`, {
       completionLength: completion.length,
-    })
+    });
 
-    const cocktail = parseCocktailFromCompletion(completion)
+    const cocktail = parseCocktailFromCompletion(completion);
 
-    const endTime = Date.now()
-    const duration = endTime - startTime
+    const endTime = Date.now();
+    const duration = endTime - startTime;
 
-    cocktailLogger.info(`Cocktail recommendation completed [${requestId}] (${duration}ms)`, {
-      cocktailName: cocktail.name,
-      englishName: cocktail.english_name,
-      baseSpirit: cocktail.base_spirit,
-      ingredientsCount: cocktail.ingredients.length,
-      stepsCount: cocktail.steps.length,
-      language: currentLanguage,
-    })
+    cocktailLogger.info(
+      `Cocktail recommendation completed [${requestId}] (${duration}ms)`,
+      {
+        cocktailName: cocktail.name,
+        englishName: cocktail.english_name,
+        baseSpirit: cocktail.base_spirit,
+        ingredientsCount: cocktail.ingredients.length,
+        stepsCount: cocktail.steps.length,
+        language: currentLanguage,
+      },
+    );
 
-    return cocktail
+    return cocktail;
   } catch (error) {
-    const endTime = Date.now()
-    const duration = endTime - startTime
+    const endTime = Date.now();
+    const duration = endTime - startTime;
 
-    cocktailLogger.error(`Cocktail recommendation failed [${requestId}] (${duration}ms)`, {
-      error: error instanceof Error ? { name: error.name, message: error.message } : String(error),
-    })
+    cocktailLogger.error(
+      `Cocktail recommendation failed [${requestId}] (${duration}ms)`,
+      {
+        error:
+          error instanceof Error
+            ? { name: error.name, message: error.message }
+            : String(error),
+      },
+    );
 
-    throw error
+    throw error;
   }
 }

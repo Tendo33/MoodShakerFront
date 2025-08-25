@@ -30,7 +30,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // You can log the error to an error reporting service
-    appLogger.error("Error caught by ErrorBoundary", { error, componentStack: errorInfo.componentStack });
+    appLogger.error("Error caught by ErrorBoundary", {
+      error,
+      componentStack: errorInfo.componentStack,
+    });
   }
 
   render(): ReactNode {
@@ -61,7 +64,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             </p>
             <button
               onClick={() => {
-                if (typeof window !== 'undefined') {
+                if (typeof window !== "undefined") {
                   window.location.reload();
                 }
               }}

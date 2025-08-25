@@ -1,43 +1,42 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 interface QuickLoadingDotsProps {
-  size?: 'sm' | 'md' | 'lg'
-  color?: 'amber' | 'pink' | 'blue' | 'gradient'
-  speed?: 'slow' | 'normal' | 'fast'
-  className?: string
+  size?: "sm" | "md" | "lg";
+  color?: "amber" | "pink" | "blue" | "gradient";
+  speed?: "slow" | "normal" | "fast";
+  className?: string;
 }
 
 export default function QuickLoadingDots({
-  size = 'md',
-  color = 'gradient',
-  speed = 'normal',
-  className = ''
+  size = "md",
+  color = "gradient",
+  speed = "normal",
+  className = "",
 }: QuickLoadingDotsProps) {
-  
   const sizeConfig = {
-    sm: { dot: 'w-1.5 h-1.5', gap: 'space-x-1' },
-    md: { dot: 'w-2 h-2', gap: 'space-x-1.5' },
-    lg: { dot: 'w-3 h-3', gap: 'space-x-2' }
-  }
+    sm: { dot: "w-1.5 h-1.5", gap: "space-x-1" },
+    md: { dot: "w-2 h-2", gap: "space-x-1.5" },
+    lg: { dot: "w-3 h-3", gap: "space-x-2" },
+  };
 
   const colorConfig = {
-    amber: 'bg-amber-500',
-    pink: 'bg-pink-500',
-    blue: 'bg-blue-500',
-    gradient: 'bg-gradient-to-r from-amber-500 to-pink-500'
-  }
+    amber: "bg-amber-500",
+    pink: "bg-pink-500",
+    blue: "bg-blue-500",
+    gradient: "bg-gradient-to-r from-amber-500 to-pink-500",
+  };
 
   const speedConfig = {
     slow: { duration: 1.8, stagger: 0.3 },
     normal: { duration: 1.4, stagger: 0.2 },
-    fast: { duration: 1.0, stagger: 0.15 }
-  }
+    fast: { duration: 1.0, stagger: 0.15 },
+  };
 
-  const { dot, gap } = sizeConfig[size]
-  const dotColor = colorConfig[color]
-  const { duration, stagger } = speedConfig[speed]
+  const { dot, gap } = sizeConfig[size];
+  const dotColor = colorConfig[color];
+  const { duration, stagger } = speedConfig[speed];
 
   return (
     <div className={`flex items-center justify-center ${gap} ${className}`}>
@@ -58,22 +57,21 @@ export default function QuickLoadingDots({
         />
       ))}
     </div>
-  )
+  );
 }
 
-
 interface PulseRingLoaderProps {
-  size?: number
-  thickness?: number
-  color?: string
-  className?: string
+  size?: number;
+  thickness?: number;
+  color?: string;
+  className?: string;
 }
 
 export function PulseRingLoader({
   size = 20,
   thickness = 2,
-  color = 'border-amber-500',
-  className = ''
+  color = "border-amber-500",
+  className = "",
 }: PulseRingLoaderProps) {
   return (
     <div className={`inline-block ${className}`}>
@@ -82,28 +80,27 @@ export function PulseRingLoader({
         style={{
           width: size,
           height: size,
-          borderWidth: thickness
+          borderWidth: thickness,
         }}
         animate={{ rotate: 360 }}
         transition={{
           duration: 1,
           repeat: Number.POSITIVE_INFINITY,
-          ease: "linear"
+          ease: "linear",
         }}
       />
     </div>
-  )
+  );
 }
-
 
 interface InlineLoadingProps {
-  text?: string
-  className?: string
+  text?: string;
+  className?: string;
 }
 
-export function InlineLoading({ 
-  text = "加载中", 
-  className = "" 
+export function InlineLoading({
+  text = "加载中",
+  className = "",
 }: InlineLoadingProps) {
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
@@ -114,11 +111,11 @@ export function InlineLoading({
         transition={{
           duration: 2,
           repeat: Number.POSITIVE_INFINITY,
-          ease: "easeInOut"
+          ease: "easeInOut",
         }}
       >
         {text}
       </motion.span>
     </div>
-  )
+  );
 }

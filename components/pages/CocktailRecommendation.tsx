@@ -1,8 +1,6 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { motion } from "framer-motion"
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Clock,
@@ -15,21 +13,21 @@ import {
   ChevronUp,
   Lightbulb,
   RefreshCcw,
-} from "lucide-react"
-import { useLanguage } from "@/context/LanguageContext"
-import { useCocktail } from "@/context/CocktailContext"
-import { getCocktailById } from "@/api/cocktail"
-import type { Cocktail, Ingredient, Tool, Step } from "@/api/cocktail"
-import { CocktailImage } from "@/components/CocktailImage"
-import { cocktailLogger, imageLogger } from "@/utils/logger"
-import { commonStyles } from "@/utils/style-constants"
-import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem"
+} from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import { useCocktail } from "@/context/CocktailContext";
+import { getCocktailById } from "@/api/cocktail";
+import type { Cocktail, Ingredient, Tool, Step } from "@/api/cocktail";
+import { CocktailImage } from "@/components/CocktailImage";
+import { cocktailLogger, imageLogger } from "@/utils/logger";
+import { commonStyles } from "@/utils/style-constants";
+import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem";
 
 export default function CocktailRecommendation() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const cocktailId = searchParams?.get("id")
-  const { t, getPathWithLanguage, language } = useLanguage()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const cocktailId = searchParams?.get("id");
+  const { t, getPathWithLanguage, language } = useLanguage();
   const {
     recommendation: contextCocktail,
     userFeedback,
@@ -38,69 +36,77 @@ export default function CocktailRecommendation() {
     isImageLoading,
     loadSavedData,
     refreshImage,
-  } = useCocktail()
+  } = useCocktail();
 
-  const [cocktail, setCocktail] = useState<Cocktail | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [showShareTooltip, setShowShareTooltip] = useState(false)
-  const [expandedSection, setExpandedSection] = useState<string | null>("steps")
-  const [activeStep, setActiveStep] = useState<number | null>(null)
-  const [isPageLoaded, setIsPageLoaded] = useState(false)
-  const [isRefreshingImage, setIsRefreshingImage] = useState(false)
-  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0)
+  const [cocktail, setCocktail] = useState<Cocktail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showShareTooltip, setShowShareTooltip] = useState(false);
+  const [expandedSection, setExpandedSection] = useState<string | null>(
+    "steps",
+  );
+  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+  const [isRefreshingImage, setIsRefreshingImage] = useState(false);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
-  const textColorClass = "text-white"
-  const cardClasses = "bg-gray-800 text-white"
-  const borderClasses = "border-gray-700"
-  const gradientText = "bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent"
+  const textColorClass = "text-white";
+  const cardClasses = "bg-gray-800 text-white";
+  const borderClasses = "border-gray-700";
+  const gradientText =
+    "bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent";
 
-  const getLocalizedContent = (field: string, englishField: string): string | undefined => {
+  const getLocalizedContent = (
+    field: string,
+    englishField: string,
+  ): string | undefined => {
     if (language === "en" && cocktail?.[englishField as keyof Cocktail]) {
-      return cocktail[englishField as keyof Cocktail] as string
+      return cocktail[englishField as keyof Cocktail] as string;
     }
-    return cocktail?.[field as keyof Cocktail] as string
-  }
+    return cocktail?.[field as keyof Cocktail] as string;
+  };
 
   const getLocalizedIngredientName = (ingredient: Ingredient): string => {
     if (language === "en" && ingredient.english_name) {
-      return ingredient.english_name
+      return ingredient.english_name;
     }
-    return ingredient.name
-  }
+    return ingredient.name;
+  };
 
   const getLocalizedIngredientAmount = (ingredient: Ingredient): string => {
     if (language === "en" && ingredient.english_amount) {
-      return ingredient.english_amount
+      return ingredient.english_amount;
     }
-    return ingredient.amount
-  }
+    return ingredient.amount;
+  };
 
   const getLocalizedIngredientUnit = (ingredient: Ingredient): string => {
     if (language === "en" && ingredient.english_unit) {
-      return ingredient.english_unit
+      return ingredient.english_unit;
     }
-    return ingredient.unit || ""
-  }
+    return ingredient.unit || "";
+  };
 
   const getLocalizedToolName = (tool: Tool): string => {
     if (language === "en" && tool.english_name) {
-      return tool.english_name
+      return tool.english_name;
     }
-    return tool.name
-  }
+    return tool.name;
+  };
 
-  const getLocalizedStepContent = (step: Step): { description: string; tips?: string } => {
+  const getLocalizedStepContent = (
+    step: Step,
+  ): { description: string; tips?: string } => {
     if (language === "en") {
       return {
         description: step.english_description || step.description,
         tips: step.english_tips || step.tips,
-      }
+      };
     }
     return {
       description: step.description,
       tips: step.tips,
-    }
-  }
+    };
+  };
 
   // Set page title based on language
   useEffect(() => {
@@ -108,42 +114,42 @@ export default function CocktailRecommendation() {
       const title =
         language === "en" && cocktail.english_name
           ? `${cocktail.english_name} - MoodShaker`
-          : `${cocktail.name} - MoodShaker`
-      document.title = title
+          : `${cocktail.name} - MoodShaker`;
+      document.title = title;
     }
-  }, [cocktail, language])
+  }, [cocktail, language]);
 
   useEffect(() => {
     const fetchCocktail = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         if (cocktailId) {
-          const data = await getCocktailById(cocktailId)
-          setCocktail(data)
+          const data = await getCocktailById(cocktailId);
+          setCocktail(data);
         } else if (contextCocktail) {
-          setCocktail(contextCocktail)
+          setCocktail(contextCocktail);
         } else {
-          loadSavedData()
+          loadSavedData();
           if (contextCocktail) {
-            setCocktail(contextCocktail)
+            setCocktail(contextCocktail);
           }
         }
 
         // Add a small delay before showing animations
-        setTimeout(() => setIsPageLoaded(true), 100)
+        setTimeout(() => setIsPageLoaded(true), 100);
       } catch (error) {
-        cocktailLogger.error("Error fetching cocktail", error)
+        cocktailLogger.error("Error fetching cocktail", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchCocktail()
-  }, [cocktailId, contextCocktail, loadSavedData])
+    fetchCocktail();
+  }, [cocktailId, contextCocktail, loadSavedData]);
 
   const handleBack = () => {
-    router.push(getPathWithLanguage("/"))
-  }
+    router.push(getPathWithLanguage("/"));
+  };
 
   const handleShare = () => {
     try {
@@ -154,59 +160,61 @@ export default function CocktailRecommendation() {
             text: `Check out this ${cocktail?.name} recipe from MoodShaker!`,
             url: window.location.href,
           })
-          .catch(() => copyToClipboard())
+          .catch(() => copyToClipboard());
       } else {
-        copyToClipboard()
+        copyToClipboard();
       }
     } catch (err) {
-      copyToClipboard()
+      copyToClipboard();
     }
-  }
+  };
 
   const copyToClipboard = () => {
     try {
-      navigator.clipboard.writeText(window.location.href)
-      setShowShareTooltip(true)
-      setTimeout(() => setShowShareTooltip(false), 2000)
+      navigator.clipboard.writeText(window.location.href);
+      setShowShareTooltip(true);
+      setTimeout(() => setShowShareTooltip(false), 2000);
     } catch (err) {
-      alert(`Copy this URL: ${window.location.href}`)
+      alert(`Copy this URL: ${window.location.href}`);
     }
-  }
+  };
 
   const handlePrint = () => {
-    window.print()
-  }
+    window.print();
+  };
 
   const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section)
-  }
+    setExpandedSection(expandedSection === section ? null : section);
+  };
 
   const handleRefreshImage = async () => {
     if (refreshImage && cocktail) {
-      setIsRefreshingImage(true)
+      setIsRefreshingImage(true);
       try {
-        await refreshImage()
+        await refreshImage();
       } catch (error) {
-        imageLogger.error("Error refreshing image", error)
+        imageLogger.error("Error refreshing image", error);
       } finally {
-        setIsRefreshingImage(false)
+        setIsRefreshingImage(false);
       }
     }
-  }
+  };
 
   const loadingMessages = [
     t("recommendation.loadingMessage1"),
     t("recommendation.loadingMessage2"),
     t("recommendation.loadingMessage3"),
-  ]
+  ];
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setLoadingMessageIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length)
-    }, 3000) // Change message every 3 seconds
+      setLoadingMessageIndex(
+        (prevIndex) => (prevIndex + 1) % loadingMessages.length,
+      );
+    }, 3000); // Change message every 3 seconds
 
-    return () => clearInterval(intervalId) // Clean up interval on unmount
-  }, [loadingMessages.length])
+    return () => clearInterval(intervalId); // Clean up interval on unmount
+  }, [loadingMessages.length]);
 
   if (isLoading || isContextLoading) {
     return (
@@ -217,7 +225,7 @@ export default function CocktailRecommendation() {
         estimatedDuration={4000}
         onComplete={() => setIsLoading(false)}
       />
-    )
+    );
   }
 
   // If no cocktail found
@@ -231,8 +239,12 @@ export default function CocktailRecommendation() {
             transition={{ duration: 0.5 }}
             className="text-center py-12 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl"
           >
-            <h2 className={`text-2xl font-medium mb-4 ${textColorClass}`}>{t("recommendation.notFound")}</h2>
-            <p className="text-gray-300 mb-6">{t("recommendation.notFoundDesc")}</p>
+            <h2 className={`text-2xl font-medium mb-4 ${textColorClass}`}>
+              {t("recommendation.notFound")}
+            </h2>
+            <p className="text-gray-300 mb-6">
+              {t("recommendation.notFoundDesc")}
+            </p>
             <button
               onClick={handleBack}
               className={commonStyles.primaryButtonFull}
@@ -242,7 +254,7 @@ export default function CocktailRecommendation() {
           </motion.div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -322,7 +334,11 @@ export default function CocktailRecommendation() {
               <BookmarkPlus className="h-5 w-5" />
             </motion.button>
 
-            <motion.div className="relative" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div
+              className="relative"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <button
                 onClick={handleShare}
                 className="p-2.5 rounded-full hover:bg-white/10 transition-colors"
@@ -386,7 +402,9 @@ export default function CocktailRecommendation() {
                       disabled={isRefreshingImage || isImageLoading}
                       className="p-2.5 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors"
                     >
-                      <RefreshCcw className={`h-5 w-5 ${isRefreshingImage || isImageLoading ? "animate-spin" : ""}`} />
+                      <RefreshCcw
+                        className={`h-5 w-5 ${isRefreshingImage || isImageLoading ? "animate-spin" : ""}`}
+                      />
                     </button>
                   </motion.div>
                 )}
@@ -395,7 +413,9 @@ export default function CocktailRecommendation() {
                   <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mx-auto mb-2" />
-                      <p className="text-sm text-white">{t("recommendation.imageLoading")}</p>
+                      <p className="text-sm text-white">
+                        {t("recommendation.imageLoading")}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -417,11 +437,15 @@ export default function CocktailRecommendation() {
                   visible: { opacity: 1, transition: { duration: 0.5 } },
                 }}
               >
-                <h1 className={`text-4xl md:text-5xl font-bold mb-2 ${gradientText} inline-block`}>
+                <h1
+                  className={`text-4xl md:text-5xl font-bold mb-2 ${gradientText} inline-block`}
+                >
                   {getLocalizedContent("name", "english_name")}
                 </h1>
                 {cocktail?.english_name && language === "cn" && (
-                  <p className="text-gray-400 text-xl mb-4">{cocktail.english_name}</p>
+                  <p className="text-gray-400 text-xl mb-4">
+                    {cocktail.english_name}
+                  </p>
                 )}
               </motion.div>
 
@@ -503,7 +527,10 @@ export default function CocktailRecommendation() {
                     <p className="text-sm text-gray-400">Alcohol Level</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {getLocalizedContent("alcohol_level", "english_alcohol_level")}
+                    {getLocalizedContent(
+                      "alcohol_level",
+                      "english_alcohol_level",
+                    )}
                   </p>
                 </motion.div>
                 <motion.div
@@ -522,7 +549,10 @@ export default function CocktailRecommendation() {
                     <p className="text-sm text-gray-400">Prep Time</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {getLocalizedContent("time_required", "english_time_required") || "5 minutes"}
+                    {getLocalizedContent(
+                      "time_required",
+                      "english_time_required",
+                    ) || "5 minutes"}
                   </p>
                 </motion.div>
                 <motion.div
@@ -541,7 +571,10 @@ export default function CocktailRecommendation() {
                     <p className="text-sm text-gray-400">Serving Glass</p>
                   </div>
                   <p className={`font-medium ${textColorClass}`}>
-                    {getLocalizedContent("serving_glass", "english_serving_glass")}
+                    {getLocalizedContent(
+                      "serving_glass",
+                      "english_serving_glass",
+                    )}
                   </p>
                 </motion.div>
               </motion.div>
@@ -618,7 +651,9 @@ export default function CocktailRecommendation() {
                 className="w-full p-5 flex justify-between items-center bg-gradient-to-r from-amber-500/20 to-pink-500/20"
                 onClick={() => toggleSection("ingredients")}
               >
-                <h3 className={`text-xl font-bold ${textColorClass}`}>{t("recommendation.ingredients")}</h3>
+                <h3 className={`text-xl font-bold ${textColorClass}`}>
+                  {t("recommendation.ingredients")}
+                </h3>
                 {expandedSection === "ingredients" ? (
                   <ChevronUp className="h-5 w-5" />
                 ) : (
@@ -641,7 +676,9 @@ export default function CocktailRecommendation() {
                         </span>
                         <span className="text-amber-400 font-medium">
                           {getLocalizedIngredientAmount(ingredient)}
-                          {getLocalizedIngredientUnit(ingredient) ? ` ${getLocalizedIngredientUnit(ingredient)}` : ""}
+                          {getLocalizedIngredientUnit(ingredient)
+                            ? ` ${getLocalizedIngredientUnit(ingredient)}`
+                            : ""}
                         </span>
                       </motion.li>
                     ))}
@@ -662,8 +699,14 @@ export default function CocktailRecommendation() {
                 className="w-full p-5 flex justify-between items-center bg-gradient-to-r from-pink-500/20 to-amber-500/20"
                 onClick={() => toggleSection("tools")}
               >
-                <h3 className={`text-xl font-bold ${textColorClass}`}>{t("recommendation.tools")}</h3>
-                {expandedSection === "tools" ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                <h3 className={`text-xl font-bold ${textColorClass}`}>
+                  {t("recommendation.tools")}
+                </h3>
+                {expandedSection === "tools" ? (
+                  <ChevronUp className="h-5 w-5" />
+                ) : (
+                  <ChevronDown className="h-5 w-5" />
+                )}
               </button>
               {expandedSection === "tools" && (
                 <div className="p-5">
@@ -676,7 +719,9 @@ export default function CocktailRecommendation() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
                       >
-                        <span className={`${textColorClass} font-medium`}>{getLocalizedToolName(tool)}</span>
+                        <span className={`${textColorClass} font-medium`}>
+                          {getLocalizedToolName(tool)}
+                        </span>
                         {tool.alternative && (
                           <span className="text-sm text-gray-400 mt-1">
                             {t("recommendation.alternative")}:{" "}
@@ -701,12 +746,14 @@ export default function CocktailRecommendation() {
               }}
             >
               <div className="p-5 bg-gradient-to-r from-pink-500/20 to-purple-500/20">
-                <h3 className={`text-xl font-bold ${textColorClass}`}>{t("recommendation.steps")}</h3>
+                <h3 className={`text-xl font-bold ${textColorClass}`}>
+                  {t("recommendation.steps")}
+                </h3>
               </div>
               <div className="p-5">
                 <ol className="space-y-8">
                   {cocktail?.steps?.map((step) => {
-                    const localizedStep = getLocalizedStepContent(step)
+                    const localizedStep = getLocalizedStepContent(step);
                     return (
                       <motion.li
                         key={step.step_number}
@@ -727,7 +774,11 @@ export default function CocktailRecommendation() {
                           {step.step_number}
                         </motion.div>
                         <div className="flex-1">
-                          <p className={`${textColorClass} text-base leading-relaxed`}>{localizedStep.description}</p>
+                          <p
+                            className={`${textColorClass} text-base leading-relaxed`}
+                          >
+                            {localizedStep.description}
+                          </p>
                           {localizedStep.tips && (
                             <motion.div
                               className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
@@ -743,7 +794,7 @@ export default function CocktailRecommendation() {
                           )}
                         </div>
                       </motion.li>
-                    )
+                    );
                   })}
                 </ol>
               </div>
@@ -763,7 +814,9 @@ export default function CocktailRecommendation() {
                 }}
               >
                 <div className="p-5 bg-gradient-to-r from-amber-500/20 to-pink-500/20">
-                  <h3 className={`text-xl font-bold ${textColorClass}`}>{t("recommendation.ingredients")}</h3>
+                  <h3 className={`text-xl font-bold ${textColorClass}`}>
+                    {t("recommendation.ingredients")}
+                  </h3>
                 </div>
                 <div className="p-5">
                   <ul className="divide-y divide-gray-700/30">
@@ -781,7 +834,9 @@ export default function CocktailRecommendation() {
                         </span>
                         <span className="text-amber-400 font-medium">
                           {getLocalizedIngredientAmount(ingredient)}
-                          {getLocalizedIngredientUnit(ingredient) ? ` ${getLocalizedIngredientUnit(ingredient)}` : ""}
+                          {getLocalizedIngredientUnit(ingredient)
+                            ? ` ${getLocalizedIngredientUnit(ingredient)}`
+                            : ""}
                         </span>
                       </motion.li>
                     ))}
@@ -798,7 +853,9 @@ export default function CocktailRecommendation() {
                 }}
               >
                 <div className="p-5 bg-gradient-to-r from-pink-500/20 to-amber-500/20">
-                  <h3 className={`text-xl font-bold ${textColorClass}`}>{t("recommendation.tools")}</h3>
+                  <h3 className={`text-xl font-bold ${textColorClass}`}>
+                    {t("recommendation.tools")}
+                  </h3>
                 </div>
                 <div className="p-5">
                   <ul className="space-y-3">
@@ -810,7 +867,9 @@ export default function CocktailRecommendation() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
                       >
-                        <span className={`${textColorClass} font-medium`}>{getLocalizedToolName(tool)}</span>
+                        <span className={`${textColorClass} font-medium`}>
+                          {getLocalizedToolName(tool)}
+                        </span>
                         {tool.alternative && (
                           <span className="text-sm text-gray-400 mt-1">
                             {t("recommendation.alternative")}:{" "}
@@ -836,12 +895,14 @@ export default function CocktailRecommendation() {
                 }}
               >
                 <div className="p-5 bg-gradient-to-r from-pink-500/20 to-purple-500/20">
-                  <h3 className={`text-xl font-bold ${textColorClass}`}>{t("recommendation.steps")}</h3>
+                  <h3 className={`text-xl font-bold ${textColorClass}`}>
+                    {t("recommendation.steps")}
+                  </h3>
                 </div>
                 <div className="p-5">
                   <ol className="space-y-8">
                     {cocktail?.steps?.map((step) => {
-                      const localizedStep = getLocalizedStepContent(step)
+                      const localizedStep = getLocalizedStepContent(step);
                       return (
                         <motion.li
                           key={step.step_number}
@@ -856,7 +917,8 @@ export default function CocktailRecommendation() {
                             <motion.div
                               className={commonStyles.circleIcon}
                               animate={{
-                                scale: activeStep === step.step_number ? 1.1 : 1,
+                                scale:
+                                  activeStep === step.step_number ? 1.1 : 1,
                                 boxShadow:
                                   activeStep === step.step_number
                                     ? "0 0 15px rgba(236, 72, 153, 0.5)"
@@ -867,7 +929,11 @@ export default function CocktailRecommendation() {
                               {step.step_number}
                             </motion.div>
                             <div className="flex-1">
-                              <p className={`${textColorClass} text-lg leading-relaxed`}>{localizedStep.description}</p>
+                              <p
+                                className={`${textColorClass} text-lg leading-relaxed`}
+                              >
+                                {localizedStep.description}
+                              </p>
                               {localizedStep.tips && (
                                 <motion.div
                                   className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
@@ -885,11 +951,12 @@ export default function CocktailRecommendation() {
                           </div>
 
                           {/* Step progress line */}
-                          {step.step_number < (cocktail?.steps?.length || 0) && (
+                          {step.step_number <
+                            (cocktail?.steps?.length || 0) && (
                             <div className="absolute left-5 top-14 bottom-0 w-0.5 bg-gradient-to-b from-pink-500/50 to-amber-500/20 h-[calc(100%-3.5rem)]"></div>
                           )}
                         </motion.li>
-                      )
+                      );
                     })}
                   </ol>
                 </div>
@@ -938,5 +1005,5 @@ export default function CocktailRecommendation() {
         }
       `}</style>
     </div>
-  )
+  );
 }

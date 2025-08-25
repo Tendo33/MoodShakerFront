@@ -10,7 +10,9 @@
  * @returns 格式化的ID字符串
  */
 export function generateId(prefix?: string, length: number = 13): string {
-  const randomPart = Math.random().toString(36).substring(2, 2 + length);
+  const randomPart = Math.random()
+    .toString(36)
+    .substring(2, 2 + length);
   return prefix ? `${prefix}_${randomPart}` : randomPart;
 }
 

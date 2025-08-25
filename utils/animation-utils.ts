@@ -8,25 +8,44 @@ export const animations = {
   // Elegant fade in with subtle scale
   fadeIn: {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] } },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] },
+    },
   },
-  
+
   // Smooth slide up with enhanced easing
   slideUp: {
     hidden: { opacity: 0, y: 40, scale: 0.98 },
-    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] },
+    },
   },
 
   // Slide in from left
   slideInLeft: {
     hidden: { opacity: 0, x: -50, scale: 0.95 },
-    visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] } },
+    visible: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] },
+    },
   },
 
   // Slide in from right
   slideInRight: {
     hidden: { opacity: 0, x: 50, scale: 0.95 },
-    visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] } },
+    visible: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: { duration: 0.8, ease: [0.23, 1, 0.32, 1] },
+    },
   },
 
   // Sophisticated stagger container
@@ -44,13 +63,23 @@ export const animations = {
   // Scale up with rotation
   scaleIn: {
     hidden: { opacity: 0, scale: 0.8, rotate: -5 },
-    visible: { opacity: 1, scale: 1, rotate: 0, transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] } },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: { duration: 0.6, ease: [0.23, 1, 0.32, 1] },
+    },
   },
 
   // Elegant fade down
   fadeInDown: {
     hidden: { opacity: 0, y: -30, scale: 0.95 },
-    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7, ease: [0.23, 1, 0.32, 1] } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.7, ease: [0.23, 1, 0.32, 1] },
+    },
   },
 };
 
@@ -193,7 +222,8 @@ export const cardTap = {
 // Glass morphism effects
 export const glassMorphism = {
   backdropFilter: "blur(12px)",
-  background: "linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))",
+  background:
+    "linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))",
   border: "1px solid rgba(255,255,255,0.1)",
 };
 

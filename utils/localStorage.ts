@@ -3,7 +3,7 @@
  * 提供类型安全的本地存储操作
  */
 
-import { appLogger } from '@/utils/logger';
+import { appLogger } from "@/utils/logger";
 
 /**
  * 从localStorage获取数据并解析
@@ -78,8 +78,13 @@ export function clearStorageWithPrefix(prefix: string): void {
       localStorage.removeItem(key);
     });
 
-    appLogger.info(`Cleared ${keysToRemove.length} localStorage items with prefix ${prefix}`);
+    appLogger.info(
+      `Cleared ${keysToRemove.length} localStorage items with prefix ${prefix}`,
+    );
   } catch (error) {
-    appLogger.error(`Error clearing localStorage items with prefix ${prefix}`, error);
+    appLogger.error(
+      `Error clearing localStorage items with prefix ${prefix}`,
+      error,
+    );
   }
 }
