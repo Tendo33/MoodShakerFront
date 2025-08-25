@@ -360,7 +360,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     [language, getPathWithoutLanguage],
   )
 
-  // 检测客户端环境
+
   useEffect(() => {
     setIsClient(true)
   }, [])

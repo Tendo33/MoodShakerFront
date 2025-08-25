@@ -65,7 +65,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   const [progressPercentage, setProgressPercentage] = useState(0)
   const [isClient, setIsClient] = useState(false)
 
-  // 检测客户端环境
+
   useEffect(() => {
     setIsClient(true)
   }, [])

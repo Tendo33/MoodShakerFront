@@ -82,7 +82,7 @@ export default function Home() {
   )
   useImagePreload(imageUrls)
 
-  // 检测客户端环境
+
   useEffect(() => {
     setIsClient(true)
   }, [])

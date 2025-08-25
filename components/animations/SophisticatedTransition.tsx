@@ -33,7 +33,7 @@ export default function SophisticatedTransition({
     { id: 11, x: 30, y: 55, delay: 1.1 }
   ], [])
 
-  // 检测是否在客户端
+
   useEffect(() => {
     setIsClient(true)
   }, [])

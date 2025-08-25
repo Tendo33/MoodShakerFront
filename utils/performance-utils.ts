@@ -79,7 +79,7 @@ export const useImagePreload = (imageSources: string[]) => {
   return loadedImages;
 };
 
-// 虚拟化滚动 Hook - 对于长列表
+
 export const useVirtualization = <T>(
   items: T[],
   itemHeight: number,
@@ -110,7 +110,7 @@ export const useVirtualization = <T>(
   return { visibleItems, handleScroll };
 };
 
-// 组件懒加载可见性检测
+
 export const useIntersectionObserver = (
   threshold = 0.1,
   rootMargin = '100px'

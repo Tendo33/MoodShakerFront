@@ -61,15 +61,15 @@ export default function LoadingSpinner({
     );
   }
 
-  // 现代版本的旋转加载器
+
   if (variant === 'modern') {
     return (
       <div className="flex flex-col items-center justify-center space-y-6">
         <div className="relative">
-          {/* 背景环 */}
+
           <div className={`${sizeConfig[size].spinner} rounded-full border-4 border-gray-800`}></div>
           
-          {/* 动态进度环 */}
+
           <motion.div
             className={`${sizeConfig[size].spinner} rounded-full absolute top-0 border-4 border-transparent ${colorClass} border-t-current`}
             animate={{ rotate: 360 }}
@@ -80,7 +80,7 @@ export default function LoadingSpinner({
             }}
           />
           
-          {/* 内部脉冲 */}
+
           <motion.div
             className="absolute top-1/2 left-1/2 w-2 h-2 bg-gradient-to-br from-amber-400 to-pink-400 rounded-full -translate-x-1/2 -translate-y-1/2"
             animate={{

@@ -436,7 +436,7 @@ export default function Questions() {
         type="cocktail-mixing"
         message={t("questions.generating")}
         estimatedDuration={3000}
-        onComplete={() => console.log('鸡尾酒调制完成！')}
+        onComplete={() => {}}
       />
     </div>
   )
