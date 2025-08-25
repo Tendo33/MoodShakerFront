@@ -210,147 +210,100 @@ export default function CocktailRecommendation() {
   if (isLoading || isContextLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        {/* Sophisticated background elements */}
         <div className="absolute inset-0 overflow-hidden">
-          {/* Elegant geometric grid */}
-          <div className="absolute inset-0 opacity-10">
+          {/* Elegant geometric pattern */}
+          <div className="absolute inset-0 opacity-8">
             <div
               className="absolute inset-0"
               style={{
                 backgroundImage: `
-                linear-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px)
-              `,
-                backgroundSize: "60px 60px",
+                  linear-gradient(rgba(245, 158, 11, 0.08) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(245, 158, 11, 0.08) 1px, transparent 1px)
+                `,
+                backgroundSize: "80px 80px",
               }}
             />
           </div>
 
-          {/* Sophisticated floating crystals */}
-          {[...Array(8)].map((_, i) => (
+          {/* Subtle floating orbs */}
+          {[...Array(6)].map((_, i) => (
             <motion.div
-              key={`crystal-${i}`}
-              className="absolute"
-              initial={{
-                x: Math.random() * (typeof window !== "undefined" ? window.innerWidth : 1200),
-                y: Math.random() * (typeof window !== "undefined" ? window.innerHeight : 800),
-                opacity: 0,
-                scale: 0,
-                rotate: 0,
+              key={`orb-${i}`}
+              className="absolute rounded-full bg-gradient-to-br from-amber-500/10 to-pink-500/10 backdrop-blur-sm"
+              style={{
+                width: `${60 + i * 25}px`,
+                height: `${60 + i * 25}px`,
+                left: `${10 + (i * 15) % 70}%`,
+                top: `${15 + (i * 12) % 65}%`,
               }}
               animate={{
-                y: [null, -200, -400],
-                x: [null, null, Math.random() * 50 - 25],
-                opacity: [0, 0.6, 0],
-                scale: [0, 1, 0.5],
-                rotate: [0, 180, 360],
+                y: [0, -25, 0],
+                x: [0, Math.sin(i) * 18, 0],
+                scale: [1, 1.08, 1],
+                opacity: [0.08, 0.25, 0.08],
               }}
               transition={{
-                duration: 8 + Math.random() * 4,
+                duration: 10 + i * 2,
                 repeat: Number.POSITIVE_INFINITY,
-                delay: Math.random() * 6,
-                ease: [0.23, 1, 0.32, 1],
+                delay: i * 0.6,
+                ease: "easeInOut",
               }}
-            >
-              <div className="relative">
-                <div
-                  className="w-6 h-6 bg-gradient-to-br from-amber-300/40 to-orange-500/40 transform rotate-45 backdrop-blur-sm"
-                  style={{
-                    clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-                    filter: "drop-shadow(0 0 10px rgba(245, 158, 11, 0.3))",
-                  }}
-                />
-                <div
-                  className="absolute inset-0 w-6 h-6 bg-gradient-to-br from-pink-300/30 to-purple-500/30 transform rotate-45 backdrop-blur-sm"
-                  style={{
-                    clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-                    filter: "drop-shadow(0 0 8px rgba(236, 72, 153, 0.2))",
-                  }}
-                />
-              </div>
-            </motion.div>
+            />
           ))}
 
           {/* Refined light rays */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            {[...Array(6)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <motion.div
                 key={`ray-${i}`}
                 className="absolute origin-center"
                 style={{
-                  width: "400px",
-                  height: "2px",
+                  width: "350px",
+                  height: "1px",
                   background: `linear-gradient(90deg, transparent, ${
-                    i % 2 === 0 ? "rgba(245, 158, 11, 0.3)" : "rgba(236, 72, 153, 0.3)"
+                    i % 2 === 0 ? "rgba(245, 158, 11, 0.25)" : "rgba(236, 72, 153, 0.25)"
                   }, transparent)`,
-                  transform: `rotate(${i * 30}deg)`,
-                  filter: "blur(1px)",
+                  transform: `rotate(${i * 45}deg)`,
+                  filter: "blur(0.5px)",
                 }}
                 animate={{
-                  opacity: [0.1, 0.6, 0.1],
-                  scaleX: [0.5, 1.2, 0.5],
+                  opacity: [0.08, 0.5, 0.08],
+                  scaleX: [0.4, 1.1, 0.4],
                 }}
                 transition={{
-                  duration: 6,
+                  duration: 7,
                   repeat: Number.POSITIVE_INFINITY,
-                  delay: i * 1,
+                  delay: i * 0.4,
                   ease: "easeInOut",
                 }}
               />
             ))}
           </div>
-
-          {/* Ambient pulse rings */}
-          {[...Array(4)].map((_, i) => (
-            <motion.div
-              key={`pulse-${i}`}
-              className="absolute top-1/2 left-1/2 rounded-full border-2 opacity-20"
-              style={{
-                width: `${150 + i * 80}px`,
-                height: `${150 + i * 80}px`,
-                marginTop: `-${75 + i * 40}px`,
-                marginLeft: `-${75 + i * 40}px`,
-                borderColor: i % 2 === 0 ? "#f59e0b" : "#ec4899",
-                borderStyle: "dashed",
-                borderSpacing: "10px",
-              }}
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.1, 0.4, 0.1],
-                rotate: [0, 360],
-              }}
-              transition={{
-                duration: 10 + i * 2,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "linear",
-              }}
-            />
-          ))}
         </div>
 
         <motion.div
           className="relative z-10 text-center"
-          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          initial={{ opacity: 0, scale: 0.9, y: 40 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ duration: 1.4, ease: [0.23, 1, 0.32, 1] }}
         >
-          {/* Modern cocktail shaker animation */}
+          {/* Elegant cocktail glass silhouette */}
           <motion.div
-            className="relative mx-auto mb-12 w-40 h-56"
-            initial={{ rotateY: -45, scale: 0.8 }}
+            className="relative mx-auto mb-10 w-20 h-28"
+            initial={{ rotateY: -20, scale: 0.9 }}
             animate={{ rotateY: 0, scale: 1 }}
-            transition={{ duration: 1.8, ease: [0.23, 1, 0.32, 1] }}
+            transition={{ duration: 1.6, ease: [0.23, 1, 0.32, 1] }}
           >
-            {/* Shaker body */}
+            {/* Glass body */}
             <motion.div
-              className="absolute inset-x-4 top-8 bottom-4 rounded-3xl backdrop-blur-xl border-2 border-white/20 shadow-2xl overflow-hidden"
+              className="absolute inset-x-3 top-3 bottom-10 rounded-b-full backdrop-blur-lg border border-white/15 shadow-xl overflow-hidden"
               style={{
-                background: "linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))",
-                boxShadow: "inset 0 0 40px rgba(255,255,255,0.1), 0 0 60px rgba(245, 158, 11, 0.15)",
+                background: "linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01))",
+                clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)",
               }}
               animate={{
-                y: [0, -12, 8, -5, 0],
-                rotateZ: [0, 5, -8, 3, -2, 0],
-                x: [0, 3, -6, 2, 0],
+                opacity: [0.7, 1, 0.7],
               }}
               transition={{
                 duration: 2.5,
@@ -358,201 +311,101 @@ export default function CocktailRecommendation() {
                 ease: "easeInOut",
               }}
             >
-              {/* Liquid inside shaker */}
+              {/* Sophisticated liquid gradient */}
               <motion.div
-                className="absolute bottom-0 left-0 right-0 rounded-b-3xl overflow-hidden"
-                initial={{ height: "20%" }}
-                animate={{ height: ["20%", "70%", "65%"] }}
+                className="absolute bottom-0 left-0 right-0 h-2/3 rounded-b-full overflow-hidden opacity-70"
+                style={{
+                  background: "linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6, #06b6d4)",
+                  backgroundSize: "250% 250%",
+                }}
+                animate={{
+                  backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
+                  height: ["40%", "75%", "55%"],
+                }}
                 transition={{
-                  duration: 2.5,
-                  ease: [0.23, 1, 0.32, 1],
+                  duration: 5,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "easeInOut",
                 }}
               >
+                {/* Elegant liquid surface */}
                 <motion.div
-                  className="w-full h-full relative"
-                  style={{
-                    background: "linear-gradient(135deg, #f59e0b, #fb923c, #ec4899, #8b5cf6)",
-                    backgroundSize: "300% 300%",
-                  }}
+                  className="absolute top-0 left-0 right-0 h-3 bg-white/25 rounded-full"
                   animate={{
-                    backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
+                    scaleX: [1, 1.15, 0.9, 1],
+                    y: [0, -4, 4, 0],
                   }}
                   transition={{
-                    duration: 4,
+                    duration: 2.5,
                     repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut",
-                  }}
-                >
-                  {/* Liquid surface with realistic motion */}
-                  <motion.div
-                    className="absolute top-0 left-0 right-0 h-4 bg-white/20 rounded-full"
-                    animate={{
-                      scaleX: [1, 1.1, 0.9, 1],
-                      y: [0, -3, 3, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: "easeInOut",
-                    }}
-                  />
-
-                  {/* Swirling effect */}
-                  <motion.div
-                    className="absolute inset-0 opacity-30"
-                    style={{
-                      background: "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.3), transparent)",
-                    }}
-                    animate={{ rotate: [0, 360] }}
-                    transition={{
-                      duration: 3,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: "linear",
-                    }}
-                  />
-                </motion.div>
-              </motion.div>
-
-              {/* Shaker reflections */}
-              <div className="absolute top-4 left-4 w-8 h-16 bg-white/30 rounded-full blur-sm transform -skew-x-12" />
-              <div className="absolute top-8 right-6 w-4 h-8 bg-white/20 rounded-full blur-sm" />
-
-              {/* Ice cubes floating */}
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={`ice-${i}`}
-                  className="absolute w-3 h-3 bg-white/60 rounded-sm backdrop-blur-sm shadow-lg"
-                  style={{
-                    left: `${20 + ((i * 12) % 50)}%`,
-                    top: `${30 + ((i * 8) % 40)}%`,
-                  }}
-                  animate={{
-                    y: [0, -15, 0],
-                    x: [0, Math.sin(i) * 10, 0],
-                    rotate: [0, 180, 360],
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{
-                    duration: 2.5 + Math.random(),
-                    repeat: Number.POSITIVE_INFINITY,
-                    delay: i * 0.3,
                     ease: "easeInOut",
                   }}
                 />
-              ))}
+
+                {/* Subtle swirling effect */}
+                <motion.div
+                  className="absolute inset-0 opacity-20"
+                  style={{
+                    background: "conic-gradient(from 0deg, transparent, rgba(255,255,255,0.2), transparent)",
+                  }}
+                  animate={{ rotate: [0, 360] }}
+                  transition={{
+                    duration: 4,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "linear",
+                  }}
+                />
+              </motion.div>
             </motion.div>
 
-            {/* Shaker cap */}
-            <motion.div
-              className="absolute top-0 left-2 right-2 h-12 rounded-t-3xl backdrop-blur-xl border-2 border-white/30 shadow-xl"
-              style={{
-                background: "linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08))",
-              }}
-              animate={{
-                y: [0, -8, 4, -3, 0],
-                rotateZ: [0, 3, -5, 1, 0],
-                x: [0, 2, -4, 1, 0],
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-                delay: 0.1,
-              }}
-            >
-              {/* Cap details */}
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-2 bg-white/40 rounded-full" />
-              <div className="absolute top-6 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/20 rounded-full" />
-            </motion.div>
-
-            {/* Shaking motion effects */}
-            <motion.div
-              className="absolute -inset-4 rounded-full border-2 border-dashed border-amber-400/30"
-              animate={{
-                rotate: [0, 360],
-                scale: [1, 1.15, 0.95, 1.08, 1],
-                opacity: [0.3, 0.8, 0.2, 0.6, 0.3],
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
-            />
+            {/* Glass stem */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-1 h-8 bg-white/15 rounded-full backdrop-blur-sm" />
             
-            {/* Additional shaking effect rings */}
-            <motion.div
-              className="absolute -inset-6 rounded-full border border-dashed border-pink-400/20"
-              animate={{
-                rotate: [360, 0],
-                scale: [1, 1.2, 1],
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-                delay: 1,
-              }}
-            />
+            {/* Glass base */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-white/15 rounded-full backdrop-blur-sm" />
           </motion.div>
 
-          <motion.div className="space-y-6">
+          <motion.div className="space-y-5">
             <motion.h2
-              className={commonStyles.primaryTitle}
-              initial={{ opacity: 0, y: 20 }}
+              className="text-2xl font-light text-gray-300 tracking-wide"
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
+              transition={{ delay: 0.6, duration: 0.9, ease: "easeOut" }}
             >
               {t("recommendation.loading")}
             </motion.h2>
 
-            {/* Shaking sound effects visualization */}
-            <div className="flex justify-center space-x-6">
+            {/* Elegant pulsing indicator */}
+            <div className="flex justify-center space-x-4">
               {[...Array(3)].map((_, i) => (
                 <motion.div
-                  key={`sound-wave-${i}`}
-                  className="w-1 rounded-full bg-gradient-to-t from-amber-500 to-pink-500"
+                  key={`pulse-${i}`}
+                  className="w-1.5 h-1.5 rounded-full bg-gradient-to-t from-amber-400 to-pink-400"
                   animate={{
-                    height: [20, 40, 15, 45, 25],
-                    opacity: [0.3, 1, 0.4, 0.9, 0.5],
+                    scale: [1, 1.5, 1],
+                    opacity: [0.4, 1, 0.4],
                   }}
                   transition={{
-                    duration: 1.2,
+                    duration: 1.8,
                     repeat: Number.POSITIVE_INFINITY,
-                    delay: i * 0.15,
+                    delay: i * 0.2,
                     ease: "easeInOut",
                   }}
                 />
               ))}
             </div>
-            
-            {/* Shaking motion text */}
-            <motion.p
-              className="text-sm text-gray-400 font-medium tracking-wide"
-              animate={{
-                x: [0, 3, -3, 0],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
-            >
-              🍸 正在调制您的专属鸡尾酒...
-            </motion.p>
 
             {/* Sophisticated progress bar */}
             <motion.div
-              className="w-80 h-3 bg-slate-800/40 rounded-full overflow-hidden mx-auto backdrop-blur-xl border border-white/10 shadow-xl"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
+              className="w-64 h-1 bg-slate-800/50 rounded-full overflow-hidden mx-auto backdrop-blur-sm border border-white/8"
+              initial={{ opacity: 0, scaleX: 0.9 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ delay: 0.9, duration: 0.7 }}
             >
               <motion.div
                 className="h-full rounded-full relative overflow-hidden"
                 style={{
-                  background: "linear-gradient(90deg, #f59e0b, #fb923c, #ec4899, #8b5cf6)",
+                  background: "linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6)",
                   backgroundSize: "200% 100%",
                 }}
                 initial={{ width: "0%" }}
@@ -561,16 +414,16 @@ export default function CocktailRecommendation() {
                   backgroundPosition: ["0% 0%", "100% 0%"],
                 }}
                 transition={{
-                  width: { duration: 3, ease: [0.23, 1, 0.32, 1] },
-                  backgroundPosition: { duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" },
+                  width: { duration: 4, ease: [0.23, 1, 0.32, 1] },
+                  backgroundPosition: { duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "linear" },
                 }}
               >
-                {/* Elegant shimmer */}
+                {/* Refined shimmer */}
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12"
                   animate={{ x: ["-100%", "200%"] }}
                   transition={{
-                    duration: 1.8,
+                    duration: 2.5,
                     repeat: Number.POSITIVE_INFINITY,
                     ease: [0.23, 1, 0.32, 1],
                   }}
@@ -578,15 +431,15 @@ export default function CocktailRecommendation() {
               </motion.div>
             </motion.div>
 
-            {/* Elegant loading messages */}
-            <motion.div className="h-6">
+            {/* Minimal loading messages */}
+            <motion.div className="h-5">
               <motion.p
-                className="text-slate-300 text-base font-medium tracking-wide"
+                className="text-gray-400 text-sm font-light tracking-wide"
                 key={loadingMessageIndex}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
               >
                 {loadingMessages[loadingMessageIndex]}
               </motion.p>
@@ -594,13 +447,14 @@ export default function CocktailRecommendation() {
           </motion.div>
         </motion.div>
 
+        {/* Ambient overlay */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-pink-500/5 pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-br from-amber-500/3 via-transparent to-pink-500/3 pointer-events-none"
           animate={{
-            opacity: [0.3, 0.6, 0.3],
+            opacity: [0.2, 0.5, 0.2],
           }}
           transition={{
-            duration: 8,
+            duration: 10,
             repeat: Number.POSITIVE_INFINITY,
             ease: "easeInOut",
           }}

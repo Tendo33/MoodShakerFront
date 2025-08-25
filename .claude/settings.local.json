@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "Bash(pnpm:*)"
+      "Bash(pnpm:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

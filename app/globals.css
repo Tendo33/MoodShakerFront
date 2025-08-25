@@ -139,7 +139,7 @@
   @apply p-3 md:p-4 lg:p-5;
 }
 
-/* Improved container max-widths for better content distribution */
+/* Container utilities */
 .container-narrow {
   @apply max-w-4xl mx-auto;
 }
@@ -161,22 +161,11 @@
   @apply p-2 md:p-3 lg:p-4;
 }
 
-/* Better responsive spacing for mobile devices */
+/* Mobile responsive overrides - consolidated */
 @media (max-width: 640px) {
-  .section-spacing {
-    /* Minimal mobile section spacing */
-    @apply py-3;
-  }
-
-  .content-spacing {
-    /* Very tight mobile content spacing */
-    @apply space-y-2;
-  }
-
-  .card-spacing {
-    /* Minimal mobile card padding */
-    @apply p-2;
-  }
+  .section-spacing { @apply py-3; }
+  .content-spacing { @apply space-y-2; }
+  .card-spacing { @apply p-2; }
 }
 
 /* Optimized hero section for better screen utilization */
@@ -228,13 +217,8 @@
 }
 
 /* Compact variants for high-density layouts */
-.text-spacing-compact {
-  @apply space-y-1.5 md:space-y-2;
-}
-
-.button-group-compact {
-  @apply flex flex-col sm:flex-row gap-1 md:gap-1.5;
-}
+.text-spacing-compact { @apply space-y-1.5 md:space-y-2; }
+.button-group-compact { @apply flex flex-col sm:flex-row gap-1 md:gap-1.5; }
 
 /* Enhanced focus states for better accessibility */
 .focus-ring {

@@ -6,6 +6,7 @@ import { useCocktail } from "@/context/CocktailContext"
 import { useLanguage } from "@/context/LanguageContext"
 import { Container, Card, Button, GradientText, Badge } from "@/components/ui/core"
 import { motion, AnimatePresence } from "framer-motion"
+import SophisticatedTransition from "@/components/animations/SophisticatedTransition"
 
 export default function Questions() {
   const router = useRouter()
@@ -30,6 +31,7 @@ export default function Questions() {
   const [showFeedbackForm, setShowFeedbackForm] = useState(false)
   const [showBaseSpirits, setShowBaseSpirits] = useState(false)
   const [feedback, setFeedback] = useState("")
+  const [showTransition, setShowTransition] = useState(false)
 
   const totalSteps = 5 // 3 questions + base spirits + feedback
   const getCurrentStep = () => {
@@ -155,8 +157,15 @@ export default function Questions() {
     if (feedback.trim()) {
       saveFeedback(feedback)
     }
-    submitRequest()
-    router.push(getPathWithLanguage("/cocktail/recommendation"))
+    
+    // Show sophisticated transition
+    setShowTransition(true)
+    
+    // Submit request and navigate after transition
+    setTimeout(async () => {
+      await submitRequest()
+      router.push(getPathWithLanguage("/cocktail/recommendation"))
+    }, 3400) // Match the transition duration
   }
 
   const handleReset = () => {
@@ -168,11 +177,48 @@ export default function Questions() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
+      {/* Sophisticated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-5 w-16 h-16 bg-gradient-to-br from-amber-500/10 to-pink-500/10 rounded-full blur-lg animate-pulse" />
-        <div className="absolute top-20 right-10 w-12 h-12 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-full blur-md animate-pulse delay-1000" />
-        <div className="absolute bottom-20 left-1/4 w-20 h-20 bg-gradient-to-br from-blue-500/5 to-teal-500/5 rounded-full blur-xl animate-pulse delay-2000" />
+        {/* Elegant geometric pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(245, 158, 11, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(245, 158, 11, 0.05) 1px, transparent 1px)
+              `,
+              backgroundSize: "100px 100px",
+            }}
+          />
+        </div>
+        
+        {/* Subtle floating orbs */}
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={`bg-orb-${i}`}
+            className="absolute rounded-full bg-gradient-to-br from-amber-500/8 to-pink-500/8 backdrop-blur-sm"
+            style={{
+              width: `${80 + i * 30}px`,
+              height: `${80 + i * 30}px`,
+              left: `${5 + (i * 20) % 80}%`,
+              top: `${10 + (i * 15) % 70}%`,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              x: [0, Math.sin(i) * 15, 0],
+              scale: [1, 1.05, 1],
+              opacity: [0.05, 0.15, 0.05],
+            }}
+            transition={{
+              duration: 12 + i * 3,
+              repeat: Number.POSITIVE_INFINITY,
+              delay: i * 0.8,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
       </div>
 
       <Container className="relative z-10 py-6 md:py-8 lg:py-10">
@@ -183,14 +229,33 @@ export default function Questions() {
               {Math.round(calculatedProgress)}%
             </span>
           </div>
-          <div className="w-full bg-gray-800/60 rounded-full h-1.5 backdrop-blur-sm border border-gray-700/30">
+          <div className="w-full bg-slate-800/40 rounded-full h-1 backdrop-blur-xl border border-white/10 shadow-lg overflow-hidden">
             <motion.div
-              className="bg-gradient-to-r from-amber-500 to-pink-500 h-1.5 rounded-full shadow-lg shadow-amber-500/30 relative overflow-hidden"
-              initial={{ width: 0 }}
-              animate={{ width: `${calculatedProgress}%` }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="h-full rounded-full relative overflow-hidden"
+              style={{
+                background: "linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6)",
+                backgroundSize: "200% 100%",
+              }}
+              initial={{ width: "0%" }}
+              animate={{ 
+                width: `${calculatedProgress}%`,
+                backgroundPosition: ["0% 0%", "100% 0%"]
+              }}
+              transition={{ 
+                width: { duration: 1.2, ease: [0.23, 1, 0.32, 1] },
+                backgroundPosition: { duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "linear" }
+              }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+              {/* Elegant shimmer effect */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
+                animate={{ x: ["-100%", "200%"] }}
+                transition={{
+                  duration: 2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: [0.23, 1, 0.32, 1],
+                }}
+              />
             </motion.div>
           </div>
         </div>
@@ -199,10 +264,10 @@ export default function Questions() {
           {!showBaseSpirits && !showFeedbackForm && (
             <motion.div
               key={currentQuestion}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -30, scale: 0.95 }}
+              transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
               className="space-y-8 md:space-y-10"
             >
                               <div className="text-center space-y-6 md:space-y-8">
@@ -223,17 +288,28 @@ export default function Questions() {
                 {questions[currentQuestion - 1]?.options.map((option, index) => (
                   <motion.div
                     key={option.value}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.08 }}
-                    whileHover={{ scale: 1.02, y: -3 }}
-                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 25, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.6, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
+                    whileHover={{ 
+                      scale: 1.02, 
+                      y: -5,
+                      transition: { duration: 0.3, ease: "easeOut" }
+                    }}
+                    whileTap={{ 
+                      scale: 0.97,
+                      transition: { duration: 0.1 }
+                    }}
                   >
                     <Card
-                      className="cursor-pointer h-full transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/15 group bg-gray-800/40 backdrop-blur-md border-gray-700/40 hover:border-amber-500/40 hover:bg-amber-500/5 relative overflow-hidden"
+                      className="cursor-pointer h-full transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/20 group bg-slate-800/40 backdrop-blur-xl border-slate-700/40 hover:border-amber-500/50 hover:bg-amber-500/8 relative overflow-hidden"
                       onClick={() => handleAnswer(currentQuestion, option.value)}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 via-transparent to-pink-500/0 group-hover:from-amber-500/5 group-hover:to-pink-500/5 transition-all duration-500" />
+                      {/* Sophisticated hover effect */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 via-transparent to-pink-500/0 group-hover:from-amber-500/8 group-hover:to-pink-500/8 transition-all duration-700" />
+                      
+                      {/* Elegant corner accent */}
+                      <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-amber-500/20 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                       <div className="aspect-[3/2] relative overflow-hidden rounded-xl mb-3">
                         <img
@@ -389,6 +465,12 @@ export default function Questions() {
           </Button>
         </div>
       </Container>
+    
+    {/* Sophisticated transition overlay */}
+    <SophisticatedTransition 
+      isShowing={showTransition}
+      message={t("questions.generating")}
+    />
     </div>
   )
 }

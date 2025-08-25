@@ -31,7 +31,7 @@ export default function Home() {
   const { t, language } = useLanguage()
   const [hasSavedSession, setHasSavedSession] = useState(false)
   const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0)
-  const [isClient, setIsClient] = useState(false)
+
   const shouldAnimate = useDelayedAnimation(100)
 
   // Use in-view animation hooks for sections
@@ -77,12 +77,11 @@ export default function Home() {
   // 性能优化：预加载关键图片
   const imageUrls = useMemo(
     () => featuredCocktails.map((cocktail) => cocktail.image).filter(Boolean),
-    [], // Removed featuredCocktails from dependency array
+    [featuredCocktails]
   )
-  const preloadedImages = useImagePreload(imageUrls)
+  useImagePreload(imageUrls)
 
   useEffect(() => {
-    setIsClient(true)
     const answers = localStorage.getItem("moodshaker-answers")
     setHasSavedSession(!!answers)
   }, [])
@@ -115,13 +114,14 @@ export default function Home() {
     },
   ]
 
-  // Get the correct question path based on language
-  const questionsPath = `/${language === "en" ? "en" : "cn"}/questions`
-  const newQuestionPath = `/${language === "en" ? "en" : "cn"}/questions?new=true`
-
+  // Get paths with language prefix
   const getPathWithLanguage = (path: string) => {
-    return `/${language === "en" ? "en" : "cn"}${path}`
+    const langPrefix = language === "en" ? "en" : "cn"
+    return `/${langPrefix}${path}`
   }
+  
+  const questionsPath = getPathWithLanguage("/questions")
+  const newQuestionPath = getPathWithLanguage("/questions?new=true")
 
   return (
     <div className="bg-background text-foreground">
