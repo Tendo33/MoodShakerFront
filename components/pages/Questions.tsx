@@ -175,8 +175,8 @@ export default function Questions() {
         <div className="absolute bottom-20 left-1/4 w-20 h-20 bg-gradient-to-br from-blue-500/5 to-teal-500/5 rounded-full blur-xl animate-pulse delay-2000" />
       </div>
 
-      <Container className="relative z-10 py-4">
-        <div className="mb-4">
+      <Container className="relative z-10 py-4 md:py-6">
+        <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-semibold text-gray-300 tracking-wide">{t("questions.progress")}</span>
             <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20">
@@ -203,21 +203,23 @@ export default function Questions() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="space-y-4"
+              className="space-y-6"
             >
-              <div className="text-center space-y-3">
-                <Badge
-                  variant="secondary"
-                  className="border-amber-500/30 text-amber-300 bg-amber-500/8 backdrop-blur-sm px-3 py-1 text-xs font-medium tracking-wide"
-                >
-                  {t("questions.step")} {currentStep} / {totalSteps}
-                </Badge>
-                <GradientText className="text-2xl md:text-3xl font-bold leading-tight tracking-tight">
-                  {questions[currentQuestion - 1]?.title}
-                </GradientText>
+                              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center gap-4">
+                  <Badge
+                    variant="secondary"
+                    className="border-amber-500/30 text-amber-300 bg-amber-500/8 backdrop-blur-sm px-3 py-1 text-xs font-medium tracking-wide"
+                  >
+                    {t("questions.step")} {currentStep} / {totalSteps}
+                  </Badge>
+                  <GradientText className="text-xl md:text-2xl font-bold leading-tight tracking-tight">
+                    {questions[currentQuestion - 1]?.title}
+                  </GradientText>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 max-w-5xl mx-auto">
                 {questions[currentQuestion - 1]?.options.map((option, index) => (
                   <motion.div
                     key={option.value}
@@ -233,7 +235,7 @@ export default function Questions() {
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 via-transparent to-pink-500/0 group-hover:from-amber-500/5 group-hover:to-pink-500/5 transition-all duration-500" />
 
-                      <div className="aspect-[4/3] relative overflow-hidden rounded-xl mb-3">
+                      <div className="aspect-[3/2] relative overflow-hidden rounded-xl mb-3">
                         <img
                           src={option.image || "/placeholder.svg?height=200&width=300&query=cocktail"}
                           alt={option.label}
@@ -261,24 +263,26 @@ export default function Questions() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-4"
+              className="space-y-6"
             >
-              <div className="text-center space-y-3">
-                <Badge
-                  variant="secondary"
-                  className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium"
-                >
-                  {t("questions.step")} {currentStep} / {totalSteps}
-                </Badge>
-                <GradientText className="text-2xl md:text-3xl font-bold tracking-tight">
-                  {t("questions.base_spirits.title")}
-                </GradientText>
+                              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center gap-4">
+                  <Badge
+                    variant="secondary"
+                    className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium"
+                  >
+                    {t("questions.step")} {currentStep} / {totalSteps}
+                  </Badge>
+                  <GradientText className="text-xl md:text-2xl font-bold tracking-tight">
+                    {t("questions.base_spirits.title")}
+                  </GradientText>
+                </div>
                 <p className="text-sm text-gray-400 max-w-2xl mx-auto leading-relaxed">
                   {t("questions.base_spirits.description")}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 max-w-4xl mx-auto">
                 {baseSpiritsOptions.map((spirit, index) => (
                   <motion.div
                     key={spirit.value}
@@ -294,7 +298,7 @@ export default function Questions() {
                           ? "ring-2 ring-amber-500/60 bg-amber-500/10 shadow-lg shadow-amber-500/20"
                           : "hover:shadow-lg hover:shadow-amber-500/10 bg-gray-800/40 backdrop-blur-sm border-gray-700/40 hover:border-amber-500/30"
                       }`}
-                      onClick={() => toggleBaseSpirit(spirit.value, baseSpiritsOptions)}
+                      onClick={() => toggleBaseSpirit(spirit.value)}
                     >
                       {baseSpirits.includes(spirit.value) && (
                         <div className="absolute top-1 right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
@@ -335,16 +339,18 @@ export default function Questions() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-4 max-w-2xl mx-auto"
             >
-              <div className="text-center space-y-3">
-                <Badge
-                  variant="secondary"
-                  className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium"
-                >
-                  {t("questions.step")} {currentStep} / {totalSteps}
-                </Badge>
-                <GradientText className="text-2xl md:text-3xl font-bold tracking-tight">
-                  {t("questions.feedback.title")}
-                </GradientText>
+                              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center gap-4">
+                  <Badge
+                    variant="secondary"
+                    className="border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium"
+                  >
+                    {t("questions.step")} {currentStep} / {totalSteps}
+                  </Badge>
+                  <GradientText className="text-xl md:text-2xl font-bold tracking-tight">
+                    {t("questions.feedback.title")}
+                  </GradientText>
+                </div>
                 <p className="text-sm text-gray-400 leading-relaxed">{t("questions.feedback.description")}</p>
               </div>
 

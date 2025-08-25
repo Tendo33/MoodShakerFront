@@ -115,18 +115,18 @@
 
 /* Enhanced spacing utilities for better breathing room */
 .section-spacing {
-  /* Reduced section padding for more compact layout */
-  @apply py-8 md:py-12 lg:py-16;
+  /* Further reduced section padding for compact layout */
+  @apply py-4 md:py-6 lg:py-8;
 }
 
 .content-spacing {
-  /* Reduced content spacing for tighter layout */
-  @apply space-y-4 md:space-y-6 lg:space-y-8;
+  /* Tighter content spacing for better screen utilization */
+  @apply space-y-3 md:space-y-4 lg:space-y-5;
 }
 
 .card-spacing {
-  /* Reduced card padding for more compact design */
-  @apply p-4 md:p-6 lg:p-8;
+  /* More compact card padding */
+  @apply p-3 md:p-4 lg:p-5;
 }
 
 /* Improved container max-widths for better content distribution */
@@ -138,58 +138,92 @@
   @apply max-w-6xl mx-auto;
 }
 
+/* Compact mode utilities for tight layouts */
+.section-spacing-compact {
+  @apply py-3 md:py-4 lg:py-6;
+}
+
+.content-spacing-compact {
+  @apply space-y-2 md:space-y-3 lg:space-y-4;
+}
+
+.card-spacing-compact {
+  @apply p-2 md:p-3 lg:p-4;
+}
+
 /* Better responsive spacing for mobile devices */
 @media (max-width: 640px) {
   .section-spacing {
-    /* Further reduced mobile section spacing */
-    @apply py-6;
+    /* Minimal mobile section spacing */
+    @apply py-3;
   }
 
   .content-spacing {
-    /* Tighter mobile content spacing */
-    @apply space-y-3;
+    /* Very tight mobile content spacing */
+    @apply space-y-2;
   }
 
   .card-spacing {
-    /* More compact mobile card padding */
-    @apply p-3;
+    /* Minimal mobile card padding */
+    @apply p-2;
   }
 }
 
-/* Refined hero section to prevent overwhelming screen space */
+/* Optimized hero section for better screen utilization */
 .hero-height {
-  /* Reduced hero height for more compact layout */
-  min-height: 70vh;
+  /* Significantly reduced hero height */
+  min-height: 50vh;
 }
 
 @media (max-width: 768px) {
   .hero-height {
-    /* Further reduced mobile hero height */
-    min-height: 60vh;
+    /* Compact mobile hero height */
+    min-height: 45vh;
   }
 }
 
-/* Better grid spacing for cards */
+@media (max-width: 480px) {
+  .hero-height {
+    /* Very compact small mobile hero height */
+    min-height: 40vh;
+  }
+}
+
+/* Optimized grid spacing for cards */
 .card-grid {
-  /* Reduced grid gaps for tighter card layout */
-  @apply grid gap-4 md:gap-6 lg:gap-8;
+  /* Tighter grid gaps for more content per screen */
+  @apply grid gap-2 md:gap-3 lg:gap-4;
+}
+
+.card-grid-compact {
+  /* Extra tight grid for maximum content density */
+  @apply grid gap-1.5 md:gap-2 lg:gap-3;
 }
 
 /* Improved text spacing for better readability */
 .text-spacing {
-  /* Reduced text spacing for more compact content */
-  @apply space-y-3 md:space-y-4;
+  /* Compact text spacing for denser content */
+  @apply space-y-2 md:space-y-3;
 }
 
 .text-spacing p {
-  /* Tighter paragraph spacing */
-  @apply mb-3 last:mb-0;
+  /* Minimal paragraph spacing */
+  @apply mb-2 last:mb-0;
 }
 
 /* Enhanced button spacing */
 .button-group {
-  /* Reduced button group spacing */
-  @apply flex flex-col sm:flex-row gap-2 md:gap-3;
+  /* Tight button group spacing */
+  @apply flex flex-col sm:flex-row gap-1.5 md:gap-2;
+}
+
+/* Compact variants for high-density layouts */
+.text-spacing-compact {
+  @apply space-y-1.5 md:space-y-2;
+}
+
+.button-group-compact {
+  @apply flex flex-col sm:flex-row gap-1 md:gap-1.5;
 }
 
 /* Enhanced focus states for better accessibility */
@@ -223,19 +257,39 @@
 
 @media (max-width: 640px) {
   h1 {
-    font-size: 2rem !important;
-    line-height: 1.2 !important;
+    font-size: 1.75rem !important;
+    line-height: 1.15 !important;
   }
   h2 {
-    font-size: 1.75rem !important;
-    line-height: 1.3 !important;
+    font-size: 1.5rem !important;
+    line-height: 1.25 !important;
   }
   h3 {
-    font-size: 1.5rem !important;
-    line-height: 1.4 !important;
+    font-size: 1.25rem !important;
+    line-height: 1.35 !important;
   }
   p {
-    font-size: 0.95rem !important;
-    line-height: 1.6 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+  }
+}
+
+/* Additional breakpoint for very small screens */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem !important;
+    line-height: 1.1 !important;
+  }
+  h2 {
+    font-size: 1.25rem !important;
+    line-height: 1.2 !important;
+  }
+  h3 {
+    font-size: 1.125rem !important;
+    line-height: 1.3 !important;
+  }
+  p {
+    font-size: 0.875rem !important;
+    line-height: 1.45 !important;
   }
 }

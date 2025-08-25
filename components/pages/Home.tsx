@@ -125,7 +125,7 @@ export default function Home() {
 
   return (
     <div className="bg-background text-foreground">
-      <section className="relative hero-height flex items-center section-spacing overflow-hidden">
+      <section className="relative hero-height flex items-center section-spacing-compact overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
             className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
@@ -148,12 +148,12 @@ export default function Home() {
         </div>
 
         <Container size="xl">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
             <motion.div
               initial="hidden"
               animate={shouldAnimate ? "visible" : "hidden"}
               variants={animations.staggerContainer}
-              className="content-spacing"
+              className="content-spacing-compact"
             >
               <motion.div variants={animations.slideUp} className="mb-6">
                 <Badge variant="primary" size="md" className="glass-effect">
@@ -334,7 +334,7 @@ export default function Home() {
       <section ref={featuresRef} className="section-spacing bg-gradient-to-b from-background to-card/50">
         <Container size="xl">
           <motion.div
-            className="text-center mb-12 lg:mb-16 container-narrow"
+            className="text-center mb-8 lg:mb-12 container-narrow"
             initial={{ opacity: 0, y: 20 }}
             animate={featuresInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6 }}
@@ -349,7 +349,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="card-grid grid-cols-1 md:grid-cols-3">
+          <div className="card-grid-compact grid-cols-1 md:grid-cols-3">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
@@ -394,7 +394,7 @@ export default function Home() {
       <section ref={popularRef} className="section-spacing bg-card/50">
         <Container size="xl">
           <motion.div
-            className="text-center mb-12 lg:mb-16 container-narrow"
+            className="text-center mb-8 lg:mb-12 container-narrow"
             initial={{ opacity: 0, y: 20 }}
             animate={popularInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6 }}
@@ -407,7 +407,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="card-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="card-grid-compact grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {featuredCocktails.map((cocktail, index) => (
               <motion.div
                 key={index}
@@ -476,7 +476,7 @@ export default function Home() {
             <GradientText as="h2" className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
               {language === "en" ? "Ready to discover your perfect cocktail?" : "准备好发现您的完美鸡尾酒了吗?"}
             </GradientText>
-            <p className="text-lg md:text-xl text-muted-foreground font-source-sans leading-relaxed mb-8">
+            <p className="text-lg md:text-xl text-muted-foreground font-source-sans leading-relaxed mb-10">
               {language === "en"
                 ? "Start now and let us recommend the perfect drink for your mood."
                 : "立即开始，让我们为您推荐最适合您心情的饮品。"}

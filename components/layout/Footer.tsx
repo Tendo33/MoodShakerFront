@@ -94,7 +94,7 @@ export default function Footer() {
               <div className={`w-10 h-10 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center`}>
                 <Cocktail className="h-5 w-5 text-white" />
               </div>
-              <span className={`font-bold text-xl ${gradientStyles.primaryText}`}>
+              <span className={`font-bold text-gray-400 text-xl ${gradientStyles.primaryText}`}>
                 MoodShaker
               </span>
             </motion.div>
