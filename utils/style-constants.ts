@@ -9,7 +9,7 @@ export const gradientStyles = {
   primaryButton: "bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600",
   
   // 文字渐变
-  primaryText: "bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 bg-clip-text text-transparent",
+  primaryText: "text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-red-400 to-pink-500",
   
   // 圆形图标背景
   iconBackground: "bg-gradient-to-r from-amber-500 to-pink-500",

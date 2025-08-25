@@ -75,7 +75,7 @@ export default function Header() {
             <Cocktail className="h-5 w-5 text-white" />
           </motion.div>
           <motion.span
-            className={`${gradientStyles.primaryText}`}
+            className="gradient-text-bright font-bold text-xl"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
