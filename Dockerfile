@@ -32,7 +32,7 @@ COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.mjs ./
-COPY --from=builder /app/.env ./.env
+# 注意：.env文件不复制，因为生产环境变量应该通过运行时传入
 
 # 安装生产依赖
 RUN pnpm install --prod --frozen-lockfile
@@ -40,12 +40,8 @@ RUN pnpm install --prod --frozen-lockfile
 # 设置环境变量
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV NEXT_PUBLIC_OPENAI_API_KEY=
-ENV NEXT_PUBLIC_OPENAI_BASE_URL=https://api.openai.com/v1
-ENV NEXT_PUBLIC_OPENAI_MODEL=deepseek-v3-250324
-ENV NEXT_PUBLIC_IMAGE_API_URL=
-ENV NEXT_PUBLIC_IMAGE_API_KEY=
-ENV NEXT_PUBLIC_IMAGE_MODEL=Kwai-Kolors/Kolors
+# 注意：NEXT_PUBLIC_* 环境变量应该在构建时通过 --build-arg 传入
+# 或者在运行时通过 docker run -e 传入
 
 # 暴露端口
 EXPOSE 3000
