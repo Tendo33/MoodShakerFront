@@ -169,15 +169,34 @@ export default function Questions() {
   ];
 
   useEffect(() => {
-    loadSavedData();
-  }, []);
+    // 异步加载数据，避免阻塞渲染
+    const loadData = async () => {
+      try {
+        await loadSavedData();
+      } catch (error) {
+        console.error("加载保存数据失败:", error);
+      }
+    };
+    
+    loadData();
+  }, [loadSavedData]);
 
-  const handleAnswer = (questionId: number, option: string) => {
-    saveAnswer(questionId.toString(), option);
-    if (questionId < questions.length) {
-      setCurrentQuestion(questionId + 1);
-    } else {
-      setShowBaseSpirits(true);
+  const handleAnswer = async (questionId: number, option: string) => {
+    try {
+      await saveAnswer(questionId.toString(), option);
+      if (questionId < questions.length) {
+        setCurrentQuestion(questionId + 1);
+      } else {
+        setShowBaseSpirits(true);
+      }
+    } catch (error) {
+      console.error("保存答案时出错:", error);
+      // 即使保存失败也继续流程，避免阻塞用户
+      if (questionId < questions.length) {
+        setCurrentQuestion(questionId + 1);
+      } else {
+        setShowBaseSpirits(true);
+      }
     }
   };
 
@@ -187,13 +206,14 @@ export default function Questions() {
   };
 
   const handleFeedbackSubmit = async () => {
-    if (feedback.trim()) {
-      saveFeedback(feedback);
-    }
-
     startGeneration();
 
     try {
+      // 异步保存反馈
+      if (feedback.trim()) {
+        await saveFeedback(feedback);
+      }
+
       updateProgress(20);
       await submitRequest();
       updateProgress(70);

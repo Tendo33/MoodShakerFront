@@ -8,6 +8,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ErrorAlert from "@/components/ErrorAlert";
 import PageTransition from "@/components/animations/PageTransition";
+import PerformanceMonitor from "@/components/PerformanceMonitor";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
@@ -63,6 +64,7 @@ export default function RootLayout({
                 </main>
                 <Footer />
                 <Toaster />
+                <PerformanceMonitor />
               </div>
             </LanguageProvider>
           </CocktailProvider>
