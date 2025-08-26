@@ -5,12 +5,12 @@ name: Release and Docker Build
 on:
   push:
     tags:
-      - "v*"  # 匹配所有以v开头的标签，如v1.0.0, v2.1.3等
+      - "v*" # 匹配所有以v开头的标签，如v1.0.0, v2.1.3等
 
 # GitHub Actions需要的权限设置
 permissions:
-  contents: write    # 允许创建Release和读取代码
-  packages: write    # 允许推送Docker镜像到GitHub包注册表
+  contents: write # 允许创建Release和读取代码
+  packages: write # 允许推送Docker镜像到GitHub包注册表
 
 jobs:
   # 第一步：创建GitHub Release
@@ -21,13 +21,13 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整的git历史，用于生成发布说明
+          fetch-depth: 0 # 获取完整的git历史，用于生成发布说明
 
       - name: 创建GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          generate_release_notes: true  # 自动生成发布说明
+          generate_release_notes: true # 自动生成发布说明
           files: |
             README.md  # 将README文件附加到Release中
         env:
@@ -48,7 +48,7 @@ jobs:
       - name: 设置Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          platforms: linux/amd64,linux/arm64  # 支持多平台构建
+          platforms: linux/amd64,linux/arm64 # 支持多平台构建
 
       - name: 登录到DockerHub
         uses: docker/login-action@v3
@@ -60,7 +60,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/moodshaker  # 使用项目名moodshaker作为镜像名
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/moodshaker # 使用项目名moodshaker作为镜像名
           tags: |
             type=semver,pattern={{version}}           # 如：1.2.3
             type=semver,pattern={{major}}.{{minor}}   # 如：1.2
@@ -75,9 +75,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64  # 构建多平台镜像
+          platforms: linux/amd64,linux/arm64 # 构建多平台镜像
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha  # 使用GitHub Actions缓存
-          cache-to: type=gha,mode=max  # 保存缓存以加速后续构建
+          cache-from: type=gha # 使用GitHub Actions缓存
+          cache-to: type=gha,mode=max # 保存缓存以加速后续构建

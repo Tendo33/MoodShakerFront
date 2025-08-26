@@ -81,7 +81,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     isLoading: isDataLoading,
     errors: dataErrors,
     updateItem,
-    reload: reloadData
+    reload: reloadData,
   } = useBatchAsyncState<{
     answers: Record<string, string>;
     feedback: string;
@@ -89,11 +89,23 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     recommendation: Cocktail | null;
     imageData: string | null;
   }>([
-    { key: 'answers', storageKey: STORAGE_KEYS.ANSWERS, defaultValue: {} },
-    { key: 'feedback', storageKey: STORAGE_KEYS.FEEDBACK, defaultValue: "" },
-    { key: 'baseSpirits', storageKey: STORAGE_KEYS.BASE_SPIRITS, defaultValue: [] },
-    { key: 'recommendation', storageKey: STORAGE_KEYS.RECOMMENDATION, defaultValue: null },
-    { key: 'imageData', storageKey: STORAGE_KEYS.IMAGE_DATA, defaultValue: null },
+    { key: "answers", storageKey: STORAGE_KEYS.ANSWERS, defaultValue: {} },
+    { key: "feedback", storageKey: STORAGE_KEYS.FEEDBACK, defaultValue: "" },
+    {
+      key: "baseSpirits",
+      storageKey: STORAGE_KEYS.BASE_SPIRITS,
+      defaultValue: [],
+    },
+    {
+      key: "recommendation",
+      storageKey: STORAGE_KEYS.RECOMMENDATION,
+      defaultValue: null,
+    },
+    {
+      key: "imageData",
+      storageKey: STORAGE_KEYS.IMAGE_DATA,
+      defaultValue: null,
+    },
   ]);
 
   // 解构批量加载的数据
@@ -113,14 +125,16 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   useEffect(() => {
     const errorKeys = Object.keys(dataErrors);
     if (errorKeys.length > 0) {
-      const errorMessages = errorKeys.map(key => `${key}: ${dataErrors[key].message}`);
+      const errorMessages = errorKeys.map(
+        (key) => `${key}: ${dataErrors[key].message}`,
+      );
       cocktailLogger.error("数据加载错误:", errorMessages);
     }
   }, [dataErrors]);
 
   // 兼容原有的 loadSavedData 方法
   const loadSavedData = useCallback(() => {
-    reloadData().catch(error => {
+    reloadData().catch((error) => {
       cocktailLogger.error("重新加载数据失败:", error);
     });
   }, [reloadData]);
@@ -131,9 +145,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         ...answers,
         [questionId]: optionId,
       };
-      
+
       try {
-        await updateItem('answers', newAnswers);
+        await updateItem("answers", newAnswers);
         cocktailLogger.debug(`答案保存成功: ${questionId} = ${optionId}`);
       } catch (error) {
         cocktailLogger.error("保存答案失败:", error);
@@ -143,34 +157,40 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     [answers, updateItem],
   );
 
-  const saveFeedback = useCallback(async (feedback: string) => {
-    try {
-      await updateItem('feedback', feedback);
-      cocktailLogger.debug("反馈保存成功:", feedback);
-    } catch (error) {
-      cocktailLogger.error("保存反馈失败:", error);
-      setError("保存反馈失败，请重试");
-    }
-  }, [updateItem]);
+  const saveFeedback = useCallback(
+    async (feedback: string) => {
+      try {
+        await updateItem("feedback", feedback);
+        cocktailLogger.debug("反馈保存成功:", feedback);
+      } catch (error) {
+        cocktailLogger.error("保存反馈失败:", error);
+        setError("保存反馈失败，请重试");
+      }
+    },
+    [updateItem],
+  );
 
-  const saveBaseSpirits = useCallback(async (spirits: string[]) => {
-    try {
-      await updateItem('baseSpirits', spirits);
-      cocktailLogger.debug("基酒选择保存成功:", spirits);
-    } catch (error) {
-      cocktailLogger.error("保存基酒选择失败:", error);
-      setError("保存基酒选择失败，请重试");
-    }
-  }, [updateItem]);
+  const saveBaseSpirits = useCallback(
+    async (spirits: string[]) => {
+      try {
+        await updateItem("baseSpirits", spirits);
+        cocktailLogger.debug("基酒选择保存成功:", spirits);
+      } catch (error) {
+        cocktailLogger.error("保存基酒选择失败:", error);
+        setError("保存基酒选择失败，请重试");
+      }
+    },
+    [updateItem],
+  );
 
   const toggleBaseSpirit = useCallback(
     async (spiritId: string, allSpiritsOptions: SpiritOption[]) => {
       const updatedSpirits = baseSpirits.includes(spiritId)
         ? baseSpirits.filter((id) => id !== spiritId)
         : [...baseSpirits, spiritId];
-      
+
       try {
-        await updateItem('baseSpirits', updatedSpirits);
+        await updateItem("baseSpirits", updatedSpirits);
         cocktailLogger.debug("基酒切换成功:", { spiritId, updatedSpirits });
       } catch (error) {
         cocktailLogger.error("切换基酒失败:", error);
@@ -200,11 +220,11 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       await asyncStorage.setItem(STORAGE_KEYS.REQUEST, request);
 
       recommendation = await requestCocktailRecommendation(request);
-      await updateItem('recommendation', recommendation);
+      await updateItem("recommendation", recommendation);
 
       const prompt = generateImagePrompt(recommendation);
       const imageDataResult = await generateCocktailImage(prompt, sessionId);
-      await updateItem('imageData', imageDataResult);
+      await updateItem("imageData", imageDataResult);
 
       setProgressPercentage(100);
       return recommendation;
@@ -249,10 +269,15 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         throw new Error("No cocktail recommendation available.");
       }
 
-      const sessionId = (await asyncStorage.getItem(STORAGE_KEYS.SESSION_ID, "")) || "";
+      const sessionId =
+        (await asyncStorage.getItem(STORAGE_KEYS.SESSION_ID, "")) || "";
       const prompt = generateImagePrompt(recommendation);
-      const imageDataResult = await generateCocktailImage(prompt, sessionId, true); // Force refresh
-      await updateItem('imageData', imageDataResult);
+      const imageDataResult = await generateCocktailImage(
+        prompt,
+        sessionId,
+        true,
+      ); // Force refresh
+      await updateItem("imageData", imageDataResult);
 
       return imageDataResult;
     } catch (err) {

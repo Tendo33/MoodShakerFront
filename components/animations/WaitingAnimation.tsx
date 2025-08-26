@@ -145,6 +145,6 @@ const WaitingAnimation = memo(function WaitingAnimation({
   );
 });
 
-WaitingAnimation.displayName = 'WaitingAnimation';
+WaitingAnimation.displayName = "WaitingAnimation";
 
 export default WaitingAnimation;

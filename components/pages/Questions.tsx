@@ -4,11 +4,7 @@ import { useState, useEffect, memo, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
-import {
-  Container,
-  Button,
-  GradientText,
-} from "@/components/ui/core";
+import { Container, Button, GradientText } from "@/components/ui/core";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
 
@@ -46,15 +42,18 @@ const Questions = memo(function Questions() {
   } = useSmartLoading();
 
   const totalSteps = 5;
-  
+
   // 使用useMemo优化进度计算
   const currentStep = useMemo(() => {
     if (showFeedbackForm) return 5;
     if (showBaseSpirits) return 4;
     return currentQuestion;
   }, [showFeedbackForm, showBaseSpirits, currentQuestion]);
-  
-  const calculatedProgress = useMemo(() => (currentStep / totalSteps) * 100, [currentStep, totalSteps]);
+
+  const calculatedProgress = useMemo(
+    () => (currentStep / totalSteps) * 100,
+    [currentStep, totalSteps],
+  );
 
   const questions = [
     {
@@ -179,28 +178,31 @@ const Questions = memo(function Questions() {
         console.error("加载保存数据失败:", error);
       }
     };
-    
+
     loadData();
   }, [loadSavedData]);
 
-  const handleAnswer = useCallback(async (questionId: number, option: string) => {
-    try {
-      await saveAnswer(questionId.toString(), option);
-      if (questionId < questions.length) {
-        setCurrentQuestion(questionId + 1);
-      } else {
-        setShowBaseSpirits(true);
+  const handleAnswer = useCallback(
+    async (questionId: number, option: string) => {
+      try {
+        await saveAnswer(questionId.toString(), option);
+        if (questionId < questions.length) {
+          setCurrentQuestion(questionId + 1);
+        } else {
+          setShowBaseSpirits(true);
+        }
+      } catch (error) {
+        console.error("保存答案时出错:", error);
+        // 即使保存失败也继续流程，避免阻塞用户
+        if (questionId < questions.length) {
+          setCurrentQuestion(questionId + 1);
+        } else {
+          setShowBaseSpirits(true);
+        }
       }
-    } catch (error) {
-      console.error("保存答案时出错:", error);
-      // 即使保存失败也继续流程，避免阻塞用户
-      if (questionId < questions.length) {
-        setCurrentQuestion(questionId + 1);
-      } else {
-        setShowBaseSpirits(true);
-      }
-    }
-  }, [saveAnswer, questions.length]);
+    },
+    [saveAnswer, questions.length],
+  );
 
   const handleBaseSpiritsDone = () => {
     setShowBaseSpirits(false);
@@ -290,12 +292,12 @@ const Questions = memo(function Questions() {
               {Math.round(calculatedProgress)}%
             </span>
           </div>
-          
+
           {/* 优化后的进度栏 - 符合项目aesthetic */}
           <div className="relative w-full bg-white/8 rounded-full h-2 overflow-hidden shadow-inner">
             {/* 背景渐变提示 */}
             <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-pink-500/10 to-amber-500/10 opacity-30" />
-            
+
             {/* 主进度条 - 美丽的渐变 */}
             <motion.div
               className="h-full bg-gradient-to-r from-amber-400 via-pink-400 to-amber-500 rounded-full shadow-lg relative overflow-hidden"
@@ -555,6 +557,6 @@ const Questions = memo(function Questions() {
   );
 });
 
-Questions.displayName = 'Questions';
+Questions.displayName = "Questions";
 
 export default Questions;

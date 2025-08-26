@@ -13,11 +13,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Button,
-  Container,
-  GradientText,
-} from "@/components/ui/core";
+import { Button, Container, GradientText } from "@/components/ui/core";
 import {
   animations,
   useDelayedAnimation,
@@ -43,7 +39,7 @@ export default function Home() {
 
   // 使用异步状态检查保存的会话 - 性能优化核心
   const { data: savedAnswers, isLoading: isCheckingSession } = useAsyncState({
-    storageKey: 'moodshaker-answers',
+    storageKey: "moodshaker-answers",
     defaultValue: {},
     immediate: true, // 立即加载但不阻塞渲染
   });

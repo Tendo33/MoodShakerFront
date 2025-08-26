@@ -82,29 +82,34 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
   }, [type, message]);
 
   // 优化进度更新函数 - 修改为接收startTime参数
-  const updateProgress = useCallback((elapsed: number, animationFrame: number, startTime: number) => {
-    const estimatedProgress = Math.min(
-      (elapsed / estimatedDuration) * 100,
-      95,
-    );
+  const updateProgress = useCallback(
+    (elapsed: number, animationFrame: number, startTime: number) => {
+      const estimatedProgress = Math.min(
+        (elapsed / estimatedDuration) * 100,
+        95,
+      );
 
-    const combinedProgress =
-      actualProgress > 0
-        ? Math.max(actualProgress, estimatedProgress * 0.7)
-        : estimatedProgress;
+      const combinedProgress =
+        actualProgress > 0
+          ? Math.max(actualProgress, estimatedProgress * 0.7)
+          : estimatedProgress;
 
-    const naturalProgress = combinedProgress + Math.sin(elapsed * 0.01) * 2;
+      const naturalProgress = combinedProgress + Math.sin(elapsed * 0.01) * 2;
 
-    setSimulatedProgress(Math.min(naturalProgress, 100));
+      setSimulatedProgress(Math.min(naturalProgress, 100));
 
-    if (combinedProgress < 100) {
-      requestAnimationFrame(() => updateProgress(Date.now() - startTime, animationFrame, startTime));
-    } else {
-      setTimeout(() => {
-        onComplete?.();
-      }, 500);
-    }
-  }, [actualProgress, estimatedDuration, onComplete]);
+      if (combinedProgress < 100) {
+        requestAnimationFrame(() =>
+          updateProgress(Date.now() - startTime, animationFrame, startTime),
+        );
+      } else {
+        setTimeout(() => {
+          onComplete?.();
+        }, 500);
+      }
+    },
+    [actualProgress, estimatedDuration, onComplete],
+  );
 
   useEffect(() => {
     if (!isShowing || !loadingConfig) return;
@@ -113,7 +118,9 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
     let animationFrame: number;
 
     const startProgressUpdate = () => {
-      animationFrame = requestAnimationFrame(() => updateProgress(Date.now() - startTime, animationFrame, startTime));
+      animationFrame = requestAnimationFrame(() =>
+        updateProgress(Date.now() - startTime, animationFrame, startTime),
+      );
     };
 
     startProgressUpdate();
@@ -123,7 +130,14 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
         cancelAnimationFrame(animationFrame);
       }
     };
-  }, [isShowing, actualProgress, estimatedDuration, onComplete, loadingConfig, updateProgress]);
+  }, [
+    isShowing,
+    actualProgress,
+    estimatedDuration,
+    onComplete,
+    loadingConfig,
+    updateProgress,
+  ]);
 
   if (!loadingConfig) return null;
 
@@ -140,7 +154,7 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
   );
 });
 
-SmartLoadingSystem.displayName = 'SmartLoadingSystem';
+SmartLoadingSystem.displayName = "SmartLoadingSystem";
 
 export default SmartLoadingSystem;
 

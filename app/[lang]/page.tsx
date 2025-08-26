@@ -5,9 +5,11 @@ import dynamic from "next/dynamic";
 // 懒加载首页组件，减少初始包大小
 // 注意：在App Router中，我们移除了ssr: false，因为Home组件已经使用"use client"
 const Home = dynamic(() => import("@/components/pages/Home"), {
-  loading: () => <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-  </div>
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  ),
 });
 
 export const metadata: Metadata = {

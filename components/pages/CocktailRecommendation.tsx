@@ -201,8 +201,6 @@ export default function CocktailRecommendation() {
     }
   };
 
-
-
   if (isLoading || isContextLoading) {
     return (
       <SmartLoadingSystem

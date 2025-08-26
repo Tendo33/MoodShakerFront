@@ -1,7 +1,7 @@
 /**
  * 异步存储管理器 - 性能优化核心模块
  * 解决localStorage同步阻塞问题，提供批量操作和缓存机制
- * 
+ *
  * 就像把"排队买票"升级为"网上订票"，让存储操作不再阻塞用户界面
  */
 
@@ -10,7 +10,7 @@ import { appLogger } from "@/utils/logger";
 // 操作类型定义
 interface StorageOperation {
   id: string;
-  type: 'get' | 'set' | 'remove' | 'clear';
+  type: "get" | "set" | "remove" | "clear";
   key?: string;
   value?: any;
   resolve: (value: any) => void;
@@ -45,7 +45,7 @@ export class AsyncStorageManager {
 
   constructor() {
     // 在浏览器环境中初始化
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       this.initializeCache();
     }
   }
@@ -57,14 +57,14 @@ export class AsyncStorageManager {
     try {
       // 预加载常用的keys到缓存中
       const commonKeys = [
-        'moodshaker-answers',
-        'moodshaker-feedback', 
-        'moodshaker-base-spirits',
-        'moodshaker-recommendation',
-        'moodshaker-language'
+        "moodshaker-answers",
+        "moodshaker-feedback",
+        "moodshaker-base-spirits",
+        "moodshaker-recommendation",
+        "moodshaker-language",
       ];
 
-      commonKeys.forEach(key => {
+      commonKeys.forEach((key) => {
         const value = localStorage.getItem(key);
         if (value !== null) {
           try {
@@ -72,24 +72,24 @@ export class AsyncStorageManager {
             this.cache.set(key, {
               data: parsed,
               timestamp: Date.now(),
-              expiry: Date.now() + this.CACHE_TTL
+              expiry: Date.now() + this.CACHE_TTL,
             });
           } catch {
             // 如果不是JSON，直接存储字符串
             this.cache.set(key, {
               data: value,
               timestamp: Date.now(),
-              expiry: Date.now() + this.CACHE_TTL
+              expiry: Date.now() + this.CACHE_TTL,
             });
           }
         }
       });
 
-      appLogger.info('AsyncStorageManager缓存初始化完成', {
-        cachedItems: this.cache.size
+      appLogger.info("AsyncStorageManager缓存初始化完成", {
+        cachedItems: this.cache.size,
       });
     } catch (error) {
-      appLogger.error('缓存初始化失败', error);
+      appLogger.error("缓存初始化失败", error);
     }
   }
 
@@ -110,16 +110,16 @@ export class AsyncStorageManager {
     return new Promise((resolve, reject) => {
       const operation: StorageOperation = {
         id: `get_${key}_${Date.now()}`,
-        type: 'get',
+        type: "get",
         key,
         resolve: (value) => {
           // 获取成功后更新缓存
           if (value !== null) {
             this.updateCache(key, value);
           }
-          resolve(value !== null ? value : defaultValue ?? null);
+          resolve(value !== null ? value : (defaultValue ?? null));
         },
-        reject
+        reject,
       };
 
       this.addToQueue(operation);
@@ -128,7 +128,7 @@ export class AsyncStorageManager {
 
   /**
    * 异步设置数据
-   * @param key 存储键名  
+   * @param key 存储键名
    * @param value 要存储的数据
    * @returns Promise<void>
    */
@@ -139,11 +139,11 @@ export class AsyncStorageManager {
     return new Promise((resolve, reject) => {
       const operation: StorageOperation = {
         id: `set_${key}_${Date.now()}`,
-        type: 'set',
+        type: "set",
         key,
         value,
         resolve,
-        reject
+        reject,
       };
 
       this.addToQueue(operation);
@@ -162,10 +162,10 @@ export class AsyncStorageManager {
     return new Promise((resolve, reject) => {
       const operation: StorageOperation = {
         id: `remove_${key}_${Date.now()}`,
-        type: 'remove',
+        type: "remove",
         key,
         resolve,
-        reject
+        reject,
       };
 
       this.addToQueue(operation);
@@ -177,19 +177,21 @@ export class AsyncStorageManager {
    * @param operations 操作列表
    * @returns Promise<结果数组>
    */
-  async batchOperations(operations: Array<{
-    type: 'get' | 'set' | 'remove';
-    key: string;
-    value?: any;
-    defaultValue?: any;
-  }>): Promise<any[]> {
-    const promises = operations.map(op => {
+  async batchOperations(
+    operations: Array<{
+      type: "get" | "set" | "remove";
+      key: string;
+      value?: any;
+      defaultValue?: any;
+    }>,
+  ): Promise<any[]> {
+    const promises = operations.map((op) => {
       switch (op.type) {
-        case 'get':
+        case "get":
           return this.getItem(op.key, op.defaultValue);
-        case 'set':
+        case "set":
           return this.setItem(op.key, op.value);
-        case 'remove':
+        case "remove":
           return this.removeItem(op.key);
         default:
           return Promise.resolve(null);
@@ -205,7 +207,7 @@ export class AsyncStorageManager {
    * @returns Promise<void>
    */
   async clearWithPrefix(prefix: string): Promise<void> {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     return new Promise((resolve, reject) => {
       try {
@@ -225,8 +227,10 @@ export class AsyncStorageManager {
           }
         }
 
-        const removePromises = keysToRemove.map(key => this.removeItem(key));
-        Promise.all(removePromises).then(() => resolve()).catch(reject);
+        const removePromises = keysToRemove.map((key) => this.removeItem(key));
+        Promise.all(removePromises)
+          .then(() => resolve())
+          .catch(reject);
       } catch (error) {
         reject(error);
       }
@@ -256,7 +260,7 @@ export class AsyncStorageManager {
     this.cache.set(key, {
       data: value,
       timestamp: Date.now(),
-      expiry: Date.now() + this.CACHE_TTL
+      expiry: Date.now() + this.CACHE_TTL,
     });
   }
 
@@ -300,7 +304,7 @@ export class AsyncStorageManager {
 
     try {
       // 使用requestIdleCallback优化性能
-      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
         await new Promise<void>((resolve) => {
           window.requestIdleCallback(() => {
             this.executeOperations(operations);
@@ -317,10 +321,10 @@ export class AsyncStorageManager {
         });
       }
     } catch (error) {
-      appLogger.error('批量操作处理失败', error);
+      appLogger.error("批量操作处理失败", error);
       // 执行失败时通知所有待处理的操作
-      operations.forEach(op => {
-        op.reject(new Error('批量操作失败'));
+      operations.forEach((op) => {
+        op.reject(new Error("批量操作失败"));
       });
     } finally {
       this.isProcessing = false;
@@ -331,21 +335,24 @@ export class AsyncStorageManager {
    * 执行实际的localStorage操作
    */
   private executeOperations(operations: StorageOperation[]): void {
-    operations.forEach(operation => {
+    operations.forEach((operation) => {
       try {
         switch (operation.type) {
-          case 'get':
+          case "get":
             const value = localStorage.getItem(operation.key!);
             const parsed = value ? JSON.parse(value) : null;
             operation.resolve(parsed);
             break;
 
-          case 'set':
-            localStorage.setItem(operation.key!, JSON.stringify(operation.value));
+          case "set":
+            localStorage.setItem(
+              operation.key!,
+              JSON.stringify(operation.value),
+            );
             operation.resolve(undefined);
             break;
 
-          case 'remove':
+          case "remove":
             localStorage.removeItem(operation.key!);
             operation.resolve(undefined);
             break;
@@ -368,7 +375,7 @@ export class AsyncStorageManager {
       cacheSize: this.cache.size,
       queueLength: this.operationQueue.length,
       isProcessing: this.isProcessing,
-      cacheHitRate: this.calculateCacheHitRate()
+      cacheHitRate: this.calculateCacheHitRate(),
     };
   }
 
@@ -397,7 +404,10 @@ export class AsyncStorageManager {
 export const asyncStorage = new AsyncStorageManager();
 
 // 便捷函数，兼容原有API
-export const getFromStorageAsync = <T>(key: string, defaultValue?: T): Promise<T | null> => {
+export const getFromStorageAsync = <T>(
+  key: string,
+  defaultValue?: T,
+): Promise<T | null> => {
   return asyncStorage.getItem(key, defaultValue);
 };
 
@@ -414,11 +424,13 @@ export const clearStorageWithPrefixAsync = (prefix: string): Promise<void> => {
 };
 
 // 批量操作便捷函数
-export const batchStorageOperations = (operations: Array<{
-  type: 'get' | 'set' | 'remove';
-  key: string;
-  value?: any;
-  defaultValue?: any;
-}>): Promise<any[]> => {
+export const batchStorageOperations = (
+  operations: Array<{
+    type: "get" | "set" | "remove";
+    key: string;
+    value?: any;
+    defaultValue?: any;
+  }>,
+): Promise<any[]> => {
   return asyncStorage.batchOperations(operations);
 };

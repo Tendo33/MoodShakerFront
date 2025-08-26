@@ -37,8 +37,13 @@ export async function getChatCompletion(
 
   try {
     // 生成缓存键 - 基于消息内容和选项
-    const cacheKey = createCacheKey('chat-completion', model, messages, options);
-    
+    const cacheKey = createCacheKey(
+      "chat-completion",
+      model,
+      messages,
+      options,
+    );
+
     const response = await optimizedFetch(
       `${OPENAI_BASE_URL}chat/completions`,
       {
@@ -58,8 +63,8 @@ export async function getChatCompletion(
         cacheKey,
         cacheTTL: 10 * 60 * 1000, // 10分钟缓存
         deduplicate: true,
-        retryCount: 2
-      }
+        retryCount: 2,
+      },
     );
 
     const endTime = Date.now();
@@ -146,22 +151,26 @@ export async function generateImage(
     }
 
     // 生成缓存键 - 图片生成通常不缓存，因为每次都要新的图片
-    const cacheKey = createCacheKey('image-generation', prompt, options);
-    
-    const response = await optimizedFetch(IMAGE_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${IMAGE_API_KEY}`,
-        Accept: "application/json",
+    const cacheKey = createCacheKey("image-generation", prompt, options);
+
+    const response = await optimizedFetch(
+      IMAGE_API_URL,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${IMAGE_API_KEY}`,
+          Accept: "application/json",
+        },
+        body: JSON.stringify(requestBody),
       },
-      body: JSON.stringify(requestBody),
-    }, {
-      cacheKey,
-      cacheTTL: 0, // 图片生成不缓存
-      deduplicate: true, // 但要去重
-      retryCount: 1
-    });
+      {
+        cacheKey,
+        cacheTTL: 0, // 图片生成不缓存
+        deduplicate: true, // 但要去重
+        retryCount: 1,
+      },
+    );
 
     const endTime = Date.now();
     const duration = endTime - startTime;

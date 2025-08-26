@@ -436,8 +436,14 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
         // Then check localStorage (only on client) - 异步获取
         if (isClient) {
-          const savedLanguage = await asyncStorage.getItem("moodshaker-language", "");
-          if (savedLanguage && (savedLanguage === "en" || savedLanguage === "cn")) {
+          const savedLanguage = await asyncStorage.getItem(
+            "moodshaker-language",
+            "",
+          );
+          if (
+            savedLanguage &&
+            (savedLanguage === "en" || savedLanguage === "cn")
+          ) {
             appLogger.debug("Using language from localStorage:", savedLanguage);
             setLanguageState(savedLanguage as Language);
             setIsLoading(false);

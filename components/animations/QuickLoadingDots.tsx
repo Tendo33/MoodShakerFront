@@ -106,7 +106,7 @@ export function InlineLoading({
   className = "",
 }: InlineLoadingProps) {
   const { t } = useLanguage();
-  
+
   // Get display text: custom text > translated > fallback
   const displayText = text || t(textKey) || t("loading.dots");
   return (

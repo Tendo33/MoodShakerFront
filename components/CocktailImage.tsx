@@ -110,6 +110,6 @@ const CocktailImage = memo(function CocktailImage({
   );
 });
 
-CocktailImage.displayName = 'CocktailImage';
+CocktailImage.displayName = "CocktailImage";
 
 export { CocktailImage };
