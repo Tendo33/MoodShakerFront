@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -12,7 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
 
-export default function Questions() {
+const Questions = memo(function Questions() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, locale, getPathWithLanguage } = useLanguage();
@@ -46,13 +46,15 @@ export default function Questions() {
   } = useSmartLoading();
 
   const totalSteps = 5;
-  const getCurrentStep = () => {
+  
+  // 使用useMemo优化进度计算
+  const currentStep = useMemo(() => {
     if (showFeedbackForm) return 5;
     if (showBaseSpirits) return 4;
     return currentQuestion;
-  };
-  const currentStep = getCurrentStep();
-  const calculatedProgress = (currentStep / totalSteps) * 100;
+  }, [showFeedbackForm, showBaseSpirits, currentQuestion]);
+  
+  const calculatedProgress = useMemo(() => (currentStep / totalSteps) * 100, [currentStep, totalSteps]);
 
   const questions = [
     {
@@ -181,7 +183,7 @@ export default function Questions() {
     loadData();
   }, [loadSavedData]);
 
-  const handleAnswer = async (questionId: number, option: string) => {
+  const handleAnswer = useCallback(async (questionId: number, option: string) => {
     try {
       await saveAnswer(questionId.toString(), option);
       if (questionId < questions.length) {
@@ -198,7 +200,7 @@ export default function Questions() {
         setShowBaseSpirits(true);
       }
     }
-  };
+  }, [saveAnswer, questions.length]);
 
   const handleBaseSpiritsDone = () => {
     setShowBaseSpirits(false);
@@ -218,15 +220,15 @@ export default function Questions() {
       await submitRequest();
       updateProgress(70);
 
+      // 模拟处理进度，最终进度达到100%时会自动触发onComplete导航
       setTimeout(() => {
         updateProgress(100);
-        setTimeout(() => {
-          router.push(getPathWithLanguage("/cocktail/recommendation"));
-        }, 500);
       }, 800);
     } catch (error) {
       console.error("提交失败:", error);
       completeGeneration();
+      // 如果出错，确保用户知道发生了什么
+      // 可以在这里添加错误提示
     }
   };
 
@@ -239,6 +241,11 @@ export default function Questions() {
     completeGeneration();
   };
 
+  // 导航到推荐页面的函数
+  const navigateToRecommendation = useCallback(() => {
+    router.push(getPathWithLanguage("/cocktail/recommendation"));
+  }, [router, getPathWithLanguage]);
+
   // 如果正在生成，显示全屏等待动画
   if (isGenerating) {
     return (
@@ -246,7 +253,7 @@ export default function Questions() {
         type="cocktail-mixing"
         message={t("questions.generating")}
         estimatedDuration={3000}
-        onComplete={() => {}}
+        onComplete={navigateToRecommendation}
       />
     );
   }
@@ -546,4 +553,8 @@ export default function Questions() {
       </Container>
     </div>
   );
-}
+});
+
+Questions.displayName = 'Questions';
+
+export default Questions;

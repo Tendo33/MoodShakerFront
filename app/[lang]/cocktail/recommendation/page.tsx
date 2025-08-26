@@ -1,8 +1,16 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import CocktailRecommendation from "@/components/pages/CocktailRecommendation";
+import dynamic from "next/dynamic";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
+
+// 懒加载推荐页面组件
+// 注意：在App Router中，我们移除了ssr: false，因为CocktailRecommendation组件已经使用"use client"
+const CocktailRecommendation = dynamic(() => import("@/components/pages/CocktailRecommendation"), {
+  loading: () => <div className="flex justify-center items-center h-screen">
+    <LoadingSpinner variant="modern" />
+  </div>
+});
 
 export default async function RecommendationPage({
   params,
@@ -17,15 +25,7 @@ export default async function RecommendationPage({
 
   return (
     <ErrorBoundary>
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center h-screen">
-            <LoadingSpinner variant="modern" />
-          </div>
-        }
-      >
-        <CocktailRecommendation />
-      </Suspense>
+      <CocktailRecommendation />
     </ErrorBoundary>
   );
 }
