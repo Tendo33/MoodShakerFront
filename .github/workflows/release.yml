@@ -42,16 +42,16 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 设置Node.js环境和pnpm
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'pnpm'  # 缓存pnpm依赖以加速构建
-          
       - name: 安装pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8  # 使用pnpm版本8
+
+      - name: 设置Node.js环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'  # 缓存pnpm依赖以加速构建
 
       - name: 设置Docker Buildx
         uses: docker/setup-buildx-action@v3
