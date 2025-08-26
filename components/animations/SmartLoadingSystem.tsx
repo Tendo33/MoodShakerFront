@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo, useCallback } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import WaitingAnimation from "./WaitingAnimation";
 
@@ -27,7 +27,7 @@ interface LoadingConfig {
   duration: number;
 }
 
-export default function SmartLoadingSystem({
+const SmartLoadingSystem = memo(function SmartLoadingSystem({
   isShowing,
   onComplete,
   message,
@@ -81,45 +81,49 @@ export default function SmartLoadingSystem({
     setLoadingConfig(configs[type] || configs["cocktail-mixing"]);
   }, [type, message]);
 
+  // 优化进度更新函数 - 修改为接收startTime参数
+  const updateProgress = useCallback((elapsed: number, animationFrame: number, startTime: number) => {
+    const estimatedProgress = Math.min(
+      (elapsed / estimatedDuration) * 100,
+      95,
+    );
+
+    const combinedProgress =
+      actualProgress > 0
+        ? Math.max(actualProgress, estimatedProgress * 0.7)
+        : estimatedProgress;
+
+    const naturalProgress = combinedProgress + Math.sin(elapsed * 0.01) * 2;
+
+    setSimulatedProgress(Math.min(naturalProgress, 100));
+
+    if (combinedProgress < 100) {
+      requestAnimationFrame(() => updateProgress(Date.now() - startTime, animationFrame, startTime));
+    } else {
+      setTimeout(() => {
+        onComplete?.();
+      }, 500);
+    }
+  }, [actualProgress, estimatedDuration, onComplete]);
+
   useEffect(() => {
     if (!isShowing || !loadingConfig) return;
 
     const startTime = Date.now();
     let animationFrame: number;
 
-    const updateProgress = () => {
-      const elapsed = Date.now() - startTime;
-      const estimatedProgress = Math.min(
-        (elapsed / estimatedDuration) * 100,
-        95,
-      );
-
-      const combinedProgress =
-        actualProgress > 0
-          ? Math.max(actualProgress, estimatedProgress * 0.7)
-          : estimatedProgress;
-
-      const naturalProgress = combinedProgress + Math.sin(elapsed * 0.01) * 2;
-
-      setSimulatedProgress(Math.min(naturalProgress, 100));
-
-      if (combinedProgress < 100) {
-        animationFrame = requestAnimationFrame(updateProgress);
-      } else {
-        setTimeout(() => {
-          onComplete?.();
-        }, 500);
-      }
+    const startProgressUpdate = () => {
+      animationFrame = requestAnimationFrame(() => updateProgress(Date.now() - startTime, animationFrame, startTime));
     };
 
-    animationFrame = requestAnimationFrame(updateProgress);
+    startProgressUpdate();
 
     return () => {
       if (animationFrame) {
         cancelAnimationFrame(animationFrame);
       }
     };
-  }, [isShowing, actualProgress, estimatedDuration, onComplete, loadingConfig]);
+  }, [isShowing, actualProgress, estimatedDuration, onComplete, loadingConfig, updateProgress]);
 
   if (!loadingConfig) return null;
 
@@ -134,7 +138,11 @@ export default function SmartLoadingSystem({
       progress={simulatedProgress}
     />
   );
-}
+});
+
+SmartLoadingSystem.displayName = 'SmartLoadingSystem';
+
+export default SmartLoadingSystem;
 
 export function useSmartLoading() {
   const [isLoading, setIsLoading] = useState(false);

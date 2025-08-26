@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { getCocktailImage } from "@/api/image";
@@ -13,7 +13,7 @@ interface CocktailImageProps {
   cocktailName?: string;
 }
 
-export default function CocktailImage({
+const CocktailImage = memo(function CocktailImage({
   cocktailId,
   imageData,
   cocktailName = "Cocktail",
@@ -88,13 +88,15 @@ export default function CocktailImage({
             alt={cocktailName || "Cocktail"}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            priority
+            priority={false} // 移除priority，只对首屏图片使用
             className="object-cover"
             onLoadingComplete={() => setIsLoading(false)}
             onError={() => {
               setError("Failed to load image");
               setImageSrc(placeholderUrl);
             }}
+            placeholder="blur" // 添加模糊占位符
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/wA=" // 1x1像素的模糊占位符
           />
         </motion.div>
       )}
@@ -106,6 +108,8 @@ export default function CocktailImage({
       )}
     </>
   );
-}
+});
+
+CocktailImage.displayName = 'CocktailImage';
 
 export { CocktailImage };

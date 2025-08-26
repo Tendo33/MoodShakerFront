@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -13,7 +13,7 @@ interface WaitingAnimationProps {
   progress?: number;
 }
 
-export default function WaitingAnimation({
+const WaitingAnimation = memo(function WaitingAnimation({
   isShowing = true,
   onComplete,
   message,
@@ -143,4 +143,8 @@ export default function WaitingAnimation({
       </motion.div>
     </div>
   );
-}
+});
+
+WaitingAnimation.displayName = 'WaitingAnimation';
+
+export default WaitingAnimation;

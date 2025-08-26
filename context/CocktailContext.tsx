@@ -15,10 +15,11 @@ import {
   type BartenderRequest,
 } from "@/api/cocktail";
 import {
-  getFromStorage,
-  saveToStorage,
-  clearStorageWithPrefix,
-} from "@/utils/localStorage";
+  asyncStorage,
+  saveToStorageAsync,
+  clearStorageWithPrefixAsync,
+} from "@/utils/asyncStorage";
+import { useBatchAsyncState } from "@/hooks/useAsyncState";
 import { generateCocktailImage, generateImagePrompt } from "@/api/image";
 import { generateSessionId } from "@/utils/generateId";
 import { cocktailLogger } from "@/utils/logger";
@@ -74,88 +75,109 @@ interface CocktailProviderProps {
 }
 
 export const CocktailProvider = ({ children }: CocktailProviderProps) => {
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [userFeedback, setUserFeedback] = useState("");
-  const [baseSpirits, setBaseSpirits] = useState<string[]>([]);
-  const [recommendation, setRecommendation] = useState<Cocktail | null>(null);
-  const [imageData, setImageData] = useState<string | null>(null);
+  // 使用批量异步状态管理 - 性能优化核心
+  const {
+    data: savedData,
+    isLoading: isDataLoading,
+    errors: dataErrors,
+    updateItem,
+    reload: reloadData
+  } = useBatchAsyncState<{
+    answers: Record<string, string>;
+    feedback: string;
+    baseSpirits: string[];
+    recommendation: Cocktail | null;
+    imageData: string | null;
+  }>([
+    { key: 'answers', storageKey: STORAGE_KEYS.ANSWERS, defaultValue: {} },
+    { key: 'feedback', storageKey: STORAGE_KEYS.FEEDBACK, defaultValue: "" },
+    { key: 'baseSpirits', storageKey: STORAGE_KEYS.BASE_SPIRITS, defaultValue: [] },
+    { key: 'recommendation', storageKey: STORAGE_KEYS.RECOMMENDATION, defaultValue: null },
+    { key: 'imageData', storageKey: STORAGE_KEYS.IMAGE_DATA, defaultValue: null },
+  ]);
+
+  // 解构批量加载的数据
+  const answers = savedData.answers || {};
+  const userFeedback = savedData.feedback || "";
+  const baseSpirits = savedData.baseSpirits || [];
+  const recommendation = savedData.recommendation || null;
+  const imageData = savedData.imageData || null;
+
+  // 其他状态
   const [isLoading, setIsLoading] = useState(false);
   const [isImageLoading, setIsImageLoadingState] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
-  const [isClient, setIsClient] = useState(false);
 
+  // 检查数据加载错误
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const loadSavedData = useCallback(() => {
-    // 只在客户端加载数据
-    if (!isClient) return;
-
-    try {
-      // 使用正确的 getFromStorage 调用方式，提供默认值
-      const savedAnswers = getFromStorage(STORAGE_KEYS.ANSWERS, {});
-      const savedFeedback = getFromStorage(STORAGE_KEYS.FEEDBACK, "");
-      const savedBaseSpirits = getFromStorage(STORAGE_KEYS.BASE_SPIRITS, []);
-      const savedRecommendation = getFromStorage(
-        STORAGE_KEYS.RECOMMENDATION,
-        null,
-      );
-      const savedImageData = getFromStorage(STORAGE_KEYS.IMAGE_DATA, null);
-
-      setAnswers(savedAnswers);
-      setUserFeedback(savedFeedback);
-      setBaseSpirits(savedBaseSpirits);
-      // getFromStorage 已经处理了 JSON 解析，无需再次解析
-      setRecommendation(savedRecommendation);
-      setImageData(savedImageData);
-    } catch (error) {
-      cocktailLogger.error("Error loading saved data:", error);
-      // 如果读取失败，设置默认值
-      setAnswers({});
-      setUserFeedback("");
-      setBaseSpirits([]);
-      setRecommendation(null);
-      setImageData(null);
+    const errorKeys = Object.keys(dataErrors);
+    if (errorKeys.length > 0) {
+      const errorMessages = errorKeys.map(key => `${key}: ${dataErrors[key].message}`);
+      cocktailLogger.error("数据加载错误:", errorMessages);
     }
-  }, [isClient]);
+  }, [dataErrors]);
+
+  // 兼容原有的 loadSavedData 方法
+  const loadSavedData = useCallback(() => {
+    reloadData().catch(error => {
+      cocktailLogger.error("重新加载数据失败:", error);
+    });
+  }, [reloadData]);
 
   const saveAnswer = useCallback(
-    (questionId: string, optionId: string) => {
-      setAnswers((prevAnswers) => ({
-        ...prevAnswers,
-        [questionId]: optionId,
-      }));
-      saveToStorage(STORAGE_KEYS.ANSWERS, {
+    async (questionId: string, optionId: string) => {
+      const newAnswers = {
         ...answers,
         [questionId]: optionId,
-      });
+      };
+      
+      try {
+        await updateItem('answers', newAnswers);
+        cocktailLogger.debug(`答案保存成功: ${questionId} = ${optionId}`);
+      } catch (error) {
+        cocktailLogger.error("保存答案失败:", error);
+        setError("保存答案失败，请重试");
+      }
     },
-    [answers],
+    [answers, updateItem],
   );
 
-  const saveFeedback = useCallback((feedback: string) => {
-    setUserFeedback(feedback);
-    saveToStorage(STORAGE_KEYS.FEEDBACK, feedback);
-  }, []);
+  const saveFeedback = useCallback(async (feedback: string) => {
+    try {
+      await updateItem('feedback', feedback);
+      cocktailLogger.debug("反馈保存成功:", feedback);
+    } catch (error) {
+      cocktailLogger.error("保存反馈失败:", error);
+      setError("保存反馈失败，请重试");
+    }
+  }, [updateItem]);
 
-  const saveBaseSpirits = useCallback((spirits: string[]) => {
-    setBaseSpirits(spirits);
-    saveToStorage(STORAGE_KEYS.BASE_SPIRITS, spirits);
-  }, []);
+  const saveBaseSpirits = useCallback(async (spirits: string[]) => {
+    try {
+      await updateItem('baseSpirits', spirits);
+      cocktailLogger.debug("基酒选择保存成功:", spirits);
+    } catch (error) {
+      cocktailLogger.error("保存基酒选择失败:", error);
+      setError("保存基酒选择失败，请重试");
+    }
+  }, [updateItem]);
 
   const toggleBaseSpirit = useCallback(
-    (spiritId: string, allSpiritsOptions: SpiritOption[]) => {
-      setBaseSpirits((prevSpirits) => {
-        const updatedSpirits = prevSpirits.includes(spiritId)
-          ? prevSpirits.filter((id) => id !== spiritId)
-          : [...prevSpirits, spiritId];
-        saveToStorage(STORAGE_KEYS.BASE_SPIRITS, updatedSpirits);
-        return updatedSpirits;
-      });
+    async (spiritId: string, allSpiritsOptions: SpiritOption[]) => {
+      const updatedSpirits = baseSpirits.includes(spiritId)
+        ? baseSpirits.filter((id) => id !== spiritId)
+        : [...baseSpirits, spiritId];
+      
+      try {
+        await updateItem('baseSpirits', updatedSpirits);
+        cocktailLogger.debug("基酒切换成功:", { spiritId, updatedSpirits });
+      } catch (error) {
+        cocktailLogger.error("切换基酒失败:", error);
+        setError("切换基酒失败，请重试");
+      }
     },
-    [],
+    [baseSpirits, updateItem],
   );
 
   const submitRequest = useCallback(async (): Promise<Cocktail> => {
@@ -167,7 +189,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
     try {
       const sessionId = generateSessionId();
-      saveToStorage(STORAGE_KEYS.SESSION_ID, sessionId);
+      await asyncStorage.setItem(STORAGE_KEYS.SESSION_ID, sessionId);
 
       const request: BartenderRequest = {
         answers,
@@ -175,19 +197,14 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         sessionId,
       };
 
-      saveToStorage(STORAGE_KEYS.REQUEST, JSON.stringify(request));
+      await asyncStorage.setItem(STORAGE_KEYS.REQUEST, request);
 
       recommendation = await requestCocktailRecommendation(request);
-      setRecommendation(recommendation);
-      saveToStorage(
-        STORAGE_KEYS.RECOMMENDATION,
-        JSON.stringify(recommendation),
-      );
+      await updateItem('recommendation', recommendation);
 
       const prompt = generateImagePrompt(recommendation);
-      const imageData = await generateCocktailImage(prompt, sessionId);
-      setImageData(imageData);
-      saveToStorage(STORAGE_KEYS.IMAGE_DATA, imageData);
+      const imageDataResult = await generateCocktailImage(prompt, sessionId);
+      await updateItem('imageData', imageDataResult);
 
       setProgressPercentage(100);
       return recommendation;
@@ -205,16 +222,19 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     [answers],
   );
 
-  const resetAll = useCallback(() => {
-    clearStorageWithPrefix("moodshaker-");
-    setAnswers({});
-    setUserFeedback("");
-    setBaseSpirits([]);
-    setRecommendation(null);
-    setImageData(null);
-    setError(null);
-    setProgressPercentage(0);
-  }, []);
+  const resetAll = useCallback(async () => {
+    try {
+      await clearStorageWithPrefixAsync("moodshaker-");
+      // 重新加载数据以确保状态同步
+      await reloadData();
+      setError(null);
+      setProgressPercentage(0);
+      cocktailLogger.debug("重置所有数据成功");
+    } catch (error) {
+      cocktailLogger.error("重置数据失败:", error);
+      setError("重置数据失败，请刷新页面重试");
+    }
+  }, [reloadData]);
 
   const setIsImageLoading = useCallback((loading: boolean) => {
     setIsImageLoadingState(loading);
@@ -229,13 +249,12 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         throw new Error("No cocktail recommendation available.");
       }
 
-      const sessionId = getFromStorage(STORAGE_KEYS.SESSION_ID, "");
+      const sessionId = (await asyncStorage.getItem(STORAGE_KEYS.SESSION_ID, "")) || "";
       const prompt = generateImagePrompt(recommendation);
-      const imageData = await generateCocktailImage(prompt, sessionId, true); // Force refresh
-      setImageData(imageData);
-      saveToStorage(STORAGE_KEYS.IMAGE_DATA, imageData);
+      const imageDataResult = await generateCocktailImage(prompt, sessionId, true); // Force refresh
+      await updateItem('imageData', imageDataResult);
 
-      return imageData;
+      return imageDataResult;
     } catch (err) {
       setError("Failed to refresh cocktail image.");
       cocktailLogger.error("Error refreshing cocktail image:", err);
@@ -245,9 +264,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     }
   }, [recommendation]);
 
-  useEffect(() => {
-    loadSavedData();
-  }, [loadSavedData]);
+  // 移除原有的useEffect，因为批量异步状态管理已经处理了数据加载
 
   const contextValue = useMemo(() => {
     return {
@@ -256,7 +273,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       baseSpirits,
       recommendation,
       imageData,
-      isLoading,
+      isLoading: isLoading || isDataLoading, // 合并加载状态
       isImageLoading,
       error,
       progressPercentage,
@@ -278,6 +295,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     recommendation,
     imageData,
     isLoading,
+    isDataLoading,
     isImageLoading,
     error,
     progressPercentage,

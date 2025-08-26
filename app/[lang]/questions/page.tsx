@@ -1,7 +1,15 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import Questions from "@/components/pages/Questions";
+import dynamic from "next/dynamic";
 import ErrorBoundary from "@/components/ErrorBoundary";
+
+// 懒加载问题页面组件
+// 注意：在App Router中，我们移除了ssr: false，因为Questions组件已经使用"use client"
+const Questions = dynamic(() => import("@/components/pages/Questions"), {
+  loading: () => <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  </div>
+});
 
 interface PageProps {
   params: {

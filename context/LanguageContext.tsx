@@ -9,6 +9,7 @@ import {
 } from "react";
 import { appLogger } from "@/utils/logger";
 import { usePathname, useRouter } from "next/navigation";
+import { asyncStorage } from "@/utils/asyncStorage";
 import type { ReactNode } from "react";
 
 // Define available languages
@@ -412,46 +413,50 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     setIsClient(true);
   }, []);
 
-  // Initialize language from URL or localStorage
+  // Initialize language from URL or localStorage - 异步优化
   useEffect(() => {
-    const initializeLanguage = () => {
+    const initializeLanguage = async () => {
       setIsLoading(true);
 
-      // First check URL path for language parameter
-      if (pathname) {
-        const pathLang = extractLanguageFromPathname(pathname);
-        if (pathLang) {
-          appLogger.debug("Language detected from URL:", pathLang);
-          setLanguageState(pathLang);
-          // Save to localStorage to maintain consistency (only on client)
-          if (isClient) {
-            localStorage.setItem("moodshaker-language", pathLang);
+      try {
+        // First check URL path for language parameter
+        if (pathname) {
+          const pathLang = extractLanguageFromPathname(pathname);
+          if (pathLang) {
+            appLogger.debug("Language detected from URL:", pathLang);
+            setLanguageState(pathLang);
+            // Save to localStorage to maintain consistency (only on client)
+            if (isClient) {
+              await asyncStorage.setItem("moodshaker-language", pathLang);
+            }
+            setIsLoading(false);
+            return;
           }
-          setIsLoading(false);
-          return;
         }
-      }
 
-      // Then check localStorage (only on client)
-      if (isClient) {
-        const savedLanguage = localStorage.getItem("moodshaker-language");
-        if (
-          savedLanguage &&
-          (savedLanguage === "en" || savedLanguage === "cn")
-        ) {
-          appLogger.debug("Using language from localStorage:", savedLanguage);
-          setLanguageState(savedLanguage as Language);
-          setIsLoading(false);
-          return;
+        // Then check localStorage (only on client) - 异步获取
+        if (isClient) {
+          const savedLanguage = await asyncStorage.getItem("moodshaker-language", "");
+          if (savedLanguage && (savedLanguage === "en" || savedLanguage === "cn")) {
+            appLogger.debug("Using language from localStorage:", savedLanguage);
+            setLanguageState(savedLanguage as Language);
+            setIsLoading(false);
+            return;
+          }
         }
-      }
 
-      // Default to Chinese
-      setLanguageState("cn");
-      if (isClient) {
-        localStorage.setItem("moodshaker-language", "cn");
+        // Default to Chinese
+        setLanguageState("cn");
+        if (isClient) {
+          await asyncStorage.setItem("moodshaker-language", "cn");
+        }
+        setIsLoading(false);
+      } catch (error) {
+        appLogger.error("Language initialization failed:", error);
+        // 降级到默认语言
+        setLanguageState("cn");
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     // Only initialize when we know we're on client or when we have pathname
@@ -493,14 +498,18 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     }
   }, [language, isLoading, extractLanguageFromPathname, getPathWithLanguage]);
 
-  // Update URL when language changes
+  // Update URL when language changes - 异步优化
   const setLanguage = useCallback(
-    (lang: Language) => {
+    async (lang: Language) => {
       setLanguageState(lang);
 
-      // Save to localStorage
+      // Save to localStorage - 异步保存
       if (isClient) {
-        localStorage.setItem("moodshaker-language", lang);
+        try {
+          await asyncStorage.setItem("moodshaker-language", lang);
+        } catch (error) {
+          appLogger.error("Failed to save language preference:", error);
+        }
       }
 
       // Update URL path if we're on the client side

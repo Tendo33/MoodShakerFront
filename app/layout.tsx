@@ -8,21 +8,31 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ErrorAlert from "@/components/ErrorAlert";
 import PageTransition from "@/components/animations/PageTransition";
+import PerformanceMonitor from "@/components/PerformanceMonitor";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
+// 优化字体加载 - 减少权重变体，启用预加载
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
   display: "swap",
-  weight: ["400", "700", "900"],
+  preload: true, // 启用预加载
+  weight: ["400", "700"], // 减少权重变体，只保留必要权重
+  style: ["normal"], // 只加载正常样式
+  adjustFontFallback: false, // 禁用字体回退调整以提升性能
+  fallback: ["serif"], // 明确指定回退字体
 });
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
   variable: "--font-source-sans",
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
+  preload: true, // 启用预加载
+  weight: ["400", "500", "600"], // 减少权重变体
+  style: ["normal"], // 只加载正常样式
+  adjustFontFallback: false, // 禁用字体回退调整
+  fallback: ["system-ui", "sans-serif"], // 明确指定回退字体
 });
 
 export const metadata: Metadata = {
@@ -63,6 +73,7 @@ export default function RootLayout({
                 </main>
                 <Footer />
                 <Toaster />
+                <PerformanceMonitor />
               </div>
             </LanguageProvider>
           </CocktailProvider>

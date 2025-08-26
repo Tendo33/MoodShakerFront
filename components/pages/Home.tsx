@@ -26,14 +26,13 @@ import {
   useInViewAnimation,
 } from "@/utils/animation-utils";
 import { useImagePreload } from "@/utils/performance-utils";
+import { useAsyncState } from "@/hooks/useAsyncState";
 
 import { cocktailImages } from "@/utils/cocktail-images";
 
 export default function Home() {
   const { t, language } = useLanguage();
-  const [hasSavedSession, setHasSavedSession] = useState(false);
   const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0);
-  const [isClient, setIsClient] = useState(false);
 
   const shouldAnimate = useDelayedAnimation(100);
 
@@ -41,6 +40,16 @@ export default function Home() {
   const [featuresRef, featuresInView] = useInViewAnimation();
   const [popularRef, popularInView] = useInViewAnimation();
   const [ctaRef, ctaInView] = useInViewAnimation();
+
+  // 使用异步状态检查保存的会话 - 性能优化核心
+  const { data: savedAnswers, isLoading: isCheckingSession } = useAsyncState({
+    storageKey: 'moodshaker-answers',
+    defaultValue: {},
+    immediate: true, // 立即加载但不阻塞渲染
+  });
+
+  // 计算是否有保存的会话
+  const hasSavedSession = savedAnswers && Object.keys(savedAnswers).length > 0;
 
   // Featured cocktails for the hero section with translations
   const featuredCocktails: Array<{
@@ -101,17 +110,6 @@ export default function Home() {
     [featuredCocktails],
   );
   useImagePreload(imageUrls);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (isClient) {
-      const answers = localStorage.getItem("moodshaker-answers");
-      setHasSavedSession(!!answers);
-    }
-  }, [isClient]);
 
   // Rotate featured cocktails
   useEffect(() => {
