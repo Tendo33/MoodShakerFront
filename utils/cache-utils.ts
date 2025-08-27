@@ -97,17 +97,17 @@ export const withCache = <T, Args extends unknown[]>(
       // 尝试从缓存获取
       const cached = cache.get(key);
       if (cached !== null) {
-        appLogger.debug(`Cache hit for key: ${key}`);
+        appLogger.debug("Cache hit");
         return cached;
       }
 
-      appLogger.debug(`Cache miss for key: ${key}`);
+      appLogger.debug("Cache miss");
       try {
         const result = await fn(...args);
         cache.set(key, result, ttl);
         return result;
       } catch (error) {
-        appLogger.error(`Function execution failed for key: ${key}`, error);
+        appLogger.error("Function execution failed");
         throw error;
       }
     };

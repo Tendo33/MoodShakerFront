@@ -28,12 +28,7 @@ export async function getChatCompletion(
   const startTime = Date.now();
   const model = OPENAI_MODEL;
 
-  openaiLogger.info(`Starting model request [${requestId}]`, {
-    model,
-    temperature: options.temperature || 0.7,
-    max_tokens: options.max_tokens || 1000,
-    messagesCount: messages.length,
-  });
+  openaiLogger.info(`Starting model request [${requestId}]`);
 
   try {
     // 生成缓存键 - 基于消息内容和选项
@@ -72,34 +67,20 @@ export async function getChatCompletion(
 
     if (!response.ok) {
       const errorText = await response.text();
-      openaiLogger.error(`Request failed [${requestId}] (${duration}ms)`, {
-        status: response.status,
-        statusText: response.statusText,
-        errorText,
-      });
+      openaiLogger.error(`Request failed [${requestId}] (${duration}ms)`);
       throw new Error(`OpenAI API error (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
 
-    openaiLogger.info(`Request successful [${requestId}] (${duration}ms)`, {
-      status: response.status,
-      model: data.model,
-      usage: data.usage,
-      finishReason: data.choices[0].finish_reason,
-    });
+    openaiLogger.info(`Request successful [${requestId}] (${duration}ms)`);
 
     return data.choices[0].message.content;
   } catch (error) {
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    openaiLogger.error(`Request exception [${requestId}] (${duration}ms)`, {
-      error:
-        error instanceof Error
-          ? { name: error.name, message: error.message }
-          : String(error),
-    });
+    openaiLogger.error(`Request exception [${requestId}] (${duration}ms)`);
 
     throw error;
   }
@@ -120,13 +101,7 @@ export async function generateImage(
   const requestId = generateImageId();
   const startTime = Date.now();
 
-  openaiLogger.info(`Starting image generation [${requestId}]`, {
-    promptLength: prompt.length,
-    imageSize: options.image_size || "1024x1024",
-    hasSeed: !!options.seed,
-    hasNegativePrompt: !!options.negative_prompt,
-    hasImage: !!options.image,
-  });
+  openaiLogger.info(`Starting image generation [${requestId}]`);
 
   try {
     if (!IMAGE_API_KEY) {
@@ -178,12 +153,7 @@ export async function generateImage(
     if (!response.ok) {
       const responseText = await response.text();
       openaiLogger.error(
-        `Image generation failed [${requestId}] (${duration}ms)`,
-        {
-          status: response.status,
-          statusText: response.statusText,
-          responseText,
-        },
+        `Image generation failed [${requestId}] (${duration}ms)`
       );
       throw new Error(
         `Image generation API error (${response.status}): ${responseText}`,
@@ -196,26 +166,18 @@ export async function generateImage(
       const responseText = await response.text();
       data = JSON.parse(responseText);
     } catch (e) {
-      openaiLogger.error(`Failed to parse response JSON [${requestId}]`, {
-        error: e instanceof Error ? e.message : String(e),
-      });
+      openaiLogger.error(`Failed to parse response JSON [${requestId}]`);
       throw new Error("Failed to parse response as JSON");
     }
 
     openaiLogger.info(
-      `Image generation successful [${requestId}] (${duration}ms)`,
-      {
-        status: response.status,
-        hasImages: !!data.images,
-        imagesCount: data.images?.length || 0,
-      },
+      `Image generation successful [${requestId}] (${duration}ms)`
     );
 
     // Check response format
     if (!data.images || !data.images[0] || !data.images[0].url) {
       openaiLogger.error(
-        `Invalid response format from image API [${requestId}]`,
-        data,
+        `Invalid response format from image API [${requestId}]`
       );
       throw new Error("Invalid response format from image API");
     }
@@ -226,13 +188,7 @@ export async function generateImage(
     const duration = endTime - startTime;
 
     openaiLogger.error(
-      `Image generation exception [${requestId}] (${duration}ms)`,
-      {
-        error:
-          error instanceof Error
-            ? { name: error.name, message: error.message }
-            : String(error),
-      },
+      `Image generation exception [${requestId}] (${duration}ms)`
     );
 
     throw error;

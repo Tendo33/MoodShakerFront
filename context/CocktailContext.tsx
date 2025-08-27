@@ -131,14 +131,14 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       const errorMessages = errorKeys.map(
         (key) => `${key}: ${dataErrors[key].message}`,
       );
-      cocktailLogger.error("数据加载错误:", errorMessages);
+      cocktailLogger.error("Data loading error");
     }
   }, [dataErrors]);
 
   // 兼容原有的 loadSavedData 方法
   const loadSavedData = useCallback(() => {
     reloadData().catch((error) => {
-      cocktailLogger.error("重新加载数据失败:", error);
+      cocktailLogger.error("Failed to reload data");
     });
   }, [reloadData]);
 
@@ -151,9 +151,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
       try {
         await updateItem("answers", newAnswers);
-        cocktailLogger.debug(`答案保存成功: ${questionId} = ${optionId}`);
+        cocktailLogger.debug("User answer saved successfully");
       } catch (error) {
-        cocktailLogger.error("保存答案失败:", error);
+        cocktailLogger.error("Failed to save answer");
         setError(t("error.saveAnswers"));
       }
     },
@@ -164,9 +164,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     async (feedback: string) => {
       try {
         await updateItem("feedback", feedback);
-        cocktailLogger.debug("反馈保存成功:", feedback);
+        cocktailLogger.debug("User feedback saved successfully");
       } catch (error) {
-        cocktailLogger.error("保存反馈失败:", error);
+        cocktailLogger.error("Failed to save feedback");
         setError(t("error.saveFeedback"));
       }
     },
@@ -177,9 +177,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     async (spirits: string[]) => {
       try {
         await updateItem("baseSpirits", spirits);
-        cocktailLogger.debug("基酒选择保存成功:", spirits);
+        cocktailLogger.debug("Base spirits saved successfully");
       } catch (error) {
-        cocktailLogger.error("保存基酒选择失败:", error);
+        cocktailLogger.error("Failed to save base spirits");
         setError(t("error.saveBaseSpirits"));
       }
     },
@@ -194,9 +194,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
       try {
         await updateItem("baseSpirits", updatedSpirits);
-        cocktailLogger.debug("基酒切换成功:", { spiritId, updatedSpirits });
+        cocktailLogger.debug("Base spirit toggled successfully");
       } catch (error) {
-        cocktailLogger.error("切换基酒失败:", error);
+        cocktailLogger.error("Failed to toggle base spirit");
         setError(t("error.toggleBaseSpirit"));
       }
     },
@@ -252,9 +252,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       await reloadData();
       setError(null);
       setProgressPercentage(0);
-      cocktailLogger.debug("重置所有数据成功");
+      cocktailLogger.debug("All data reset successfully");
     } catch (error) {
-      cocktailLogger.error("重置数据失败:", error);
+      cocktailLogger.error("Failed to reset data");
       setError(t("error.resetData"));
     }
   }, [reloadData, t]);

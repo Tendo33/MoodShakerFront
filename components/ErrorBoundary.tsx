@@ -1,7 +1,7 @@
 "use client";
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { appLogger } from "@/utils/logger";
+import { appLogger, safeLogger } from "@/utils/logger";
 import { gradientStyles } from "@/utils/style-constants";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -70,11 +70,16 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // You can log the error to an error reporting service
-    appLogger.error("Error caught by ErrorBoundary", {
-      error,
-      componentStack: errorInfo.componentStack,
-    });
+    // 使用安全日志记录器，不暴露敏感信息
+    safeLogger.appError("ErrorBoundary");
+    
+    // 详细错误信息仅在开发环境记录
+    if (process.env.NODE_ENV === 'development') {
+      appLogger.error("Error caught by ErrorBoundary", {
+        error,
+        componentStack: errorInfo.componentStack,
+      });
+    }
   }
 
   render(): ReactNode {

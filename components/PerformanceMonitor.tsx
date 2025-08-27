@@ -7,7 +7,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { asyncStorage } from "@/utils/asyncStorage";
-import { appLogger } from "@/utils/logger";
+import { appLogger, safeLogger } from "@/utils/logger";
 import { cacheMetrics } from "@/utils/cache-utils";
 
 interface PerformanceMetrics {
@@ -80,13 +80,7 @@ export default function PerformanceMonitor() {
     setMetrics(newMetrics);
     setOptimizationSuggestions(generateOptimizationSuggestions(newMetrics));
 
-    appLogger.debug("性能指标更新", {
-      pageLoadTime: `${pageLoadTime.toFixed(2)}ms`,
-      storageOperations: storageStats.queueLength,
-      cacheHitRate: `${(cacheMetrics.getHitRate() * 100).toFixed(1)}%`,
-      apiCallCount: apiData.count,
-      averageApiTime: `${apiData.average.toFixed(2)}ms`,
-    });
+    appLogger.debug("Performance metrics updated");
   }, []);
 
   useEffect(() => {
@@ -310,9 +304,7 @@ export function usePerformanceTimer(componentName: string) {
       const duration = endTime - startTime.current;
 
       if (process.env.NODE_ENV === "development" && duration > 16) {
-        appLogger.warn(
-          `${componentName} 渲染时间过长: ${duration.toFixed(2)}ms`,
-        );
+        safeLogger.performanceMetric("component render", duration);
       }
     };
   });
@@ -321,7 +313,7 @@ export function usePerformanceTimer(componentName: string) {
     markTime: (label: string) => {
       const currentTime = performance.now();
       const elapsed = currentTime - startTime.current;
-      appLogger.debug(`${componentName} - ${label}: ${elapsed.toFixed(2)}ms`);
+      safeLogger.performanceMetric(label, elapsed);
     },
   };
 }

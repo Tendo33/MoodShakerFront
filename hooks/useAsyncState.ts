@@ -94,7 +94,7 @@ export function useAsyncState<T>(
         onSuccess(result);
       }
 
-      appLogger.debug(`Async state loaded successfully: ${storageKey}`, result);
+      appLogger.debug("Async state loaded successfully");
     } catch (err) {
       if (!mountedRef.current) return;
 
@@ -107,7 +107,7 @@ export function useAsyncState<T>(
         onError(error);
       }
 
-      appLogger.error(`Async state loading failed: ${storageKey}`, error);
+      appLogger.error("Async state loading failed");
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
@@ -128,7 +128,7 @@ export function useAsyncState<T>(
         // 异步保存到存储
         await asyncStorage.setItem(storageKey, newData);
 
-        appLogger.debug(`Async state updated successfully: ${storageKey}`, newData);
+        appLogger.debug("Async state updated successfully");
       } catch (err) {
         const error = err instanceof Error ? err : new Error("Data save failed");
         setError(error);
@@ -136,7 +136,7 @@ export function useAsyncState<T>(
         // 保存失败时回滚数据
         await loadData();
 
-        appLogger.error(`Async state update failed: ${storageKey}`, error);
+        appLogger.error("Async state update failed");
         throw error;
       }
     },
@@ -243,7 +243,7 @@ export function useBatchAsyncState<T extends Record<string, any>>(
       setData(newData);
       setPhase("success");
 
-      appLogger.debug("Batch async state loaded successfully", newData);
+      appLogger.debug("Batch async state loaded successfully");
     } catch (err) {
       if (!mountedRef.current) return;
 
@@ -277,7 +277,7 @@ export function useBatchAsyncState<T extends Record<string, any>>(
         // 异步保存
         await asyncStorage.setItem(config.storageKey, value);
 
-        appLogger.debug(`Batch state item updated successfully: ${String(key)}`, value);
+        appLogger.debug("Batch state item updated successfully");
       } catch (err) {
         const error = err instanceof Error ? err : new Error("Data save failed");
         setErrors((prev) => ({ ...prev, [String(key)]: error }));
@@ -285,7 +285,7 @@ export function useBatchAsyncState<T extends Record<string, any>>(
         // 回滚数据
         await loadBatchData();
 
-        appLogger.error(`Batch state item update failed: ${String(key)}`, error);
+        appLogger.error("Batch state item update failed");
         throw error;
       }
     },
@@ -329,7 +329,7 @@ export function usePreloadStorage(keys: string[]): void {
         }));
 
         await asyncStorage.batchOperations(operations);
-        appLogger.debug("Storage preloading completed", keys);
+        appLogger.debug("Storage preloading completed");
       } catch (error) {
         appLogger.warn("Storage preloading failed", error);
       }

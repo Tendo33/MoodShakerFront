@@ -22,7 +22,7 @@ export function getFromStorage<T>(key: string, defaultValue?: T): T | any {
 
     return JSON.parse(item);
   } catch (error) {
-    appLogger.error(`Error reading ${key} from localStorage`, error);
+    appLogger.error("localStorage read error");
     return defaultValue;
   }
 }
@@ -38,7 +38,7 @@ export function saveToStorage<T>(key: string, value: T): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    appLogger.error(`Error saving ${key} to localStorage`, error);
+    appLogger.error("localStorage save error");
   }
 }
 
@@ -52,7 +52,7 @@ export function removeFromStorage(key: string): void {
   try {
     localStorage.removeItem(key);
   } catch (error) {
-    appLogger.error(`Error removing ${key} from localStorage`, error);
+    appLogger.error("localStorage remove error");
   }
 }
 
@@ -78,9 +78,7 @@ export function clearStorageWithPrefix(prefix: string): void {
       localStorage.removeItem(key);
     });
 
-    appLogger.info(
-      `Cleared ${keysToRemove.length} localStorage items with prefix ${prefix}`,
-    );
+    appLogger.info("localStorage items cleared");
   } catch (error) {
     appLogger.error(
       `Error clearing localStorage items with prefix ${prefix}`,

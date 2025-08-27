@@ -55,6 +55,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 应用启动日志
+  if (typeof window !== 'undefined') {
+    import('@/utils/logger').then(({ safeLogger }) => {
+      safeLogger.appStart();
+    });
+  }
   return (
     <html
       lang="zh-CN"

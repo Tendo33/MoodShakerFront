@@ -7,6 +7,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { Container, Button, GradientText } from "@/components/ui/core";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
+import { appLogger, safeLogger } from "@/utils/logger";
 
 const Questions = memo(function Questions() {
   const router = useRouter();
@@ -148,7 +149,7 @@ const Questions = memo(function Questions() {
       try {
         await loadSavedData();
       } catch (error) {
-        console.error(t("error.loadData"), error);
+        appLogger.error("Data loading failed");
       }
     };
 
@@ -157,6 +158,7 @@ const Questions = memo(function Questions() {
 
   const handleAnswer = useCallback(
     async (questionId: number, option: string) => {
+      safeLogger.userInteraction("select questionnaire option");
       try {
         await saveAnswer(questionId.toString(), option);
         if (questionId < questions.length) {
@@ -165,7 +167,7 @@ const Questions = memo(function Questions() {
           setShowBaseSpirits(true);
         }
       } catch (error) {
-        console.error(t("error.saveAnswersProgress"), error);
+        appLogger.error("Answer progress save failed");
         // 即使保存失败也继续流程，避免阻塞用户
         if (questionId < questions.length) {
           setCurrentQuestion(questionId + 1);
@@ -183,6 +185,7 @@ const Questions = memo(function Questions() {
   };
 
   const handleFeedbackSubmit = async () => {
+    safeLogger.userInteraction("submit questionnaire");
     startGeneration();
 
     try {
@@ -200,7 +203,7 @@ const Questions = memo(function Questions() {
         updateProgress(100);
       }, 800);
     } catch (error) {
-      console.error(t("error.submitFailed"), error);
+      appLogger.error("Questionnaire submission failed");
       completeGeneration();
       // 如果出错，确保用户知道发生了什么
       // 可以在这里添加错误提示

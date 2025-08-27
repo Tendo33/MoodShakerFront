@@ -85,11 +85,9 @@ export class AsyncStorageManager {
         }
       });
 
-      appLogger.info("AsyncStorageManager缓存初始化完成", {
-        cachedItems: this.cache.size,
-      });
+      appLogger.info("AsyncStorageManager cache initialization completed");
     } catch (error) {
-      appLogger.error("缓存初始化失败", error);
+      appLogger.error("Cache initialization failed");
     }
   }
 
@@ -321,7 +319,7 @@ export class AsyncStorageManager {
         });
       }
     } catch (error) {
-      appLogger.error("批量操作处理失败", error);
+      appLogger.error("Batch operation processing failed");
       // 执行失败时通知所有待处理的操作
       operations.forEach((op) => {
         op.reject(new Error("批量操作失败"));
@@ -361,7 +359,7 @@ export class AsyncStorageManager {
             operation.reject(new Error(`不支持的操作类型: ${operation.type}`));
         }
       } catch (error) {
-        appLogger.error(`localStorage操作失败: ${operation.type}`, error);
+        appLogger.error("localStorage operation failed");
         operation.reject(error as Error);
       }
     });

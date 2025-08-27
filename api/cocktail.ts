@@ -870,16 +870,11 @@ function createUserMessage(
  */
 function parseCocktailFromCompletion(completion: string): Cocktail {
   try {
-    cocktailLogger.debug("Parsing cocktail data from model response", {
-      completionLength: completion.length,
-      completionPreview: completion.substring(0, 200) + "...",
-    });
+    cocktailLogger.debug("Parsing cocktail data from model response");
 
     const jsonMatch = completion.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      cocktailLogger.error("Cannot extract JSON data from response", {
-        completionPreview: completion.substring(0, 300) + "...",
-      });
+      cocktailLogger.error("Cannot extract JSON data from response");
       throw new Error("No JSON found in completion");
     }
 
@@ -887,13 +882,7 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
     const cocktail = JSON.parse(jsonString) as Cocktail;
 
     // Log parsing result
-    cocktailLogger.info("Successfully parsed cocktail data", {
-      name: cocktail.name,
-      english_name: cocktail.english_name,
-      ingredientsCount: cocktail.ingredients?.length || 0,
-      stepsCount: cocktail.steps?.length || 0,
-      toolsCount: cocktail.tools?.length || 0,
-    });
+    cocktailLogger.info("Successfully parsed cocktail data");
 
     // Ensure all required fields exist
     return {
@@ -919,13 +908,7 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       steps: cocktail.steps || [],
     };
   } catch (error) {
-    cocktailLogger.error("Failed to parse cocktail data", {
-      error:
-        error instanceof Error
-          ? { name: error.name, message: error.message }
-          : String(error),
-      completionPreview: completion.substring(0, 300) + "...",
-    });
+    cocktailLogger.error("Failed to parse cocktail data");
 
     return {
       name: "Parsing Error Cocktail",
@@ -979,9 +962,7 @@ export async function requestCocktailRecommendation(
       },
     );
 
-    cocktailLogger.debug(`Received model response [${requestId}]`, {
-      completionLength: completion.length,
-    });
+    cocktailLogger.debug(`Received model response [${requestId}]`);
 
     const cocktail = parseCocktailFromCompletion(completion);
 
@@ -989,15 +970,7 @@ export async function requestCocktailRecommendation(
     const duration = endTime - startTime;
 
     cocktailLogger.info(
-      `Cocktail recommendation completed [${requestId}] (${duration}ms)`,
-      {
-        cocktailName: cocktail.name,
-        englishName: cocktail.english_name,
-        baseSpirit: cocktail.base_spirit,
-        ingredientsCount: cocktail.ingredients.length,
-        stepsCount: cocktail.steps.length,
-        language: currentLanguage,
-      },
+      `Cocktail recommendation completed [${requestId}] (${duration}ms)`
     );
 
     return cocktail;
@@ -1006,13 +979,7 @@ export async function requestCocktailRecommendation(
     const duration = endTime - startTime;
 
     cocktailLogger.error(
-      `Cocktail recommendation failed [${requestId}] (${duration}ms)`,
-      {
-        error:
-          error instanceof Error
-            ? { name: error.name, message: error.message }
-            : String(error),
-      },
+      `Cocktail recommendation failed [${requestId}] (${duration}ms)`
     );
 
     throw error;

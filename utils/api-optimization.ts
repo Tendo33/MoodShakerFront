@@ -54,7 +54,7 @@ export async function optimizedFetch(
   const cachedResponse = apiCache.get(key);
   if (cachedResponse) {
     cacheMetrics.recordHit();
-    appLogger.debug(`Cache hit for request: ${key}`);
+    appLogger.debug("Request cache hit");
     return cachedResponse;
   }
 
@@ -64,7 +64,7 @@ export async function optimizedFetch(
   if (deduplicate) {
     const existingRequest = pendingRequests.get(key);
     if (existingRequest) {
-      appLogger.debug(`Deduplicating request: ${key}`);
+      appLogger.debug("Request deduplication");
       return existingRequest.promise;
     }
   }
@@ -217,7 +217,7 @@ function cleanupExpiredPendingRequests(): void {
   for (const [key, request] of pendingRequests.entries()) {
     if (now - request.timestamp > maxAge) {
       pendingRequests.delete(key);
-      appLogger.debug(`Cleaned up expired pending request: ${key}`);
+      appLogger.debug("Cleaned expired pending request");
     }
   }
 }
