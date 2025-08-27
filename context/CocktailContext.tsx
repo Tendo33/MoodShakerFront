@@ -76,7 +76,7 @@ interface CocktailProviderProps {
 }
 
 export const CocktailProvider = ({ children }: CocktailProviderProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   // 使用批量异步状态管理 - 性能优化核心
   const {
@@ -222,7 +222,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
       await asyncStorage.setItem(STORAGE_KEYS.REQUEST, request);
 
-      recommendation = await requestCocktailRecommendation(request);
+      recommendation = await requestCocktailRecommendation(request, undefined, language);
       await updateItem("recommendation", recommendation);
 
       const prompt = generateImagePrompt(recommendation);
@@ -238,7 +238,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [answers, baseSpirits]);
+  }, [answers, baseSpirits, language]);
 
   const isQuestionAnswered = useCallback(
     (questionId: string) => !!answers[questionId],

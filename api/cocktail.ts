@@ -957,31 +957,13 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
 export async function requestCocktailRecommendation(
   request: BartenderRequest,
   agentType: AgentType = AgentType.CLASSIC_BARTENDER,
+  language: string = "en", // Accept language parameter directly
 ): Promise<Cocktail> {
   const requestId = generateCocktailId();
   const startTime = Date.now();
   try {
-    // Get current language - fix: use better language detection logic
-    let currentLanguage = "en"; // Default to English
-    if (typeof window !== "undefined") {
-      // Try to get from localStorage first
-      const savedLanguage = localStorage.getItem("moodshaker-language");
-      if (savedLanguage) {
-        currentLanguage = savedLanguage;
-      } else {
-        // If no saved language, try to detect from URL or browser
-        const urlPath = window.location.pathname;
-        if (urlPath.includes("/cn/")) {
-          currentLanguage = "cn";
-        } else if (urlPath.includes("/en/")) {
-          currentLanguage = "en";
-        } else {
-          // Fallback to browser language
-          const browserLang = navigator.language.toLowerCase();
-          currentLanguage = browserLang.startsWith("zh") ? "cn" : "en";
-        }
-      }
-    }
+    // Use the language parameter directly instead of detecting it
+    const currentLanguage = language || "en";
 
     const systemPrompt = createSystemPrompt(agentType, currentLanguage);
     const userMessage = createUserMessage(request, currentLanguage);
