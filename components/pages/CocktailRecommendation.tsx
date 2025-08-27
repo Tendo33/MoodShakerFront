@@ -43,9 +43,10 @@ export default function CocktailRecommendation() {
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string | null>(
-    "steps",
-  );
+  // 移动端手机section展开状态 - 默认全部展开
+  const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
+  const [isToolsExpanded, setIsToolsExpanded] = useState(true);
+  const [isStepsExpanded, setIsStepsExpanded] = useState(true);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
@@ -185,7 +186,17 @@ export default function CocktailRecommendation() {
   };
 
   const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
+    switch (section) {
+      case "ingredients":
+        setIsIngredientsExpanded(!isIngredientsExpanded);
+        break;
+      case "tools":
+        setIsToolsExpanded(!isToolsExpanded);
+        break;
+      case "steps":
+        setIsStepsExpanded(!isStepsExpanded);
+        break;
+    }
   };
 
   const handleRefreshImage = async () => {
@@ -639,13 +650,13 @@ export default function CocktailRecommendation() {
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
                   {t("recommendation.ingredients")}
                 </h3>
-                {expandedSection === "ingredients" ? (
+                {isIngredientsExpanded ? (
                   <ChevronUp className="h-5 w-5" />
                 ) : (
                   <ChevronDown className="h-5 w-5" />
                 )}
               </button>
-              {expandedSection === "ingredients" && (
+              {isIngredientsExpanded && (
                 <div className="p-5">
                   <ul className="divide-y divide-gray-700/30">
                     {cocktail?.ingredients?.map((ingredient, index) => (
@@ -687,13 +698,13 @@ export default function CocktailRecommendation() {
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
                   {t("recommendation.tools")}
                 </h3>
-                {expandedSection === "tools" ? (
+                {isToolsExpanded ? (
                   <ChevronUp className="h-5 w-5" />
                 ) : (
                   <ChevronDown className="h-5 w-5" />
                 )}
               </button>
-              {expandedSection === "tools" && (
+              {isToolsExpanded && (
                 <div className="p-5">
                   <ul className="space-y-3">
                     {cocktail?.tools?.map((tool, index) => (
@@ -722,7 +733,7 @@ export default function CocktailRecommendation() {
               )}
             </motion.div>
 
-            {/* Steps Section - Always expanded on mobile */}
+            {/* Steps Section */}
             <motion.div
               className={`border ${borderClasses} rounded-xl shadow-lg overflow-hidden ${cardClasses}`}
               variants={{
@@ -730,12 +741,21 @@ export default function CocktailRecommendation() {
                 visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
               }}
             >
-              <div className="p-5 bg-gradient-to-r from-pink-500/20 to-purple-500/20">
+              <button
+                className="w-full p-5 flex justify-between items-center bg-gradient-to-r from-pink-500/20 to-purple-500/20"
+                onClick={() => toggleSection("steps")}
+              >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
                   {t("recommendation.steps")}
                 </h3>
-              </div>
-              <div className="p-5">
+                {isStepsExpanded ? (
+                  <ChevronUp className="h-5 w-5" />
+                ) : (
+                  <ChevronDown className="h-5 w-5" />
+                )}
+              </button>
+              {isStepsExpanded && (
+                <div className="p-5">
                 <ol className="space-y-8">
                   {cocktail?.steps?.map((step) => {
                     const localizedStep = getLocalizedStepContent(step);
@@ -782,7 +802,8 @@ export default function CocktailRecommendation() {
                     );
                   })}
                 </ol>
-              </div>
+                </div>
+              )}
             </motion.div>
           </div>
 
