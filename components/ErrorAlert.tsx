@@ -6,7 +6,7 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export default function ErrorAlert() {
   const { errors, clearError } = useError();
-  const { locale } = useLanguage();
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
 
   // Get the first error message (if any)
@@ -47,7 +47,7 @@ export default function ErrorAlert() {
             </div>
             <div className="ml-3 w-0 flex-1 pt-0.5">
               <p className="text-sm font-medium text-white">
-                {locale === "en" ? "Error" : "错误"}
+                {t("common.error")}
               </p>
               <p className="mt-1 text-sm text-gray-300">{message}</p>
             </div>

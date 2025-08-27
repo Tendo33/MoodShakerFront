@@ -111,6 +111,9 @@ function createSystemPrompt(agentType: AgentType, language: string): string {
   // English prompts
   const english_classic_bartender_prompt = `You are a classic bartender specializing in traditional cocktails. Your role is to recommend the perfect classic cocktail based on the user's mood and preferences, "user requirements" is the first priority, you need to ensure the user's requirements, then recommend the perfect classic cocktail based on the user's mood and preferences.
 
+# IMPORTANT: LANGUAGE REQUIREMENT
+You MUST respond entirely in English. All content in your JSON response including names, descriptions, ingredients, steps, tools, and all other text fields MUST be written in English. Do not use any Chinese characters or other non-English text.
+
 # Input Information Processing
 User input will contain the following information:
 1. User Requirements
@@ -279,6 +282,9 @@ You must strictly follow this JSON format for your response, do not include any 
 }`;
 
   const english_creative_bartender_prompt = `You are a creative bartender who creates unique cocktail recipes based on user's mood and preferences, do not use classic cocktail recipes. "user requirements" is the first priority, you need to ensure the user's requirements, then create unique cocktail recipes based on the user's mood and preferences.
+
+# IMPORTANT: LANGUAGE REQUIREMENT
+You MUST respond entirely in English. All content in your JSON response including names, descriptions, ingredients, steps, tools, and all other text fields MUST be written in English. Do not use any Chinese characters or other non-English text.
 
 # Input Information Processing
 User input will contain the following information:
@@ -460,6 +466,9 @@ You must strictly follow this JSON format for your response, do not include any 
   // Chinese prompts (existing)
   const chinese_classic_bartender_prompt = `你是一位专注于经典鸡尾酒的调酒师,需要根据用户的心情和偏好推荐合适的经典鸡尾酒，你在提供鸡尾酒配方时，确保鸡尾酒的配方是经典的,"用户需求"是第一优先级，你要先保证用户的需求，然后根据用户的需求，推荐合适的经典鸡尾酒。
 
+# 重要：语言要求
+你必须完全用中文回复。你的JSON响应中的所有内容包括名称、描述、配料、步骤、工具和所有其他文本字段都必须用中文书写。不要使用任何英文字符或其他非中文文本（除了"english_name"字段应该用英文）。
+
 # 输入信息处理
 用户输入将包含以下信息:
 1. 用户需求
@@ -628,6 +637,9 @@ You must strictly follow this JSON format for your response, do not include any 
 }`;
 
   const chinese_creative_bartender_prompt = `你是一位创意调酒师,需要根据用户的心情和偏好创造独特的鸡尾酒配方，你在提供鸡尾酒配方时，确保生成的鸡尾酒的配方是有创意的,新颖的,不要使用经典鸡尾酒的配方，"用户需求"是第一优先级，你要先保证用户的需求，然后根据用户的需求，创造独特的鸡尾酒配方。
+
+# 重要：语言要求
+你必须完全用中文回复。你的JSON响应中的所有内容包括名称、描述、配料、步骤、工具和所有其他文本字段都必须用中文书写。不要使用任何英文字符或其他非中文文本（除了"english_name"字段应该用英文）。
 
   # 输入信息处理
   用户输入将包含以下信息:
@@ -949,11 +961,27 @@ export async function requestCocktailRecommendation(
   const requestId = generateCocktailId();
   const startTime = Date.now();
   try {
-    // Get current language
-    const currentLanguage =
-      typeof window !== "undefined"
-        ? localStorage.getItem("moodshaker-language") || "cn"
-        : "en";
+    // Get current language - fix: use better language detection logic
+    let currentLanguage = "en"; // Default to English
+    if (typeof window !== "undefined") {
+      // Try to get from localStorage first
+      const savedLanguage = localStorage.getItem("moodshaker-language");
+      if (savedLanguage) {
+        currentLanguage = savedLanguage;
+      } else {
+        // If no saved language, try to detect from URL or browser
+        const urlPath = window.location.pathname;
+        if (urlPath.includes("/cn/")) {
+          currentLanguage = "cn";
+        } else if (urlPath.includes("/en/")) {
+          currentLanguage = "en";
+        } else {
+          // Fallback to browser language
+          const browserLang = navigator.language.toLowerCase();
+          currentLanguage = browserLang.startsWith("zh") ? "cn" : "en";
+        }
+      }
+    }
 
     const systemPrompt = createSystemPrompt(agentType, currentLanguage);
     const userMessage = createUserMessage(request, currentLanguage);

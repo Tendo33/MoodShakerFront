@@ -63,8 +63,8 @@ export default function RootLayout({
     >
       <body className="dark">
         <ErrorProvider>
-          <CocktailProvider>
-            <LanguageProvider>
+          <LanguageProvider>
+            <CocktailProvider>
               <div className="min-h-screen flex flex-col bg-background text-foreground">
                 <Header />
                 <ErrorAlert />
@@ -75,8 +75,8 @@ export default function RootLayout({
                 <Toaster />
                 <PerformanceMonitor />
               </div>
-            </LanguageProvider>
-          </CocktailProvider>
+            </CocktailProvider>
+          </LanguageProvider>
         </ErrorProvider>
       </body>
     </html>

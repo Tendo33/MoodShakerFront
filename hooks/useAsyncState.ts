@@ -94,11 +94,11 @@ export function useAsyncState<T>(
         onSuccess(result);
       }
 
-      appLogger.debug(`异步状态加载成功: ${storageKey}`, result);
+      appLogger.debug(`Async state loaded successfully: ${storageKey}`, result);
     } catch (err) {
       if (!mountedRef.current) return;
 
-      const error = err instanceof Error ? err : new Error("数据加载失败");
+      const error = err instanceof Error ? err : new Error("Data loading failed");
       setError(error);
       setPhase("error");
 
@@ -107,7 +107,7 @@ export function useAsyncState<T>(
         onError(error);
       }
 
-      appLogger.error(`异步状态加载失败: ${storageKey}`, error);
+      appLogger.error(`Async state loading failed: ${storageKey}`, error);
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
@@ -128,15 +128,15 @@ export function useAsyncState<T>(
         // 异步保存到存储
         await asyncStorage.setItem(storageKey, newData);
 
-        appLogger.debug(`异步状态更新成功: ${storageKey}`, newData);
+        appLogger.debug(`Async state updated successfully: ${storageKey}`, newData);
       } catch (err) {
-        const error = err instanceof Error ? err : new Error("数据保存失败");
+        const error = err instanceof Error ? err : new Error("Data save failed");
         setError(error);
 
         // 保存失败时回滚数据
         await loadData();
 
-        appLogger.error(`异步状态更新失败: ${storageKey}`, error);
+        appLogger.error(`Async state update failed: ${storageKey}`, error);
         throw error;
       }
     },
@@ -243,15 +243,15 @@ export function useBatchAsyncState<T extends Record<string, any>>(
       setData(newData);
       setPhase("success");
 
-      appLogger.debug("批量异步状态加载成功", newData);
+      appLogger.debug("Batch async state loaded successfully", newData);
     } catch (err) {
       if (!mountedRef.current) return;
 
-      const error = err instanceof Error ? err : new Error("批量数据加载失败");
+      const error = err instanceof Error ? err : new Error("Batch data loading failed");
       setErrors({ batch: error });
       setPhase("error");
 
-      appLogger.error("批量异步状态加载失败", error);
+      appLogger.error("Batch async state loading failed", error);
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
@@ -277,15 +277,15 @@ export function useBatchAsyncState<T extends Record<string, any>>(
         // 异步保存
         await asyncStorage.setItem(config.storageKey, value);
 
-        appLogger.debug(`批量状态项更新成功: ${String(key)}`, value);
+        appLogger.debug(`Batch state item updated successfully: ${String(key)}`, value);
       } catch (err) {
-        const error = err instanceof Error ? err : new Error("数据保存失败");
+        const error = err instanceof Error ? err : new Error("Data save failed");
         setErrors((prev) => ({ ...prev, [String(key)]: error }));
 
         // 回滚数据
         await loadBatchData();
 
-        appLogger.error(`批量状态项更新失败: ${String(key)}`, error);
+        appLogger.error(`Batch state item update failed: ${String(key)}`, error);
         throw error;
       }
     },
@@ -329,9 +329,9 @@ export function usePreloadStorage(keys: string[]): void {
         }));
 
         await asyncStorage.batchOperations(operations);
-        appLogger.debug("存储预加载完成", keys);
+        appLogger.debug("Storage preloading completed", keys);
       } catch (error) {
-        appLogger.warn("存储预加载失败", error);
+        appLogger.warn("Storage preloading failed", error);
       }
     };
 

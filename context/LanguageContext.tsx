@@ -75,17 +75,26 @@ const translations: TranslationDictionary = {
     "questions.cocktail_type.title": "您想要什么类型的鸡尾酒？🍸",
     "questions.cocktail_type.classic": "经典鸡尾酒",
     "questions.cocktail_type.creative": "创意特调",
+    "questions.cocktail_type.classic.description": "经典马提尼、威士忌酸等传统鸡尾酒",
+    "questions.cocktail_type.creative.description": "创新口味和独特配方的现代鸡尾酒",
 
     "questions.alcohol_strength.title": "您希望酒精浓度如何？💪",
     "questions.alcohol_strength.light": "轻度酒精",
     "questions.alcohol_strength.medium": "中度酒精",
     "questions.alcohol_strength.strong": "高度酒精",
     "questions.alcohol_strength.surprise": "随机惊喜",
+    "questions.alcohol_strength.light.description": "酒精度较低，口感清爽",
+    "questions.alcohol_strength.medium.description": "适中的酒精浓度，平衡口感",
+    "questions.alcohol_strength.strong.description": "高酒精度，浓烈口感",
+    "questions.alcohol_strength.surprise.description": "让我们为您选择合适的浓度",
 
     "questions.skill_level.title": "您的调酒技能水平？🎯",
     "questions.skill_level.beginner": "初学者",
     "questions.skill_level.intermediate": "中级",
     "questions.skill_level.advanced": "高级",
+    "questions.skill_level.beginner.description": "简单易做，无需复杂工具",
+    "questions.skill_level.intermediate.description": "需要一些调酒技巧和基本工具",
+    "questions.skill_level.advanced.description": "复杂制作工艺，专业调酒技术",
 
     "questions.base_spirits.title": "选择您拥有的基酒",
     "questions.base_spirits.description": "请选择您家中现有的基酒（可选多个）",
@@ -140,9 +149,14 @@ const translations: TranslationDictionary = {
     "footer.quickLinks": "快速链接",
     "footer.about": "关于我们",
     "footer.privacy": "隐私政策",
-    "footer.terms": "使用条款",
+    "footer.terms": "服务条款",
     "footer.contact": "联系我们",
     "footer.madeWith": "AI生成的回答未必正确无误，请仔细核查",
+    "footer.description": "找到适合您心情的鸡尾酒，让每一次品尝都成为难忘的体验。我们的AI驱动推荐系统帮助您发现适合您口味的新风味。",
+    "footer.copyright": "版权所有",
+    "footer.rights": "保留所有权利",
+    "footer.social": "关注我们",
+    "footer.address": "上海市浦东新区张江高科技园区",
 
     // Language selector
     "language.select": "选择语言",
@@ -151,8 +165,13 @@ const translations: TranslationDictionary = {
 
     // Common
     "common.loading": "加载中...",
-    "common.error": "出错了",
+    "common.error": "错误",
     "common.tryAgain": "重试",
+    
+    // Error boundary
+    "error.boundary.title": "出现了一些问题",
+    "error.boundary.description": "很抱歉，在渲染此组件时出现了错误。",
+    "error.boundary.refresh": "刷新页面",
 
     // Recommendation page
     "recommendation.back": "返回首页",
@@ -193,6 +212,23 @@ const translations: TranslationDictionary = {
     "loading.default": "正在调制中",
     "loading.subtitle": "为您精心调配完美口感",
     "loading.dots": "加载中",
+
+    // Error messages
+    "error.saveAnswers": "保存答案失败，请重试",
+    "error.saveFeedback": "保存反馈失败，请重试",
+    "error.saveBaseSpirits": "保存基酒选择失败，请重试",
+    "error.toggleBaseSpirit": "切换基酒失败，请重试",
+    "error.resetData": "重置数据失败，请刷新页面重试",
+    "error.loadData": "加载保存数据失败",
+    "error.saveAnswersProgress": "保存答案时出错",
+    "error.submitFailed": "提交失败",
+
+    // Home page CTA
+    "home.cta.title": "准备好发现您的完美鸡尾酒了吗?",
+    "home.cta.subtitle": "立即开始，让我们为您推荐最适合您心情的饮品。",
+
+
+
   },
   en: {
     // App title
@@ -236,17 +272,26 @@ const translations: TranslationDictionary = {
     "questions.cocktail_type.title": "What type of cocktail do you want? 🍸",
     "questions.cocktail_type.classic": "Classic Cocktails",
     "questions.cocktail_type.creative": "Creative Specials",
+    "questions.cocktail_type.classic.description": "Traditional cocktails like Martini, Whiskey Sour",
+    "questions.cocktail_type.creative.description": "Modern cocktails with innovative flavors and unique recipes",
 
     "questions.alcohol_strength.title": "How strong do you want it? 💪",
     "questions.alcohol_strength.light": "Light Alcohol",
     "questions.alcohol_strength.medium": "Medium Alcohol",
     "questions.alcohol_strength.strong": "Strong Alcohol",
     "questions.alcohol_strength.surprise": "Surprise Me",
+    "questions.alcohol_strength.light.description": "Lower alcohol content, refreshing taste",
+    "questions.alcohol_strength.medium.description": "Moderate alcohol content, balanced flavor",
+    "questions.alcohol_strength.strong.description": "High alcohol content, bold flavor",
+    "questions.alcohol_strength.surprise.description": "Let us choose the perfect strength for you",
 
     "questions.skill_level.title": "What's your bartending skill level? 🎯",
     "questions.skill_level.beginner": "Beginner",
     "questions.skill_level.intermediate": "Intermediate",
     "questions.skill_level.advanced": "Advanced",
+    "questions.skill_level.beginner.description": "Easy to make, no complex tools required",
+    "questions.skill_level.intermediate.description": "Requires some bartending skills and basic tools",
+    "questions.skill_level.advanced.description": "Complex preparation, professional bartending techniques",
 
     "questions.base_spirits.title": "Select Your Available Spirits",
     "questions.base_spirits.description":
@@ -304,10 +349,15 @@ const translations: TranslationDictionary = {
     "footer.quickLinks": "Quick Links",
     "footer.about": "About Us",
     "footer.privacy": "Privacy Policy",
-    "footer.terms": "Terms of Use",
+    "footer.terms": "Terms of Service",
     "footer.contact": "Contact Us",
     "footer.madeWith":
       "AI Generated answers may not be accurate, please verify carefully",
+    "footer.description": "Find the perfect cocktail for your mood and make every tasting experience memorable. Our AI-powered recommendation system helps you discover new flavors tailored to your preferences.",
+    "footer.copyright": "Copyright",
+    "footer.rights": "All rights reserved",
+    "footer.social": "Follow Us",
+    "footer.address": "Zhangjiang Hi-Tech Park, Pudong, Shanghai",
 
     // Language selector
     "language.select": "Select Language",
@@ -318,6 +368,11 @@ const translations: TranslationDictionary = {
     "common.loading": "Loading...",
     "common.error": "Error",
     "common.tryAgain": "Try Again",
+    
+    // Error boundary
+    "error.boundary.title": "Something went wrong",
+    "error.boundary.description": "We're sorry, but there was an error rendering this component.",
+    "error.boundary.refresh": "Refresh the page",
 
     // Recommendation page
     "recommendation.back": "Back to Home",
@@ -360,6 +415,24 @@ const translations: TranslationDictionary = {
     "loading.default": "Mixing...",
     "loading.subtitle": "Crafting the perfect flavor for you",
     "loading.dots": "Loading",
+
+    // Error messages
+    "error.saveAnswers": "Failed to save answers, please try again",
+    "error.saveFeedback": "Failed to save feedback, please try again",
+    "error.saveBaseSpirits": "Failed to save spirit selection, please try again",
+    "error.toggleBaseSpirit": "Failed to toggle spirit, please try again",
+    "error.resetData": "Failed to reset data, please refresh the page and try again",
+    "error.loadData": "Failed to load saved data",
+    "error.saveAnswersProgress": "Error saving answers",
+    "error.submitFailed": "Submission failed",
+
+    // Home page CTA
+    "home.cta.title": "Ready to discover your perfect cocktail?",
+    "home.cta.subtitle": "Start now and let us recommend the perfect drink for your mood.",
+
+
+
+
   },
 };
 
@@ -451,16 +524,16 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
           }
         }
 
-        // Default to Chinese
-        setLanguageState("cn");
+        // Default to English (consistent with API)
+        setLanguageState("en");
         if (isClient) {
-          await asyncStorage.setItem("moodshaker-language", "cn");
+          await asyncStorage.setItem("moodshaker-language", "en");
         }
         setIsLoading(false);
       } catch (error) {
         appLogger.error("Language initialization failed:", error);
         // 降级到默认语言
-        setLanguageState("cn");
+        setLanguageState("en");
         setIsLoading(false);
       }
     };

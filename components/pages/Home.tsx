@@ -531,14 +531,10 @@ export default function Home() {
               as="h2"
               className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6"
             >
-              {language === "en"
-                ? "Ready to discover your perfect cocktail?"
-                : "准备好发现您的完美鸡尾酒了吗?"}
+              {t("home.cta.title")}
             </GradientText>
             <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed mb-10">
-              {language === "en"
-                ? "Start now and let us recommend the perfect drink for your mood."
-                : "立即开始，让我们为您推荐最适合您心情的饮品。"}
+              {t("home.cta.subtitle")}
             </p>
             <Button
               size="xl"

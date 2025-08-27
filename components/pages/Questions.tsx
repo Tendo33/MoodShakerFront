@@ -65,19 +65,13 @@ const Questions = memo(function Questions() {
           value: "classic",
           label: t("questions.cocktail_type.classic"),
           image: "/classic.png",
-          description:
-            locale === "cn"
-              ? "经典马提尼、威士忌酸等传统鸡尾酒"
-              : "Traditional cocktails like Martini, Whiskey Sour",
+          description: t("questions.cocktail_type.classic.description"),
         },
         {
           value: "creative",
           label: t("questions.cocktail_type.creative"),
           image: "/custom.png",
-          description:
-            locale === "cn"
-              ? "创新口味和独特配方的现代鸡尾酒"
-              : "Modern cocktails with innovative flavors and unique recipes",
+          description: t("questions.cocktail_type.creative.description"),
         },
       ],
     },
@@ -90,37 +84,25 @@ const Questions = memo(function Questions() {
           value: "light",
           label: t("questions.alcohol_strength.light"),
           image: "/alcohol_low.png",
-          description:
-            locale === "cn"
-              ? "酒精度较低，口感清爽"
-              : "Lower alcohol content, refreshing taste",
+          description: t("questions.alcohol_strength.light.description"),
         },
         {
           value: "medium",
           label: t("questions.alcohol_strength.medium"),
           image: "/alcohol_medium.png",
-          description:
-            locale === "cn"
-              ? "适中的酒精浓度，平衡口感"
-              : "Moderate alcohol content, balanced flavor",
+          description: t("questions.alcohol_strength.medium.description"),
         },
         {
           value: "strong",
           label: t("questions.alcohol_strength.strong"),
           image: "/alcohol_high.png",
-          description:
-            locale === "cn"
-              ? "高酒精度，浓烈口感"
-              : "High alcohol content, bold flavor",
+          description: t("questions.alcohol_strength.strong.description"),
         },
         {
           value: "surprise",
           label: t("questions.alcohol_strength.surprise"),
           image: "/any.png",
-          description:
-            locale === "cn"
-              ? "让我们为您选择合适的浓度"
-              : "Let us choose the perfect strength for you",
+          description: t("questions.alcohol_strength.surprise.description"),
         },
       ],
     },
@@ -133,28 +115,19 @@ const Questions = memo(function Questions() {
           value: "beginner",
           label: t("questions.skill_level.beginner"),
           image: "/skill_easy.png",
-          description:
-            locale === "cn"
-              ? "简单易做，无需复杂工具"
-              : "Easy to make, no complex tools required",
+          description: t("questions.skill_level.beginner.description"),
         },
         {
           value: "intermediate",
           label: t("questions.skill_level.intermediate"),
           image: "/skill_medium.png",
-          description:
-            locale === "cn"
-              ? "需要一些调酒技巧和基本工具"
-              : "Requires some bartending skills and basic tools",
+          description: t("questions.skill_level.intermediate.description"),
         },
         {
           value: "advanced",
           label: t("questions.skill_level.advanced"),
           image: "/skill_hard.png",
-          description:
-            locale === "cn"
-              ? "复杂制作工艺，专业调酒技术"
-              : "Complex preparation, professional bartending techniques",
+          description: t("questions.skill_level.advanced.description"),
         },
       ],
     },
@@ -175,7 +148,7 @@ const Questions = memo(function Questions() {
       try {
         await loadSavedData();
       } catch (error) {
-        console.error("加载保存数据失败:", error);
+        console.error(t("error.loadData"), error);
       }
     };
 
@@ -192,7 +165,7 @@ const Questions = memo(function Questions() {
           setShowBaseSpirits(true);
         }
       } catch (error) {
-        console.error("保存答案时出错:", error);
+        console.error(t("error.saveAnswersProgress"), error);
         // 即使保存失败也继续流程，避免阻塞用户
         if (questionId < questions.length) {
           setCurrentQuestion(questionId + 1);
@@ -227,7 +200,7 @@ const Questions = memo(function Questions() {
         updateProgress(100);
       }, 800);
     } catch (error) {
-      console.error("提交失败:", error);
+      console.error(t("error.submitFailed"), error);
       completeGeneration();
       // 如果出错，确保用户知道发生了什么
       // 可以在这里添加错误提示

@@ -45,10 +45,7 @@ export default function Footer() {
     },
     {
       icon: <MapPin className="h-5 w-5 mr-2 text-amber-500" />,
-      text:
-        language === "en"
-          ? "Zhangjiang Hi-Tech Park, Pudong, Shanghai"
-          : "上海市浦东新区张江高科技园区",
+      text: t("footer.address"),
     },
   ];
 
@@ -104,9 +101,7 @@ export default function Footer() {
               variants={itemAnimation}
               className="text-sm text-gray-400 mb-6 max-w-md mx-auto"
             >
-              {language === "en"
-                ? "Find the perfect cocktail for your mood and make every tasting experience memorable. Our AI-powered recommendation system helps you discover new flavors tailored to your preferences."
-                : "找到适合您心情的鸡尾酒，让每一次品尝都成为难忘的体验。我们的AI驱动推荐系统帮助您发现适合您口味的新风味。"}
+              {t("footer.description")}
             </motion.p>
             <motion.div
               variants={itemAnimation}

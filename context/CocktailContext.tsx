@@ -23,6 +23,7 @@ import { useBatchAsyncState } from "@/hooks/useAsyncState";
 import { generateCocktailImage, generateImagePrompt } from "@/api/image";
 import { generateSessionId } from "@/utils/generateId";
 import { cocktailLogger } from "@/utils/logger";
+import { useLanguage } from "@/context/LanguageContext";
 
 // 存储键常量
 const STORAGE_KEYS = {
@@ -75,6 +76,8 @@ interface CocktailProviderProps {
 }
 
 export const CocktailProvider = ({ children }: CocktailProviderProps) => {
+  const { t } = useLanguage();
+  
   // 使用批量异步状态管理 - 性能优化核心
   const {
     data: savedData,
@@ -151,10 +154,10 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         cocktailLogger.debug(`答案保存成功: ${questionId} = ${optionId}`);
       } catch (error) {
         cocktailLogger.error("保存答案失败:", error);
-        setError("保存答案失败，请重试");
+        setError(t("error.saveAnswers"));
       }
     },
-    [answers, updateItem],
+    [answers, updateItem, t],
   );
 
   const saveFeedback = useCallback(
@@ -164,10 +167,10 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         cocktailLogger.debug("反馈保存成功:", feedback);
       } catch (error) {
         cocktailLogger.error("保存反馈失败:", error);
-        setError("保存反馈失败，请重试");
+        setError(t("error.saveFeedback"));
       }
     },
-    [updateItem],
+    [updateItem, t],
   );
 
   const saveBaseSpirits = useCallback(
@@ -177,10 +180,10 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         cocktailLogger.debug("基酒选择保存成功:", spirits);
       } catch (error) {
         cocktailLogger.error("保存基酒选择失败:", error);
-        setError("保存基酒选择失败，请重试");
+        setError(t("error.saveBaseSpirits"));
       }
     },
-    [updateItem],
+    [updateItem, t],
   );
 
   const toggleBaseSpirit = useCallback(
@@ -194,10 +197,10 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         cocktailLogger.debug("基酒切换成功:", { spiritId, updatedSpirits });
       } catch (error) {
         cocktailLogger.error("切换基酒失败:", error);
-        setError("切换基酒失败，请重试");
+        setError(t("error.toggleBaseSpirit"));
       }
     },
-    [baseSpirits, updateItem],
+    [baseSpirits, updateItem, t],
   );
 
   const submitRequest = useCallback(async (): Promise<Cocktail> => {
@@ -252,9 +255,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       cocktailLogger.debug("重置所有数据成功");
     } catch (error) {
       cocktailLogger.error("重置数据失败:", error);
-      setError("重置数据失败，请刷新页面重试");
+      setError(t("error.resetData"));
     }
-  }, [reloadData]);
+  }, [reloadData, t]);
 
   const setIsImageLoading = useCallback((loading: boolean) => {
     setIsImageLoadingState(loading);

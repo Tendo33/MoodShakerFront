@@ -3,6 +3,7 @@
 import React, { forwardRef } from "react";
 import Link from "next/link";
 import { Loader2, ExternalLink } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?:
@@ -40,6 +41,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
+    const { t } = useLanguage();
     const baseStyles =
       "relative font-medium rounded-xl transition-all duration-300 flex items-center justify-center font-source-sans focus-ring";
 
@@ -89,7 +91,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading ? (
           <span className="flex items-center justify-center">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            <span>Loading...</span>
+            <span>{t("common.loading")}</span>
           </span>
         ) : (
           <>
