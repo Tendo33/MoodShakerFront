@@ -970,7 +970,7 @@ export async function requestCocktailRecommendation(
     const duration = endTime - startTime;
 
     cocktailLogger.info(
-      `Cocktail recommendation completed [${requestId}] (${duration}ms)`
+      `Cocktail recommendation completed [${requestId}] (${duration}ms)`,
     );
 
     return cocktail;
@@ -979,7 +979,7 @@ export async function requestCocktailRecommendation(
     const duration = endTime - startTime;
 
     cocktailLogger.error(
-      `Cocktail recommendation failed [${requestId}] (${duration}ms)`
+      `Cocktail recommendation failed [${requestId}] (${duration}ms)`,
     );
 
     throw error;

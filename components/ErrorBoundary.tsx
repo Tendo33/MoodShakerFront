@@ -8,7 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 // Error fallback component that can use hooks
 function ErrorFallback() {
   const { t } = useLanguage();
-  
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] p-6 text-center">
       <div className="w-16 h-16 mb-4 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
@@ -72,9 +72,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // 使用安全日志记录器，不暴露敏感信息
     safeLogger.appError("ErrorBoundary");
-    
+
     // 详细错误信息仅在开发环境记录
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       appLogger.error("Error caught by ErrorBoundary", {
         error,
         componentStack: errorInfo.componentStack,

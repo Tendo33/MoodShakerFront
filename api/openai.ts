@@ -153,7 +153,7 @@ export async function generateImage(
     if (!response.ok) {
       const responseText = await response.text();
       openaiLogger.error(
-        `Image generation failed [${requestId}] (${duration}ms)`
+        `Image generation failed [${requestId}] (${duration}ms)`,
       );
       throw new Error(
         `Image generation API error (${response.status}): ${responseText}`,
@@ -171,13 +171,13 @@ export async function generateImage(
     }
 
     openaiLogger.info(
-      `Image generation successful [${requestId}] (${duration}ms)`
+      `Image generation successful [${requestId}] (${duration}ms)`,
     );
 
     // Check response format
     if (!data.images || !data.images[0] || !data.images[0].url) {
       openaiLogger.error(
-        `Invalid response format from image API [${requestId}]`
+        `Invalid response format from image API [${requestId}]`,
       );
       throw new Error("Invalid response format from image API");
     }
@@ -188,7 +188,7 @@ export async function generateImage(
     const duration = endTime - startTime;
 
     openaiLogger.error(
-      `Image generation exception [${requestId}] (${duration}ms)`
+      `Image generation exception [${requestId}] (${duration}ms)`,
     );
 
     throw error;

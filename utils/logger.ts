@@ -104,17 +104,21 @@ export const appLogger = createLogger("App");
 export const safeLogger = {
   // Application lifecycle
   appStart: () => appLogger.info("Application started"),
-  appError: (component: string) => appLogger.error(`Component error: ${component}`),
-  
+  appError: (component: string) =>
+    appLogger.error(`Component error: ${component}`),
+
   // User interactions (safe level)
-  userInteraction: (action: string) => appLogger.debug(`User action: ${action}`),
+  userInteraction: (action: string) =>
+    appLogger.debug(`User action: ${action}`),
   pageNavigation: (path: string) => appLogger.debug(`Page navigation: ${path}`),
-  
+
   // System status
-  cacheOperation: (operation: string) => appLogger.debug(`Cache operation: ${operation}`),
-  networkRequest: (status: string) => appLogger.debug(`Network request: ${status}`),
-  
+  cacheOperation: (operation: string) =>
+    appLogger.debug(`Cache operation: ${operation}`),
+  networkRequest: (status: string) =>
+    appLogger.debug(`Network request: ${status}`),
+
   // Performance metrics (generic)
-  performanceMetric: (metric: string, value: number) => 
+  performanceMetric: (metric: string, value: number) =>
     appLogger.debug(`Performance metric ${metric}: ${value}ms`),
 };

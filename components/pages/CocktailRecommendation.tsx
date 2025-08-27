@@ -756,52 +756,52 @@ export default function CocktailRecommendation() {
               </button>
               {isStepsExpanded && (
                 <div className="p-5">
-                <ol className="space-y-8">
-                  {cocktail?.steps?.map((step) => {
-                    const localizedStep = getLocalizedStepContent(step);
-                    return (
-                      <motion.li
-                        key={step.step_number}
-                        className="flex gap-4"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: step.step_number * 0.1 }}
-                        onMouseEnter={() => setActiveStep(step.step_number)}
-                        onMouseLeave={() => setActiveStep(null)}
-                      >
-                        <motion.div
-                          className={commonStyles.circleIcon}
-                          animate={{
-                            scale: activeStep === step.step_number ? 1.1 : 1,
-                          }}
-                          transition={{ duration: 0.3 }}
+                  <ol className="space-y-8">
+                    {cocktail?.steps?.map((step) => {
+                      const localizedStep = getLocalizedStepContent(step);
+                      return (
+                        <motion.li
+                          key={step.step_number}
+                          className="flex gap-4"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: step.step_number * 0.1 }}
+                          onMouseEnter={() => setActiveStep(step.step_number)}
+                          onMouseLeave={() => setActiveStep(null)}
                         >
-                          {step.step_number}
-                        </motion.div>
-                        <div className="flex-1">
-                          <p
-                            className={`${textColorClass} text-base leading-relaxed`}
+                          <motion.div
+                            className={commonStyles.circleIcon}
+                            animate={{
+                              scale: activeStep === step.step_number ? 1.1 : 1,
+                            }}
+                            transition={{ duration: 0.3 }}
                           >
-                            {localizedStep.description}
-                          </p>
-                          {localizedStep.tips && (
-                            <motion.div
-                              className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 0.3 }}
+                            {step.step_number}
+                          </motion.div>
+                          <div className="flex-1">
+                            <p
+                              className={`${textColorClass} text-base leading-relaxed`}
                             >
-                              <p className="text-amber-400/70 text-xs flex items-center gap-2">
-                                <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
-                                <span>{localizedStep.tips}</span>
-                              </p>
-                            </motion.div>
-                          )}
-                        </div>
-                      </motion.li>
-                    );
-                  })}
-                </ol>
+                              {localizedStep.description}
+                            </p>
+                            {localizedStep.tips && (
+                              <motion.div
+                                className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded-lg"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                              >
+                                <p className="text-amber-400/70 text-xs flex items-center gap-2">
+                                  <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                                  <span>{localizedStep.tips}</span>
+                                </p>
+                              </motion.div>
+                            )}
+                          </div>
+                        </motion.li>
+                      );
+                    })}
+                  </ol>
                 </div>
               )}
             </motion.div>

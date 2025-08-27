@@ -98,7 +98,8 @@ export function useAsyncState<T>(
     } catch (err) {
       if (!mountedRef.current) return;
 
-      const error = err instanceof Error ? err : new Error("Data loading failed");
+      const error =
+        err instanceof Error ? err : new Error("Data loading failed");
       setError(error);
       setPhase("error");
 
@@ -130,7 +131,8 @@ export function useAsyncState<T>(
 
         appLogger.debug("Async state updated successfully");
       } catch (err) {
-        const error = err instanceof Error ? err : new Error("Data save failed");
+        const error =
+          err instanceof Error ? err : new Error("Data save failed");
         setError(error);
 
         // 保存失败时回滚数据
@@ -247,7 +249,8 @@ export function useBatchAsyncState<T extends Record<string, any>>(
     } catch (err) {
       if (!mountedRef.current) return;
 
-      const error = err instanceof Error ? err : new Error("Batch data loading failed");
+      const error =
+        err instanceof Error ? err : new Error("Batch data loading failed");
       setErrors({ batch: error });
       setPhase("error");
 
@@ -279,7 +282,8 @@ export function useBatchAsyncState<T extends Record<string, any>>(
 
         appLogger.debug("Batch state item updated successfully");
       } catch (err) {
-        const error = err instanceof Error ? err : new Error("Data save failed");
+        const error =
+          err instanceof Error ? err : new Error("Data save failed");
         setErrors((prev) => ({ ...prev, [String(key)]: error }));
 
         // 回滚数据

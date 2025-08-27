@@ -56,8 +56,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // 应用启动日志
-  if (typeof window !== 'undefined') {
-    import('@/utils/logger').then(({ safeLogger }) => {
+  if (typeof window !== "undefined") {
+    import("@/utils/logger").then(({ safeLogger }) => {
       safeLogger.appStart();
     });
   }
