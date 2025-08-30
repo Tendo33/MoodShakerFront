@@ -58,12 +58,4 @@ export function generateComponentId(componentType: string): string {
   return generateId(componentType, 7);
 }
 
-// 预定义的常用ID生成器
-export const idGenerators = {
-  request: () => generateRequestId(),
-  session: () => generateSessionId(),
-  cocktail: () => generateCocktailId(),
-  image: () => generateImageId(),
-  input: () => generateComponentId("input"),
-  password: () => generateComponentId("password"),
-};
+

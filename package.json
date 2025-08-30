@@ -20,7 +20,6 @@
     "eslint-plugin-react-hooks": "latest",
     "eslint-plugin-react-refresh": "latest",
     "framer-motion": "latest",
-    "geist": "^1.3.1",
     "globals": "latest",
     "lucide-react": "^0.454.0",
     "next": "15.2.4",

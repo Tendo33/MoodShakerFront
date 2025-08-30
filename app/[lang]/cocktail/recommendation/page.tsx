@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
+
 import dynamic from "next/dynamic";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, memo, useCallback } from "react";
+import { useState, useEffect, memo } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { getCocktailImage } from "@/api/image";

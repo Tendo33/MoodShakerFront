@@ -65,25 +65,3 @@ export const dynamicConfigs = {
   }
 };
 
-// 常用组件的动态导入
-export const LazyComponents = {
-  // 页面组件
-  Home: createDynamicImport(() => import('@/components/pages/Home'), dynamicConfigs.pages),
-  Questions: createDynamicImport(() => import('@/components/pages/Questions'), dynamicConfigs.pages),
-  CocktailRecommendation: createDynamicImport(() => import('@/components/pages/CocktailRecommendation'), dynamicConfigs.pages),
-  CocktailDetailPage: createDynamicImport(() => import('@/components/pages/CocktailDetailPage'), dynamicConfigs.pages),
-  
-  // 动画组件 - 较大，懒加载
-  SmartLoadingSystem: createDynamicImport(() => import('@/components/animations/SmartLoadingSystem'), dynamicConfigs.heavyComponents),
-  WaitingAnimation: createDynamicImport(() => import('@/components/animations/WaitingAnimation'), dynamicConfigs.heavyComponents),
-  PageTransition: createDynamicImport(() => import('@/components/animations/PageTransition'), dynamicConfigs.heavyComponents),
-  
-  // 功能组件
-  CocktailImage: createDynamicImport(() => import('@/components/CocktailImage'), dynamicConfigs.lightComponents),
-  ErrorAlert: createDynamicImport(() => import('@/components/ErrorAlert'), dynamicConfigs.lightComponents),
-  LanguageSelector: createDynamicImport(() => import('@/components/LanguageSelector'), dynamicConfigs.lightComponents),
-  
-  // 布局组件
-  Header: createDynamicImport(() => import('@/components/layout/Header'), dynamicConfigs.lightComponents),
-  Footer: createDynamicImport(() => import('@/components/layout/Footer'), dynamicConfigs.lightComponents)
-};

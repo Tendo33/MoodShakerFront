@@ -27,25 +27,7 @@ export const useDebounce = <T extends (...args: unknown[]) => unknown>(
   ) as T;
 };
 
-// 节流 Hook - 限制执行频率
-export const useThrottle = <T extends (...args: unknown[]) => unknown>(
-  callback: T,
-  delay: number,
-): T => {
-  const lastRun = useRef<number>(0);
 
-  return useCallback(
-    (...args: Parameters<T>) => {
-      const now = Date.now();
-
-      if (now - lastRun.current >= delay) {
-        callback(...args);
-        lastRun.current = now;
-      }
-    },
-    [callback, delay],
-  ) as T;
-};
 
 // 图片预加载 Hook
 export const useImagePreload = (imageSources: string[]) => {
@@ -159,9 +141,4 @@ export const usePerformanceMonitor = (componentName: string) => {
   });
 };
 
-// 内存泄漏预防
-export const useCleanup = (cleanup: () => void) => {
-  useEffect(() => {
-    return cleanup;
-  }, [cleanup]);
-};
+

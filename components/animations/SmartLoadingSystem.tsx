@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 import { useEffect, useState, memo, useCallback } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import WaitingAnimation from "./WaitingAnimation";

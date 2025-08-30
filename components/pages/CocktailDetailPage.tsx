@@ -19,7 +19,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import type { Cocktail, Ingredient, Tool, Step } from "@/api/cocktail";
 import { getCocktailById } from "@/services/cocktailService";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import CocktailImage from "@/components/CocktailImage";
+import { CocktailImage } from "@/components/CocktailImage";
 import { cocktailLogger } from "@/utils/logger";
 import { commonStyles } from "@/utils/style-constants";
 
