@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -25,7 +25,7 @@ import { cocktailLogger, imageLogger } from "@/utils/logger";
 import { commonStyles } from "@/utils/style-constants";
 import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem";
 
-export default function CocktailRecommendation() {
+const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const cocktailId = searchParams?.get("id");
@@ -185,7 +185,7 @@ export default function CocktailRecommendation() {
     window.print();
   };
 
-  const toggleSection = (section: string) => {
+  const toggleSection = useCallback((section: string) => {
     switch (section) {
       case "ingredients":
         setIsIngredientsExpanded(!isIngredientsExpanded);
@@ -197,7 +197,7 @@ export default function CocktailRecommendation() {
         setIsStepsExpanded(!isStepsExpanded);
         break;
     }
-  };
+  }, [isIngredientsExpanded, isToolsExpanded, isStepsExpanded]);
 
   const handleRefreshImage = async () => {
     if (refreshImage && cocktail) {
@@ -1012,4 +1012,8 @@ export default function CocktailRecommendation() {
       `}</style>
     </div>
   );
-}
+});
+
+CocktailRecommendation.displayName = "CocktailRecommendation";
+
+export default CocktailRecommendation;

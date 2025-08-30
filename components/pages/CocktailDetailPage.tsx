@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -27,7 +27,7 @@ interface CocktailDetailPageProps {
   id: string;
 }
 
-export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
+const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: CocktailDetailPageProps) {
   const router = useRouter();
   const { t, getPathWithLanguage, language } = useLanguage();
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
@@ -172,9 +172,9 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
     window.print();
   };
 
-  const toggleSection = (section: string) => {
+  const toggleSection = useCallback((section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
-  };
+  }, [expandedSection]);
 
   // Show loading state
   if (isLoading) {
@@ -944,4 +944,8 @@ export default function CocktailDetailPage({ id }: CocktailDetailPageProps) {
       `}</style>
     </div>
   );
-}
+});
+
+CocktailDetailPage.displayName = "CocktailDetailPage";
+
+export default CocktailDetailPage;

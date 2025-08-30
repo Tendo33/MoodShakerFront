@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
@@ -26,7 +26,7 @@ import { useAsyncState } from "@/hooks/useAsyncState";
 
 import { cocktailImages } from "@/utils/cocktail-images";
 
-export default function Home() {
+const Home = React.memo(function Home() {
   const { t, language } = useLanguage();
   const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0);
 
@@ -47,15 +47,8 @@ export default function Home() {
   // 计算是否有保存的会话
   const hasSavedSession = savedAnswers && Object.keys(savedAnswers).length > 0;
 
-  // Featured cocktails for the hero section with translations
-  const featuredCocktails: Array<{
-    id: string;
-    name: string;
-    englishName: string;
-    description: string;
-    image: string;
-    tags: string[];
-  }> = [
+  // Featured cocktails for the hero section with translations - 使用 useMemo 优化性能
+  const featuredCocktails = useMemo(() => [
     {
       id: "mojito",
       name: language === "en" ? "Mojito" : "莫吉托",
@@ -98,7 +91,7 @@ export default function Home() {
           ? ["Stylish", "Fruity", "Vodka"]
           : ["时尚", "果味", "伏特加"],
     },
-  ];
+  ], [language]); // 仅在语言变化时重新计算
 
   // 性能优化：预加载关键图片
   const imageUrls = useMemo(
@@ -551,4 +544,8 @@ export default function Home() {
       </section>
     </div>
   );
-}
+});
+
+Home.displayName = "Home";
+
+export default Home;
