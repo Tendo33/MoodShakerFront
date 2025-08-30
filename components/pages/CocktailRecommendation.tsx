@@ -55,7 +55,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const cardClasses = "bg-gray-800 text-white";
   const borderClasses = "border-gray-700";
   const gradientText =
-    "bg-gradient-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent";
+    "bg-gradient-to-r from-amber-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg";
 
   const getLocalizedContent = (
     field: string,
@@ -421,6 +421,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             {/* Cocktail info with animation */}
             <motion.div
               className="w-full lg:w-3/5 flex flex-col"
+              style={{ 
+                overflow: 'visible',  // 确保内容不被裁剪
+                minHeight: 'auto'     // 高度自适应
+              }}
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -428,6 +432,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             >
               <motion.div
                 className="text-center lg:text-left"
+                style={{ 
+                  paddingBottom: '0.5rem',  // 添加底部padding确保下沿不被裁剪
+                  lineHeight: '1.2'        // 确保行高足够
+                }}
                 variants={{
                   hidden: { opacity: 0 },
                   visible: { opacity: 1, transition: { duration: 0.5 } },
@@ -435,11 +443,24 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               >
                 <h1
                   className={`text-4xl md:text-5xl font-bold mb-2 ${gradientText} inline-block`}
+                  style={{
+                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
+                    lineHeight: '1.1',        // 适当的行高
+                    paddingBottom: '0.25rem', // 底部padding防止被裁剪
+                    minHeight: 'auto',        // 确保高度自适应
+                    overflow: 'visible'       // 确保内容不被裁剪
+                  }}
                 >
                   {getLocalizedContent("name", "english_name")}
                 </h1>
                 {cocktail?.english_name && language === "cn" && (
-                  <p className="text-gray-400 text-xl mb-4">
+                  <p 
+                    className="text-gray-300 text-xl mb-4"
+                    style={{
+                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.6)'
+                    }}
+                  >
                     {cocktail.english_name}
                   </p>
                 )}
