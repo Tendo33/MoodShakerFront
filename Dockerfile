@@ -40,7 +40,7 @@ RUN pnpm install --prod --frozen-lockfile
 # 设置环境变量
 ENV NODE_ENV=production
 ENV PORT=3000
-# 注意：NEXT_PUBLIC_* 环境变量应该在构建时通过 --build-arg 传入
+# 注意：环境变量应该在构建时通过 --build-arg 传入
 # 或者在运行时通过 docker run -e 传入
 
 # 暴露端口

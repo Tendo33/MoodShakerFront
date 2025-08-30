@@ -32,14 +32,14 @@ MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的调
 
 ```bash
 # OpenAI Configuration
-NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key_here
-NEXT_PUBLIC_OPENAI_BASE_URL=https://api.openai.com/v1
-NEXT_PUBLIC_OPENAI_MODEL=deepseek-v3-250324
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_MODEL=deepseek-v3-250324
 
 # Image Generation Configuration(siliconflow)
-NEXT_PUBLIC_IMAGE_API_URL=https://api.siliconflow.cn/v1/images/generations
-NEXT_PUBLIC_IMAGE_API_KEY=your_image_api_key_here
-NEXT_PUBLIC_IMAGE_MODEL=Kwai-Kolors/Kolors
+IMAGE_API_URL=https://api.siliconflow.cn/v1/images/generations
+IMAGE_API_KEY=your_image_api_key_here
+IMAGE_MODEL=Kwai-Kolors/Kolors
 
 # Application Configuration
 HOST_PORT=3000

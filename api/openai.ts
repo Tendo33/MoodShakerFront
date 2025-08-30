@@ -5,14 +5,14 @@ import { generateRequestId, generateImageId } from "@/utils/generateId";
 import { optimizedFetch, createCacheKey } from "@/utils/api-optimization";
 
 // Environment variables
-const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-const OPENAI_BASE_URL = process.env.NEXT_PUBLIC_OPENAI_BASE_URL;
-const OPENAI_MODEL = process.env.NEXT_PUBLIC_OPENAI_MODEL;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL;
+const OPENAI_MODEL = process.env.OPENAI_MODEL;
 
 // Image generation API
-const IMAGE_API_URL = process.env.NEXT_PUBLIC_IMAGE_API_URL;
-const IMAGE_API_KEY = process.env.NEXT_PUBLIC_IMAGE_API_KEY;
-const IMAGE_MODEL = process.env.NEXT_PUBLIC_IMAGE_MODEL || "Kwai-Kolors/Kolors";
+const IMAGE_API_URL = process.env.IMAGE_API_URL;
+const IMAGE_API_KEY = process.env.IMAGE_API_KEY;
+const IMAGE_MODEL = process.env.IMAGE_MODEL || "Kwai-Kolors/Kolors";
 
 /**
  * Send a chat completion request to the OpenAI API
