@@ -19,7 +19,7 @@ interface CocktailPageProps {
 export async function generateMetadata({
   params,
 }: CocktailPageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { id } = params;
   try {
     const cocktail = await getCocktailById(id);
     return {
@@ -55,8 +55,8 @@ export function generateStaticParams() {
   );
 }
 
-export default async function CocktailPage({ params }: CocktailPageProps) {
-  const { lang, id } = await params;
+export default function CocktailPage({ params }: CocktailPageProps) {
+  const { lang, id } = params;
 
   // Validate language parameter
   if (lang !== "en" && lang !== "cn") {

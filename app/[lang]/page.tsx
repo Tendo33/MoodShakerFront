@@ -21,13 +21,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function LangHomePage({
+export default function LangHomePage({
   params,
 }: {
   params: { lang: string };
 }) {
   // Validate language parameter
-  const { lang } = await params;
+  const { lang } = params;
   if (lang !== "en" && lang !== "cn") {
     redirect("/cn");
   }

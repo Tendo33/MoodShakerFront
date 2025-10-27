@@ -118,22 +118,44 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
 
   // Fetch cocktail data
   useEffect(() => {
+    let isCancelled = false;
+    let animationTimer: ReturnType<typeof setTimeout> | undefined;
+
     const fetchCocktail = async () => {
       setIsLoading(true);
       try {
         const data = await getCocktailById(id);
+        if (isCancelled) {
+          return;
+        }
         setCocktail(data);
 
         // Add a small delay before showing animations
-        setTimeout(() => setIsPageLoaded(true), 100);
+        animationTimer = setTimeout(() => {
+          if (!isCancelled) {
+            setIsPageLoaded(true);
+          }
+        }, 100);
       } catch (error) {
-        cocktailLogger.error("Error fetching cocktail", error);
+        if (!isCancelled) {
+          cocktailLogger.error("Error fetching cocktail", error);
+        }
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
+    setIsPageLoaded(false);
     fetchCocktail();
+
+    return () => {
+      isCancelled = true;
+      if (animationTimer) {
+        clearTimeout(animationTimer);
+      }
+    };
   }, [id]);
 
   const handleBack = () => {

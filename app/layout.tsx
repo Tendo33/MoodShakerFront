@@ -8,7 +8,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ErrorAlert from "@/components/ErrorAlert";
 import PageTransition from "@/components/animations/PageTransition";
-import PerformanceMonitor from "@/components/PerformanceMonitor";
+import DevPerformanceMonitor from "@/components/DevPerformanceMonitor";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
@@ -55,12 +55,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 应用启动日志
-  if (typeof window !== "undefined") {
-    import("@/utils/logger").then(({ safeLogger }) => {
-      safeLogger.appStart();
-    });
-  }
   return (
     <html
       lang="zh-CN"
@@ -79,7 +73,7 @@ export default function RootLayout({
                 </main>
                 <Footer />
                 <Toaster />
-                <PerformanceMonitor />
+                <DevPerformanceMonitor />
               </div>
             </CocktailProvider>
           </LanguageProvider>
