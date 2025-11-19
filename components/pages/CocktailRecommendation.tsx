@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { toPng } from "html-to-image";
 import {
   ArrowLeft,
   Clock,
@@ -15,6 +16,8 @@ import {
   ChevronUp,
   Lightbulb,
   RefreshCcw,
+  Image as ImageIcon,
+  Loader2,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCocktail } from "@/context/CocktailContext";
@@ -24,6 +27,8 @@ import { CocktailImage } from "@/components/CocktailImage";
 import { cocktailLogger, imageLogger } from "@/utils/logger";
 import { commonStyles } from "@/utils/style-constants";
 import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem";
+import { PolaroidCard } from "@/components/share/PolaroidCard";
+import { ShareModal } from "@/components/share/ShareModal";
 
 const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const router = useRouter();
@@ -50,6 +55,12 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
+  
+  // Share Card State
+  const [generatedCardUrl, setGeneratedCardUrl] = useState<string | null>(null);
+  const [isGeneratingCard, setIsGeneratingCard] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Updated design system classes
   const textColorClass = "text-foreground";
@@ -212,6 +223,31 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     }
   };
 
+  const handleGenerateCard = useCallback(async () => {
+    if (!cardRef.current) return;
+    
+    setIsGeneratingCard(true);
+    try {
+      // Add a small delay to ensure rendering
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const dataUrl = await toPng(cardRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        // Removed forced white background to respect component's dark theme
+        skipAutoScale: true,
+      });
+      
+      setGeneratedCardUrl(dataUrl);
+      setShowShareModal(true);
+    } catch (error) {
+      console.error('Failed to generate card', error);
+      // Fallback or alert
+    } finally {
+      setIsGeneratingCard(false);
+    }
+  }, []);
+
   if (isLoading || isContextLoading) {
     return (
       <SmartLoadingSystem
@@ -319,6 +355,21 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               aria-label="Print recipe"
             >
               <Printer className="h-5 w-5" />
+            </motion.button>
+
+            <motion.button
+              onClick={handleGenerateCard}
+              disabled={isGeneratingCard}
+              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label="Generate Share Card"
+            >
+              {isGeneratingCard ? (
+                 <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                 <ImageIcon className="h-5 w-5" />
+              )}
             </motion.button>
 
             <motion.button
@@ -1015,6 +1066,23 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           }
         }
       `}</style>
+
+      {/* Hidden Polaroid Card for Generation */}
+      <div style={{ position: 'fixed', top: '-9999px', left: '-9999px' }}>
+        {cocktail && (
+            <PolaroidCard 
+                ref={cardRef} 
+                cocktail={cocktail} 
+                imageUrl={imageData || cocktail.image || `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`} 
+            />
+        )}
+      </div>
+
+      <ShareModal 
+        isOpen={showShareModal} 
+        onClose={() => setShowShareModal(false)} 
+        imageUrl={generatedCardUrl} 
+      />
     </div>
   );
 });
