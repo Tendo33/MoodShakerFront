@@ -66,7 +66,7 @@ export default function LanguageSelector() {
       >
         <Globe className={`h-4 w-4 ${isOpen ? "text-primary" : ""}`} />
         <span className="hidden md:inline text-sm font-medium font-source-sans tracking-wide">
-          {language === "en" ? "English" : "中文"}
+          {t(language === "en" ? "language.en" : "language.cn")}
         </span>
         <ChevronDown
           className={`h-3 w-3 transition-transform duration-300 ${

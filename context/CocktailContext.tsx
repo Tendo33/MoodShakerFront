@@ -233,14 +233,14 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
       if (!cocktailResponse.ok) {
         const errorData = await cocktailResponse.json();
-        throw new Error(errorData.error || "生成鸡尾酒推荐失败");
+        throw new Error(errorData.error || t("error.generationFailed"));
       }
 
       const cocktailData = await cocktailResponse.json();
       recommendation = cocktailData.data;
       
       if (!recommendation) {
-        throw new Error("服务器返回了无效的鸡尾酒数据");
+        throw new Error(t("error.invalidData"));
       }
       
       await updateItem("recommendation", recommendation);

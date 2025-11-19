@@ -234,7 +234,7 @@ const Questions = memo(function Questions() {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "生成鸡尾酒推荐失败，请稍后重试";
+          : t("error.generationFailed");
 
       appLogger.error("Questionnaire submission failed", errorMessage);
       completeGeneration();

@@ -122,17 +122,6 @@ const translations: TranslationDictionary = {
     "questions.skill.description":
       "想要多花哨的调酒方式？我们为每个技能等级都准备了选项！",
 
-    // Question options
-    "questions.options.classic": "经典特调",
-    "questions.options.custom": "来点惊喜",
-    "questions.options.alcohol_low": "低酒精度",
-    "questions.options.alcohol_medium": "中酒精度",
-    "questions.options.alcohol_high": "高酒精度",
-    "questions.options.any": "我无所谓",
-    "questions.options.skill_easy": "简单混合",
-    "questions.options.skill_medium": "中等难度",
-    "questions.options.skill_hard": "调酒大师",
-
     // Base spirits
     "spirits.all": "全部🎉",
     "spirits.all.desc": "使用所有基酒",
@@ -232,6 +221,9 @@ const translations: TranslationDictionary = {
     "error.loadData": "加载保存数据失败",
     "error.saveAnswersProgress": "保存答案时出错",
     "error.submitFailed": "提交失败",
+    "error.generationFailed": "生成鸡尾酒推荐失败，请稍后重试",
+    "error.invalidData": "服务器返回了无效的鸡尾酒数据",
+    "error.parseFailed": "无法解析鸡尾酒数据",
 
     // Home page CTA
     "home.cta.title": "准备好发现您的完美鸡尾酒了吗?",
@@ -333,17 +325,6 @@ const translations: TranslationDictionary = {
     "questions.skill.title": "Mixology Level? 🎯",
     "questions.skill.description":
       "How fancy do you want to get with your cocktail making? We've got options for every skill level!",
-
-    // Question options
-    "questions.options.classic": "Choose from classics",
-    "questions.options.custom": "Surprise Me!",
-    "questions.options.low": "Just a Sip",
-    "questions.options.medium": "Balanced Buzz",
-    "questions.options.high": "Party Mode",
-    "questions.options.any": "Surprise Me!",
-    "questions.options.skill_easy": "Mix & Pour",
-    "questions.options.skill_medium": "Intermediate",
-    "questions.options.skill_hard": "Advanced",
 
     // Base spirits
     "spirits.all": "All",
@@ -450,6 +431,9 @@ const translations: TranslationDictionary = {
     "error.loadData": "Failed to load saved data",
     "error.saveAnswersProgress": "Error saving answers",
     "error.submitFailed": "Submission failed",
+    "error.generationFailed": "Failed to generate cocktail recommendation, please try again later",
+    "error.invalidData": "Server returned invalid cocktail data",
+    "error.parseFailed": "Failed to parse cocktail data",
 
     // Home page CTA
     "home.cta.title": "Ready to discover your perfect cocktail?",
