@@ -237,52 +237,32 @@ const Questions = memo(function Questions() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* Minimal sophisticated background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Subtle gradient accent */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/3 via-transparent to-pink-500/3" />
-
-        {/* Sophisticated line pattern */}
-        <div className="absolute inset-0 opacity-[0.03]">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
-              `,
-              backgroundSize: "120px 120px",
-            }}
-          />
-        </div>
-      </div>
-
-      <Container className="relative z-10 py-6 md:py-8 lg:py-10">
-        <div className="mb-8 md:mb-10">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-xs font-semibold text-gray-300 tracking-wide">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Ambient background elements are now handled globally, 
+          but we can add some local flair if needed */}
+      
+      <Container className="relative z-10 py-16 md:py-24">
+        <div className="mb-12 md:mb-16 max-w-3xl mx-auto">
+          <div className="flex justify-between items-center mb-4 px-1">
+            <span className="text-sm font-bold text-muted-foreground tracking-wider uppercase">
               {t("questions.progress")}
             </span>
-            <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20">
+            <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
               {Math.round(calculatedProgress)}%
             </span>
           </div>
 
           {/* 优化后的进度栏 - 符合项目aesthetic */}
-          <div className="relative w-full bg-white/8 rounded-full h-2 overflow-hidden shadow-inner">
-            {/* 背景渐变提示 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-pink-500/10 to-amber-500/10 opacity-30" />
-
+          <div className="relative w-full bg-white/5 rounded-full h-3 overflow-hidden shadow-inner backdrop-blur-sm border border-white/5">
             {/* 主进度条 - 美丽的渐变 */}
             <motion.div
-              className="h-full bg-gradient-to-r from-amber-400 via-pink-400 to-amber-500 rounded-full shadow-lg relative overflow-hidden"
+              className="h-full bg-gradient-to-r from-primary to-secondary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)] relative overflow-hidden"
               initial={{ width: "0%" }}
               animate={{ width: `${calculatedProgress}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
               {/* 添加闪亮效果 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" style={{ backgroundSize: "200% 100%" }} />
             </motion.div>
           </div>
         </div>
@@ -291,63 +271,69 @@ const Questions = memo(function Questions() {
           {!showBaseSpirits && !showFeedbackForm && (
             <motion.div
               key={currentQuestion}
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -30, scale: 0.95 }}
-              transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
-              className="space-y-8 md:space-y-10"
+              initial={{ opacity: 0, y: 30, scale: 0.95, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -30, scale: 0.95, filter: "blur(10px)" }}
+              transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              className="space-y-12"
             >
-              <div className="text-center space-y-6 md:space-y-8">
-                <div className="flex items-center justify-center gap-4">
-                  <div className="border border-amber-500/30 text-amber-300 bg-amber-500/8 backdrop-blur-sm px-3 py-1 text-xs font-medium tracking-wide rounded-full">
-                    {t("questions.step")} {currentStep} / {totalSteps}
-                  </div>
-                  <GradientText className="text-xl md:text-2xl font-bold leading-tight tracking-tight">
+              <div className="text-center space-y-6">
+                <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
+                  <span className="text-primary font-bold text-sm tracking-wider">
+                    STEP {currentStep} / {totalSteps}
+                  </span>
+                </div>
+                
+                <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
+                  <GradientText>
                     {questions[currentQuestion - 1]?.title}
                   </GradientText>
-                </div>
+                </h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10 max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
                 {questions[currentQuestion - 1]?.options.map(
                   (option, index) => (
                     <motion.div
                       key={option.value}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.08 }}
-                      whileHover={{ y: -8 }}
-                      whileTap={{ scale: 0.96 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      whileHover={{ y: -10, scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <div
-                        className="cursor-pointer h-full group relative overflow-hidden bg-white/5 border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:bg-white/8 hover:border-white/20"
+                        className="cursor-pointer h-full group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/30"
                         onClick={() =>
                           handleAnswer(currentQuestion, option.value)
                         }
                       >
-                        {/* Subtle hover accent */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                        {/* Card Content Container */}
+                        <div className="relative h-full rounded-2xl overflow-hidden bg-black/20 p-6 flex flex-col">
+                          {/* Subtle hover accent */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                        <div className="aspect-square relative overflow-hidden rounded-lg mb-4 bg-black/20">
-                          <img
-                            src={
-                              option.image ||
-                              "/placeholder.svg?height=200&width=300&query=cocktail"
-                            }
-                            alt={option.label}
-                            className="w-full h-full object-cover opacity-80"
-                          />
-                        </div>
+                          <div className="aspect-square relative overflow-hidden rounded-2xl mb-6 bg-black/20 shadow-inner group-hover:shadow-lg transition-shadow duration-500">
+                            <motion.img
+                              src={
+                                option.image ||
+                                "/placeholder.svg?height=400&width=400&query=cocktail"
+                              }
+                              alt={option.label}
+                              className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-110"
+                            />
+                          </div>
 
-                        <div className="relative z-10">
-                          <h3 className="text-lg font-light text-white mb-2">
-                            {option.label}
-                          </h3>
-                          {option.description && (
-                            <p className="text-sm text-white/60 leading-relaxed">
-                              {option.description}
-                            </p>
-                          )}
+                          <div className="relative z-10 mt-auto">
+                            <h3 className="text-2xl font-bold text-foreground mb-3 font-playfair group-hover:text-primary transition-colors duration-300">
+                              {option.label}
+                            </h3>
+                            {option.description && (
+                              <p className="text-base text-muted-foreground leading-relaxed font-source-sans">
+                                {option.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -359,41 +345,46 @@ const Questions = memo(function Questions() {
 
           {showBaseSpirits && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-8 md:space-y-10"
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -30, filter: "blur(10px)" }}
+              className="space-y-12"
             >
-              <div className="text-center space-y-6 md:space-y-8">
-                <div className="flex items-center justify-center gap-4">
-                  <div className="border border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium rounded-full">
-                    {t("questions.step")} {currentStep} / {totalSteps}
-                  </div>
-                  <GradientText className="text-xl md:text-2xl font-bold tracking-tight">
-                    {t("questions.base_spirits.title")}
-                  </GradientText>
+              <div className="text-center space-y-6">
+                <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
+                  <span className="text-primary font-bold text-sm tracking-wider">
+                    STEP {currentStep} / {totalSteps}
+                  </span>
                 </div>
-                <p className="text-sm text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                  {t("questions.base_spirits.description")}
-                </p>
+                
+                <div className="space-y-4">
+                  <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
+                    <GradientText>
+                      {t("questions.base_spirits.title")}
+                    </GradientText>
+                  </h2>
+                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed font-source-sans">
+                    {t("questions.base_spirits.description")}
+                  </p>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-6 lg:gap-8 max-w-4xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
                 {baseSpiritsOptions.map((spirit, index) => (
                   <motion.div
                     key={spirit.value}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
+                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <div
-                      className={`cursor-pointer transition-all duration-300 relative overflow-hidden ${
+                      className={`cursor-pointer transition-all duration-300 relative overflow-hidden rounded-2xl p-4 text-center h-full group ${
                         baseSpirits.includes(spirit.value)
-                          ? "bg-amber-500/20 border-amber-500/50"
-                          : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
-                      } border rounded-xl p-4 text-center`}
+                          ? "glass-effect border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.3)]"
+                          : "glass-effect hover:border-primary/30 hover:shadow-lg"
+                      }`}
                       onClick={() =>
                         toggleBaseSpirit(
                           spirit.value,
@@ -405,9 +396,9 @@ const Questions = memo(function Questions() {
                       }
                     >
                       {baseSpirits.includes(spirit.value) && (
-                        <div className="absolute top-2 right-2 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+                        <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow-md z-20">
                           <svg
-                            className="w-3 h-3 text-black"
+                            className="w-3.5 h-3.5 text-primary-foreground"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -419,14 +410,18 @@ const Questions = memo(function Questions() {
                           </svg>
                         </div>
                       )}
-                      <div className="aspect-square relative overflow-hidden rounded-lg mb-3 bg-black/20">
+                      
+                      {/* Selection overlay */}
+                      <div className={`absolute inset-0 bg-primary/10 transition-opacity duration-300 ${baseSpirits.includes(spirit.value) ? 'opacity-100' : 'opacity-0'}`} />
+
+                      <div className="aspect-square relative overflow-hidden rounded-xl mb-4 bg-black/20 group-hover:shadow-inner transition-shadow">
                         <img
                           src={spirit.image || "/placeholder.svg"}
                           alt={spirit.label}
-                          className="w-full h-full object-cover opacity-70"
+                          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
                         />
                       </div>
-                      <h3 className="text-sm font-light text-white">
+                      <h3 className={`text-lg font-medium transition-colors duration-300 ${baseSpirits.includes(spirit.value) ? 'text-primary' : 'text-foreground'}`}>
                         {spirit.label}
                       </h3>
                     </div>
@@ -434,10 +429,12 @@ const Questions = memo(function Questions() {
                 ))}
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-center pt-8">
                 <Button
                   onClick={handleBaseSpiritsDone}
-                  className="px-8 py-2 font-semibold tracking-wide"
+                  size="lg"
+                  variant="primary"
+                  className="px-12 py-6 text-lg shadow-xl hover:shadow-primary/30"
                 >
                   {t("questions.continue")}
                 </Button>
@@ -447,46 +444,54 @@ const Questions = memo(function Questions() {
 
           {showFeedbackForm && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-6 md:space-y-8 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -30, filter: "blur(10px)" }}
+              className="space-y-10 max-w-3xl mx-auto"
             >
-              <div className="text-center space-y-6 md:space-y-8">
-                <div className="flex items-center justify-center gap-4">
-                  <div className="border border-amber-500/30 text-amber-400 bg-amber-500/8 px-3 py-1 text-xs font-medium rounded-full">
-                    {t("questions.step")} {currentStep} / {totalSteps}
-                  </div>
-                  <GradientText className="text-xl md:text-2xl font-bold tracking-tight">
-                    {t("questions.feedback.title")}
-                  </GradientText>
+              <div className="text-center space-y-6">
+                <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
+                  <span className="text-primary font-bold text-sm tracking-wider">
+                    FINAL STEP
+                  </span>
                 </div>
-                <p className="text-sm text-gray-400 leading-relaxed">
-                  {t("questions.feedback.description")}
-                </p>
+                
+                <div className="space-y-4">
+                  <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
+                    <GradientText>
+                      {t("questions.feedback.title")}
+                    </GradientText>
+                  </h2>
+                  <p className="text-lg text-muted-foreground leading-relaxed font-source-sans">
+                    {t("questions.feedback.description")}
+                  </p>
+                </div>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
-                <textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder={t("questions.feedback.placeholder")}
-                  className="w-full h-24 bg-transparent border-none rounded-xl p-3 text-sm text-white placeholder-white/30 focus:outline-none resize-none"
-                />
+              <div className="glass-effect rounded-3xl p-1">
+                <div className="bg-black/20 rounded-2xl p-6">
+                  <textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    placeholder={t("questions.feedback.placeholder")}
+                    className="w-full h-40 bg-transparent border border-white/10 rounded-xl p-4 text-lg text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 resize-none transition-all"
+                  />
+                </div>
               </div>
 
-              <div className="flex gap-4 justify-between">
+              <div className="flex gap-6 justify-center items-center pt-4">
                 <Button
                   variant="outline"
                   onClick={() => setShowFeedbackForm(false)}
-                  className="px-6 py-2 font-medium"
+                  className="px-8 py-6 text-base"
                 >
                   {t("questions.skip")}
                 </Button>
                 <Button
                   onClick={handleFeedbackSubmit}
                   disabled={isGenerating}
-                  className="px-8 py-2 font-semibold tracking-wide"
+                  variant="primary"
+                  className="px-12 py-6 text-lg font-bold shadow-2xl hover:shadow-primary/40"
                 >
                   {isGenerating
                     ? t("questions.generating")
@@ -497,20 +502,17 @@ const Questions = memo(function Questions() {
           )}
         </AnimatePresence>
 
-        <div className="fixed bottom-6 left-6 z-20">
+        {/* Floating Reset Button */}
+        <div className="fixed bottom-8 left-8 z-50">
           <motion.button
             onClick={handleReset}
-            whileHover={{ scale: 1.05, y: -2 }}
+            whileHover={{ scale: 1.05, x: 5 }}
             whileTap={{ scale: 0.95 }}
-            className="group relative overflow-hidden px-5 py-2.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/30 rounded-full text-white/90 text-sm font-medium shadow-lg backdrop-blur-sm transition-all duration-300 hover:from-red-500/30 hover:to-pink-500/30 hover:border-red-500/50 hover:shadow-red-500/20 hover:shadow-xl"
+            className="group flex items-center gap-3 px-5 py-3 glass-effect rounded-full hover:border-destructive/50 transition-colors duration-300"
           >
-            {/* 背景光晕效果 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-            {/* 重置图标 */}
-            <div className="relative flex items-center gap-2">
+            <div className="p-2 rounded-full bg-destructive/10 group-hover:bg-destructive/20 transition-colors">
               <svg
-                className="w-4 h-4 text-white/80 group-hover:text-white transition-colors duration-300"
+                className="w-4 h-4 text-destructive"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -522,10 +524,10 @@ const Questions = memo(function Questions() {
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
-              <span className="group-hover:text-white transition-colors duration-300">
-                {t("questions.reset")}
-              </span>
             </div>
+            <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+              {t("questions.reset")}
+            </span>
           </motion.button>
         </div>
       </Container>
