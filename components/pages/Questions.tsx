@@ -2,6 +2,7 @@
 
 import { useState, useEffect, memo, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { Container, Button, GradientText } from "@/components/ui/core";
@@ -369,13 +370,15 @@ const Questions = memo(function Questions() {
                           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                           <div className="aspect-square relative overflow-hidden rounded-lg mb-3 bg-black/20 shadow-inner group-hover:shadow-lg transition-shadow duration-500">
-                            <motion.img
+                            <Image
                               src={
                                 option.image ||
                                 "/placeholder.svg?height=400&width=400&query=cocktail"
                               }
                               alt={option.label}
-                              className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-110"
+                              fill
+                              sizes="(max-width: 768px) 50vw, 33vw"
+                              className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-110"
                             />
                           </div>
 
@@ -471,10 +474,12 @@ const Questions = memo(function Questions() {
                       <div className={`absolute inset-0 bg-primary/10 transition-opacity duration-300 ${baseSpirits.includes(spirit.value) ? 'opacity-100' : 'opacity-0'}`} />
 
                       <div className="aspect-square relative overflow-hidden rounded-lg mb-3 bg-black/20 group-hover:shadow-inner transition-shadow">
-                        <img
+                        <Image
                           src={spirit.image || "/placeholder.svg"}
                           alt={spirit.label}
-                          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+                          fill
+                          sizes="(max-width: 768px) 33vw, 16vw"
+                          className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
                         />
                       </div>
                       <h3 className={`text-sm font-medium transition-colors duration-300 ${baseSpirits.includes(spirit.value) ? 'text-primary' : 'text-foreground'}`}>
