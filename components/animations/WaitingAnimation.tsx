@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface WaitingAnimationProps {
@@ -69,7 +69,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6 fixed inset-0 z-50">
       <motion.div
-        className="max-w-md w-full text-center space-y-20"
+        className="max-w-3xl w-full text-center space-y-20"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -115,32 +115,38 @@ const WaitingAnimation = memo(function WaitingAnimation({
         </div>
 
         <div className="space-y-12">
-          <motion.div
-            className="space-y-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-          >
-            <h2 className="text-4xl font-medium bg-gradient-to-r from-amber-300 via-orange-300 to-pink-300 bg-clip-text text-transparent tracking-wide">
-              {displayMessage}
-            </h2>
-            <motion.p
-              className="text-lg text-slate-300 font-light"
-              animate={{
-                opacity: [0.6, 1, 0.6],
-                color: [
-                  "rgb(203 213 225)",
-                  "rgb(251 191 36)",
-                  "rgb(203 213 225)",
-                ],
-              }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-            >
-              {displaySubtitle}
-            </motion.p>
-          </motion.div>
+          <div className="min-h-[160px] flex flex-col items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={displayMessage}
+                className="space-y-6 w-full"
+                initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+                transition={{ duration: 0.5 }}
+              >
+                <h2 className="text-4xl md:text-5xl font-medium bg-gradient-to-r from-amber-300 via-orange-300 to-pink-300 bg-clip-text text-transparent tracking-wide pb-2 leading-relaxed px-4">
+                  {displayMessage}
+                </h2>
+                <motion.p
+                  className="text-lg text-slate-300 font-light"
+                  animate={{
+                    opacity: [0.6, 1, 0.6],
+                    color: [
+                      "rgb(203 213 225)",
+                      "rgb(251 191 36)",
+                      "rgb(203 213 225)",
+                    ],
+                  }}
+                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                >
+                  {displaySubtitle}
+                </motion.p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-          <div className="w-full h-2 rounded-full overflow-hidden relative bg-slate-700/50">
+          <div className="w-full h-2 rounded-full overflow-hidden relative bg-slate-700/50 max-w-md mx-auto">
             <motion.div
               className="h-full bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 rounded-full shadow-lg shadow-amber-400/20"
               style={{ width: `${currentProgress}%` }}

@@ -224,7 +224,14 @@ const Questions = memo(function Questions() {
       }
 
       updateProgress(20);
-      await submitRequest();
+      
+      // Add safety timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Request timed out")), 20000)
+      );
+
+      await Promise.race([submitRequest(), timeoutPromise]);
+      
       updateProgress(70);
 
       setTimeout(() => {
