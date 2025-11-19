@@ -1,9 +1,6 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runner
+    image: ${DOCKER_IMAGE:-simonsun3/moodshaker:latest}
     ports:
       - "${HOST_PORT:-3000}:3000"
     env_file:
