@@ -54,28 +54,28 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-gray-900/95 backdrop-blur-md shadow-md"
-          : "bg-transparent"
+          ? "glass-effect py-2"
+          : "bg-transparent py-4"
       }`}
       suppressHydrationWarning
     >
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="container mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
         {/* Logo */}
         <Link
           href={homeLink}
-          className="flex items-center gap-2 font-bold text-xl"
+          className="flex items-center gap-3 font-bold text-xl md:text-2xl"
         >
           <motion.div
-            className={`w-10 h-10 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center`}
+            className={`w-10 h-10 md:w-12 md:h-12 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center shadow-lg`}
             whileHover={{ scale: 1.1, rotate: 5 }}
             transition={{ duration: 0.2 }}
           >
-            <Cocktail className="h-5 w-5 text-white" />
+            <Cocktail className="h-5 w-5 md:h-6 md:w-6 text-white" />
           </motion.div>
           <motion.span
-            className="gradient-text-bright font-bold text-xl"
+            className="gradient-text-bright font-bold font-playfair tracking-tight"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -85,9 +85,9 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-6">
+        <div className="hidden md:flex items-center space-x-8">
           <LanguageSelector />
-          <Button href={questionsLink} size="sm" variant="primary">
+          <Button href={questionsLink} size="lg" variant="primary" className="shadow-xl hover:shadow-primary/25">
             {t("home.start")}
           </Button>
         </div>
@@ -98,7 +98,7 @@ export default function Header() {
 
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-gray-300 hover:text-white p-2 ml-2 rounded-md hover:bg-white/5"
+            className="text-gray-300 hover:text-white p-2 ml-2 rounded-full hover:bg-white/10 transition-colors"
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
           >
@@ -111,20 +111,21 @@ export default function Header() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="md:hidden"
+            className="md:hidden overflow-hidden"
             initial="hidden"
             animate="visible"
             exit="exit"
             variants={mobileMenuVariants as any}
           >
-            <div className="px-4 py-3 space-y-1 bg-gray-800/95 backdrop-blur-md shadow-lg border-t border-gray-700/50">
+            <div className="px-6 py-6 space-y-4 glass-effect mt-2 mx-4 rounded-2xl border-t border-white/10">
               <div className="pt-2 pb-1">
                 <Button
                   href={questionsLink}
-                  size="sm"
+                  size="lg"
                   variant="primary"
                   fullWidth
                   onClick={() => setIsMobileMenuOpen(false)}
+                  className="shadow-lg"
                 >
                   {t("home.start")}
                 </Button>
