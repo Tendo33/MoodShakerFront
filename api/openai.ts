@@ -31,6 +31,22 @@ export async function getChatCompletion(
   openaiLogger.info(`Starting model request [${requestId}]`);
 
   try {
+    // 验证必要的环境变量
+    if (!OPENAI_API_KEY) {
+      openaiLogger.error(`Missing API key [${requestId}]`);
+      throw new Error("OpenAI API密钥未配置，请检查环境变量OPENAI_API_KEY");
+    }
+
+    if (!OPENAI_BASE_URL) {
+      openaiLogger.error(`Missing API base URL [${requestId}]`);
+      throw new Error("OpenAI API地址未配置，请检查环境变量OPENAI_BASE_URL");
+    }
+
+    if (!model) {
+      openaiLogger.error(`Missing model name [${requestId}]`);
+      throw new Error("OpenAI模型名称未配置，请检查环境变量OPENAI_MODEL");
+    }
+
     // 生成缓存键 - 基于消息内容和选项
     const cacheKey = createCacheKey(
       "chat-completion",
@@ -39,8 +55,11 @@ export async function getChatCompletion(
       options,
     );
 
+    const apiUrl = `${OPENAI_BASE_URL}chat/completions`;
+    openaiLogger.debug(`Requesting ${apiUrl} with model ${model}`);
+
     const response = await optimizedFetch(
-      `${OPENAI_BASE_URL}chat/completions`,
+      apiUrl,
       {
         method: "POST",
         headers: {
@@ -66,23 +85,80 @@ export async function getChatCompletion(
     const duration = endTime - startTime;
 
     if (!response.ok) {
-      const errorText = await response.text();
-      openaiLogger.error(`Request failed [${requestId}] (${duration}ms)`);
-      throw new Error(`OpenAI API error (${response.status}): ${errorText}`);
+      let errorText = "";
+      let errorDetails = "";
+      
+      try {
+        errorText = await response.text();
+        // 尝试解析JSON错误响应
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorDetails = errorJson.error?.message || errorText;
+        } catch {
+          errorDetails = errorText;
+        }
+      } catch {
+        errorDetails = "无法读取错误响应";
+      }
+
+      openaiLogger.error(
+        `Request failed [${requestId}] (${duration}ms) - Status: ${response.status}`,
+        { statusText: response.statusText, error: errorDetails },
+      );
+
+      // 根据不同的HTTP状态码提供更友好的错误信息
+      let userMessage = "";
+      switch (response.status) {
+        case 401:
+          userMessage = "API密钥无效或已过期，请检查您的OpenAI API配置";
+          break;
+        case 429:
+          userMessage = "API请求频率过高或配额已用尽，请稍后重试";
+          break;
+        case 500:
+        case 502:
+        case 503:
+          userMessage = "OpenAI服务暂时不可用，请稍后重试";
+          break;
+        case 400:
+          userMessage = `请求格式错误: ${errorDetails}`;
+          break;
+        default:
+          userMessage = `API请求失败 (状态码 ${response.status}): ${errorDetails}`;
+      }
+
+      throw new Error(userMessage);
     }
 
     const data = await response.json();
 
     openaiLogger.info(`Request successful [${requestId}] (${duration}ms)`);
 
+    // 验证响应数据格式
+    if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
+      openaiLogger.error(`Invalid response format [${requestId}]`, data);
+      throw new Error("API返回了无效的响应格式");
+    }
+
     return data.choices[0].message.content;
   } catch (error) {
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    openaiLogger.error(`Request exception [${requestId}] (${duration}ms)`);
+    // 如果错误已经是我们抛出的友好错误，直接传递
+    if (error instanceof Error) {
+      openaiLogger.error(
+        `Request exception [${requestId}] (${duration}ms): ${error.message}`,
+      );
+      throw error;
+    }
 
-    throw error;
+    // 处理未知错误
+    openaiLogger.error(
+      `Request exception [${requestId}] (${duration}ms)`,
+      error,
+    );
+    throw new Error("API请求失败，请检查网络连接或稍后重试");
   }
 }
 

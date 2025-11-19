@@ -103,10 +103,10 @@ const translations: TranslationDictionary = {
     "questions.base_spirits.title": "选择您拥有的基酒",
     "questions.base_spirits.description": "请选择您家中现有的基酒（可选多个）",
 
-    "questions.feedback.title": "分享您的心情和偏好",
-    "questions.feedback.description": "告诉我们您现在的心情或任何特殊要求",
+    "questions.feedback.title": "特殊要求",
+    "questions.feedback.description": "有什么过敏忌口、特殊喜好或者具体的想喝的味道吗？",
     "questions.feedback.placeholder":
-      "例如：我想要酸甜口味的鸡尾酒，今天心情很好...",
+      "例如：不要冰，加点辣，我特别喜欢薄荷...",
 
     "questions.back": "返回",
     "questions.availableSpirits": "可用的基酒（可选）✨",
@@ -217,6 +217,11 @@ const translations: TranslationDictionary = {
     "loading.default": "正在调制中",
     "loading.subtitle": "为您精心调配完美口感",
     "loading.dots": "加载中",
+    "loading.rotating.1": "正在挑选最优质的基酒...",
+    "loading.rotating.2": "正在平衡风味...",
+    "loading.rotating.3": "正在冰镇酒杯...",
+    "loading.rotating.4": "正在注入灵魂...",
+    "loading.rotating.5": "马上就好...",
 
     // Error messages
     "error.saveAnswers": "保存答案失败，请重试",
@@ -308,11 +313,11 @@ const translations: TranslationDictionary = {
     "questions.base_spirits.description":
       "Choose the base spirits you have at home (optional)",
 
-    "questions.feedback.title": "Share Your Mood & Preferences",
+    "questions.feedback.title": "Special Requests",
     "questions.feedback.description":
-      "Tell us about your current mood or any special requests",
+      "Any allergies, dislikes, or specific cravings?",
     "questions.feedback.placeholder":
-      "e.g., I want something sweet and sour, feeling great today...",
+      "e.g., No ice, extra spicy, I love mint...",
 
     "questions.back": "Back",
     "questions.availableSpirits": "Available Spirits (Optional) ✨",
@@ -428,6 +433,11 @@ const translations: TranslationDictionary = {
     "loading.default": "Mixing...",
     "loading.subtitle": "Crafting the perfect flavor for you",
     "loading.dots": "Loading",
+    "loading.rotating.1": "Selecting the finest spirits...",
+    "loading.rotating.2": "Balancing the flavors...",
+    "loading.rotating.3": "Chilling the glass...",
+    "loading.rotating.4": "Adding a touch of magic...",
+    "loading.rotating.5": "Almost ready...",
 
     // Error messages
     "error.saveAnswers": "Failed to save answers, please try again",

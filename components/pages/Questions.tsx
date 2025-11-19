@@ -32,6 +32,10 @@ const Questions = memo(function Questions() {
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [showBaseSpirits, setShowBaseSpirits] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+
+  // Loading message rotation
+  const [loadingMessage, setLoadingMessage] = useState("");
 
   const {
     isLoading: isGenerating,
@@ -42,9 +46,31 @@ const Questions = memo(function Questions() {
     LoadingComponent,
   } = useSmartLoading();
 
+  // Rotate loading messages
+  useEffect(() => {
+    if (!isGenerating) return;
+
+    const messages = [
+      t("loading.rotating.1"),
+      t("loading.rotating.2"),
+      t("loading.rotating.3"),
+      t("loading.rotating.4"),
+      t("loading.rotating.5"),
+    ];
+    
+    setLoadingMessage(messages[0]); // Start with first message
+    
+    let msgIndex = 0;
+    const interval = setInterval(() => {
+      msgIndex = (msgIndex + 1) % messages.length;
+      setLoadingMessage(messages[msgIndex]);
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [isGenerating, t]);
+
   const totalSteps = 5;
 
-  // 使用useMemo优化进度计算
   const currentStep = useMemo(() => {
     if (showFeedbackForm) return 5;
     if (showBaseSpirits) return 4;
@@ -144,7 +170,6 @@ const Questions = memo(function Questions() {
   ];
 
   useEffect(() => {
-    // 异步加载数据，避免阻塞渲染
     const loadData = async () => {
       try {
         await loadSavedData();
@@ -159,6 +184,11 @@ const Questions = memo(function Questions() {
   const handleAnswer = useCallback(
     async (questionId: number, option: string) => {
       safeLogger.userInteraction("select questionnaire option");
+      setSelectedOption(option);
+      
+      // Add delay for micro-interaction
+      await new Promise(resolve => setTimeout(resolve, 400));
+      
       try {
         await saveAnswer(questionId.toString(), option);
         if (questionId < questions.length) {
@@ -166,14 +196,15 @@ const Questions = memo(function Questions() {
         } else {
           setShowBaseSpirits(true);
         }
+        setSelectedOption(null); // Reset selection
       } catch (error) {
         appLogger.error("Answer progress save failed");
-        // 即使保存失败也继续流程，避免阻塞用户
         if (questionId < questions.length) {
           setCurrentQuestion(questionId + 1);
         } else {
           setShowBaseSpirits(true);
         }
+        setSelectedOption(null);
       }
     },
     [saveAnswer, questions.length],
@@ -189,7 +220,6 @@ const Questions = memo(function Questions() {
     startGeneration();
 
     try {
-      // 异步保存反馈
       if (feedback.trim()) {
         await saveFeedback(feedback);
       }
@@ -198,15 +228,22 @@ const Questions = memo(function Questions() {
       await submitRequest();
       updateProgress(70);
 
-      // 模拟处理进度，最终进度达到100%时会自动触发onComplete导航
       setTimeout(() => {
         updateProgress(100);
       }, 800);
     } catch (error) {
-      appLogger.error("Questionnaire submission failed");
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "生成鸡尾酒推荐失败，请稍后重试";
+
+      appLogger.error("Questionnaire submission failed", errorMessage);
       completeGeneration();
-      // 如果出错，确保用户知道发生了什么
-      // 可以在这里添加错误提示
+
+      // 显示用户友好的错误提示
+      if (typeof window !== "undefined") {
+        alert(`⚠️ ${errorMessage}`);
+      }
     }
   };
 
@@ -219,17 +256,15 @@ const Questions = memo(function Questions() {
     completeGeneration();
   };
 
-  // 导航到推荐页面的函数
   const navigateToRecommendation = useCallback(() => {
     router.push(getPathWithLanguage("/cocktail/recommendation"));
   }, [router, getPathWithLanguage]);
 
-  // 如果正在生成，显示全屏等待动画
   if (isGenerating) {
     return (
       <LoadingComponent
         type="cocktail-mixing"
-        message={t("questions.generating")}
+        message={loadingMessage} // Use rotating message
         estimatedDuration={3000}
         onComplete={navigateToRecommendation}
       />
@@ -238,8 +273,6 @@ const Questions = memo(function Questions() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Ambient background elements are now handled globally, 
-          but we can add some local flair if needed */}
       
       <Container className="relative z-10 py-16 md:py-24">
         <div className="mb-12 md:mb-16 max-w-3xl mx-auto">
@@ -252,16 +285,13 @@ const Questions = memo(function Questions() {
             </span>
           </div>
 
-          {/* 优化后的进度栏 - 符合项目aesthetic */}
           <div className="relative w-full bg-white/5 rounded-full h-3 overflow-hidden shadow-inner backdrop-blur-sm border border-white/5">
-            {/* 主进度条 - 美丽的渐变 */}
             <motion.div
               className="h-full bg-gradient-to-r from-primary to-secondary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)] relative overflow-hidden"
               initial={{ width: "0%" }}
               animate={{ width: `${calculatedProgress}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              {/* 添加闪亮效果 */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" style={{ backgroundSize: "200% 100%" }} />
             </motion.div>
           </div>
@@ -303,14 +333,25 @@ const Questions = memo(function Questions() {
                       whileTap={{ scale: 0.98 }}
                     >
                       <div
-                        className="cursor-pointer h-full group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/30"
+                        className={`cursor-pointer h-full group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/30 ${
+                          selectedOption === option.value ? "border-primary shadow-[0_0_30px_rgba(var(--primary),0.6)] scale-[1.02]" : ""
+                        }`}
                         onClick={() =>
                           handleAnswer(currentQuestion, option.value)
                         }
                       >
-                        {/* Card Content Container */}
+                        {/* Micro-interaction Ripple */}
+                        {selectedOption === option.value && (
+                          <motion.div
+                            className="absolute inset-0 bg-primary/20 z-20"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        )}
+
                         <div className="relative h-full rounded-2xl overflow-hidden bg-black/20 p-6 flex flex-col">
-                          {/* Subtle hover accent */}
                           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                           <div className="aspect-square relative overflow-hidden rounded-2xl mb-6 bg-black/20 shadow-inner group-hover:shadow-lg transition-shadow duration-500">
@@ -397,7 +438,9 @@ const Questions = memo(function Questions() {
                     >
                       {baseSpirits.includes(spirit.value) && (
                         <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow-md z-20">
-                          <svg
+                          <motion.svg
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
                             className="w-3.5 h-3.5 text-primary-foreground"
                             fill="currentColor"
                             viewBox="0 0 20 20"
@@ -407,11 +450,10 @@ const Questions = memo(function Questions() {
                               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                               clipRule="evenodd"
                             />
-                          </svg>
+                          </motion.svg>
                         </div>
                       )}
                       
-                      {/* Selection overlay */}
                       <div className={`absolute inset-0 bg-primary/10 transition-opacity duration-300 ${baseSpirits.includes(spirit.value) ? 'opacity-100' : 'opacity-0'}`} />
 
                       <div className="aspect-square relative overflow-hidden rounded-xl mb-4 bg-black/20 group-hover:shadow-inner transition-shadow">
@@ -452,7 +494,7 @@ const Questions = memo(function Questions() {
               <div className="text-center space-y-6">
                 <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
                   <span className="text-primary font-bold text-sm tracking-wider">
-                    FINAL STEP
+                    CUSTOMIZE
                   </span>
                 </div>
                 
