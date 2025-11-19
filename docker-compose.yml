@@ -1,6 +1,7 @@
 services:
   web:
     image: ${DOCKER_IMAGE:-simonsun3/moodshaker:latest}
+    container_name: moodshaker-web
     ports:
       - "${HOST_PORT:-3000}:3000"
     env_file:
