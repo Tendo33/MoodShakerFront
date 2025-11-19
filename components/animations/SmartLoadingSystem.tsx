@@ -181,24 +181,24 @@ export function useSmartLoading() {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const startLoading = useCallback(() => {
+  const startLoading = () => {
     setIsLoading(true);
     setProgress(0);
-  }, []);
+  };
 
-  const updateProgress = useCallback((newProgress: number) => {
+  const updateProgress = (newProgress: number) => {
     setProgress(Math.min(Math.max(newProgress, 0), 100));
-  }, []);
+  };
 
-  const completeLoading = useCallback(() => {
+  const completeLoading = () => {
     setProgress(100);
     // The actual unmounting is handled by the component calling onComplete
     // We just ensure state reflects completion
     setTimeout(() => {
-      setIsLoading(false);
-      setProgress(0);
+        setIsLoading(false);
+        setProgress(0);
     }, 1000);
-  }, []);
+  };
 
   return {
     isLoading,
