@@ -322,7 +322,13 @@ const Questions = memo(function Questions() {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+              <div className={`grid gap-4 mx-auto ${
+                questions[currentQuestion - 1]?.options.length === 2
+                  ? "grid-cols-2 max-w-xl"
+                  : questions[currentQuestion - 1]?.options.length === 3
+                  ? "grid-cols-1 md:grid-cols-3 max-w-3xl"
+                  : "grid-cols-2 md:grid-cols-4 max-w-4xl"
+              }`}>
                 {questions[currentQuestion - 1]?.options.map(
                   (option, index) => (
                     <motion.div
@@ -352,10 +358,10 @@ const Questions = memo(function Questions() {
                           />
                         )}
 
-                        <div className="relative h-full rounded-2xl overflow-hidden bg-black/20 p-6 flex flex-col">
+                        <div className="relative h-full rounded-xl overflow-hidden bg-black/20 flex flex-col p-4">
                           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                          <div className="aspect-square relative overflow-hidden rounded-2xl mb-6 bg-black/20 shadow-inner group-hover:shadow-lg transition-shadow duration-500">
+                          <div className="aspect-square relative overflow-hidden rounded-lg mb-3 bg-black/20 shadow-inner group-hover:shadow-lg transition-shadow duration-500">
                             <motion.img
                               src={
                                 option.image ||
@@ -367,11 +373,11 @@ const Questions = memo(function Questions() {
                           </div>
 
                           <div className="relative z-10 mt-auto">
-                            <h3 className="text-2xl font-bold text-foreground mb-3 font-playfair group-hover:text-primary transition-colors duration-300">
+                            <h3 className="font-bold text-foreground mb-1 font-playfair group-hover:text-primary transition-colors duration-300 text-lg">
                               {option.label}
                             </h3>
                             {option.description && (
-                              <p className="text-base text-muted-foreground leading-relaxed font-source-sans">
+                              <p className="text-muted-foreground leading-relaxed font-source-sans text-sm">
                                 {option.description}
                               </p>
                             )}
@@ -411,7 +417,7 @@ const Questions = memo(function Questions() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 max-w-6xl mx-auto">
                 {baseSpiritsOptions.map((spirit, index) => (
                   <motion.div
                     key={spirit.value}
@@ -422,7 +428,7 @@ const Questions = memo(function Questions() {
                     whileTap={{ scale: 0.95 }}
                   >
                     <div
-                      className={`cursor-pointer transition-all duration-300 relative overflow-hidden rounded-2xl p-4 text-center h-full group border ${
+                      className={`cursor-pointer transition-all duration-300 relative overflow-hidden rounded-xl p-3 text-center h-full group border ${
                         baseSpirits.includes(spirit.value)
                           ? "glass-effect border-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.2)] bg-primary/5"
                           : "glass-effect border-transparent hover:border-primary/20 hover:bg-white/5"
@@ -438,11 +444,11 @@ const Questions = memo(function Questions() {
                       }
                     >
                       {baseSpirits.includes(spirit.value) && (
-                        <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow-md z-20">
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center shadow-md z-20">
                           <motion.svg
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="w-3.5 h-3.5 text-primary-foreground"
+                            className="w-3 h-3 text-primary-foreground"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -457,14 +463,14 @@ const Questions = memo(function Questions() {
                       
                       <div className={`absolute inset-0 bg-primary/10 transition-opacity duration-300 ${baseSpirits.includes(spirit.value) ? 'opacity-100' : 'opacity-0'}`} />
 
-                      <div className="aspect-square relative overflow-hidden rounded-xl mb-4 bg-black/20 group-hover:shadow-inner transition-shadow">
+                      <div className="aspect-square relative overflow-hidden rounded-lg mb-3 bg-black/20 group-hover:shadow-inner transition-shadow">
                         <img
                           src={spirit.image || "/placeholder.svg"}
                           alt={spirit.label}
                           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
                         />
                       </div>
-                      <h3 className={`text-lg font-medium transition-colors duration-300 ${baseSpirits.includes(spirit.value) ? 'text-primary' : 'text-foreground'}`}>
+                      <h3 className={`text-sm font-medium transition-colors duration-300 ${baseSpirits.includes(spirit.value) ? 'text-primary' : 'text-foreground'}`}>
                         {spirit.label}
                       </h3>
                     </div>
