@@ -245,28 +245,46 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       
       await updateItem("recommendation", recommendation);
 
-      // 生成图片
+      // 启动后台图片生成任务（不阻塞主流程）
+      // 设置图片加载状态为 true，这样推荐页会显示加载动画
+      setIsImageLoadingState(true);
+      
       const prompt = generateImagePrompt(recommendation);
-      const imageResponse = await fetch("/api/image", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-          sessionId,
-        }),
-      });
+      
+      // 使用异步函数执行图片生成，不使用 await 阻塞主线程
+      const generateImageTask = async () => {
+        try {
+          const imageResponse = await fetch("/api/image", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              prompt,
+              sessionId,
+            }),
+          });
 
-      if (!imageResponse.ok) {
-        const errorData = await imageResponse.json();
-        cocktailLogger.warn("图片生成失败，使用默认图片", errorData.error);
-        // 图片生成失败不影响整体流程，使用 null
-        await updateItem("imageData", null);
-      } else {
-        const imageData = await imageResponse.json();
-        await updateItem("imageData", imageData.data);
-      }
+          if (!imageResponse.ok) {
+            const errorData = await imageResponse.json();
+            cocktailLogger.warn("图片生成失败，使用默认图片", errorData.error);
+            // 图片生成失败不影响整体流程，使用 null
+            await updateItem("imageData", null);
+          } else {
+            const imageData = await imageResponse.json();
+            await updateItem("imageData", imageData.data);
+          }
+        } catch (error) {
+          cocktailLogger.error("后台图片生成出错", error);
+          await updateItem("imageData", null);
+        } finally {
+          // 无论成功失败，都结束图片加载状态
+          setIsImageLoadingState(false);
+        }
+      };
+
+      // 触发后台任务
+      generateImageTask();
 
       setProgressPercentage(100);
       return recommendation;

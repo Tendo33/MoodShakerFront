@@ -6,7 +6,7 @@ import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { Container, Button, GradientText } from "@/components/ui/core";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
+import SmartLoadingSystem, { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
 import { appLogger, safeLogger } from "@/utils/logger";
 
 const Questions = memo(function Questions() {
@@ -43,7 +43,6 @@ const Questions = memo(function Questions() {
     startLoading: startGeneration,
     updateProgress,
     completeLoading: completeGeneration,
-    LoadingComponent,
   } = useSmartLoading();
 
   // Rotate loading messages
@@ -262,7 +261,9 @@ const Questions = memo(function Questions() {
 
   if (isGenerating) {
     return (
-      <LoadingComponent
+      <SmartLoadingSystem
+        isShowing={isGenerating}
+        actualProgress={progress}
         type="cocktail-mixing"
         message={loadingMessage} // Use rotating message
         estimatedDuration={3000}
