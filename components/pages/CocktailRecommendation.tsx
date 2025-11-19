@@ -829,7 +829,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           {/* Desktop layout */}
           <div className="hidden lg:grid lg:grid-cols-12 gap-10">
             {/* Left column: Ingredients and Tools */}
-            <div className="lg:col-span-4 space-y-8">
+            <div className="lg:col-span-4 space-y-8 sticky top-24 self-start">
               {/* Ingredients with animation */}
               <motion.div
                 className={`rounded-2xl overflow-hidden ${cardClasses}`}
@@ -919,12 +919,12 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
                 }}
               >
-                <div className="p-8 bg-white/5 border-b border-white/5">
+                <div className="p-6 bg-white/5 border-b border-white/5">
                   <h3 className={`text-2xl font-bold ${textColorClass}`}>
                     {t("recommendation.steps")}
                   </h3>
                 </div>
-                <div className="p-8 bg-black/10">
+                <div className="p-6 bg-black/10">
                   <ol className="space-y-12">
                     {cocktail?.steps?.map((step) => {
                       const localizedStep = getLocalizedStepContent(step);
@@ -960,13 +960,13 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                               </p>
                               {localizedStep.tips && (
                                 <motion.div
-                                  className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl"
+                                  className="mt-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg"
                                   initial={{ opacity: 0, y: 5 }}
                                   animate={{ opacity: 1, y: 0 }}
                                   transition={{ duration: 0.3 }}
                                 >
-                                  <p className="text-amber-200/90 text-base flex items-start gap-3">
-                                    <Lightbulb className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                                  <p className="text-amber-200/90 text-sm flex items-start gap-2">
+                                    <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
                                     <span>{localizedStep.tips}</span>
                                   </p>
                                 </motion.div>

@@ -333,8 +333,8 @@ const Questions = memo(function Questions() {
                       whileTap={{ scale: 0.98 }}
                     >
                       <div
-                        className={`cursor-pointer h-full group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/30 ${
-                          selectedOption === option.value ? "border-primary shadow-[0_0_30px_rgba(var(--primary),0.6)] scale-[1.02]" : ""
+                        className={`cursor-pointer h-full group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 ${
+                          selectedOption === option.value ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.2)] scale-[1.01]" : "border-transparent"
                         }`}
                         onClick={() =>
                           handleAnswer(currentQuestion, option.value)
@@ -343,9 +343,9 @@ const Questions = memo(function Questions() {
                         {/* Micro-interaction Ripple */}
                         {selectedOption === option.value && (
                           <motion.div
-                            className="absolute inset-0 bg-primary/20 z-20"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                            className="absolute inset-0 bg-primary/10 z-20"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.3 }}
                           />
@@ -421,10 +421,10 @@ const Questions = memo(function Questions() {
                     whileTap={{ scale: 0.95 }}
                   >
                     <div
-                      className={`cursor-pointer transition-all duration-300 relative overflow-hidden rounded-2xl p-4 text-center h-full group ${
+                      className={`cursor-pointer transition-all duration-300 relative overflow-hidden rounded-2xl p-4 text-center h-full group border ${
                         baseSpirits.includes(spirit.value)
-                          ? "glass-effect border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.3)]"
-                          : "glass-effect hover:border-primary/30 hover:shadow-lg"
+                          ? "glass-effect border-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.2)] bg-primary/5"
+                          : "glass-effect border-transparent hover:border-primary/20 hover:bg-white/5"
                       }`}
                       onClick={() =>
                         toggleBaseSpirit(
@@ -476,7 +476,6 @@ const Questions = memo(function Questions() {
                   onClick={handleBaseSpiritsDone}
                   size="lg"
                   variant="primary"
-                  className="px-12 py-6 text-lg shadow-xl hover:shadow-primary/30"
                 >
                   {t("questions.continue")}
                 </Button>
@@ -525,7 +524,7 @@ const Questions = memo(function Questions() {
                 <Button
                   variant="outline"
                   onClick={() => setShowFeedbackForm(false)}
-                  className="px-8 py-6 text-base"
+                  size="lg"
                 >
                   {t("questions.skip")}
                 </Button>
@@ -533,7 +532,7 @@ const Questions = memo(function Questions() {
                   onClick={handleFeedbackSubmit}
                   disabled={isGenerating}
                   variant="primary"
-                  className="px-12 py-6 text-lg font-bold shadow-2xl hover:shadow-primary/40"
+                  size="lg"
                 >
                   {isGenerating
                     ? t("questions.generating")
