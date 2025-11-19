@@ -9,18 +9,14 @@ import {
   useMemo,
 } from "react";
 import type { ReactNode } from "react";
-import {
-  requestCocktailRecommendation,
-  type Cocktail,
-  type BartenderRequest,
-} from "@/api/cocktail";
+import type { Cocktail, BartenderRequest } from "@/api/cocktail";
 import {
   asyncStorage,
   saveToStorageAsync,
   clearStorageWithPrefixAsync,
 } from "@/utils/asyncStorage";
 import { useBatchAsyncState } from "@/hooks/useAsyncState";
-import { generateCocktailImage, generateImagePrompt } from "@/api/image";
+import { generateImagePrompt } from "@/api/image";
 import { generateSessionId } from "@/utils/generateId";
 import { cocktailLogger } from "@/utils/logger";
 import { useLanguage } from "@/context/LanguageContext";
@@ -218,31 +214,92 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         answers,
         baseSpirits,
         sessionId,
+        specialRequests: userFeedback,
       };
 
       await asyncStorage.setItem(STORAGE_KEYS.REQUEST, request);
 
-      recommendation = await requestCocktailRecommendation(
-        request,
-        undefined,
-        language,
-      );
+      // 调用服务端 API 路由生成鸡尾酒推荐
+      const cocktailResponse = await fetch("/api/cocktail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...request,
+          language,
+        }),
+      });
+
+      if (!cocktailResponse.ok) {
+        const errorData = await cocktailResponse.json();
+        throw new Error(errorData.error || t("error.generationFailed"));
+      }
+
+      const cocktailData = await cocktailResponse.json();
+      recommendation = cocktailData.data;
+      
+      if (!recommendation) {
+        throw new Error(t("error.invalidData"));
+      }
+      
       await updateItem("recommendation", recommendation);
 
+      // 启动后台图片生成任务（不阻塞主流程）
+      // 设置图片加载状态为 true，这样推荐页会显示加载动画
+      setIsImageLoadingState(true);
+      
       const prompt = generateImagePrompt(recommendation);
-      const imageDataResult = await generateCocktailImage(prompt, sessionId);
-      await updateItem("imageData", imageDataResult);
+      
+      // 使用异步函数执行图片生成，不使用 await 阻塞主线程
+      const generateImageTask = async () => {
+        try {
+          const imageResponse = await fetch("/api/image", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              prompt,
+              sessionId,
+            }),
+          });
+
+          if (!imageResponse.ok) {
+            const errorData = await imageResponse.json();
+            cocktailLogger.warn("图片生成失败，使用默认图片", errorData.error);
+            // 图片生成失败不影响整体流程，使用 null
+            await updateItem("imageData", null);
+          } else {
+            const imageData = await imageResponse.json();
+            await updateItem("imageData", imageData.data);
+          }
+        } catch (error) {
+          cocktailLogger.error("后台图片生成出错", error);
+          await updateItem("imageData", null);
+        } finally {
+          // 无论成功失败，都结束图片加载状态
+          setIsImageLoadingState(false);
+        }
+      };
+
+      // 触发后台任务
+      generateImageTask();
 
       setProgressPercentage(100);
       return recommendation;
     } catch (err) {
-      setError("Failed to generate cocktail recommendation.");
-      cocktailLogger.error("Error generating cocktail recommendation:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to generate cocktail recommendation.";
+      setError(errorMessage);
+      cocktailLogger.error("Error generating cocktail recommendation", err);
       throw err;
     } finally {
       setIsLoading(false);
     }
-  }, [answers, baseSpirits, language]);
+  }, [answers, baseSpirits, language, userFeedback, updateItem]);
 
   const isQuestionAnswered = useCallback(
     (questionId: string) => !!answers[questionId],
@@ -279,22 +336,39 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       const sessionId =
         (await asyncStorage.getItem(STORAGE_KEYS.SESSION_ID, "")) || "";
       const prompt = generateImagePrompt(recommendation);
-      const imageDataResult = await generateCocktailImage(
-        prompt,
-        sessionId,
-        true,
-      ); // Force refresh
-      await updateItem("imageData", imageDataResult);
 
-      return imageDataResult;
+      // 调用服务端 API 路由生成图片
+      const imageResponse = await fetch("/api/image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+          sessionId,
+          forceRefresh: true,
+        }),
+      });
+
+      if (!imageResponse.ok) {
+        const errorData = await imageResponse.json();
+        throw new Error(errorData.error || "Failed to refresh image");
+      }
+
+      const imageData = await imageResponse.json();
+      await updateItem("imageData", imageData.data);
+
+      return imageData.data;
     } catch (err) {
-      setError("Failed to refresh cocktail image.");
-      cocktailLogger.error("Error refreshing cocktail image:", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to refresh cocktail image.";
+      setError(errorMessage);
+      cocktailLogger.error("Error refreshing cocktail image", err);
       return null;
     } finally {
       setIsImageLoading(false);
     }
-  }, [recommendation]);
+  }, [recommendation, updateItem]);
 
   // 移除原有的useEffect，因为批量异步状态管理已经处理了数据加载
 

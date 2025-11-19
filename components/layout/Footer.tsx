@@ -34,29 +34,12 @@ export default function Footer() {
       label: "Github",
     },
   ];
-  const contactInfo = [
-    {
-      icon: <Mail className="h-5 w-5 mr-2 text-amber-500" />,
-      text: "contact@moodshaker.com",
-    },
-    {
-      icon: <Phone className="h-5 w-5 mr-2 text-amber-500" />,
-      text: "+86 123 4567 8910",
-    },
-    {
-      icon: <MapPin className="h-5 w-5 mr-2 text-amber-500" />,
-      text: t("footer.address"),
-    },
-  ];
-
+  
   const footerLinks = [
     { text: t("footer.about"), href: "#" },
     { text: t("footer.privacy"), href: "#" },
     { text: t("footer.terms"), href: "#" },
   ];
-
-  // Get the correct home link based on language
-  const homeLink = language === "en" ? "/en" : "/zh";
 
   const staggerAnimation = {
     hidden: { opacity: 0 },
@@ -74,84 +57,91 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gray-800/90 backdrop-blur-sm border-t border-gray-700/50 pt-12 pb-6">
-      <Container>
-        <div className="grid grid-cols-1 gap-8 mb-8">
-          {/* MoodShaker Column */}
-          <motion.div
-            className="md:col-span-1 max-w-2xl mx-auto text-center"
-            initial="hidden"
-            animate="visible"
-            variants={staggerAnimation}
-          >
-            <motion.div
-              variants={itemAnimation}
-              className="flex items-center justify-center gap-2 mb-4"
-            >
-              <div
-                className={`w-10 h-10 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center`}
+    <footer className="relative z-10 mt-auto">
+      {/* Glass effect container for footer */}
+      <div className="glass-effect border-t border-white/10">
+        <div className="py-12 md:py-16 lg:py-20">
+          <Container>
+            <div className="grid grid-cols-1 gap-8 mb-12">
+              {/* MoodShaker Column */}
+              <motion.div
+                className="md:col-span-1 max-w-2xl mx-auto text-center"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={staggerAnimation}
               >
-                <Cocktail className="h-5 w-5 text-white" />
-              </div>
-              <span className="gradient-text-bright font-bold text-xl">
-                MoodShaker
-              </span>
-            </motion.div>
-            <motion.p
-              variants={itemAnimation}
-              className="text-sm text-gray-400 mb-6 max-w-md mx-auto"
-            >
-              {t("footer.description")}
-            </motion.p>
-            <motion.div
-              variants={itemAnimation}
-              className="flex justify-center space-x-3"
-            >
-              {socialLinks.map((link, index) => (
-                <Link
-                  key={index}
-                  href={link.href}
-                  className="text-gray-400 hover:text-amber-500 transition-colors p-2 hover:bg-white/5 rounded-full"
-                  aria-label={link.label}
-                  target="_blank"
+                <motion.div
+                  variants={itemAnimation}
+                  className="flex items-center justify-center gap-3 mb-6"
                 >
-                  {link.icon}
-                </Link>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-
-        <Divider />
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="mt-6 text-center text-sm text-gray-400"
-        >
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="flex items-center justify-center">
-              © {new Date().getFullYear()} MoodShaker. {t("footer.madeWith")}
-              <Heart
-                className="h-3.5 w-3.5 mx-1 text-pink-500 inline"
-                fill="currentColor"
-              />
-            </p>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4 md:mt-0">
-              {footerLinks.map((link, index) => (
-                <Link
-                  key={index}
-                  href={link.href}
-                  className="text-gray-400 hover:text-amber-500 transition-colors"
+                  <div
+                    className={`w-12 h-12 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center shadow-lg`}
+                  >
+                    <Cocktail className="h-6 w-6 text-white" />
+                  </div>
+                  <span className="gradient-text-bright font-bold text-2xl font-playfair">
+                    MoodShaker
+                  </span>
+                </motion.div>
+                <motion.p
+                  variants={itemAnimation}
+                  className="text-base text-muted-foreground mb-8 max-w-md mx-auto font-source-sans leading-relaxed"
                 >
-                  {link.text}
-                </Link>
-              ))}
+                  {t("footer.description")}
+                </motion.p>
+                <motion.div
+                  variants={itemAnimation}
+                  className="flex justify-center space-x-4"
+                >
+                  {socialLinks.map((link, index) => (
+                    <Link
+                      key={index}
+                      href={link.href}
+                      className="text-muted-foreground hover:text-primary transition-all duration-300 p-3 hover:bg-white/5 rounded-full hover:scale-110"
+                      aria-label={link.label}
+                      target="_blank"
+                    >
+                      {link.icon}
+                    </Link>
+                  ))}
+                </motion.div>
+              </motion.div>
             </div>
-          </div>
-        </motion.div>
-      </Container>
+
+            <Divider className="border-white/10 my-8" />
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-center text-sm text-muted-foreground font-source-sans"
+            >
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p className="flex items-center justify-center">
+                  © {new Date().getFullYear()} MoodShaker. {t("footer.madeWith")}
+                  <Heart
+                    className="h-3.5 w-3.5 mx-1 text-pink-500 inline"
+                    fill="currentColor"
+                  />
+                </p>
+                <div className="flex flex-wrap justify-center gap-x-8 gap-y-2">
+                  {footerLinks.map((link, index) => (
+                    <Link
+                      key={index}
+                      href={link.href}
+                      className="hover:text-primary transition-colors hover:underline decoration-primary/30 underline-offset-4"
+                    >
+                      {link.text}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </Container>
+        </div>
+      </div>
     </footer>
   );
 }

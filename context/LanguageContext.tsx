@@ -103,10 +103,10 @@ const translations: TranslationDictionary = {
     "questions.base_spirits.title": "选择您拥有的基酒",
     "questions.base_spirits.description": "请选择您家中现有的基酒（可选多个）",
 
-    "questions.feedback.title": "分享您的心情和偏好",
-    "questions.feedback.description": "告诉我们您现在的心情或任何特殊要求",
+    "questions.feedback.title": "特殊要求",
+    "questions.feedback.description": "有什么过敏忌口、特殊喜好或者具体的想喝的味道吗？",
     "questions.feedback.placeholder":
-      "例如：我想要酸甜口味的鸡尾酒，今天心情很好...",
+      "例如：不要冰，加点辣，我特别喜欢薄荷...",
 
     "questions.back": "返回",
     "questions.availableSpirits": "可用的基酒（可选）✨",
@@ -121,17 +121,6 @@ const translations: TranslationDictionary = {
     "questions.skill.title": "调酒技能点？🎯",
     "questions.skill.description":
       "想要多花哨的调酒方式？我们为每个技能等级都准备了选项！",
-
-    // Question options
-    "questions.options.classic": "经典特调",
-    "questions.options.custom": "来点惊喜",
-    "questions.options.alcohol_low": "低酒精度",
-    "questions.options.alcohol_medium": "中酒精度",
-    "questions.options.alcohol_high": "高酒精度",
-    "questions.options.any": "我无所谓",
-    "questions.options.skill_easy": "简单混合",
-    "questions.options.skill_medium": "中等难度",
-    "questions.options.skill_hard": "调酒大师",
 
     // Base spirits
     "spirits.all": "全部🎉",
@@ -217,6 +206,11 @@ const translations: TranslationDictionary = {
     "loading.default": "正在调制中",
     "loading.subtitle": "为您精心调配完美口感",
     "loading.dots": "加载中",
+    "loading.rotating.1": "正在挑选最优质的基酒...",
+    "loading.rotating.2": "正在平衡风味...",
+    "loading.rotating.3": "正在冰镇酒杯...",
+    "loading.rotating.4": "正在注入灵魂...",
+    "loading.rotating.5": "马上就好...",
 
     // Error messages
     "error.saveAnswers": "保存答案失败，请重试",
@@ -227,6 +221,9 @@ const translations: TranslationDictionary = {
     "error.loadData": "加载保存数据失败",
     "error.saveAnswersProgress": "保存答案时出错",
     "error.submitFailed": "提交失败",
+    "error.generationFailed": "生成鸡尾酒推荐失败，请稍后重试",
+    "error.invalidData": "服务器返回了无效的鸡尾酒数据",
+    "error.parseFailed": "无法解析鸡尾酒数据",
 
     // Home page CTA
     "home.cta.title": "准备好发现您的完美鸡尾酒了吗?",
@@ -308,11 +305,11 @@ const translations: TranslationDictionary = {
     "questions.base_spirits.description":
       "Choose the base spirits you have at home (optional)",
 
-    "questions.feedback.title": "Share Your Mood & Preferences",
+    "questions.feedback.title": "Special Requests",
     "questions.feedback.description":
-      "Tell us about your current mood or any special requests",
+      "Any allergies, dislikes, or specific cravings?",
     "questions.feedback.placeholder":
-      "e.g., I want something sweet and sour, feeling great today...",
+      "e.g., No ice, extra spicy, I love mint...",
 
     "questions.back": "Back",
     "questions.availableSpirits": "Available Spirits (Optional) ✨",
@@ -328,17 +325,6 @@ const translations: TranslationDictionary = {
     "questions.skill.title": "Mixology Level? 🎯",
     "questions.skill.description":
       "How fancy do you want to get with your cocktail making? We've got options for every skill level!",
-
-    // Question options
-    "questions.options.classic": "Choose from classics",
-    "questions.options.custom": "Surprise Me!",
-    "questions.options.low": "Just a Sip",
-    "questions.options.medium": "Balanced Buzz",
-    "questions.options.high": "Party Mode",
-    "questions.options.any": "Surprise Me!",
-    "questions.options.skill_easy": "Mix & Pour",
-    "questions.options.skill_medium": "Intermediate",
-    "questions.options.skill_hard": "Advanced",
 
     // Base spirits
     "spirits.all": "All",
@@ -428,6 +414,11 @@ const translations: TranslationDictionary = {
     "loading.default": "Mixing...",
     "loading.subtitle": "Crafting the perfect flavor for you",
     "loading.dots": "Loading",
+    "loading.rotating.1": "Selecting the finest spirits...",
+    "loading.rotating.2": "Balancing the flavors...",
+    "loading.rotating.3": "Chilling the glass...",
+    "loading.rotating.4": "Adding a touch of magic...",
+    "loading.rotating.5": "Almost ready...",
 
     // Error messages
     "error.saveAnswers": "Failed to save answers, please try again",
@@ -440,6 +431,9 @@ const translations: TranslationDictionary = {
     "error.loadData": "Failed to load saved data",
     "error.saveAnswersProgress": "Error saving answers",
     "error.submitFailed": "Submission failed",
+    "error.generationFailed": "Failed to generate cocktail recommendation, please try again later",
+    "error.invalidData": "Server returned invalid cocktail data",
+    "error.parseFailed": "Failed to parse cocktail data",
 
     // Home page CTA
     "home.cta.title": "Ready to discover your perfect cocktail?",

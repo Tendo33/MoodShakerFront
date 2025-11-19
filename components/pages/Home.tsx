@@ -139,7 +139,7 @@ const Home = React.memo(function Home() {
 
   return (
     <div className="bg-background text-foreground">
-      <section className="relative hero-height flex items-center section-spacing-compact pt-16 md:pt-20 lg:pt-24 overflow-hidden">
+      <section className="relative hero-height flex items-center section-spacing pt-16 md:pt-20 lg:pt-24 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
             className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
@@ -167,7 +167,7 @@ const Home = React.memo(function Home() {
               initial="hidden"
               animate={shouldAnimate ? "visible" : "hidden"}
               variants={animations.staggerContainer}
-              className="content-spacing-compact"
+              className="content-spacing"
             >
               <motion.div variants={animations.slideUp} className="mb-6">
                 <div className="inline-flex items-center bg-primary/20 text-primary border border-primary/30 px-3 py-1.5 text-sm rounded-full font-medium glass-effect">
@@ -390,7 +390,7 @@ const Home = React.memo(function Home() {
             </p>
           </motion.div>
 
-          <div className="card-grid-compact grid-cols-1 md:grid-cols-3">
+          <div className="card-grid grid-cols-1 md:grid-cols-3">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
@@ -456,7 +456,7 @@ const Home = React.memo(function Home() {
             </p>
           </motion.div>
 
-          <div className="card-grid-compact grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="card-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {featuredCocktails.map((cocktail, index) => (
               <motion.div
                 key={index}

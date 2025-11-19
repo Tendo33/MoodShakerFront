@@ -47,9 +47,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl hover:shadow-primary/25 active:scale-95 glow-effect",
+        "bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg active:scale-95",
       secondary:
-        "bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-lg hover:shadow-xl hover:shadow-secondary/25 active:scale-95",
+        "bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-md hover:shadow-lg active:scale-95",
       outline:
         "bg-transparent border-2 border-border hover:bg-accent/10 hover:border-accent text-foreground active:scale-95",
       ghost:
@@ -63,11 +63,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizeStyles = {
-      xs: "px-3 py-1.5 text-xs",
-      sm: "px-4 py-2 text-sm",
-      md: "px-6 py-3 text-base",
-      lg: "px-8 py-4 text-lg",
-      xl: "px-10 py-5 text-xl",
+      xs: "px-2.5 py-1 text-xs",
+      sm: "px-3 py-1.5 text-sm",
+      md: "px-5 py-2.5 text-sm",
+      lg: "px-6 py-3 text-base",
+      xl: "px-8 py-3.5 text-lg",
     };
 
     const widthStyles = fullWidth ? "w-full" : "w-auto";

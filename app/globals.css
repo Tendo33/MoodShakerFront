@@ -8,6 +8,34 @@
   .text-balance {
     text-wrap: balance;
   }
+  
+  /* 锦囊二：质感 - 噪点纹理 */
+  .noise-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  /* 锦囊三：玻璃感 - 高级水晶效果 */
+  .glass-effect {
+    @apply backdrop-blur-xl bg-background/40 border border-white/10 shadow-2xl;
+    /* 额外的光泽 */
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.01) 100%
+    );
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+    /* 性能优化：使用 GPU 加速 */
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
 }
 
 @layer base {
@@ -129,20 +157,20 @@
   }
 }
 
-/* Enhanced spacing utilities for better breathing room */
+/* 锦囊一：呼吸感 - 宽松的间距定义 */
 .section-spacing {
-  /* Further reduced section padding for compact layout */
-  @apply py-4 md:py-6 lg:py-8;
+  /* Increased section padding for luxury feel */
+  @apply py-16 md:py-24 lg:py-32;
 }
 
 .content-spacing {
-  /* Tighter content spacing for better screen utilization */
-  @apply space-y-3 md:space-y-4 lg:space-y-5;
+  /* Relaxed content spacing */
+  @apply space-y-8 md:space-y-12 lg:space-y-16;
 }
 
 .card-spacing {
-  /* More compact card padding */
-  @apply p-3 md:p-4 lg:p-5;
+  /* More generous card padding */
+  @apply p-6 md:p-8 lg:p-10;
 }
 
 /* Container utilities */
@@ -154,86 +182,60 @@
   @apply max-w-6xl mx-auto;
 }
 
-/* Compact mode utilities for tight layouts */
-.section-spacing-compact {
-  @apply py-3 md:py-4 lg:py-6;
-}
-
-.content-spacing-compact {
-  @apply space-y-2 md:space-y-3 lg:space-y-4;
-}
-
-.card-spacing-compact {
-  @apply p-2 md:p-3 lg:p-4;
-}
+/* Removed 'compact' variants to enforce spacious design */
 
 /* Mobile responsive overrides - consolidated */
 @media (max-width: 640px) {
   .section-spacing {
-    @apply py-3;
+    @apply py-12;
   }
   .content-spacing {
-    @apply space-y-2;
+    @apply space-y-6;
   }
   .card-spacing {
-    @apply p-2;
+    @apply p-6;
   }
 }
 
 /* Optimized hero section for better screen utilization */
 .hero-height {
-  /* Significantly reduced hero height */
-  min-height: 50vh;
+  /* Taller hero for impact */
+  min-height: 85vh;
 }
 
 @media (max-width: 768px) {
   .hero-height {
-    /* Compact mobile hero height */
-    min-height: 45vh;
+    min-height: 75vh;
   }
 }
 
 @media (max-width: 480px) {
   .hero-height {
-    /* Very compact small mobile hero height */
-    min-height: 40vh;
+    min-height: 65vh;
   }
 }
 
 /* Optimized grid spacing for cards */
 .card-grid {
-  /* Tighter grid gaps for more content per screen */
-  @apply grid gap-2 md:gap-3 lg:gap-4;
-}
-
-.card-grid-compact {
-  /* Extra tight grid for maximum content density */
-  @apply grid gap-1.5 md:gap-2 lg:gap-3;
+  /* Wider grid gaps */
+  @apply grid gap-6 md:gap-8 lg:gap-10;
 }
 
 /* Improved text spacing for better readability */
 .text-spacing {
-  /* Compact text spacing for denser content */
-  @apply space-y-2 md:space-y-3;
+  /* Relaxed text spacing */
+  @apply space-y-4 md:space-y-6;
 }
 
 .text-spacing p {
-  /* Minimal paragraph spacing */
-  @apply mb-2 last:mb-0;
+  /* More paragraph spacing */
+  @apply mb-4 last:mb-0;
 }
 
 /* Enhanced button spacing */
 .button-group {
-  /* Tight button group spacing */
-  @apply flex flex-col sm:flex-row gap-1.5 md:gap-2;
-}
-
-/* Compact variants for high-density layouts */
-.text-spacing-compact {
-  @apply space-y-1.5 md:space-y-2;
-}
-.button-group-compact {
-  @apply flex flex-col sm:flex-row gap-1 md:gap-1.5;
+  /* Relaxed button group spacing */
+  @apply flex flex-col sm:flex-row gap-4 md:gap-6;
 }
 
 /* Enhanced focus states for better accessibility */
@@ -249,57 +251,57 @@
 /* Improved responsive typography with better hierarchy */
 @layer base {
   h1 {
-    @apply text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight;
+    @apply text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight;
   }
   h2 {
-    @apply text-2xl md:text-3xl lg:text-4xl font-bold leading-tight tracking-tight;
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight;
   }
   h3 {
-    @apply text-xl md:text-2xl font-semibold leading-snug;
+    @apply text-2xl md:text-3xl font-semibold leading-snug;
   }
   h4 {
-    @apply text-lg md:text-xl font-semibold leading-snug;
+    @apply text-xl md:text-2xl font-semibold leading-snug;
   }
   p {
-    @apply text-base leading-relaxed;
+    @apply text-lg leading-relaxed;
   }
 }
 
 @media (max-width: 640px) {
   h1 {
-    font-size: 1.75rem !important;
+    font-size: 2.5rem !important;
     line-height: 1.15 !important;
   }
   h2 {
-    font-size: 1.5rem !important;
+    font-size: 2rem !important;
     line-height: 1.25 !important;
   }
   h3 {
-    font-size: 1.25rem !important;
+    font-size: 1.5rem !important;
     line-height: 1.35 !important;
   }
   p {
-    font-size: 0.9rem !important;
-    line-height: 1.5 !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
   }
 }
 
 /* Additional breakpoint for very small screens */
 @media (max-width: 480px) {
   h1 {
-    font-size: 1.5rem !important;
+    font-size: 2rem !important;
     line-height: 1.1 !important;
   }
   h2 {
-    font-size: 1.25rem !important;
+    font-size: 1.5rem !important;
     line-height: 1.2 !important;
   }
   h3 {
-    font-size: 1.125rem !important;
+    font-size: 1.25rem !important;
     line-height: 1.3 !important;
   }
   p {
-    font-size: 0.875rem !important;
-    line-height: 1.45 !important;
+    font-size: 0.9375rem !important;
+    line-height: 1.5 !important;
   }
 }

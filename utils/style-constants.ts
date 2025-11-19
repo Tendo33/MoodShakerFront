@@ -23,7 +23,7 @@ export const gradientStyles = {
 // 通用样式组合
 export const commonStyles = {
   // 主按钮完整样式
-  primaryButtonFull: `${gradientStyles.primaryButton} text-white px-8 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105`,
+  primaryButtonFull: `${gradientStyles.primaryButton} text-white px-6 py-2.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105`,
 
   // 圆形图标完整样式
   circleIcon: `flex h-10 w-10 items-center justify-center rounded-full ${gradientStyles.iconBackground} text-white shadow-lg flex-shrink-0`,

@@ -68,6 +68,7 @@ export default function RootLayout({
       className={`${playfairDisplay.variable} ${sourceSans.variable} antialiased`}
     >
       <body className="dark">
+        <div className="noise-bg" />
         <ErrorProvider>
           <LanguageProvider>
             <CocktailProvider>

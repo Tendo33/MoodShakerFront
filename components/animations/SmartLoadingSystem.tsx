@@ -1,7 +1,6 @@
 "use client";
 
-
-import { useEffect, useState, memo, useCallback } from "react";
+import { useEffect, useState, memo, useCallback, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import WaitingAnimation from "./WaitingAnimation";
 
@@ -38,6 +37,10 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
   const { t } = useLanguage();
   const [simulatedProgress, setSimulatedProgress] = useState(0);
   const [loadingConfig, setLoadingConfig] = useState<LoadingConfig>();
+  
+  // Use ref to persist start time across re-renders (prevent reset on message change)
+  const startTimeRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const configs: Record<string, LoadingConfig> = {
@@ -79,65 +82,81 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
     };
 
     setLoadingConfig(configs[type] || configs["cocktail-mixing"]);
-  }, [type, message]);
+  }, [type]); // Removed 'message' dependency to avoid unnecessary config re-sets
 
-  // 优化进度更新函数 - 修改为接收startTime参数
+  // Initialize start time when showing
+  useEffect(() => {
+    if (isShowing && startTimeRef.current === null) {
+      startTimeRef.current = Date.now();
+      setSimulatedProgress(0);
+    } else if (!isShowing) {
+      startTimeRef.current = null;
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    }
+  }, [isShowing]);
+
   const updateProgress = useCallback(
-    (elapsed: number, animationFrame: number, startTime: number) => {
+    () => {
+      if (!startTimeRef.current || !isShowing) return;
+
+      const elapsed = Date.now() - startTimeRef.current;
+      
+      // Calculate purely simulated progress (0-95%)
       const estimatedProgress = Math.min(
         (elapsed / estimatedDuration) * 100,
-        95,
+        95
       );
 
-      const combinedProgress =
-        actualProgress > 0
-          ? Math.max(actualProgress, estimatedProgress * 0.7)
-          : estimatedProgress;
+      // Merge with actual progress if provided
+      // Logic: actual progress is the floor. If actual > estimated, jump to actual.
+      // If estimated > actual, continue simulating but don't exceed 98% until actual hits 100%.
+      
+      let combinedProgress = estimatedProgress;
+      
+      if (actualProgress > 0) {
+         if (actualProgress >= 100) {
+            combinedProgress = 100;
+         } else {
+            // Allow simulation to run ahead, but smoothly blend
+            combinedProgress = Math.max(estimatedProgress, actualProgress);
+            // Cap at 98% if actual is not done
+            combinedProgress = Math.min(combinedProgress, 98);
+         }
+      }
 
-      const naturalProgress = combinedProgress + Math.sin(elapsed * 0.01) * 2;
-
-      setSimulatedProgress(Math.min(naturalProgress, 100));
+      setSimulatedProgress(combinedProgress);
 
       if (combinedProgress < 100) {
-        requestAnimationFrame(() =>
-          updateProgress(Date.now() - startTime, animationFrame, startTime),
-        );
+        animationFrameRef.current = requestAnimationFrame(updateProgress);
       } else {
-        setTimeout(() => {
-          onComplete?.();
-        }, 500);
+         // Ensure we hit exactly 100 and call complete
+         setSimulatedProgress(100);
+         setTimeout(() => {
+            onComplete?.();
+         }, 800); // Wait a bit at 100% before firing complete
       }
     },
-    [actualProgress, estimatedDuration, onComplete],
+    [actualProgress, estimatedDuration, onComplete, isShowing]
   );
 
+  // Start animation loop
   useEffect(() => {
-    if (!isShowing || !loadingConfig) return;
-
-    const startTime = Date.now();
-    let animationFrame: number;
-
-    const startProgressUpdate = () => {
-      animationFrame = requestAnimationFrame(() =>
-        updateProgress(Date.now() - startTime, animationFrame, startTime),
-      );
-    };
-
-    startProgressUpdate();
-
+    if (isShowing && startTimeRef.current !== null) {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      animationFrameRef.current = requestAnimationFrame(updateProgress);
+    }
+    
     return () => {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [
-    isShowing,
-    actualProgress,
-    estimatedDuration,
-    onComplete,
-    loadingConfig,
-    updateProgress,
-  ]);
+  }, [isShowing, updateProgress]); // Depends on updateProgress which changes with actualProgress
 
   if (!loadingConfig) return null;
 
@@ -173,10 +192,12 @@ export function useSmartLoading() {
 
   const completeLoading = () => {
     setProgress(100);
+    // The actual unmounting is handled by the component calling onComplete
+    // We just ensure state reflects completion
     setTimeout(() => {
-      setIsLoading(false);
-      setProgress(0);
-    }, 500);
+        setIsLoading(false);
+        setProgress(0);
+    }, 1000);
   };
 
   return {
@@ -185,14 +206,5 @@ export function useSmartLoading() {
     startLoading,
     updateProgress,
     completeLoading,
-    LoadingComponent: (
-      props: Omit<SmartLoadingSystemProps, "isShowing" | "actualProgress">,
-    ) => (
-      <SmartLoadingSystem
-        {...props}
-        isShowing={isLoading}
-        actualProgress={progress}
-      />
-    ),
   };
 }
