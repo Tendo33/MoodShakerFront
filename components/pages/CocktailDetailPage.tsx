@@ -9,9 +9,6 @@ import {
   Clock,
   Droplet,
   GlassWater,
-  Printer,
-  Share2,
-  BookmarkPlus,
   ChevronDown,
   ChevronUp,
   Lightbulb,
@@ -39,7 +36,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id, initialD
   const { t, getPathWithLanguage, language } = useLanguage();
   const [cocktail, setCocktail] = useState<Cocktail | null>(initialData || null);
   const [isLoading, setIsLoading] = useState(!initialData);
-  const [showShareTooltip, setShowShareTooltip] = useState(false);
   
   // Match Recommendation Page State
   const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
@@ -167,36 +163,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id, initialD
     router.push(getPathWithLanguage("/"));
   };
 
-  const handleShare = () => {
-    try {
-      if (navigator.share && window.isSecureContext) {
-        navigator.share({
-            title: `${cocktail?.name} Recipe - MoodShaker`,
-            text: `Check out this ${cocktail?.name} recipe from MoodShaker!`,
-            url: window.location.href,
-          }).catch(() => copyToClipboard());
-      } else {
-        copyToClipboard();
-      }
-    } catch (err) {
-      copyToClipboard();
-    }
-  };
-
-  const copyToClipboard = () => {
-    try {
-      navigator.clipboard.writeText(window.location.href);
-      setShowShareTooltip(true);
-      setTimeout(() => setShowShareTooltip(false), 2000);
-    } catch (err) {
-      alert(`Copy this URL: ${window.location.href}`);
-    }
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
   const toggleSection = useCallback((section: string) => {
     switch (section) {
       case "ingredients":
@@ -272,25 +238,21 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id, initialD
           </div>
 
           <div className="flex items-center gap-3">
-            <motion.button onClick={handlePrint} className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Printer className="h-5 w-5" />
-            </motion.button>
-            <motion.button onClick={handleGenerateCard} disabled={isGeneratingCard} className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              {isGeneratingCard ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
-            </motion.button>
-            <motion.button className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <BookmarkPlus className="h-5 w-5" />
-            </motion.button>
-            <motion.div className="relative" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <button onClick={handleShare} className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none">
-                <Share2 className="h-5 w-5" />
-              </button>
-              {showShareTooltip && (
-                <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className={commonStyles.tooltipFull}>
-                  {t("recommendation.copied")}
-                </motion.div>
+            <motion.button
+              onClick={handleGenerateCard}
+              disabled={isGeneratingCard}
+              className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all glass-effect border border-primary/30"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={t("recommendation.saveImage")}
+            >
+              {isGeneratingCard ? (
+                 <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                 <ImageIcon className="h-5 w-5" />
               )}
-            </motion.div>
+              <span className="font-medium">{t("recommendation.saveImage")}</span>
+            </motion.button>
           </div>
         </motion.div>
 
@@ -478,16 +440,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id, initialD
       </div>
 
       <ShareModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} imageUrl={generatedCardUrl} />
-      
-      {/* Print styles */}
-      <style jsx global>{`
-        @media print {
-          body * { visibility: hidden; }
-          .container, .container * { visibility: visible; }
-          .container { position: absolute; left: 0; top: 0; width: 100%; }
-          button, .print-hide { display: none !important; }
-        }
-      `}</style>
     </div>
   );
 });
