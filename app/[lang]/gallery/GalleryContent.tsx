@@ -129,7 +129,7 @@ export default function GalleryContent({
             className="text-5xl md:text-7xl font-bold font-playfair mb-6 tracking-tight"
           >
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300">
-              The Cellar
+              {t("gallery.title")}
             </span>
           </motion.h1>
           <motion.p
@@ -138,9 +138,7 @@ export default function GalleryContent({
             transition={{ delay: 0.3, duration: 0.7 }}
             className="text-lg text-gray-400 max-w-2xl mx-auto font-light tracking-wide"
           >
-            {lang === "cn"
-              ? "探索由社区创造的独特鸡尾酒配方，每一杯都是一个故事。"
-              : "Discover unique cocktail recipes created by the community. Every drink tells a story."}
+            {t("gallery.subtitle")}
           </motion.p>
         </div>
 
@@ -162,9 +160,7 @@ export default function GalleryContent({
                   <input
                     type="text"
                     className="block w-full pl-11 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-transparent transition-all"
-                    placeholder={
-                      lang === "cn" ? "搜索鸡尾酒、成分、口味..." : "Search cocktails, ingredients, flavors..."
-                    }
+                    placeholder={t("gallery.search.placeholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => {
@@ -190,7 +186,7 @@ export default function GalleryContent({
                   className="hidden md:flex px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-pink-500/25 transition-all items-center gap-2 whitespace-nowrap"
                 >
                   <Search className="w-5 h-5" />
-                  {lang === "cn" ? "搜索" : "Search"}
+                  {t("gallery.search.button")}
                 </button>
               </div>
 
@@ -217,7 +213,7 @@ export default function GalleryContent({
                     {/* Spirit Filter */}
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs uppercase tracking-wider text-gray-500 mr-2 flex items-center gap-1">
-                        <GlassWater className="h-3 w-3" /> Base
+                        <GlassWater className="h-3 w-3" /> {t("gallery.filter.base")}
                       </span>
                       {BASE_SPIRITS.map((spirit) => (
                         <button
@@ -233,7 +229,7 @@ export default function GalleryContent({
                               : "bg-transparent text-gray-400 border-white/10 hover:border-white/30 hover:text-white"
                           }`}
                         >
-                          {spirit}
+                          {t(`gallery.spirit.${spirit.toLowerCase()}`)}
                         </button>
                       ))}
                     </div>
@@ -241,7 +237,7 @@ export default function GalleryContent({
                     {/* Flavor Filter */}
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs uppercase tracking-wider text-gray-500 mr-2 flex items-center gap-1">
-                        <Sparkles className="h-3 w-3" /> Flavor
+                        <Sparkles className="h-3 w-3" /> {t("gallery.filter.flavor")}
                       </span>
                       {FLAVORS.map((flavor) => (
                         <button
@@ -257,7 +253,7 @@ export default function GalleryContent({
                               : "bg-transparent text-gray-400 border-white/10 hover:border-white/30 hover:text-white"
                           }`}
                         >
-                          {flavor}
+                          {t(`gallery.flavor.${flavor.toLowerCase()}`)}
                         </button>
                       ))}
                     </div>
@@ -295,13 +291,6 @@ export default function GalleryContent({
                     
                     {/* Overlay Gradient */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-80" />
-                    
-                    {/* Hover Reveal Content */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                       <span className="px-6 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white font-medium tracking-wide">
-                         View Recipe
-                       </span>
-                    </div>
                   </div>
 
                   {/* Card Info - Absolute positioned at bottom */}
@@ -316,11 +305,11 @@ export default function GalleryContent({
                       
                       <div className="flex flex-wrap gap-2">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-white/10 text-xs font-medium text-pink-200 border border-pink-500/20">
-                           {cocktail.base_spirit}
+                           {lang === 'en' ? cocktail.english_base_spirit || cocktail.base_spirit : cocktail.base_spirit}
                         </span>
-                        {cocktail.alcohol_level && (
+                        {(cocktail.alcohol_level || cocktail.english_alcohol_level) && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-white/5 text-xs font-medium text-blue-200 border border-white/10">
-                             {cocktail.alcohol_level}
+                             {lang === 'en' ? cocktail.english_alcohol_level || cocktail.alcohol_level : cocktail.alcohol_level}
                           </span>
                         )}
                       </div>
@@ -342,8 +331,8 @@ export default function GalleryContent({
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4">
                <Search className="h-6 w-6 text-gray-500" />
             </div>
-            <h3 className="text-xl font-medium text-white mb-2">No cocktails found</h3>
-            <p className="text-gray-400">Try adjusting your filters or search terms.</p>
+            <h3 className="text-xl font-medium text-white mb-2">{t("gallery.noResults.title")}</h3>
+            <p className="text-gray-400">{t("gallery.noResults.desc")}</p>
           </motion.div>
         )}
       </div>

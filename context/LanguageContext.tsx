@@ -203,6 +203,49 @@ const translations: TranslationDictionary = {
       "抱歉，生成鸡尾酒推荐时出现了问题。请重试或返回首页。",
     "recommendation.startQuestions": "开始问卷",
 
+    // Gallery
+    "gallery.title": "酒单库",
+    "gallery.subtitle": "探索由社区创造的独特鸡尾酒配方，每一杯都是一个故事。",
+    "gallery.search.placeholder": "搜索鸡尾酒、成分、口味...",
+    "gallery.search.button": "搜索",
+    "gallery.filter.base": "基酒",
+    "gallery.filter.flavor": "风味",
+    "gallery.filter.alcohol_level": "酒精度",
+    "gallery.noResults.title": "未找到鸡尾酒",
+    "gallery.noResults.desc": "尝试调整筛选条件或搜索关键词。",
+    "gallery.viewRecipe": "查看配方",
+    
+    // Cocktail Detail
+    "detail.baseSpirit": "基酒",
+    "detail.alcohol": "酒精度",
+    "detail.prepTime": "制作时间",
+    "detail.glass": "酒杯",
+    "detail.flavorProfile": "风味描述",
+    "detail.recipe": "配方",
+
+    // Gallery Filters - Spirits
+    "gallery.spirit.gin": "金酒",
+    "gallery.spirit.vodka": "伏特加",
+    "gallery.spirit.rum": "朗姆酒",
+    "gallery.spirit.tequila": "龙舌兰",
+    "gallery.spirit.whiskey": "威士忌",
+    "gallery.spirit.brandy": "白兰地",
+    "gallery.spirit.other": "其他",
+
+    // Gallery Filters - Flavors
+    "gallery.flavor.sweet": "甜味",
+    "gallery.flavor.sour": "酸味",
+    "gallery.flavor.bitter": "苦味",
+    "gallery.flavor.fruity": "果味",
+    "gallery.flavor.herbal": "草本",
+    "gallery.flavor.smoky": "烟熏",
+    "gallery.flavor.spicy": "辛辣",
+
+    // Gallery Filters - Alcohol Levels
+    "gallery.level.low": "低",
+    "gallery.level.medium": "中",
+    "gallery.level.high": "高",
+
     // Loading animations
     "loading.mixing": "正在为您调制专属鸡尾酒...",
     "loading.analyzing": "正在分析您的口味偏好...",
@@ -416,6 +459,49 @@ const translations: TranslationDictionary = {
     "recommendation.errorDesc":
       "Sorry, there was an issue generating your cocktail recommendation. Please try again or return to the homepage.",
     "recommendation.startQuestions": "Start Questions",
+
+    // Gallery
+    "gallery.title": "The Cellar",
+    "gallery.subtitle": "Discover unique cocktail recipes created by the community. Every drink tells a story.",
+    "gallery.search.placeholder": "Search cocktails, ingredients, flavors...",
+    "gallery.search.button": "Search",
+    "gallery.filter.base": "Base",
+    "gallery.filter.flavor": "Flavor",
+    "gallery.filter.alcohol_level": "Level",
+    "gallery.noResults.title": "No cocktails found",
+    "gallery.noResults.desc": "Try adjusting your filters or search terms.",
+    "gallery.viewRecipe": "View Recipe",
+
+    // Cocktail Detail
+    "detail.baseSpirit": "Base Spirit",
+    "detail.alcohol": "Alcohol",
+    "detail.prepTime": "Prep Time",
+    "detail.glass": "Glass",
+    "detail.flavorProfile": "Flavor Profile",
+    "detail.recipe": "Recipe",
+
+    // Gallery Filters - Spirits
+    "gallery.spirit.gin": "Gin",
+    "gallery.spirit.vodka": "Vodka",
+    "gallery.spirit.rum": "Rum",
+    "gallery.spirit.tequila": "Tequila",
+    "gallery.spirit.whiskey": "Whiskey",
+    "gallery.spirit.brandy": "Brandy",
+    "gallery.spirit.other": "Other",
+
+    // Gallery Filters - Flavors
+    "gallery.flavor.sweet": "Sweet",
+    "gallery.flavor.sour": "Sour",
+    "gallery.flavor.bitter": "Bitter",
+    "gallery.flavor.fruity": "Fruity",
+    "gallery.flavor.herbal": "Herbal",
+    "gallery.flavor.smoky": "Smoky",
+    "gallery.flavor.spicy": "Spicy",
+
+    // Gallery Filters - Alcohol Levels
+    "gallery.level.low": "Low",
+    "gallery.level.medium": "Medium",
+    "gallery.level.high": "High",
 
     // Loading animations
     "loading.mixing": "Crafting your perfect cocktail...",
