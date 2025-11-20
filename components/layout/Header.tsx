@@ -86,15 +86,24 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
-          <Link 
+        <div className="hidden md:flex items-center space-x-4">
+          <Button 
             href={galleryLink}
-            className="text-white/80 hover:text-white transition-colors font-medium"
+            variant="outline"
+            size="md"
+            className="text-white border-white/20 hover:bg-white/10 hover:border-white/40 backdrop-blur-sm"
+            icon={<span className="text-lg">🍹</span>}
           >
             {language === 'cn' ? '酒单库' : 'Gallery'}
-          </Link>
+          </Button>
           <LanguageSelector />
-          <Button href={questionsLink} size="lg" variant="primary" className="shadow-xl hover:shadow-primary/25">
+          <Button 
+            href={questionsLink} 
+            size="md" 
+            variant="primary" 
+            className="shadow-xl hover:shadow-primary/25"
+            icon={<span className="text-lg">✨</span>}
+          >
             {t("home.start")}
           </Button>
         </div>
@@ -128,13 +137,16 @@ export default function Header() {
             <div className="absolute inset-0 bg-background/60 backdrop-blur-xl" />
             
             <div className="relative px-6 py-6 space-y-6 border-t border-white/10 bg-background/40">
-              <Link 
+              <Button 
                 href={galleryLink}
+                variant="outline"
+                fullWidth
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block py-3 text-white/90 hover:text-white font-bold text-xl border-b border-white/10"
+                className="justify-start text-lg text-white border-white/20 hover:bg-white/10 hover:border-white/40"
+                icon={<span className="text-xl">🍹</span>}
               >
                 {language === 'cn' ? '酒单库' : 'Gallery'}
-              </Link>
+              </Button>
               <div className="pt-2 pb-4">
                 <Button
                   href={questionsLink}
@@ -143,6 +155,7 @@ export default function Header() {
                   fullWidth
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="shadow-lg text-lg"
+                  icon={<span className="text-xl">✨</span>}
                 >
                   {t("home.start")}
                 </Button>

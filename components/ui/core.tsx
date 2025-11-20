@@ -43,31 +43,31 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const { t } = useLanguage();
     const baseStyles =
-      "relative font-medium rounded-xl transition-all duration-300 flex items-center justify-center font-source-sans focus-ring";
+      "relative font-medium rounded-full transition-all duration-300 flex items-center justify-center font-source-sans focus-ring transform-gpu active:scale-95";
 
     const variantStyles = {
       primary:
-        "bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg active:scale-95",
+        "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_hsl(var(--primary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.6)] hover:scale-105",
       secondary:
-        "bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-md hover:shadow-lg active:scale-95",
+        "bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-[0_4px_14px_0_hsl(var(--secondary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--secondary)/0.6)] hover:scale-105",
       outline:
-        "bg-transparent border-2 border-border hover:bg-accent/10 hover:border-accent text-foreground active:scale-95",
+        "bg-transparent border-2 border-border hover:bg-accent/10 hover:border-accent text-foreground hover:scale-105 hover:shadow-[0_0_15px_hsl(var(--accent)/0.2)]",
       ghost:
-        "bg-transparent hover:bg-accent/10 text-foreground active:scale-95",
+        "bg-transparent hover:bg-accent/10 text-foreground hover:scale-105",
       link: "bg-transparent text-primary hover:text-secondary p-0 hover:underline font-medium",
-      neon: "bg-transparent border-2 border-primary text-primary shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:bg-primary/10 active:scale-95",
+      neon: "bg-transparent border-2 border-primary text-primary shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.6)] hover:bg-primary/10 hover:scale-105",
       bubble:
-        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden before:content-[''] before:absolute before:inset-0 before:scale-0 hover:before:scale-100 before:rounded-xl before:transition-transform before:duration-500 before:bg-white/20 active:scale-95",
+        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden before:content-[''] before:absolute before:inset-0 before:scale-0 hover:before:scale-100 before:rounded-full before:transition-transform before:duration-500 before:bg-white/20 hover:scale-105 shadow-lg hover:shadow-xl",
       shine:
-        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 active:scale-95",
+        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 hover:scale-105 shadow-lg hover:shadow-xl",
     };
 
     const sizeStyles = {
-      xs: "px-2.5 py-1 text-xs",
-      sm: "px-3 py-1.5 text-sm",
-      md: "px-5 py-2.5 text-sm",
-      lg: "px-6 py-3 text-base",
-      xl: "px-8 py-3.5 text-lg",
+      xs: "px-3 py-1 text-xs",
+      sm: "px-4 py-1.5 text-sm",
+      md: "px-6 py-2.5 text-sm",
+      lg: "px-8 py-3 text-base",
+      xl: "px-10 py-3.5 text-lg",
     };
 
     const widthStyles = fullWidth ? "w-full" : "w-auto";

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
   ArrowRight,
   History,
@@ -48,7 +48,16 @@ const Home = React.memo(function Home() {
   const hasSavedSession = savedAnswers && Object.keys(savedAnswers).length > 0;
 
   // Featured cocktails for the hero section with translations - 使用 useMemo 优化性能
-  const featuredCocktails = useMemo(() => [
+  interface FeaturedCocktail {
+    id: string;
+    name: string;
+    englishName: string;
+    description: string;
+    image: string;
+    tags: string[];
+  }
+
+  const featuredCocktails = useMemo<FeaturedCocktail[]>(() => [
     {
       id: "mojito",
       name: language === "en" ? "Mojito" : "莫吉托",
@@ -144,21 +153,21 @@ const Home = React.memo(function Home() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
             className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
-            animate={floatAnimation}
+            animate={floatAnimation as any}
           />
           <motion.div
             className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
             animate={{
               ...floatAnimation,
               transition: { ...floatAnimation.transition, delay: 1 },
-            }}
+            } as any}
           />
           <motion.div
             className="absolute top-2/3 right-1/3 w-64 h-64 bg-accent/10 rounded-full blur-3xl"
             animate={{
               ...floatAnimation,
               transition: { ...floatAnimation.transition, delay: 2 },
-            }}
+            } as any}
           />
         </div>
 
@@ -167,10 +176,10 @@ const Home = React.memo(function Home() {
             <motion.div
               initial="hidden"
               animate={shouldAnimate ? "visible" : "hidden"}
-              variants={animations.staggerContainer}
+              variants={animations.staggerContainer as any}
               className="content-spacing"
             >
-              <motion.div variants={animations.slideUp} className="mb-6">
+              <motion.div variants={animations.slideUp as any} className="mb-6">
                 <div className="inline-flex items-center bg-primary/20 text-primary border border-primary/30 px-3 py-1.5 text-sm rounded-full font-medium glass-effect">
                   {language === "en"
                     ? "✨ AI-Powered Cocktail Recommendations"
@@ -180,7 +189,7 @@ const Home = React.memo(function Home() {
 
               <motion.h1
                 className="font-playfair font-bold text-shadow mb-6"
-                variants={animations.slideUp}
+                variants={animations.slideUp as any}
               >
                 <GradientText as="span" className="block leading-tight">
                   {t("home.title")}
@@ -189,7 +198,7 @@ const Home = React.memo(function Home() {
 
               <motion.p
                 className="text-lg md:text-xl text-foreground/80 font-source-sans leading-relaxed max-w-xl mb-8"
-                variants={animations.slideUp}
+                variants={animations.slideUp as any}
               >
                 {t("home.subtitle")}
               </motion.p>
@@ -197,7 +206,7 @@ const Home = React.memo(function Home() {
               {hasSavedSession ? (
                 <motion.div
                   className="glass-effect card-spacing rounded-2xl border border-border/50 glow-effect max-w-lg"
-                  variants={animations.slideUp}
+                  variants={animations.slideUp as any}
                 >
                   <div className="flex items-center mb-4">
                     <motion.div
@@ -222,9 +231,9 @@ const Home = React.memo(function Home() {
                       href={questionsPath}
                       variant="primary"
                     >
-                      {t("home.continue")}
+                      <span className="mr-1">🎈</span> {t("home.continue")}
                     </Button>
-                    <Button variant="outline" size="lg" href={galleryPath}>
+                    <Button variant="outline" size="lg" href={galleryPath} icon={<span className="text-lg">🍹</span>}>
                       {language === "en" ? "Browse Gallery" : "浏览酒单库"}
                     </Button>
                   </div>
@@ -235,7 +244,7 @@ const Home = React.memo(function Home() {
                   </div>
                 </motion.div>
               ) : (
-                <motion.div variants={animations.slideUp} className="flex flex-col sm:flex-row gap-4">
+                <motion.div variants={animations.slideUp as any} className="flex flex-col sm:flex-row gap-4">
                   <Button
                     size="xl"
                     iconPosition="right"
@@ -244,13 +253,14 @@ const Home = React.memo(function Home() {
                     variant="primary"
                     className="shadow-2xl"
                   >
-                    {t("home.start")}
+                    <span className="mr-2">✨</span> {t("home.start")}
                   </Button>
                   <Button
                     size="xl"
                     variant="outline"
                     href={galleryPath}
                     className="shadow-lg border-primary/30 hover:bg-primary/10"
+                    icon={<span className="text-xl">🍹</span>}
                   >
                      {language === "en" ? "View Gallery" : "浏览酒单"}
                   </Button>
@@ -286,7 +296,7 @@ const Home = React.memo(function Home() {
                               ...pulseAnimation,
                               scale: [1, 1.1, 1],
                               opacity: [0.6, 0.8, 0.6],
-                            }}
+                            } as any}
                             transition={{
                               duration: 3,
                               repeat: Number.POSITIVE_INFINITY,
@@ -551,7 +561,7 @@ const Home = React.memo(function Home() {
               variant="primary"
               className="shadow-2xl"
             >
-              {t("home.start")}
+              <span className="mr-2">✨</span> {t("home.start")}
             </Button>
           </motion.div>
         </Container>
