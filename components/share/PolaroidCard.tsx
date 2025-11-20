@@ -94,14 +94,20 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
         <div className="relative z-10 flex flex-col h-full">
             
             {/* 1. Hero Image */}
-            <div className="w-full aspect-[1/1] rounded-2xl overflow-hidden shadow-2xl mb-8 relative">
+            <div className="w-full aspect-[1/1] rounded-2xl overflow-hidden shadow-2xl mb-8 relative bg-white/5">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                    src={imageUrl} 
-                    alt={name}
-                    className="w-full h-full object-cover"
-                    crossOrigin="anonymous"
-                />
+                {imageUrl ? (
+                    <img 
+                        src={imageUrl} 
+                        alt={name}
+                        className="w-full h-full object-cover"
+                        crossOrigin="anonymous"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white/20">
+                        <Martini className="w-16 h-16" />
+                    </div>
+                )}
                 <div className="absolute inset-0 ring-1 ring-white/10 rounded-2xl pointer-events-none"></div>
             </div>
 

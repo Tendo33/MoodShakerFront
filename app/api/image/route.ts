@@ -8,7 +8,16 @@ import { prisma } from "@/lib/prisma";
  */
 async function imageUrlToBase64(url: string): Promise<string> {
   try {
-    const response = await fetch(url);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+    }
+
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const contentType = response.headers.get("content-type") || "image/png";
@@ -49,6 +58,7 @@ export async function POST(request: NextRequest) {
     let finalImage = imageUrl;
     if (cocktailName) {
       try {
+        imageLogger.info(`Attempting to convert and save image for: ${cocktailName}`);
         const base64Image = await imageUrlToBase64(imageUrl);
         finalImage = base64Image; // Return Base64 to frontend to avoid expiration
         
@@ -59,6 +69,8 @@ export async function POST(request: NextRequest) {
         imageLogger.info(`Saved image for cocktail: ${cocktailName}`);
       } catch (dbError) {
         imageLogger.error("Failed to save image to DB", dbError);
+        // Fallback: Return original URL if Base64 conversion/save fails
+        // But note: original URL might expire or be inaccessible
       }
     }
 
@@ -77,4 +89,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

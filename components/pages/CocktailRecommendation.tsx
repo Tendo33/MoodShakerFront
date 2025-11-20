@@ -779,7 +779,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                                 transition={{ delay: 0.3 }}
                               >
                                 <p className="text-amber-400/70 text-xs flex items-center gap-1.5">
-                                  <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+                                  <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
                                   <span>{localizedStep.tips}</span>
                                 </p>
                               </motion.div>
@@ -887,12 +887,12 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
                 }}
               >
-                <div className="p-6 bg-white/5 border-b border-white/5">
+                <div className="p-8 bg-white/5 border-b border-white/5">
                   <h3 className={`text-2xl font-bold ${textColorClass}`}>
                     {t("recommendation.steps")}
                   </h3>
                 </div>
-                <div className="p-6 bg-black/10">
+                <div className="p-8 bg-black/10">
                   <ol className="space-y-12">
                     {cocktail?.steps?.map((step) => {
                       const localizedStep = getLocalizedStepContent(step);
@@ -906,26 +906,26 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                           onMouseEnter={() => setActiveStep(step.step_number)}
                           onMouseLeave={() => setActiveStep(null)}
                         >
-                          <div className="flex gap-5">
+                          <div className="flex gap-6">
                             <div
-                              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10 text-sm"
+                              className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10"
                             >
                               {step.step_number}
                             </div>
-                            <div className="flex-1 pt-0.5">
+                            <div className="flex-1 pt-1">
                               <p
-                                className={`${textColorClass} text-lg leading-relaxed`}
+                                className={`${textColorClass} text-xl leading-relaxed`}
                               >
                                 {localizedStep.description}
                               </p>
                               {localizedStep.tips && (
                                 <motion.div
                                   className="mt-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  transition={{ delay: 0.3 }}
+                                  initial={{ opacity: 0, y: 5 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.3 }}
                                 >
-                                  <p className="text-amber-400/70 text-xs flex items-start gap-1.5">
+                                  <p className="text-amber-200/90 text-xs flex items-start gap-1.5">
                                     <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
                                     <span>{localizedStep.tips}</span>
                                   </p>
@@ -937,7 +937,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                           {/* Step progress line */}
                           {step.step_number <
                             (cocktail?.steps?.length || 0) && (
-                            <div className="absolute left-[1.2rem] top-10 bottom-[-1.5rem] w-px bg-gradient-to-b from-white/20 to-white/5"></div>
+                            <div className="absolute left-[1.7rem] top-14 bottom-[-2rem] w-px bg-gradient-to-b from-white/20 to-white/5"></div>
                           )}
                         </motion.li>
                       );
@@ -1008,7 +1008,5 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     </div>
   );
 });
-
-CocktailRecommendation.displayName = "CocktailRecommendation";
 
 export default CocktailRecommendation;

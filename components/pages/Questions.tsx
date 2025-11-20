@@ -228,7 +228,7 @@ const Questions = memo(function Questions() {
       
       // Add safety timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Request timed out")), 20000)
+        setTimeout(() => reject(new Error("Request timed out")), 60000)
       );
 
       await Promise.race([submitRequest(), timeoutPromise]);

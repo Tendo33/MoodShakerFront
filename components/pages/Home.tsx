@@ -136,6 +136,7 @@ const Home = React.memo(function Home() {
 
   const questionsPath = getPathWithLanguage("/questions");
   const newQuestionPath = getPathWithLanguage("/questions?new=true");
+  const galleryPath = getPathWithLanguage("/gallery");
 
   return (
     <div className="bg-background text-foreground">
@@ -223,13 +224,18 @@ const Home = React.memo(function Home() {
                     >
                       {t("home.continue")}
                     </Button>
-                    <Button variant="outline" size="lg" href={newQuestionPath}>
-                      {t("home.new")}
+                    <Button variant="outline" size="lg" href={galleryPath}>
+                      {language === "en" ? "Browse Gallery" : "浏览酒单库"}
                     </Button>
+                  </div>
+                  <div className="mt-4 text-center">
+                    <Link href={newQuestionPath} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                       {language === "en" ? "Start a new session instead" : "开始新的对话"}
+                    </Link>
                   </div>
                 </motion.div>
               ) : (
-                <motion.div variants={animations.slideUp}>
+                <motion.div variants={animations.slideUp} className="flex flex-col sm:flex-row gap-4">
                   <Button
                     size="xl"
                     iconPosition="right"
@@ -239,6 +245,14 @@ const Home = React.memo(function Home() {
                     className="shadow-2xl"
                   >
                     {t("home.start")}
+                  </Button>
+                  <Button
+                    size="xl"
+                    variant="outline"
+                    href={galleryPath}
+                    className="shadow-lg border-primary/30 hover:bg-primary/10"
+                  >
+                     {language === "en" ? "View Gallery" : "浏览酒单"}
                   </Button>
                 </motion.div>
               )}
