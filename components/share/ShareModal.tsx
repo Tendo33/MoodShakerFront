@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Download, Check } from "lucide-react";
 import { Button } from "@/components/ui/core";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface ShareModalProps {
 
 export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
   const [copied, setCopied] = useState(false);
+  const { t } = useLanguage();
 
   if (!isOpen || !imageUrl) return null;
 
@@ -28,7 +30,7 @@ export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
         
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/10">
-          <h3 className="text-lg font-bold text-white">Your Cocktail Card</h3>
+          <h3 className="text-lg font-bold text-white">{t("share.modal.title")}</h3>
           <button 
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/10"
@@ -55,11 +57,11 @@ export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
                 onClick={handleDownload}
                 icon={<Download className="w-4 h-4" />}
              >
-               Download Image
+               {t("share.modal.download")}
              </Button>
           </div>
           <p className="mt-4 text-xs text-gray-500 text-center">
-            Save the image to share on your social media stories or posts.
+            {t("share.modal.description")}
           </p>
         </div>
       </div>

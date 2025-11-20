@@ -169,6 +169,12 @@ const translations: TranslationDictionary = {
 
     // Recommendation page
     "recommendation.back": "返回首页",
+    "recommendation.saveImage": "保存图片",
+    "recommendation.card.ingredients": "所需原料",
+    "recommendation.card.preparation": "制作步骤",
+    "share.modal.title": "您的特调卡片",
+    "share.modal.download": "保存图片",
+    "share.modal.description": "保存这张卡片，分享给朋友们吧！",
     "recommendation.share": "分享配方",
     "recommendation.copied": "链接已复制到剪贴板",
     "recommendation.yourRequirements": "您的需求",
@@ -375,6 +381,12 @@ const translations: TranslationDictionary = {
 
     // Recommendation page
     "recommendation.back": "Back to Home",
+    "recommendation.saveImage": "Save as Image",
+    "recommendation.card.ingredients": "Ingredients",
+    "recommendation.card.preparation": "Preparation",
+    "share.modal.title": "Your Cocktail Card",
+    "share.modal.download": "Download Image",
+    "share.modal.description": "Save the image to share on your social media stories or posts.",
     "recommendation.share": "Share Recipe",
     "recommendation.copied": "Link copied to clipboard",
     "recommendation.yourRequirements": "Your Requirements",

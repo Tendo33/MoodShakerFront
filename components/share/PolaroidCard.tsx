@@ -18,7 +18,7 @@ interface PolaroidCardProps {
 
 export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
   ({ cocktail, imageUrl }, ref) => {
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     
     // Helper to get content based on language
     const getLocalizedContent = (field: string, englishField: string) => {
@@ -154,7 +154,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
                 <div className="text-center mb-5">
                     <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
                         <ShoppingBasket className="w-3 h-3 text-primary/80" />
-                        <span>Ingredients</span>
+                        <span>{t("recommendation.card.ingredients")}</span>
                     </span>
                 </div>
                 
@@ -178,7 +178,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
                 <div className="text-center mb-6">
                      <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
                         <ScrollText className="w-3 h-3 text-secondary/80" />
-                        <span>Preparation</span>
+                        <span>{t("recommendation.card.preparation")}</span>
                      </span>
                 </div>
 

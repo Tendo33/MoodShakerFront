@@ -9,9 +9,6 @@ import {
   Clock,
   Droplet,
   GlassWater,
-  Printer,
-  Share2,
-  BookmarkPlus,
   ChevronDown,
   ChevronUp,
   Lightbulb,
@@ -47,7 +44,6 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showShareTooltip, setShowShareTooltip] = useState(false);
   // 移动端手机section展开状态 - 默认全部展开
   const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
   const [isToolsExpanded, setIsToolsExpanded] = useState(true);
@@ -162,38 +158,6 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const handleBack = () => {
     router.push(getPathWithLanguage("/"));
-  };
-
-  const handleShare = () => {
-    try {
-      if (navigator.share && window.isSecureContext) {
-        navigator
-          .share({
-            title: `${cocktail?.name} Recipe - MoodShaker`,
-            text: `Check out this ${cocktail?.name} recipe from MoodShaker!`,
-            url: window.location.href,
-          })
-          .catch(() => copyToClipboard());
-      } else {
-        copyToClipboard();
-      }
-    } catch (err) {
-      copyToClipboard();
-    }
-  };
-
-  const copyToClipboard = () => {
-    try {
-      navigator.clipboard.writeText(window.location.href);
-      setShowShareTooltip(true);
-      setTimeout(() => setShowShareTooltip(false), 2000);
-    } catch (err) {
-      alert(`Copy this URL: ${window.location.href}`);
-    }
-  };
-
-  const handlePrint = () => {
-    window.print();
   };
 
   const toggleSection = useCallback((section: string) => {
@@ -348,62 +312,20 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
           <div className="flex items-center gap-3">
             <motion.button
-              onClick={handlePrint}
-              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Print recipe"
-            >
-              <Printer className="h-5 w-5" />
-            </motion.button>
-
-            <motion.button
               onClick={handleGenerateCard}
               disabled={isGeneratingCard}
-              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
+              className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all glass-effect border border-primary/30"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              aria-label="Generate Share Card"
+              aria-label={t("recommendation.saveImage")}
             >
               {isGeneratingCard ? (
                  <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                  <ImageIcon className="h-5 w-5" />
               )}
+              <span className="font-medium">{t("recommendation.saveImage")}</span>
             </motion.button>
-
-            <motion.button
-              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Save recipe"
-            >
-              <BookmarkPlus className="h-5 w-5" />
-            </motion.button>
-
-            <motion.div
-              className="relative"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <button
-                onClick={handleShare}
-                className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
-                aria-label="Share recipe"
-              >
-                <Share2 className="h-5 w-5" />
-              </button>
-              {showShareTooltip && (
-                <motion.div
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className={commonStyles.tooltipFull}
-                >
-                  {t("recommendation.copied")}
-                </motion.div>
-              )}
-            </motion.div>
           </div>
         </motion.div>
 
