@@ -10,11 +10,10 @@ const cocktailImages: Record<string, string> = {
 }
 
 async function main() {
-  console.error('DEBUG: Start seeding...')
-  console.error('DEBUG: Popular cocktails keys:', Object.keys(popularCocktails))
+  console.log('Start seeding...')
   
   for (const [key, cocktail] of Object.entries(popularCocktails)) {
-    console.error(`DEBUG: Processing ${key}...`)
+    const imagePath = cocktailImages[key] || cocktail.image;
     
     try {
       await prisma.cocktail.upsert({
@@ -39,7 +38,7 @@ async function main() {
           ingredients: cocktail.ingredients as any,
           tools: cocktail.tools as any,
           steps: cocktail.steps as any,
-          image: cocktailImages[key] || cocktail.image,
+          image: imagePath,
         },
         create: {
           id: key,
@@ -62,16 +61,16 @@ async function main() {
           ingredients: cocktail.ingredients as any,
           tools: cocktail.tools as any,
           steps: cocktail.steps as any,
-          image: cocktailImages[key] || cocktail.image,
+          image: imagePath,
         }
       })
-      console.error(`DEBUG: Upserted cocktail: ${cocktail.name}`)
+      console.log(`Seeded cocktail: ${cocktail.name}`)
     } catch (e) {
-      console.error(`DEBUG: Error upserting ${key}:`, e)
+      console.error(`Error seeding ${key}:`, e)
     }
   }
   
-  console.error('DEBUG: Seeding finished.')
+  console.log('Seeding finished.')
 }
 
 main()
