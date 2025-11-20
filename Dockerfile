@@ -4,6 +4,9 @@ FROM node:18-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
+# 安装系统依赖 (OpenSSL 3.0 compatibility)
+RUN apk add --no-cache openssl libc6-compat
+
 # 安装 pnpm
 RUN npm install -g pnpm
 
@@ -11,7 +14,7 @@ RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml ./
 
 # 安装依赖
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --shamefully-hoist
 
 # 复制所有源代码
 COPY . .
@@ -27,6 +30,9 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
+# 安装系统依赖 (OpenSSL 3.0 compatibility)
+RUN apk add --no-cache openssl libc6-compat
+
 # 安装 pnpm
 RUN npm install -g pnpm
 
@@ -38,7 +44,7 @@ COPY --from=builder /app/next.config.mjs ./
 # 注意：.env文件不复制，因为生产环境变量应该通过运行时传入
 
 # 安装生产依赖
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile --shamefully-hoist
 
 # 复制 Prisma 生成的客户端（必须在安装依赖之后）
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
