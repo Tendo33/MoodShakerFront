@@ -170,15 +170,12 @@ export default function GalleryContent({
             </div>
 
             {/* Expanded Filters */}
-            <AnimatePresence>
-              {(isFilterOpen || typeof window !== 'undefined' && window.innerWidth >= 768) && ( // Always show on desktop via CSS trick or JS check, simplified here for responsive feeling
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="md:block overflow-hidden"
-                >
-                  <div className="pt-4 flex flex-col gap-4 border-t border-white/10 mt-4">
+            <div className={`${isFilterOpen ? 'block' : 'hidden'} md:block overflow-hidden transition-all duration-300 ease-in-out`}>
+              <motion.div
+                initial={false}
+                animate={isFilterOpen ? { height: "auto", opacity: 1 } : { height: "auto", opacity: 1 }} // simplified for CSS control on desktop
+                className="pt-4 flex flex-col gap-4 border-t border-white/10 mt-4"
+              >
                     {/* Spirit Filter */}
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs uppercase tracking-wider text-gray-500 mr-2 flex items-center gap-1">
@@ -227,9 +224,8 @@ export default function GalleryContent({
                       ))}
                     </div>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              </motion.div>
+            </div>
           </div>
         </motion.div>
 

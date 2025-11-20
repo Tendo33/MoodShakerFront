@@ -635,7 +635,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               }}
             >
               <button
-                className="w-full p-6 flex justify-between items-center bg-white/5"
+                className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
                 onClick={() => toggleSection("ingredients")}
               >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
@@ -648,7 +648,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 )}
               </button>
               {isIngredientsExpanded && (
-                <div className="p-6 bg-black/20">
+                <div className="p-5 md:p-6 bg-black/20">
                   <ul className="divide-y divide-white/10">
                     {cocktail?.ingredients?.map((ingredient, index) => (
                       <motion.li
@@ -683,7 +683,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               }}
             >
               <button
-                className="w-full p-6 flex justify-between items-center bg-white/5"
+                className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
                 onClick={() => toggleSection("tools")}
               >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
@@ -696,7 +696,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 )}
               </button>
               {isToolsExpanded && (
-                <div className="p-6 bg-black/20">
+                <div className="p-5 md:p-6 bg-black/20">
                   <ul className="space-y-4">
                     {cocktail?.tools?.map((tool, index) => (
                       <motion.li
@@ -733,7 +733,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               }}
             >
               <button
-                className="w-full p-6 flex justify-between items-center bg-white/5"
+                className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
                 onClick={() => toggleSection("steps")}
               >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
@@ -746,7 +746,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 )}
               </button>
               {isStepsExpanded && (
-                <div className="p-6 bg-black/20">
+                <div className="p-5 md:p-6 bg-black/20">
                   <ol className="space-y-10">
                     {cocktail?.steps?.map((step) => {
                       const localizedStep = getLocalizedStepContent(step);

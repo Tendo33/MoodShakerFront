@@ -365,51 +365,51 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id, initialD
           <motion.h2 className={`text-3xl md:text-4xl font-bold font-playfair mb-10 ${gradientText} inline-block`} variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5 } } }}>Recipe</motion.h2>
           
           <div className="lg:hidden space-y-6">
-             {/* Mobile Accordions ... (Simulated here for brevity, matches Recommendation) */}
-             <motion.div className={`rounded-xl overflow-hidden ${cardClasses}`} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                 <button className="w-full p-6 flex justify-between items-center bg-white/5" onClick={() => toggleSection("ingredients")}>
+             {/* Mobile Accordions */}
+             <motion.div className={`rounded-2xl overflow-hidden ${cardClasses}`} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                 <button className="w-full p-6 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-colors active:bg-white/15" onClick={() => toggleSection("ingredients")}>
                      <h3 className={`text-xl font-bold ${textColorClass}`}>{t("recommendation.ingredients")}</h3>
-                     {isIngredientsExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                     {isIngredientsExpanded ? <ChevronUp className="h-6 w-6 text-primary" /> : <ChevronDown className="h-6 w-6 text-muted-foreground" />}
                  </button>
                  {isIngredientsExpanded && (
                      <div className="p-6 bg-black/20"><ul className="divide-y divide-white/10">{cocktail?.ingredients?.map((ingredient, index) => (
                          <motion.li key={index} className="py-4 flex justify-between items-center" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }}>
-                             <span className={`${textColorClass} font-medium`}>{getLocalizedIngredientName(ingredient)}</span>
-                             <span className="text-primary font-medium">{getLocalizedIngredientAmount(ingredient)} {getLocalizedIngredientUnit(ingredient) ? ` ${getLocalizedIngredientUnit(ingredient)}` : ""}</span>
+                             <span className={`${textColorClass} font-medium text-lg`}>{getLocalizedIngredientName(ingredient)}</span>
+                             <span className="text-primary font-bold text-lg">{getLocalizedIngredientAmount(ingredient)} {getLocalizedIngredientUnit(ingredient) ? ` ${getLocalizedIngredientUnit(ingredient)}` : ""}</span>
                          </motion.li>
                      ))}</ul></div>
                  )}
              </motion.div>
              
-             <motion.div className={`rounded-xl overflow-hidden ${cardClasses}`} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                 <button className="w-full p-6 flex justify-between items-center bg-white/5" onClick={() => toggleSection("tools")}>
+             <motion.div className={`rounded-2xl overflow-hidden ${cardClasses}`} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                 <button className="w-full p-6 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-colors active:bg-white/15" onClick={() => toggleSection("tools")}>
                      <h3 className={`text-xl font-bold ${textColorClass}`}>{t("recommendation.tools")}</h3>
-                     {isToolsExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                     {isToolsExpanded ? <ChevronUp className="h-6 w-6 text-primary" /> : <ChevronDown className="h-6 w-6 text-muted-foreground" />}
                  </button>
                  {isToolsExpanded && (
                      <div className="p-6 bg-black/20"><ul className="space-y-4">{cocktail?.tools?.map((tool, index) => (
                          <motion.li key={index} className="flex flex-col" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }}>
-                             <span className={`${textColorClass} font-medium`}>{getLocalizedToolName(tool)}</span>
+                             <span className={`${textColorClass} font-medium text-lg`}>{getLocalizedToolName(tool)}</span>
                              {tool.alternative && <span className="text-sm text-muted-foreground mt-1 italic">{t("recommendation.alternative")}: {language === "en" && tool.english_alternative ? tool.english_alternative : tool.alternative}</span>}
                          </motion.li>
                      ))}</ul></div>
                  )}
              </motion.div>
 
-             <motion.div className={`rounded-xl overflow-hidden ${cardClasses}`} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                 <button className="w-full p-6 flex justify-between items-center bg-white/5" onClick={() => toggleSection("steps")}>
+             <motion.div className={`rounded-2xl overflow-hidden ${cardClasses}`} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                 <button className="w-full p-6 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-colors active:bg-white/15" onClick={() => toggleSection("steps")}>
                      <h3 className={`text-xl font-bold ${textColorClass}`}>{t("recommendation.steps")}</h3>
-                     {isStepsExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                     {isStepsExpanded ? <ChevronUp className="h-6 w-6 text-primary" /> : <ChevronDown className="h-6 w-6 text-muted-foreground" />}
                  </button>
                  {isStepsExpanded && (
                      <div className="p-6 bg-black/20"><ol className="space-y-10">{cocktail?.steps?.map((step) => {
                          const localizedStep = getLocalizedStepContent(step);
                          return (
                              <motion.li key={step.step_number} className="flex gap-5" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: step.step_number * 0.1 }}>
-                                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10 text-sm">{step.step_number}</div>
-                                 <div className="flex-1 pt-0.5">
+                                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10 text-sm mt-1">{step.step_number}</div>
+                                 <div className="flex-1">
                                      <p className={`${textColorClass} text-lg leading-relaxed`}>{localizedStep.description}</p>
-                                     {localizedStep.tips && <motion.div className="mt-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}><p className="text-amber-400/70 text-xs flex items-start gap-1.5"><Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" /><span>{localizedStep.tips}</span></p></motion.div>}
+                                     {localizedStep.tips && <motion.div className="mt-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}><p className="text-amber-400/70 text-sm flex items-start gap-2"><Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" /><span>{localizedStep.tips}</span></p></motion.div>}
                                  </div>
                              </motion.li>
                          );

@@ -332,10 +332,10 @@ const Questions = memo(function Questions() {
 
               <div className={`grid gap-4 mx-auto ${
                 questions[currentQuestion - 1]?.options.length === 2
-                  ? "grid-cols-2 max-w-xl"
+                  ? "grid-cols-1 sm:grid-cols-2 max-w-xl"
                   : questions[currentQuestion - 1]?.options.length === 3
-                  ? "grid-cols-1 md:grid-cols-3 max-w-3xl"
-                  : "grid-cols-2 md:grid-cols-4 max-w-4xl"
+                  ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-3xl"
+                  : "grid-cols-1 sm:grid-cols-2 md:grid-cols-4 max-w-4xl"
               }`}>
                 {questions[currentQuestion - 1]?.options.map(
                   (option, index) => (
@@ -427,7 +427,7 @@ const Questions = memo(function Questions() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 max-w-6xl mx-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 max-w-6xl mx-auto">
                 {baseSpiritsOptions.map((spirit, index) => (
                   <motion.div
                     key={spirit.value}

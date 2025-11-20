@@ -114,32 +114,35 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+        {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="md:hidden overflow-hidden"
+            className="md:hidden fixed inset-x-0 top-[64px] z-40 overflow-hidden"
             initial="hidden"
             animate="visible"
             exit="exit"
             variants={mobileMenuVariants as any}
           >
-            <div className="px-6 py-6 space-y-4 glass-effect mt-2 mx-4 rounded-2xl border-t border-white/10">
+             {/* Backdrop blur overlay */}
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-xl" />
+            
+            <div className="relative px-6 py-6 space-y-6 border-t border-white/10 bg-background/40">
               <Link 
                 href={galleryLink}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block py-2 text-white/80 hover:text-white font-medium text-lg border-b border-white/5"
+                className="block py-3 text-white/90 hover:text-white font-bold text-xl border-b border-white/10"
               >
                 {language === 'cn' ? '酒单库' : 'Gallery'}
               </Link>
-              <div className="pt-2 pb-1">
+              <div className="pt-2 pb-4">
                 <Button
                   href={questionsLink}
-                  size="lg"
+                  size="xl"
                   variant="primary"
                   fullWidth
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="shadow-lg"
+                  className="shadow-lg text-lg"
                 >
                   {t("home.start")}
                 </Button>
