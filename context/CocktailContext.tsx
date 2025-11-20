@@ -238,19 +238,19 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
       const cocktailData = await cocktailResponse.json();
       recommendation = cocktailData.data;
-      
+
       if (!recommendation) {
         throw new Error(t("error.invalidData"));
       }
-      
+
       await updateItem("recommendation", recommendation);
 
       // 启动后台图片生成任务（不阻塞主流程）
       // 设置图片加载状态为 true，这样推荐页会显示加载动画
       setIsImageLoadingState(true);
-      
+
       const prompt = generateImagePrompt(recommendation);
-      
+
       // 使用异步函数执行图片生成，不使用 await 阻塞主线程
       const generateImageTask = async () => {
         try {
@@ -262,6 +262,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
             body: JSON.stringify({
               prompt,
               sessionId,
+              cocktailName: recommendation?.name, // Pass cocktail name for saving image
             }),
           });
 
@@ -347,6 +348,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
           prompt,
           sessionId,
           forceRefresh: true,
+          cocktailName: recommendation.name, // Pass name
         }),
       });
 
@@ -361,7 +363,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       return imageData.data;
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to refresh cocktail image.";
+        err instanceof Error
+          ? err.message
+          : "Failed to refresh cocktail image.";
       setError(errorMessage);
       cocktailLogger.error("Error refreshing cocktail image", err);
       return null;

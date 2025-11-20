@@ -4,104 +4,85 @@
 
 ## 🎨 这是什么？
 
-MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的调酒师，它能够根据你的心情，为你调制出最适合的"心情鸡尾酒"。无论是开心、难过、焦虑还是兴奋，MoodShaker 都能帮你找到最合适的解决方案。
+MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的 AI 调酒师，它能够根据你的心情，为你调制出最适合的"心情鸡尾酒"。无论是开心、难过、焦虑还是兴奋，MoodShaker 都能帮你找到最合适的解决方案。
 
-1. 经过几道选择：
-   ![MoodShaker Banner](docs/assets/img1.png)
+不需要你是调酒大师，也不需要复杂的知识，只需要跟着我们的向导，回答几个简单的问题，一杯完美契合当下的鸡尾酒就会出现在你面前。
 
-2. 鸡尾酒配方详情页：
-   ![MoodShaker Features](docs/assets/img2.png)
+## 📸 项目导览
 
-3. 鸡尾酒制作步骤：
-   ![Getting Started](docs/assets/img3.png)
+### 1. 欢迎来到 MoodShaker
+
+首页是我们旅程的起点。在这里，你可以选择"开始探索"来获取 AI 推荐，或者直接去"酒单库"看看大家的收藏。
+![MoodShaker Homepage](docs/screenshots/home_full.png)
+
+### 2. 告诉我们你的心情
+
+点击"开始探索"后，AI 会问你几个简单的问题。你是想喝点经典的，还是来点创意的？你的心情如何？
+![Questions](docs/screenshots/questions_start.png)
+
+### 3. 探索酒单库 (The Cellar)
+
+在画廊页面，你可以看到各种各样的鸡尾酒。你可以根据基酒（如金酒、伏特加）或口味（如甜、酸）来筛选你喜欢的饮品。
+![Gallery](docs/screenshots/gallery.png)
+
+### 4. 制作你的鸡尾酒
+
+当你选中一款鸡尾酒，我们提供详细的配方、所需的工具和一步步的制作说明。不仅如此，还能了解到这杯酒背后的故事。
+![Cocktail Detail](docs/screenshots/cocktail_detail.png)
 
 ## ✨ 主要特点
 
-- 🎯 基于 Next.js 15 的现代化前端架构
-- 🎨 使用 Radix UI 打造的精致界面
-- 🎭 响应式设计，让你的心情在任何设备上都能得到照顾
-- 📊 使用 Recharts 实现的数据可视化，让你的心情变化一目了然
-- 🌈 支持明暗主题切换，就像调酒师会根据场合选择不同的灯光
-- 🎬 流畅的动画效果，让你的心情转换更加丝滑
+- **🧠 AI 智能推荐**: 懂你的心情，更懂你的口味。
+- **📱 完美适配手机与电脑**: 无论在地铁上还是沙发上，随时随地都能用。
+- **🎨 现代化设计**: 简洁、优雅的暗色主题界面，保护视力又充满高级感。
+- **📚 丰富的知识库**: 不只是喝，还能学到鸡尾酒文化。
+- **🌍 多语言支持**: 支持中文和英文，方便不同用户使用。
 
-## 🚀 快速开始
+## 🚀 快速开始（新手指南）
 
-### 环境变量配置
+如果你想在自己的电脑上运行这个项目，请按照以下步骤操作：
 
-在开始之前，你需要配置以下环境变量。将 `.env.example` 文件重命名为 `.env`，然后填写相应的值：
+### 第一步：准备工作
 
-```bash
-# OpenAI Configuration
-OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_BASE_URL=https://api.openai.com/v1
-OPENAI_MODEL=deepseek-v3-250324
+确保你的电脑上安装了 `Node.js` (建议版本 18 以上)。
 
-# Image Generation Configuration(siliconflow)
-IMAGE_API_URL=https://api.siliconflow.cn/v1/images/generations
-IMAGE_API_KEY=your_image_api_key_here
-IMAGE_MODEL=Kwai-Kolors/Kolors
-
-# Application Configuration
-HOST_PORT=3000
-```
-
-### 方法一：本地开发
+### 第二步：下载项目
 
 ```bash
-# 1. 克隆仓库
 git clone https://github.com/Tendo33/MoodShakerFront
 cd MoodShakerFront
+```
 
-# 2. 配置环境变量
-mv .env.example .env
-# 编辑 .env 文件，填写必要的环境变量
+### 第三步：配置环境
 
-# 3. 安装依赖
+你需要告诉程序如何连接 AI。
+
+1. 找到项目文件夹里的 `.env.example` 文件。
+2. 把它重命名为 `.env`。
+3. 用记事本打开它，填入你的 API Key (如果你没有，可以先跳过，但 AI 功能可能无法使用)。
+
+### 第四步：启动！
+
+在终端（Terminal）中输入以下命令：
+
+```bash
+# 安装需要的工具包
 pnpm install
 
-# 4. 启动开发服务器
+# 启动网站
 pnpm dev
 ```
 
-### 方法二：Docker 部署
-
-```bash
-# 1. 配置环境变量
-mv .env.example .env
-# 编辑 .env 文件，填写必要的环境变量
-
-# 2. 一键启动所有服务
-docker-compose up -d
-```
-
-## 🛠️ 开发工具箱
-
-- `pnpm dev` - 启动开发服务器
-- `pnpm build` - 构建生产版本
-- `pnpm start` - 启动生产服务器
-- `pnpm lint` - 代码质量检查
-
-## 🏗️ 项目结构
-
-```
-MoodShakerFront/
-├── app/              # 主应用区域
-├── components/       # 可复用组件
-├── context/         # 状态管理
-├── hooks/           # 自定义钩子
-├── lib/             # 工具函数
-├── public/          # 静态资源
-├── services/        # API 服务
-├── styles/          # 全局样式
-└── utils/           # 辅助函数
-```
+现在，打开浏览器访问 `http://localhost:3000`，你的专属调酒师就在那里等你！
 
 ## 🛠️ 技术栈
 
-- **框架**: Next.js 15
-- **语言**: TypeScript
-- **样式**: Tailwind CSS
-- **UI组件**: Radix UI
+对于对技术感兴趣的朋友，我们使用了以下最前沿的技术：
+
+- **框架**: Next.js 15 (React 的超集，更快更强)
+- **语言**: TypeScript (给 JavaScript 加上了类型安全)
+- **样式**: Tailwind CSS (写样式从未如此简单)
+- **组件**: Radix UI (无障碍、高质量的组件库)
 
 ## 🤝 加入我们
 

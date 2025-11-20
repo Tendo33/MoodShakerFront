@@ -8,7 +8,7 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   /* 锦囊二：质感 - 噪点纹理 */
   .noise-bg {
     position: fixed;
@@ -86,6 +86,23 @@
     /* Enhanced font smoothing for better readability */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Mobile optimization for touch targets */
+  button,
+  [role="button"],
+  a {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent iOS zoom on inputs */
+  @media screen and (max-width: 768px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
   }
 }
 
@@ -186,6 +203,12 @@
 
 /* Mobile responsive overrides - consolidated */
 @media (max-width: 640px) {
+  /* Optimize container padding for small screens */
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
   .section-spacing {
     @apply py-12;
   }
@@ -193,7 +216,7 @@
     @apply space-y-6;
   }
   .card-spacing {
-    @apply p-6;
+    @apply p-5;
   }
 }
 
@@ -251,10 +274,10 @@
 /* Improved responsive typography with better hierarchy */
 @layer base {
   h1 {
-    @apply text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight;
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight;
   }
   h2 {
-    @apply text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight;
+    @apply text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight;
   }
   h3 {
     @apply text-2xl md:text-3xl font-semibold leading-snug;
@@ -263,45 +286,41 @@
     @apply text-xl md:text-2xl font-semibold leading-snug;
   }
   p {
-    @apply text-lg leading-relaxed;
+    @apply text-base sm:text-lg leading-relaxed;
   }
 }
 
 @media (max-width: 640px) {
   h1 {
-    font-size: 2.5rem !important;
+    font-size: 2.25rem !important; /* 36px */
     line-height: 1.15 !important;
   }
   h2 {
-    font-size: 2rem !important;
+    font-size: 1.75rem !important; /* 28px */
     line-height: 1.25 !important;
   }
   h3 {
-    font-size: 1.5rem !important;
+    font-size: 1.5rem !important; /* 24px */
     line-height: 1.35 !important;
   }
   p {
-    font-size: 1rem !important;
+    font-size: 1rem !important; /* 16px */
     line-height: 1.6 !important;
   }
 }
 
 /* Additional breakpoint for very small screens */
-@media (max-width: 480px) {
+@media (max-width: 380px) {
   h1 {
-    font-size: 2rem !important;
-    line-height: 1.1 !important;
+    font-size: 1.875rem !important; /* 30px */
   }
   h2 {
     font-size: 1.5rem !important;
-    line-height: 1.2 !important;
   }
   h3 {
     font-size: 1.25rem !important;
-    line-height: 1.3 !important;
   }
   p {
-    font-size: 0.9375rem !important;
-    line-height: 1.5 !important;
+    font-size: 0.9375rem !important; /* 15px */
   }
 }

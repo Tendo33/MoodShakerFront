@@ -9,9 +9,6 @@ import {
   Clock,
   Droplet,
   GlassWater,
-  Printer,
-  Share2,
-  BookmarkPlus,
   ChevronDown,
   ChevronUp,
   Lightbulb,
@@ -31,17 +28,24 @@ import { cocktailImages } from "@/utils/cocktail-images";
 
 interface CocktailDetailPageProps {
   id: string;
+  initialData?: Cocktail | null;
 }
 
-const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: CocktailDetailPageProps) {
+const CocktailDetailPage = React.memo(function CocktailDetailPage({
+  id,
+  initialData,
+}: CocktailDetailPageProps) {
   const router = useRouter();
   const { t, getPathWithLanguage, language } = useLanguage();
-  const [cocktail, setCocktail] = useState<Cocktail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showShareTooltip, setShowShareTooltip] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string | null>(
-    "steps",
+  const [cocktail, setCocktail] = useState<Cocktail | null>(
+    initialData || null,
   );
+  const [isLoading, setIsLoading] = useState(!initialData);
+
+  // Match Recommendation Page State
+  const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
+  const [isToolsExpanded, setIsToolsExpanded] = useState(true);
+  const [isStepsExpanded, setIsStepsExpanded] = useState(true);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
@@ -59,38 +63,39 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
         url = cocktailImages[id as keyof typeof cocktailImages];
       }
       setPolaroidImageUrl(
-        url || `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`
+        url ||
+          `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`,
       );
     }
   }, [cocktail, id]);
 
   const handleGenerateCard = useCallback(async () => {
     if (!cardRef.current) return;
-    
+
     setIsGeneratingCard(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
         pixelRatio: 2,
-        // Removed forced white background to respect component's dark theme
         skipAutoScale: true,
       });
       setGeneratedCardUrl(dataUrl);
       setShowShareModal(true);
     } catch (error) {
-      console.error('Failed to generate card', error);
+      console.error("Failed to generate card", error);
     } finally {
       setIsGeneratingCard(false);
     }
   }, []);
 
-  // Fixed style classes - Updated for new Design System
+  // Style constants matching Recommendation Page
   const textColorClass = "text-foreground";
-  const cardClasses = "glass-effect text-foreground transition-all duration-300 hover:shadow-primary/10";
+  const cardClasses =
+    "glass-effect text-foreground transition-all duration-300 hover:shadow-primary/10";
   const gradientText = "gradient-text-bright";
 
-  // Helper function to get localized content
+  // Helper functions (Same as Recommendation)
   const getLocalizedContent = (
     field: string,
     englishField: string,
@@ -101,39 +106,29 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
     return cocktail?.[field as keyof Cocktail] as string;
   };
 
-  // Helper function to get localized ingredient name
   const getLocalizedIngredientName = (ingredient: Ingredient): string => {
-    if (language === "en" && ingredient.english_name) {
+    if (language === "en" && ingredient.english_name)
       return ingredient.english_name;
-    }
     return ingredient.name;
   };
 
-  // Helper function to get localized ingredient amount
   const getLocalizedIngredientAmount = (ingredient: Ingredient): string => {
-    if (language === "en" && ingredient.english_amount) {
+    if (language === "en" && ingredient.english_amount)
       return ingredient.english_amount;
-    }
     return ingredient.amount;
   };
 
-  // Helper function to get localized ingredient unit
   const getLocalizedIngredientUnit = (ingredient: Ingredient): string => {
-    if (language === "en" && ingredient.english_unit) {
+    if (language === "en" && ingredient.english_unit)
       return ingredient.english_unit;
-    }
     return ingredient.unit || "";
   };
 
-  // Helper function to get localized tool name
   const getLocalizedToolName = (tool: Tool): string => {
-    if (language === "en" && tool.english_name) {
-      return tool.english_name;
-    }
+    if (language === "en" && tool.english_name) return tool.english_name;
     return tool.name;
   };
 
-  // Helper function to get localized step content
   const getLocalizedStepContent = (
     step: Step,
   ): { description: string; tips?: string } => {
@@ -143,13 +138,9 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
         tips: step.english_tips || step.tips,
       };
     }
-    return {
-      description: step.description,
-      tips: step.tips,
-    };
+    return { description: step.description, tips: step.tips };
   };
 
-  // Set page title based on language
   useEffect(() => {
     if (cocktail) {
       const title =
@@ -160,15 +151,19 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
     }
   }, [cocktail, language]);
 
-  // Fetch cocktail data
   useEffect(() => {
+    if (initialData) {
+      setCocktail(initialData);
+      setIsLoading(false);
+      setTimeout(() => setIsPageLoaded(true), 100);
+      return;
+    }
+
     const fetchCocktail = async () => {
       setIsLoading(true);
       try {
         const data = await getCocktailById(id);
         setCocktail(data);
-
-        // Add a small delay before showing animations
         setTimeout(() => setIsPageLoaded(true), 100);
       } catch (error) {
         cocktailLogger.error("Error fetching cocktail", error);
@@ -178,74 +173,44 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
     };
 
     fetchCocktail();
-  }, [id]);
+  }, [id, initialData]);
 
   const handleBack = () => {
     router.push(getPathWithLanguage("/"));
   };
 
-  const handleShare = () => {
-    try {
-      if (navigator.share && window.isSecureContext) {
-        navigator
-          .share({
-            title: `${cocktail?.name} Recipe - MoodShaker`,
-            text: `Check out this ${cocktail?.name} recipe from MoodShaker!`,
-            url: window.location.href,
-          })
-          .catch(() => copyToClipboard());
-      } else {
-        copyToClipboard();
+  const toggleSection = useCallback(
+    (section: string) => {
+      switch (section) {
+        case "ingredients":
+          setIsIngredientsExpanded(!isIngredientsExpanded);
+          break;
+        case "tools":
+          setIsToolsExpanded(!isToolsExpanded);
+          break;
+        case "steps":
+          setIsStepsExpanded(!isStepsExpanded);
+          break;
       }
-    } catch (err) {
-      copyToClipboard();
-    }
-  };
+    },
+    [isIngredientsExpanded, isToolsExpanded, isStepsExpanded],
+  );
 
-  const copyToClipboard = () => {
-    try {
-      navigator.clipboard.writeText(window.location.href);
-      setShowShareTooltip(true);
-      setTimeout(() => setShowShareTooltip(false), 2000);
-    } catch (err) {
-      alert(`Copy this URL: ${window.location.href}`);
-    }
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const toggleSection = useCallback((section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
-  }, [expandedSection]);
-
-  // Show loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <LoadingSpinner variant="modern" text={t("recommendation.loading")} />
         </motion.div>
       </div>
     );
   }
 
-  // If no cocktail found
   if (!cocktail) {
     return (
       <div className="min-h-screen">
         <div className="container mx-auto py-16 md:py-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center py-12 glass-effect rounded-2xl"
-          >
+          <div className="text-center py-12 glass-effect rounded-2xl">
             <h2 className={`text-2xl font-medium mb-4 ${textColorClass}`}>
               {t("recommendation.notFound")}
             </h2>
@@ -258,7 +223,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
             >
               {t("recommendation.back")}
             </button>
-          </motion.div>
+          </div>
         </div>
       </div>
     );
@@ -266,7 +231,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
 
   return (
     <div className="min-h-screen">
-      {/* Animated background */}
+      {/* Shared Background with Recommendation Page */}
       <motion.div
         className="fixed inset-0 overflow-hidden opacity-20 pointer-events-none"
         initial={{ opacity: 0 }}
@@ -275,10 +240,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
       >
         <motion.div
           className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/30 rounded-full blur-3xl"
-          animate={{
-            y: [0, -20, 0],
-            scale: [1, 1.05, 1],
-          }}
+          animate={{ y: [0, -20, 0], scale: [1, 1.05, 1] }}
           transition={{
             duration: 8,
             repeat: Number.POSITIVE_INFINITY,
@@ -287,10 +249,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
         />
         <motion.div
           className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/30 rounded-full blur-3xl"
-          animate={{
-            y: [0, 20, 0],
-            scale: [1, 1.1, 1],
-          }}
+          animate={{ y: [0, 20, 0], scale: [1, 1.1, 1] }}
           transition={{
             duration: 10,
             repeat: Number.POSITIVE_INFINITY,
@@ -301,7 +260,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
       </motion.div>
 
       <div className="container mx-auto py-12 md:py-20 px-4 relative">
-        {/* Navigation bar with animation */}
+        {/* Navigation */}
         <motion.div
           className="flex flex-wrap justify-between items-center mb-8 md:mb-12"
           initial="hidden"
@@ -323,82 +282,36 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
 
           <div className="flex items-center gap-3">
             <motion.button
-              onClick={handlePrint}
-              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Print recipe"
-            >
-              <Printer className="h-5 w-5" />
-            </motion.button>
-
-            <motion.button
               onClick={handleGenerateCard}
               disabled={isGeneratingCard}
-              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
+              className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all glass-effect border border-primary/30"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              aria-label="Generate Share Card"
+              aria-label={t("recommendation.saveImage")}
             >
               {isGeneratingCard ? (
-                 <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                 <ImageIcon className="h-5 w-5" />
+                <ImageIcon className="h-5 w-5" />
               )}
+              <span className="font-medium">
+                {t("recommendation.saveImage")}
+              </span>
             </motion.button>
-
-            <motion.button
-              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Save recipe"
-            >
-              <BookmarkPlus className="h-5 w-5" />
-            </motion.button>
-
-            <motion.div
-              className="relative"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <button
-                onClick={handleShare}
-                className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
-                aria-label="Share recipe"
-              >
-                <Share2 className="h-5 w-5" />
-              </button>
-              {showShareTooltip && (
-                <motion.div
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className={commonStyles.tooltipFull}
-                >
-                  {t("recommendation.copied")}
-                </motion.div>
-              )}
-            </motion.div>
           </div>
         </motion.div>
 
-        {/* Hero section with cocktail image and basic info */}
+        {/* Hero Section (Aligned with Recommendation Page style) */}
         <motion.div
           className="mb-16 md:mb-24"
           initial="hidden"
           animate={isPageLoaded ? "visible" : "hidden"}
           variants={{
             hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1,
-              },
-            },
+            visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
           }}
         >
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-center">
-            {/* Cocktail image with animation */}
             <motion.div
               className="w-full lg:w-2/5"
               variants={{
@@ -414,16 +327,16 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                 <div className="rounded-2xl overflow-hidden w-full h-full relative">
                   <CocktailImage
                     cocktailId={id}
-                    imageData={null}
+                    imageData={cocktail?.image || null}
                     cocktailName={cocktail?.name}
                   />
                 </div>
               </motion.div>
             </motion.div>
 
-            {/* Cocktail info with animation */}
             <motion.div
               className="w-full lg:w-3/5 flex flex-col"
+              style={{ overflow: "visible", minHeight: "auto" }}
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -431,6 +344,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
             >
               <motion.div
                 className="text-center lg:text-left space-y-4"
+                style={{ paddingBottom: "0.5rem", lineHeight: "1.2" }}
                 variants={{
                   hidden: { opacity: 0 },
                   visible: { opacity: 1, transition: { duration: 0.5 } },
@@ -438,6 +352,12 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
               >
                 <h1
                   className={`text-5xl md:text-6xl font-bold font-playfair ${gradientText} inline-block`}
+                  style={{
+                    filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))",
+                    textShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
+                    lineHeight: "1.1",
+                    paddingBottom: "0.25rem",
+                  }}
                 >
                   {getLocalizedContent("name", "english_name")}
                 </h1>
@@ -460,19 +380,14 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                 </p>
               </motion.div>
 
-              {/* Specs grid with animation */}
               <motion.div
                 className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-auto"
                 variants={{
                   hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: {
-                      staggerChildren: 0.1,
-                    },
-                  },
+                  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
                 }}
               >
+                {/* Specs - same structure as Rec page */}
                 <motion.div
                   className="flex flex-col items-center md:items-start p-4 rounded-xl glass-effect border-none bg-white/5"
                   variants={{
@@ -504,7 +419,9 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                         <path d="M5.52 16h12.96"></path>
                       </svg>
                     </div>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Base Spirit</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                      {t("detail.baseSpirit")}
+                    </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
                     {getLocalizedContent("base_spirit", "english_base_spirit")}
@@ -523,7 +440,9 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                 >
                   <div className="flex items-center mb-2">
                     <Droplet className="mr-2 h-5 w-5 text-blue-500" />
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Alcohol</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                      {t("detail.alcohol")}
+                    </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
                     {getLocalizedContent(
@@ -545,13 +464,15 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                 >
                   <div className="flex items-center mb-2">
                     <Clock className="mr-2 h-5 w-5 text-amber-500" />
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Prep Time</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                      {t("detail.prepTime")}
+                    </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
                     {getLocalizedContent(
                       "time_required",
                       "english_time_required",
-                    ) || "5 mins"}
+                    ) || (language === "cn" ? "5分钟" : "5 mins")}
                   </p>
                 </motion.div>
                 <motion.div
@@ -567,7 +488,9 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                 >
                   <div className="flex items-center mb-2">
                     <GlassWater className="mr-2 h-5 w-5 text-emerald-500" />
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Glass</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                      {t("detail.glass")}
+                    </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
                     {getLocalizedContent(
@@ -578,7 +501,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                 </motion.div>
               </motion.div>
 
-              {/* Flavor tags with animation */}
               {cocktail?.flavor_profiles?.length > 0 && (
                 <motion.div
                   className="mt-8"
@@ -587,7 +509,9 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                     visible: { opacity: 1, transition: { duration: 0.5 } },
                   }}
                 >
-                  <p className="text-sm text-muted-foreground mb-3 uppercase tracking-wider">Flavor Profile</p>
+                  <p className="text-sm text-muted-foreground mb-3 uppercase tracking-wider">
+                    {t("detail.flavorProfile")}
+                  </p>
                   <div className="flex flex-wrap gap-3">
                     {(language === "en" && cocktail.english_flavor_profiles
                       ? cocktail.english_flavor_profiles
@@ -599,7 +523,10 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.1 }}
-                        whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
+                        whileHover={{
+                          scale: 1.05,
+                          backgroundColor: "rgba(255,255,255,0.1)",
+                        }}
                       >
                         {flavor}
                       </motion.span>
@@ -611,19 +538,14 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
           </div>
         </motion.div>
 
-        {/* Recipe section with animation */}
+        {/* Recipe Section (Mobile Accordion & Desktop Split) - Same layout as Recommendation */}
         <motion.div
           className="mb-20"
           initial="hidden"
           animate={isPageLoaded ? "visible" : "hidden"}
           variants={{
             hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1,
-              },
-            },
+            visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
           }}
         >
           <motion.h2
@@ -633,33 +555,32 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
               visible: { opacity: 1, transition: { duration: 0.5 } },
             }}
           >
-            Recipe
+            {t("detail.recipe")}
           </motion.h2>
 
-          {/* Mobile accordion sections */}
           <div className="lg:hidden space-y-6">
-            {/* Ingredients Section */}
+            {/* Mobile Accordions */}
             <motion.div
-              className={`rounded-xl overflow-hidden ${cardClasses}`}
+              className={`rounded-2xl overflow-hidden ${cardClasses}`}
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
               }}
             >
               <button
-                className="w-full p-6 flex justify-between items-center bg-white/5"
+                className="w-full p-6 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-colors active:bg-white/15"
                 onClick={() => toggleSection("ingredients")}
               >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
                   {t("recommendation.ingredients")}
                 </h3>
-                {expandedSection === "ingredients" ? (
-                  <ChevronUp className="h-5 w-5" />
+                {isIngredientsExpanded ? (
+                  <ChevronUp className="h-6 w-6 text-primary" />
                 ) : (
-                  <ChevronDown className="h-5 w-5" />
+                  <ChevronDown className="h-6 w-6 text-muted-foreground" />
                 )}
               </button>
-              {expandedSection === "ingredients" && (
+              {isIngredientsExpanded && (
                 <div className="p-6 bg-black/20">
                   <ul className="divide-y divide-white/10">
                     {cocktail?.ingredients?.map((ingredient, index) => (
@@ -670,11 +591,13 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
                       >
-                        <span className={`${textColorClass} font-medium`}>
+                        <span
+                          className={`${textColorClass} font-medium text-lg`}
+                        >
                           {getLocalizedIngredientName(ingredient)}
                         </span>
-                        <span className="text-primary font-medium">
-                          {getLocalizedIngredientAmount(ingredient)}
+                        <span className="text-primary font-bold text-lg">
+                          {getLocalizedIngredientAmount(ingredient)}{" "}
                           {getLocalizedIngredientUnit(ingredient)
                             ? ` ${getLocalizedIngredientUnit(ingredient)}`
                             : ""}
@@ -686,28 +609,27 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
               )}
             </motion.div>
 
-            {/* Tools Section */}
             <motion.div
-              className={`rounded-xl overflow-hidden ${cardClasses}`}
+              className={`rounded-2xl overflow-hidden ${cardClasses}`}
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
               }}
             >
               <button
-                className="w-full p-6 flex justify-between items-center bg-white/5"
+                className="w-full p-6 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-colors active:bg-white/15"
                 onClick={() => toggleSection("tools")}
               >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
                   {t("recommendation.tools")}
                 </h3>
-                {expandedSection === "tools" ? (
-                  <ChevronUp className="h-5 w-5" />
+                {isToolsExpanded ? (
+                  <ChevronUp className="h-6 w-6 text-primary" />
                 ) : (
-                  <ChevronDown className="h-5 w-5" />
+                  <ChevronDown className="h-6 w-6 text-muted-foreground" />
                 )}
               </button>
-              {expandedSection === "tools" && (
+              {isToolsExpanded && (
                 <div className="p-6 bg-black/20">
                   <ul className="space-y-4">
                     {cocktail?.tools?.map((tool, index) => (
@@ -718,7 +640,9 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
                       >
-                        <span className={`${textColorClass} font-medium`}>
+                        <span
+                          className={`${textColorClass} font-medium text-lg`}
+                        >
                           {getLocalizedToolName(tool)}
                         </span>
                         {tool.alternative && (
@@ -736,76 +660,73 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
               )}
             </motion.div>
 
-            {/* Steps Section - Always expanded on mobile */}
             <motion.div
-              className={`rounded-xl overflow-hidden ${cardClasses}`}
+              className={`rounded-2xl overflow-hidden ${cardClasses}`}
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
               }}
             >
-              <div className="p-6 bg-white/5">
+              <button
+                className="w-full p-6 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-colors active:bg-white/15"
+                onClick={() => toggleSection("steps")}
+              >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
                   {t("recommendation.steps")}
                 </h3>
-              </div>
-              <div className="p-6 bg-black/20">
-                <ol className="space-y-10">
-                  {cocktail?.steps?.map((step) => {
-                    const localizedStep = getLocalizedStepContent(step);
-                    return (
-                      <motion.li
-                        key={step.step_number}
-                        className="flex gap-5"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: step.step_number * 0.1 }}
-                        onMouseEnter={() => setActiveStep(step.step_number)}
-                        onMouseLeave={() => setActiveStep(null)}
-                      >
-                        <motion.div
-                          className={commonStyles.circleIcon}
-                          animate={{
-                            scale: activeStep === step.step_number ? 1.1 : 1,
-                            backgroundColor: activeStep === step.step_number ? "var(--primary)" : "rgba(255,255,255,0.1)",
-                          }}
-                          transition={{ duration: 0.3 }}
+                {isStepsExpanded ? (
+                  <ChevronUp className="h-6 w-6 text-primary" />
+                ) : (
+                  <ChevronDown className="h-6 w-6 text-muted-foreground" />
+                )}
+              </button>
+              {isStepsExpanded && (
+                <div className="p-6 bg-black/20">
+                  <ol className="space-y-10">
+                    {cocktail?.steps?.map((step) => {
+                      const localizedStep = getLocalizedStepContent(step);
+                      return (
+                        <motion.li
+                          key={step.step_number}
+                          className="flex gap-5"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: step.step_number * 0.1 }}
                         >
-                          {step.step_number}
-                        </motion.div>
-                        <div className="flex-1">
-                          <p
-                            className={`${textColorClass} text-lg leading-relaxed`}
-                          >
-                            {localizedStep.description}
-                          </p>
-                          {localizedStep.tips && (
-                            <motion.div
-                              className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg"
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 0.3 }}
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10 text-sm mt-1">
+                            {step.step_number}
+                          </div>
+                          <div className="flex-1">
+                            <p
+                              className={`${textColorClass} text-lg leading-relaxed`}
                             >
-                              <p className="text-amber-200/90 text-sm flex items-start gap-2">
-                                <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                                <span>{localizedStep.tips}</span>
-                              </p>
-                            </motion.div>
-                          )}
-                        </div>
-                      </motion.li>
-                    );
-                  })}
-                </ol>
-              </div>
+                              {localizedStep.description}
+                            </p>
+                            {localizedStep.tips && (
+                              <motion.div
+                                className="mt-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                              >
+                                <p className="text-amber-400/70 text-sm flex items-start gap-2">
+                                  <Lightbulb className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                                  <span>{localizedStep.tips}</span>
+                                </p>
+                              </motion.div>
+                            )}
+                          </div>
+                        </motion.li>
+                      );
+                    })}
+                  </ol>
+                </div>
+              )}
             </motion.div>
           </div>
 
-          {/* Desktop layout */}
           <div className="hidden lg:grid lg:grid-cols-12 gap-10">
-            {/* Left column: Ingredients and Tools */}
             <div className="lg:col-span-4 space-y-8">
-              {/* Ingredients with animation */}
               <motion.div
                 className={`rounded-2xl overflow-hidden ${cardClasses}`}
                 variants={{
@@ -833,7 +754,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                           {getLocalizedIngredientName(ingredient)}
                         </span>
                         <span className="text-primary font-bold">
-                          {getLocalizedIngredientAmount(ingredient)}
+                          {getLocalizedIngredientAmount(ingredient)}{" "}
                           {getLocalizedIngredientUnit(ingredient)
                             ? ` ${getLocalizedIngredientUnit(ingredient)}`
                             : ""}
@@ -843,8 +764,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                   </ul>
                 </div>
               </motion.div>
-
-              {/* Tools with animation */}
               <motion.div
                 className={`rounded-2xl overflow-hidden ${cardClasses}`}
                 variants={{
@@ -885,7 +804,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
               </motion.div>
             </div>
 
-            {/* Right column: Steps (wider) */}
             <div className="lg:col-span-8">
               <motion.div
                 className={`rounded-2xl overflow-hidden ${cardClasses}`}
@@ -914,19 +832,9 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                           onMouseLeave={() => setActiveStep(null)}
                         >
                           <div className="flex gap-6">
-                            <motion.div
-                              className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10"
-                              animate={{
-                                scale: activeStep === step.step_number ? 1.1 : 1,
-                                backgroundColor: activeStep === step.step_number ? "var(--primary)" : "rgba(255,255,255,0.1)",
-                                borderColor: activeStep === step.step_number ? "var(--primary)" : "rgba(255,255,255,0.2)",
-                                color: activeStep === step.step_number ? "#000" : "var(--foreground)",
-                                boxShadow: activeStep === step.step_number ? "0 0 20px rgba(255, 183, 77, 0.4)" : "none",
-                              }}
-                              transition={{ duration: 0.3 }}
-                            >
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10">
                               {step.step_number}
-                            </motion.div>
+                            </div>
                             <div className="flex-1 pt-1">
                               <p
                                 className={`${textColorClass} text-xl leading-relaxed`}
@@ -935,21 +843,19 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                               </p>
                               {localizedStep.tips && (
                                 <motion.div
-                                  className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl"
+                                  className="mt-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
                                   initial={{ opacity: 0, y: 5 }}
                                   animate={{ opacity: 1, y: 0 }}
                                   transition={{ duration: 0.3 }}
                                 >
-                                  <p className="text-amber-200/90 text-base flex items-start gap-3">
-                                    <Lightbulb className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                                  <p className="text-amber-200/90 text-xs flex items-start gap-1.5">
+                                    <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
                                     <span>{localizedStep.tips}</span>
                                   </p>
                                 </motion.div>
                               )}
                             </div>
                           </div>
-
-                          {/* Step progress line */}
                           {step.step_number <
                             (cocktail?.steps?.length || 0) && (
                             <div className="absolute left-[1.7rem] top-14 bottom-[-2rem] w-px bg-gradient-to-b from-white/20 to-white/5"></div>
@@ -964,7 +870,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
           </div>
         </motion.div>
 
-        {/* Action buttons with animation */}
         <motion.div
           className="mt-16 flex flex-col sm:flex-row gap-6 justify-center"
           initial={{ opacity: 0, y: 20 }}
@@ -981,44 +886,21 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
         </motion.div>
       </div>
 
-      {/* Print styles */}
-      <style jsx global>{`
-        @media print {
-          body * {
-            visibility: hidden;
-          }
-          .container,
-          .container * {
-            visibility: visible;
-          }
-          .container {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-          }
-          button,
-          .print-hide {
-            display: none !important;
-          }
-        }
-      `}</style>
-
-      {/* Hidden Polaroid Card for Generation */}
-      <div style={{ position: 'fixed', top: '-9999px', left: '-9999px' }}>
+      {/* Hidden Polaroid */}
+      <div style={{ position: "fixed", top: "-9999px", left: "-9999px" }}>
         {cocktail && (
-            <PolaroidCard 
-                ref={cardRef} 
-                cocktail={cocktail} 
-                imageUrl={polaroidImageUrl} 
-            />
+          <PolaroidCard
+            ref={cardRef}
+            cocktail={cocktail}
+            imageUrl={polaroidImageUrl}
+          />
         )}
       </div>
 
-      <ShareModal 
-        isOpen={showShareModal} 
-        onClose={() => setShowShareModal(false)} 
-        imageUrl={generatedCardUrl} 
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        imageUrl={generatedCardUrl}
       />
     </div>
   );

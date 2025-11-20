@@ -9,9 +9,6 @@ import {
   Clock,
   Droplet,
   GlassWater,
-  Printer,
-  Share2,
-  BookmarkPlus,
   ChevronDown,
   ChevronUp,
   Lightbulb,
@@ -47,7 +44,6 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showShareTooltip, setShowShareTooltip] = useState(false);
   // 移动端手机section展开状态 - 默认全部展开
   const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
   const [isToolsExpanded, setIsToolsExpanded] = useState(true);
@@ -55,7 +51,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
-  
+
   // Share Card State
   const [generatedCardUrl, setGeneratedCardUrl] = useState<string | null>(null);
   const [isGeneratingCard, setIsGeneratingCard] = useState(false);
@@ -64,7 +60,8 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   // Updated design system classes
   const textColorClass = "text-foreground";
-  const cardClasses = "glass-effect text-foreground transition-all duration-300 hover:shadow-primary/10";
+  const cardClasses =
+    "glass-effect text-foreground transition-all duration-300 hover:shadow-primary/10";
   const borderClasses = "border-white/10";
   const gradientText = "gradient-text-bright";
 
@@ -164,51 +161,22 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     router.push(getPathWithLanguage("/"));
   };
 
-  const handleShare = () => {
-    try {
-      if (navigator.share && window.isSecureContext) {
-        navigator
-          .share({
-            title: `${cocktail?.name} Recipe - MoodShaker`,
-            text: `Check out this ${cocktail?.name} recipe from MoodShaker!`,
-            url: window.location.href,
-          })
-          .catch(() => copyToClipboard());
-      } else {
-        copyToClipboard();
+  const toggleSection = useCallback(
+    (section: string) => {
+      switch (section) {
+        case "ingredients":
+          setIsIngredientsExpanded(!isIngredientsExpanded);
+          break;
+        case "tools":
+          setIsToolsExpanded(!isToolsExpanded);
+          break;
+        case "steps":
+          setIsStepsExpanded(!isStepsExpanded);
+          break;
       }
-    } catch (err) {
-      copyToClipboard();
-    }
-  };
-
-  const copyToClipboard = () => {
-    try {
-      navigator.clipboard.writeText(window.location.href);
-      setShowShareTooltip(true);
-      setTimeout(() => setShowShareTooltip(false), 2000);
-    } catch (err) {
-      alert(`Copy this URL: ${window.location.href}`);
-    }
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const toggleSection = useCallback((section: string) => {
-    switch (section) {
-      case "ingredients":
-        setIsIngredientsExpanded(!isIngredientsExpanded);
-        break;
-      case "tools":
-        setIsToolsExpanded(!isToolsExpanded);
-        break;
-      case "steps":
-        setIsStepsExpanded(!isStepsExpanded);
-        break;
-    }
-  }, [isIngredientsExpanded, isToolsExpanded, isStepsExpanded]);
+    },
+    [isIngredientsExpanded, isToolsExpanded, isStepsExpanded],
+  );
 
   const handleRefreshImage = async () => {
     if (refreshImage && cocktail) {
@@ -225,23 +193,23 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const handleGenerateCard = useCallback(async () => {
     if (!cardRef.current) return;
-    
+
     setIsGeneratingCard(true);
     try {
       // Add a small delay to ensure rendering
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
         pixelRatio: 2,
         // Removed forced white background to respect component's dark theme
         skipAutoScale: true,
       });
-      
+
       setGeneratedCardUrl(dataUrl);
       setShowShareModal(true);
     } catch (error) {
-      console.error('Failed to generate card', error);
+      console.error("Failed to generate card", error);
       // Fallback or alert
     } finally {
       setIsGeneratingCard(false);
@@ -348,62 +316,22 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
           <div className="flex items-center gap-3">
             <motion.button
-              onClick={handlePrint}
-              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Print recipe"
-            >
-              <Printer className="h-5 w-5" />
-            </motion.button>
-
-            <motion.button
               onClick={handleGenerateCard}
               disabled={isGeneratingCard}
-              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
+              className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all glass-effect border border-primary/30"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              aria-label="Generate Share Card"
+              aria-label={t("recommendation.saveImage")}
             >
               {isGeneratingCard ? (
-                 <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                 <ImageIcon className="h-5 w-5" />
+                <ImageIcon className="h-5 w-5" />
               )}
+              <span className="font-medium">
+                {t("recommendation.saveImage")}
+              </span>
             </motion.button>
-
-            <motion.button
-              className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Save recipe"
-            >
-              <BookmarkPlus className="h-5 w-5" />
-            </motion.button>
-
-            <motion.div
-              className="relative"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <button
-                onClick={handleShare}
-                className="p-3 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
-                aria-label="Share recipe"
-              >
-                <Share2 className="h-5 w-5" />
-              </button>
-              {showShareTooltip && (
-                <motion.div
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className={commonStyles.tooltipFull}
-                >
-                  {t("recommendation.copied")}
-                </motion.div>
-              )}
-            </motion.div>
           </div>
         </motion.div>
 
@@ -474,9 +402,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             {/* Cocktail info with animation */}
             <motion.div
               className="w-full lg:w-3/5 flex flex-col"
-              style={{ 
-                overflow: 'visible',
-                minHeight: 'auto'
+              style={{
+                overflow: "visible",
+                minHeight: "auto",
               }}
               variants={{
                 hidden: { opacity: 0, y: 20 },
@@ -485,9 +413,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             >
               <motion.div
                 className="text-center lg:text-left space-y-4"
-                style={{ 
-                  paddingBottom: '0.5rem',
-                  lineHeight: '1.2'
+                style={{
+                  paddingBottom: "0.5rem",
+                  lineHeight: "1.2",
                 }}
                 variants={{
                   hidden: { opacity: 0 },
@@ -497,12 +425,12 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 <h1
                   className={`text-5xl md:text-6xl font-bold font-playfair ${gradientText} inline-block`}
                   style={{
-                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
-                    lineHeight: '1.1',
-                    paddingBottom: '0.25rem',
-                    minHeight: 'auto',
-                    overflow: 'visible'
+                    filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))",
+                    textShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
+                    lineHeight: "1.1",
+                    paddingBottom: "0.25rem",
+                    minHeight: "auto",
+                    overflow: "visible",
                   }}
                 >
                   {getLocalizedContent("name", "english_name")}
@@ -570,7 +498,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                         <path d="M5.52 16h12.96"></path>
                       </svg>
                     </div>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Base Spirit</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                      Base Spirit
+                    </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
                     {getLocalizedContent("base_spirit", "english_base_spirit")}
@@ -589,7 +519,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 >
                   <div className="flex items-center mb-2">
                     <Droplet className="mr-2 h-5 w-5 text-blue-500" />
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Alcohol</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                      Alcohol
+                    </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
                     {getLocalizedContent(
@@ -611,7 +543,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 >
                   <div className="flex items-center mb-2">
                     <Clock className="mr-2 h-5 w-5 text-amber-500" />
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Prep Time</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                      Prep Time
+                    </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
                     {getLocalizedContent(
@@ -633,7 +567,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 >
                   <div className="flex items-center mb-2">
                     <GlassWater className="mr-2 h-5 w-5 text-emerald-500" />
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Glass</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                      Glass
+                    </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
                     {getLocalizedContent(
@@ -653,7 +589,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                     visible: { opacity: 1, transition: { duration: 0.5 } },
                   }}
                 >
-                  <p className="text-sm text-muted-foreground mb-3 uppercase tracking-wider">Flavor Profile</p>
+                  <p className="text-sm text-muted-foreground mb-3 uppercase tracking-wider">
+                    Flavor Profile
+                  </p>
                   <div className="flex flex-wrap gap-3">
                     {(language === "en" && cocktail.english_flavor_profiles
                       ? cocktail.english_flavor_profiles
@@ -665,7 +603,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.1 }}
-                        whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
+                        whileHover={{
+                          scale: 1.05,
+                          backgroundColor: "rgba(255,255,255,0.1)",
+                        }}
                       >
                         {flavor}
                       </motion.span>
@@ -713,7 +654,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               }}
             >
               <button
-                className="w-full p-6 flex justify-between items-center bg-white/5"
+                className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
                 onClick={() => toggleSection("ingredients")}
               >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
@@ -726,7 +667,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 )}
               </button>
               {isIngredientsExpanded && (
-                <div className="p-6 bg-black/20">
+                <div className="p-5 md:p-6 bg-black/20">
                   <ul className="divide-y divide-white/10">
                     {cocktail?.ingredients?.map((ingredient, index) => (
                       <motion.li
@@ -761,7 +702,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               }}
             >
               <button
-                className="w-full p-6 flex justify-between items-center bg-white/5"
+                className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
                 onClick={() => toggleSection("tools")}
               >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
@@ -774,7 +715,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 )}
               </button>
               {isToolsExpanded && (
-                <div className="p-6 bg-black/20">
+                <div className="p-5 md:p-6 bg-black/20">
                   <ul className="space-y-4">
                     {cocktail?.tools?.map((tool, index) => (
                       <motion.li
@@ -811,7 +752,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               }}
             >
               <button
-                className="w-full p-6 flex justify-between items-center bg-white/5"
+                className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
                 onClick={() => toggleSection("steps")}
               >
                 <h3 className={`text-xl font-bold ${textColorClass}`}>
@@ -824,7 +765,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 )}
               </button>
               {isStepsExpanded && (
-                <div className="p-6 bg-black/20">
+                <div className="p-5 md:p-6 bg-black/20">
                   <ol className="space-y-10">
                     {cocktail?.steps?.map((step) => {
                       const localizedStep = getLocalizedStepContent(step);
@@ -838,9 +779,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                           onMouseEnter={() => setActiveStep(step.step_number)}
                           onMouseLeave={() => setActiveStep(null)}
                         >
-                          <div
-                            className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10 text-sm"
-                          >
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10 text-sm">
                             {step.step_number}
                           </div>
                           <div className="flex-1 pt-0.5">
@@ -857,7 +796,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                                 transition={{ delay: 0.3 }}
                               >
                                 <p className="text-amber-400/70 text-xs flex items-center gap-1.5">
-                                  <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+                                  <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
                                   <span>{localizedStep.tips}</span>
                                 </p>
                               </motion.div>
@@ -965,12 +904,12 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
                 }}
               >
-                <div className="p-6 bg-white/5 border-b border-white/5">
+                <div className="p-8 bg-white/5 border-b border-white/5">
                   <h3 className={`text-2xl font-bold ${textColorClass}`}>
                     {t("recommendation.steps")}
                   </h3>
                 </div>
-                <div className="p-6 bg-black/10">
+                <div className="p-8 bg-black/10">
                   <ol className="space-y-12">
                     {cocktail?.steps?.map((step) => {
                       const localizedStep = getLocalizedStepContent(step);
@@ -984,26 +923,24 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                           onMouseEnter={() => setActiveStep(step.step_number)}
                           onMouseLeave={() => setActiveStep(null)}
                         >
-                          <div className="flex gap-5">
-                            <div
-                              className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10 text-sm"
-                            >
+                          <div className="flex gap-6">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10">
                               {step.step_number}
                             </div>
-                            <div className="flex-1 pt-0.5">
+                            <div className="flex-1 pt-1">
                               <p
-                                className={`${textColorClass} text-lg leading-relaxed`}
+                                className={`${textColorClass} text-xl leading-relaxed`}
                               >
                                 {localizedStep.description}
                               </p>
                               {localizedStep.tips && (
                                 <motion.div
                                   className="mt-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  transition={{ delay: 0.3 }}
+                                  initial={{ opacity: 0, y: 5 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.3 }}
                                 >
-                                  <p className="text-amber-400/70 text-xs flex items-start gap-1.5">
+                                  <p className="text-amber-200/90 text-xs flex items-start gap-1.5">
                                     <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
                                     <span>{localizedStep.tips}</span>
                                   </p>
@@ -1015,7 +952,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                           {/* Step progress line */}
                           {step.step_number <
                             (cocktail?.steps?.length || 0) && (
-                            <div className="absolute left-[1.2rem] top-10 bottom-[-1.5rem] w-px bg-gradient-to-b from-white/20 to-white/5"></div>
+                            <div className="absolute left-[1.7rem] top-14 bottom-[-2rem] w-px bg-gradient-to-b from-white/20 to-white/5"></div>
                           )}
                         </motion.li>
                       );
@@ -1068,25 +1005,27 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
       `}</style>
 
       {/* Hidden Polaroid Card for Generation */}
-      <div style={{ position: 'fixed', top: '-9999px', left: '-9999px' }}>
+      <div style={{ position: "fixed", top: "-9999px", left: "-9999px" }}>
         {cocktail && (
-            <PolaroidCard 
-                ref={cardRef} 
-                cocktail={cocktail} 
-                imageUrl={imageData || cocktail.image || `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`} 
-            />
+          <PolaroidCard
+            ref={cardRef}
+            cocktail={cocktail}
+            imageUrl={
+              imageData ||
+              cocktail.image ||
+              `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`
+            }
+          />
         )}
       </div>
 
-      <ShareModal 
-        isOpen={showShareModal} 
-        onClose={() => setShowShareModal(false)} 
-        imageUrl={generatedCardUrl} 
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        imageUrl={generatedCardUrl}
       />
     </div>
   );
 });
-
-CocktailRecommendation.displayName = "CocktailRecommendation";
 
 export default CocktailRecommendation;

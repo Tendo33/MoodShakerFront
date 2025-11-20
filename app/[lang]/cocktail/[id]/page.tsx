@@ -4,10 +4,8 @@ import { Suspense } from "react";
 import CocktailDetailPage from "@/components/pages/CocktailDetailPage";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import {
-  getCocktailById,
-  getPopularCocktailIds,
-} from "@/services/cocktailService";
+import { getCocktailFromDB } from "@/lib/cocktail-data";
+import { getPopularCocktailIds } from "@/services/cocktailService";
 
 interface CocktailPageProps {
   params: {
@@ -21,7 +19,7 @@ export async function generateMetadata({
 }: CocktailPageProps): Promise<Metadata> {
   const { id } = await params;
   try {
-    const cocktail = await getCocktailById(id);
+    const cocktail = await getCocktailFromDB(id);
     return {
       title: `${cocktail?.name || "Cocktail"} | MoodShaker`,
       description:
@@ -42,7 +40,9 @@ export async function generateMetadata({
   }
 }
 
-// Generate static params for popular cocktails
+// Generate static params for popular cocktails - Optional: Keep or remove.
+// Since we now have dynamic DB content, static generation of EVERYTHING is impossible.
+// But we can still statically generate popular ones.
 export function generateStaticParams() {
   const cocktailIds = getPopularCocktailIds();
   const languages = ["en", "cn"];
@@ -63,9 +63,10 @@ export default async function CocktailPage({ params }: CocktailPageProps) {
     redirect("/cn/cocktail/" + id);
   }
 
-  // Validate cocktail ID
-  const validCocktailIds = getPopularCocktailIds();
-  if (!validCocktailIds.includes(id)) {
+  // Fetch cocktail from DB (or fallback to popular)
+  const cocktail = await getCocktailFromDB(id);
+
+  if (!cocktail) {
     notFound();
   }
 
@@ -78,7 +79,7 @@ export default async function CocktailPage({ params }: CocktailPageProps) {
           </div>
         }
       >
-        <CocktailDetailPage id={id} />
+        <CocktailDetailPage id={id} initialData={cocktail} />
       </Suspense>
     </ErrorBoundary>
   );

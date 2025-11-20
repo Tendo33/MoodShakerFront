@@ -14,11 +14,14 @@ services:
       - IMAGE_API_URL=${IMAGE_API_URL}
       - IMAGE_API_KEY=${IMAGE_API_KEY}
       - IMAGE_MODEL=${IMAGE_MODEL}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/moodshaker
     volumes:
       - .:/app
       - /app/node_modules
       - /app/.next
     restart: unless-stopped
+    depends_on:
+      - db
     healthcheck:
       test:
         [
@@ -46,3 +49,24 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  db:
+    image: postgres:15-alpine
+    container_name: moodshaker-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-moodshaker}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

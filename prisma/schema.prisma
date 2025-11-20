@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cocktail {
+  id                    String   @id @default(uuid())
+  name                  String
+  englishName           String?  @map("english_name")
+  description           String
+  englishDescription    String?  @map("english_description")
+  matchReason           String?  @map("match_reason")
+  englishMatchReason    String?  @map("english_match_reason")
+  baseSpirit            String   @map("base_spirit")
+  englishBaseSpirit     String?  @map("english_base_spirit")
+  alcoholLevel          String   @map("alcohol_level")
+  englishAlcoholLevel   String?  @map("english_alcohol_level")
+  servingGlass          String   @map("serving_glass")
+  englishServingGlass   String?  @map("english_serving_glass")
+  timeRequired          String   @map("time_required")
+  englishTimeRequired   String?  @map("english_time_required")
+  flavorProfiles        String[] @map("flavor_profiles")
+  englishFlavorProfiles String[] @map("english_flavor_profiles")
+  ingredients           Json
+  tools                 Json
+  steps                 Json
+  image                 String?  @db.Text // Base64 string, using Text type for large content
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("cocktails")
+}
+

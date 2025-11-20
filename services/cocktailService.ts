@@ -1,7 +1,7 @@
 import type { Cocktail } from "@/api/cocktail";
 
 // Sample popular cocktail data
-const popularCocktails: Record<string, Cocktail> = {
+export const popularCocktails: Record<string, Cocktail> = {
   mojito: {
     name: "莫吉托",
     english_name: "Mojito",

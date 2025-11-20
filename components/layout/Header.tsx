@@ -51,13 +51,12 @@ export default function Header() {
   // Get the correct home link based on language
   const homeLink = getPathWithLanguage("/");
   const questionsLink = getPathWithLanguage("/questions");
+  const galleryLink = getPathWithLanguage("/gallery");
 
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? "glass-effect py-2"
-          : "bg-transparent py-4"
+        isScrolled ? "glass-effect py-2" : "bg-transparent py-4"
       }`}
       suppressHydrationWarning
     >
@@ -85,9 +84,24 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
+        <div className="hidden md:flex items-center space-x-4">
+          <Button
+            href={galleryLink}
+            variant="outline"
+            size="md"
+            className="text-white border-white/20 hover:bg-white/10 hover:border-white/40 backdrop-blur-sm"
+            icon={<span className="text-lg">🍹</span>}
+          >
+            {language === "cn" ? "酒单库" : "Gallery"}
+          </Button>
           <LanguageSelector />
-          <Button href={questionsLink} size="lg" variant="primary" className="shadow-xl hover:shadow-primary/25">
+          <Button
+            href={questionsLink}
+            size="md"
+            variant="primary"
+            className="shadow-xl hover:shadow-primary/25"
+            icon={<span className="text-lg">✨</span>}
+          >
             {t("home.start")}
           </Button>
         </div>
@@ -111,21 +125,35 @@ export default function Header() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="md:hidden overflow-hidden"
+            className="md:hidden fixed inset-x-0 top-[64px] z-40 overflow-hidden"
             initial="hidden"
             animate="visible"
             exit="exit"
             variants={mobileMenuVariants as any}
           >
-            <div className="px-6 py-6 space-y-4 glass-effect mt-2 mx-4 rounded-2xl border-t border-white/10">
-              <div className="pt-2 pb-1">
+            {/* Backdrop blur overlay */}
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-xl" />
+
+            <div className="relative px-6 py-6 space-y-6 border-t border-white/10 bg-background/40">
+              <Button
+                href={galleryLink}
+                variant="outline"
+                fullWidth
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="justify-start text-lg text-white border-white/20 hover:bg-white/10 hover:border-white/40"
+                icon={<span className="text-xl">🍹</span>}
+              >
+                {language === "cn" ? "酒单库" : "Gallery"}
+              </Button>
+              <div className="pt-2 pb-4">
                 <Button
                   href={questionsLink}
-                  size="lg"
+                  size="xl"
                   variant="primary"
                   fullWidth
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="shadow-lg"
+                  className="shadow-lg text-lg"
+                  icon={<span className="text-xl">✨</span>}
                 >
                   {t("home.start")}
                 </Button>

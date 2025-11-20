@@ -57,5 +57,3 @@ export function generateImageId(): string {
 export function generateComponentId(componentType: string): string {
   return generateId(componentType, 7);
 }
-
-

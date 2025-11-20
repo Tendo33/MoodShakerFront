@@ -44,7 +44,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
     if (externalProgress === undefined) {
       animationFrame = requestAnimationFrame(updateAnimation);
     }
-    
+
     return () => {
       if (animationFrame) {
         cancelAnimationFrame(animationFrame);
@@ -64,7 +64,8 @@ const WaitingAnimation = memo(function WaitingAnimation({
   if (!isShowing) return null;
 
   // Use external progress if available, otherwise fallback to internal looping animation
-  const currentProgress = externalProgress !== undefined ? externalProgress : animationProgress;
+  const currentProgress =
+    externalProgress !== undefined ? externalProgress : animationProgress;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6 fixed inset-0 z-50">
