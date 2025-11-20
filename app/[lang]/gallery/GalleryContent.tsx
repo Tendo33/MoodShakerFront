@@ -51,7 +51,28 @@ export default function GalleryContent({
       const matchesSearch =
         c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (c.english_name &&
-          c.english_name.toLowerCase().includes(searchQuery.toLowerCase()));
+          c.english_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (c.ingredients &&
+          c.ingredients.some(
+            (i) =>
+              i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              (i.english_name &&
+                i.english_name.toLowerCase().includes(searchQuery.toLowerCase()))
+          )) ||
+        (c.description &&
+          c.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (c.english_description &&
+          c.english_description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())) ||
+        (c.flavor_profiles &&
+          c.flavor_profiles.some((f) =>
+            f.toLowerCase().includes(searchQuery.toLowerCase())
+          )) ||
+        (c.english_flavor_profiles &&
+          c.english_flavor_profiles.some((f) =>
+            f.toLowerCase().includes(searchQuery.toLowerCase())
+          ));
 
       const matchesSpirit = selectedSpirit
         ? c.english_base_spirit?.toLowerCase().includes(selectedSpirit.toLowerCase()) ||
@@ -132,28 +153,45 @@ export default function GalleryContent({
         >
           <div className="glass-effect border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-xl max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row gap-4 items-center">
-              {/* Search Input */}
-              <div className="relative w-full flex-1">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
+              {/* Search Input Group */}
+              <div className="flex w-full flex-1 gap-2">
+                <div className="relative flex-1">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    className="block w-full pl-11 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-transparent transition-all"
+                    placeholder={
+                      lang === "cn" ? "搜索鸡尾酒、成分、口味..." : "Search cocktails, ingredients, flavors..."
+                    }
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        // Optional: hide keyboard on mobile or trigger any other action
+                        (e.target as HTMLInputElement).blur();
+                      }
+                    }}
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
-                <input
-                  type="text"
-                  className="block w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-transparent transition-all"
-                  placeholder={
-                    lang === "cn" ? "搜索鸡尾酒..." : "Search cocktails..."
-                  }
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    // Visual feedback or force search (already reactive)
+                  }}
+                  className="hidden md:flex px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-pink-500/25 transition-all items-center gap-2 whitespace-nowrap"
+                >
+                  <Search className="w-5 h-5" />
+                  {lang === "cn" ? "搜索" : "Search"}
+                </button>
               </div>
 
               {/* Filter Toggle Button (Mobile) */}
