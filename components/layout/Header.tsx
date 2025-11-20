@@ -51,6 +51,7 @@ export default function Header() {
   // Get the correct home link based on language
   const homeLink = getPathWithLanguage("/");
   const questionsLink = getPathWithLanguage("/questions");
+  const galleryLink = getPathWithLanguage("/gallery");
 
   return (
     <header
@@ -86,6 +87,12 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
+          <Link 
+            href={galleryLink}
+            className="text-white/80 hover:text-white transition-colors font-medium"
+          >
+            {language === 'cn' ? '酒单库' : 'Gallery'}
+          </Link>
           <LanguageSelector />
           <Button href={questionsLink} size="lg" variant="primary" className="shadow-xl hover:shadow-primary/25">
             {t("home.start")}
@@ -118,6 +125,13 @@ export default function Header() {
             variants={mobileMenuVariants as any}
           >
             <div className="px-6 py-6 space-y-4 glass-effect mt-2 mx-4 rounded-2xl border-t border-white/10">
+              <Link 
+                href={galleryLink}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block py-2 text-white/80 hover:text-white font-medium text-lg border-b border-white/5"
+              >
+                {language === 'cn' ? '酒单库' : 'Gallery'}
+              </Link>
               <div className="pt-2 pb-1">
                 <Button
                   href={questionsLink}

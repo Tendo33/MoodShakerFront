@@ -262,6 +262,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
             body: JSON.stringify({
               prompt,
               sessionId,
+              cocktailName: recommendation?.name, // Pass cocktail name for saving image
             }),
           });
 
@@ -347,6 +348,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
           prompt,
           sessionId,
           forceRefresh: true,
+          cocktailName: recommendation.name, // Pass name
         }),
       });
 

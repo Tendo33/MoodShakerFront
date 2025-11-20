@@ -5,6 +5,7 @@ import { cocktailLogger } from "@/utils/logger";
 import type { BartenderRequest, Cocktail } from "@/api/cocktail";
 import { AgentType } from "@/api/cocktail";
 import { createSystemPrompt } from "@/utils/prompts";
+import { prisma } from "@/lib/prisma";
 
 /**
  * 创建用户消息
@@ -122,6 +123,50 @@ export async function POST(request: NextRequest) {
 
     // 解析结果
     const cocktail = parseCocktailFromCompletion(completion);
+
+    // Save to Database
+    try {
+      const existingCocktail = await prisma.cocktail.findFirst({
+        where: { name: cocktail.name },
+      });
+
+      if (existingCocktail) {
+        cocktail.id = existingCocktail.id;
+        if (existingCocktail.image) {
+          cocktail.image = existingCocktail.image;
+        }
+        cocktailLogger.info(`Found existing cocktail in DB: ${cocktail.name}`);
+      } else {
+        const newCocktail = await prisma.cocktail.create({
+          data: {
+            name: cocktail.name,
+            englishName: cocktail.english_name,
+            description: cocktail.description,
+            englishDescription: cocktail.english_description,
+            matchReason: cocktail.match_reason,
+            englishMatchReason: cocktail.english_match_reason,
+            baseSpirit: cocktail.base_spirit,
+            englishBaseSpirit: cocktail.english_base_spirit,
+            alcoholLevel: cocktail.alcohol_level,
+            englishAlcoholLevel: cocktail.english_alcohol_level,
+            servingGlass: cocktail.serving_glass,
+            englishServingGlass: cocktail.english_serving_glass,
+            timeRequired: cocktail.time_required || "5 mins",
+            englishTimeRequired: cocktail.english_time_required,
+            flavorProfiles: cocktail.flavor_profiles,
+            englishFlavorProfiles: cocktail.english_flavor_profiles || [],
+            ingredients: cocktail.ingredients as any,
+            tools: cocktail.tools as any,
+            steps: cocktail.steps as any,
+          },
+        });
+        cocktail.id = newCocktail.id;
+        cocktailLogger.info(`Saved new cocktail to DB: ${cocktail.name}`);
+      }
+    } catch (dbError) {
+      cocktailLogger.error("Failed to save cocktail to DB", dbError);
+      // Don't fail the request if DB save fails, just log it
+    }
 
     const duration = Date.now() - startTime;
     cocktailLogger.info(

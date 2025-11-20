@@ -31,13 +31,14 @@ import { cocktailImages } from "@/utils/cocktail-images";
 
 interface CocktailDetailPageProps {
   id: string;
+  initialData?: Cocktail | null;
 }
 
-const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: CocktailDetailPageProps) {
+const CocktailDetailPage = React.memo(function CocktailDetailPage({ id, initialData }: CocktailDetailPageProps) {
   const router = useRouter();
   const { t, getPathWithLanguage, language } = useLanguage();
-  const [cocktail, setCocktail] = useState<Cocktail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [cocktail, setCocktail] = useState<Cocktail | null>(initialData || null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(
     "steps",
@@ -162,6 +163,13 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
 
   // Fetch cocktail data
   useEffect(() => {
+    if (initialData) {
+      setCocktail(initialData);
+      setIsLoading(false);
+      setTimeout(() => setIsPageLoaded(true), 100);
+      return;
+    }
+
     const fetchCocktail = async () => {
       setIsLoading(true);
       try {
@@ -178,7 +186,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
     };
 
     fetchCocktail();
-  }, [id]);
+  }, [id, initialData]);
 
   const handleBack = () => {
     router.push(getPathWithLanguage("/"));
@@ -414,7 +422,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({ id }: Cockta
                 <div className="rounded-2xl overflow-hidden w-full h-full relative">
                   <CocktailImage
                     cocktailId={id}
-                    imageData={null}
+                    imageData={cocktail?.image || imageData}
                     cocktailName={cocktail?.name}
                   />
                 </div>
