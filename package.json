@@ -28,10 +28,10 @@
     "react-dom": "^19",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "typescript-eslint": "latest"
+    "typescript-eslint": "latest",
+    "@prisma/client": "^5.17.0"
   },
   "devDependencies": {
-    "@prisma/client": "^5.17.0",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -16,6 +16,9 @@ RUN pnpm install --frozen-lockfile
 # 复制所有源代码
 COPY . .
 
+# 生成 Prisma 客户端
+RUN npx prisma generate
+
 # 构建应用
 RUN pnpm build
 
@@ -36,6 +39,9 @@ COPY --from=builder /app/next.config.mjs ./
 
 # 安装生产依赖
 RUN pnpm install --prod --frozen-lockfile
+
+# 复制 Prisma 生成的客户端（必须在安装依赖之后）
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # 设置环境变量
 ENV NODE_ENV=production
