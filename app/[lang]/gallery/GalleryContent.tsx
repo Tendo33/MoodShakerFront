@@ -86,7 +86,7 @@ export default function GalleryContent({
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { duration: 0.5, ease: "easeOut" as const },
     },
   };
 
@@ -173,7 +173,7 @@ export default function GalleryContent({
             <div className={`${isFilterOpen ? 'block' : 'hidden'} md:block overflow-hidden transition-all duration-300 ease-in-out`}>
               <motion.div
                 initial={false}
-                animate={isFilterOpen ? { height: "auto", opacity: 1 } : { height: "auto", opacity: 1 }} // simplified for CSS control on desktop
+                animate={{ height: "auto", opacity: 1 }}
                 className="pt-4 flex flex-col gap-4 border-t border-white/10 mt-4"
               >
                     {/* Spirit Filter */}
@@ -223,7 +223,6 @@ export default function GalleryContent({
                         </button>
                       ))}
                     </div>
-                  </div>
               </motion.div>
             </div>
           </div>
