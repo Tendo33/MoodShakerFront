@@ -29,6 +29,15 @@ function mapDBCocktailToAppCocktail(dbCocktail: any): Cocktail {
 }
 
 export async function getAllCocktails(): Promise<Cocktail[]> {
+  // Check if we're in build time (no DATABASE_URL means we're building)
+  const isBuildTime = !process.env.DATABASE_URL || 
+    process.env.DATABASE_URL.includes('placeholder');
+
+  // During build time, return empty array or popular cocktails
+  if (isBuildTime) {
+    return Object.values(popularCocktails);
+  }
+
   try {
     const cocktails = await prisma.cocktail.findMany({
       orderBy: { createdAt: "desc" },
@@ -36,16 +45,22 @@ export async function getAllCocktails(): Promise<Cocktail[]> {
     return cocktails.map(mapDBCocktailToAppCocktail);
   } catch (error) {
     console.error("Error fetching cocktails from DB:", error);
-    return [];
+    return Object.values(popularCocktails);
   }
 }
 
 export async function getCocktailFromDB(id: string): Promise<Cocktail | null> {
-  try {
-    // First check if it's a popular cocktail ID (hardcoded)
-    // If it is, we might want to return the hardcoded one OR check if we seeded it.
-    // For now, let's prioritize DB, then fallback to popularCocktails.
+  // Check if we're in build time (no DATABASE_URL means we're building)
+  const isBuildTime = !process.env.DATABASE_URL || 
+    process.env.DATABASE_URL.includes('placeholder');
 
+  // During build time, only use popular cocktails
+  if (isBuildTime) {
+    return popularCocktails[id] || null;
+  }
+
+  try {
+    // At runtime, try to fetch from DB first
     const dbCocktail = await prisma.cocktail.findUnique({
       where: { id },
     });

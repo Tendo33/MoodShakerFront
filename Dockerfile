@@ -19,6 +19,10 @@ RUN pnpm install --frozen-lockfile --shamefully-hoist
 # 复制所有源代码
 COPY . .
 
+# 设置占位符环境变量用于构建时的 Prisma 客户端生成
+# 这个 URL 只在构建时使用,运行时会被实际的 DATABASE_URL 替换
+ENV DATABASE_URL="postgresql://placeholder:placeholder@placeholder:5432/placeholder?schema=public"
+
 # 生成 Prisma 客户端
 RUN npx prisma generate
 
@@ -46,8 +50,10 @@ COPY --from=builder /app/next.config.mjs ./
 # 安装生产依赖
 RUN pnpm install --prod --frozen-lockfile --shamefully-hoist
 
-# 复制 Prisma 生成的客户端（必须在安装依赖之后）
+# 复制 Prisma schema 和生成的客户端
+COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # 设置环境变量
 ENV NODE_ENV=production
