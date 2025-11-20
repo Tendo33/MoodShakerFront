@@ -26,6 +26,9 @@ ENV DATABASE_URL="postgresql://placeholder:placeholder@placeholder:5432/placehol
 # 生成 Prisma 客户端
 RUN npx prisma generate
 
+# 验证 Prisma 客户端是否生成成功
+RUN ls -la node_modules/.prisma/ || echo "Warning: .prisma directory not found"
+
 # 构建应用
 RUN pnpm build
 
@@ -47,13 +50,21 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.mjs ./
 # 注意：.env文件不复制，因为生产环境变量应该通过运行时传入
 
-# 安装生产依赖
-RUN pnpm install --prod --frozen-lockfile --shamefully-hoist
-
-# 复制 Prisma schema 和生成的客户端
+# 复制 Prisma schema (在安装依赖之前)
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# 安装生产依赖 (包含 @prisma/client)
+# 注意: 使用 --prod 会排除 prisma CLI,所以我们需要单独安装
+RUN pnpm install --frozen-lockfile --shamefully-hoist
+
+# 设置占位符 DATABASE_URL 用于 Prisma 客户端生成
+ENV DATABASE_URL="postgresql://placeholder:placeholder@placeholder:5432/placeholder?schema=public"
+
+# 生成 Prisma 客户端
+RUN npx prisma generate
+
+# 验证 Prisma 客户端是否生成成功
+RUN ls -la node_modules/.prisma/ || echo "Warning: .prisma directory not found in runner stage"
 
 # 设置环境变量
 ENV NODE_ENV=production
