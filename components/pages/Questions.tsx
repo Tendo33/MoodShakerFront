@@ -7,7 +7,9 @@ import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { Container, Button, GradientText } from "@/components/ui/core";
 import { motion, AnimatePresence } from "framer-motion";
-import SmartLoadingSystem, { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
+import SmartLoadingSystem, {
+  useSmartLoading,
+} from "@/components/animations/SmartLoadingSystem";
 import { appLogger, safeLogger } from "@/utils/logger";
 
 const Questions = memo(function Questions() {
@@ -57,9 +59,9 @@ const Questions = memo(function Questions() {
       t("loading.rotating.4"),
       t("loading.rotating.5"),
     ];
-    
+
     setLoadingMessage(messages[0]); // Start with first message
-    
+
     let msgIndex = 0;
     const interval = setInterval(() => {
       msgIndex = (msgIndex + 1) % messages.length;
@@ -185,10 +187,10 @@ const Questions = memo(function Questions() {
     async (questionId: number, option: string) => {
       safeLogger.userInteraction("select questionnaire option");
       setSelectedOption(option);
-      
+
       // Add delay for micro-interaction
-      await new Promise(resolve => setTimeout(resolve, 400));
-      
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
       try {
         await saveAnswer(questionId.toString(), option);
         if (questionId < questions.length) {
@@ -225,14 +227,14 @@ const Questions = memo(function Questions() {
       }
 
       updateProgress(20);
-      
+
       // Add safety timeout to prevent hanging
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Request timed out")), 60000)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), 60000),
       );
 
       await Promise.race([submitRequest(), timeoutPromise]);
-      
+
       updateProgress(70);
 
       setTimeout(() => {
@@ -240,9 +242,7 @@ const Questions = memo(function Questions() {
       }, 800);
     } catch (error) {
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : t("error.generationFailed");
+        error instanceof Error ? error.message : t("error.generationFailed");
 
       appLogger.error("Questionnaire submission failed", errorMessage);
       completeGeneration();
@@ -282,7 +282,6 @@ const Questions = memo(function Questions() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      
       <Container className="relative z-10 py-16 md:py-24">
         <div className="mb-12 md:mb-16 max-w-3xl mx-auto">
           <div className="flex justify-between items-center mb-4 px-1">
@@ -301,7 +300,10 @@ const Questions = memo(function Questions() {
               animate={{ width: `${calculatedProgress}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" style={{ backgroundSize: "200% 100%" }} />
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"
+                style={{ backgroundSize: "200% 100%" }}
+              />
             </motion.div>
           </div>
         </div>
@@ -322,7 +324,7 @@ const Questions = memo(function Questions() {
                     STEP {currentStep} / {totalSteps}
                   </span>
                 </div>
-                
+
                 <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
                   <GradientText>
                     {questions[currentQuestion - 1]?.title}
@@ -330,13 +332,15 @@ const Questions = memo(function Questions() {
                 </h2>
               </div>
 
-              <div className={`grid gap-4 mx-auto ${
-                questions[currentQuestion - 1]?.options.length === 2
-                  ? "grid-cols-1 sm:grid-cols-2 max-w-xl"
-                  : questions[currentQuestion - 1]?.options.length === 3
-                  ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-3xl"
-                  : "grid-cols-1 sm:grid-cols-2 md:grid-cols-4 max-w-4xl"
-              }`}>
+              <div
+                className={`grid gap-4 mx-auto ${
+                  questions[currentQuestion - 1]?.options.length === 2
+                    ? "grid-cols-1 sm:grid-cols-2 max-w-xl"
+                    : questions[currentQuestion - 1]?.options.length === 3
+                      ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-3xl"
+                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-4 max-w-4xl"
+                }`}
+              >
                 {questions[currentQuestion - 1]?.options.map(
                   (option, index) => (
                     <motion.div
@@ -349,7 +353,9 @@ const Questions = memo(function Questions() {
                     >
                       <div
                         className={`cursor-pointer h-full group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 ${
-                          selectedOption === option.value ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.2)] scale-[1.01]" : "border-transparent"
+                          selectedOption === option.value
+                            ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.2)] scale-[1.01]"
+                            : "border-transparent"
                         }`}
                         onClick={() =>
                           handleAnswer(currentQuestion, option.value)
@@ -414,7 +420,7 @@ const Questions = memo(function Questions() {
                     STEP {currentStep} / {totalSteps}
                   </span>
                 </div>
-                
+
                 <div className="space-y-4">
                   <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
                     <GradientText>
@@ -470,8 +476,10 @@ const Questions = memo(function Questions() {
                           </motion.svg>
                         </div>
                       )}
-                      
-                      <div className={`absolute inset-0 bg-primary/10 transition-opacity duration-300 ${baseSpirits.includes(spirit.value) ? 'opacity-100' : 'opacity-0'}`} />
+
+                      <div
+                        className={`absolute inset-0 bg-primary/10 transition-opacity duration-300 ${baseSpirits.includes(spirit.value) ? "opacity-100" : "opacity-0"}`}
+                      />
 
                       <div className="aspect-square relative overflow-hidden rounded-lg mb-3 bg-black/20 group-hover:shadow-inner transition-shadow">
                         <Image
@@ -482,7 +490,9 @@ const Questions = memo(function Questions() {
                           className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
                         />
                       </div>
-                      <h3 className={`text-sm font-medium transition-colors duration-300 ${baseSpirits.includes(spirit.value) ? 'text-primary' : 'text-foreground'}`}>
+                      <h3
+                        className={`text-sm font-medium transition-colors duration-300 ${baseSpirits.includes(spirit.value) ? "text-primary" : "text-foreground"}`}
+                      >
                         {spirit.label}
                       </h3>
                     </div>
@@ -515,12 +525,10 @@ const Questions = memo(function Questions() {
                     CUSTOMIZE
                   </span>
                 </div>
-                
+
                 <div className="space-y-4">
                   <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
-                    <GradientText>
-                      {t("questions.feedback.title")}
-                    </GradientText>
+                    <GradientText>{t("questions.feedback.title")}</GradientText>
                   </h2>
                   <p className="text-lg text-muted-foreground leading-relaxed font-source-sans">
                     {t("questions.feedback.description")}

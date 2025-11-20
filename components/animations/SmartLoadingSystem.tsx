@@ -37,7 +37,7 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
   const { t } = useLanguage();
   const [simulatedProgress, setSimulatedProgress] = useState(0);
   const [loadingConfig, setLoadingConfig] = useState<LoadingConfig>();
-  
+
   // Use ref to persist start time across re-renders (prevent reset on message change)
   const startTimeRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -98,49 +98,43 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
     }
   }, [isShowing]);
 
-  const updateProgress = useCallback(
-    () => {
-      if (!startTimeRef.current || !isShowing) return;
+  const updateProgress = useCallback(() => {
+    if (!startTimeRef.current || !isShowing) return;
 
-      const elapsed = Date.now() - startTimeRef.current;
-      
-      // Calculate purely simulated progress (0-95%)
-      const estimatedProgress = Math.min(
-        (elapsed / estimatedDuration) * 100,
-        95
-      );
+    const elapsed = Date.now() - startTimeRef.current;
 
-      // Merge with actual progress if provided
-      // Logic: actual progress is the floor. If actual > estimated, jump to actual.
-      // If estimated > actual, continue simulating but don't exceed 98% until actual hits 100%.
-      
-      let combinedProgress = estimatedProgress;
-      
-      if (actualProgress > 0) {
-         if (actualProgress >= 100) {
-            combinedProgress = 100;
-         } else {
-            // Allow simulation to run ahead, but smoothly blend
-            combinedProgress = Math.max(estimatedProgress, actualProgress);
-            // Cap at 98% if actual is not done
-            combinedProgress = Math.min(combinedProgress, 98);
-         }
-      }
+    // Calculate purely simulated progress (0-95%)
+    const estimatedProgress = Math.min((elapsed / estimatedDuration) * 100, 95);
 
-      setSimulatedProgress(combinedProgress);
+    // Merge with actual progress if provided
+    // Logic: actual progress is the floor. If actual > estimated, jump to actual.
+    // If estimated > actual, continue simulating but don't exceed 98% until actual hits 100%.
 
-      if (combinedProgress < 100) {
-        animationFrameRef.current = requestAnimationFrame(updateProgress);
+    let combinedProgress = estimatedProgress;
+
+    if (actualProgress > 0) {
+      if (actualProgress >= 100) {
+        combinedProgress = 100;
       } else {
-         // Ensure we hit exactly 100 and call complete
-         setSimulatedProgress(100);
-         setTimeout(() => {
-            onComplete?.();
-         }, 800); // Wait a bit at 100% before firing complete
+        // Allow simulation to run ahead, but smoothly blend
+        combinedProgress = Math.max(estimatedProgress, actualProgress);
+        // Cap at 98% if actual is not done
+        combinedProgress = Math.min(combinedProgress, 98);
       }
-    },
-    [actualProgress, estimatedDuration, onComplete, isShowing]
-  );
+    }
+
+    setSimulatedProgress(combinedProgress);
+
+    if (combinedProgress < 100) {
+      animationFrameRef.current = requestAnimationFrame(updateProgress);
+    } else {
+      // Ensure we hit exactly 100 and call complete
+      setSimulatedProgress(100);
+      setTimeout(() => {
+        onComplete?.();
+      }, 800); // Wait a bit at 100% before firing complete
+    }
+  }, [actualProgress, estimatedDuration, onComplete, isShowing]);
 
   // Start animation loop
   useEffect(() => {
@@ -150,7 +144,7 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
       }
       animationFrameRef.current = requestAnimationFrame(updateProgress);
     }
-    
+
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -195,8 +189,8 @@ export function useSmartLoading() {
     // The actual unmounting is handled by the component calling onComplete
     // We just ensure state reflects completion
     setTimeout(() => {
-        setIsLoading(false);
-        setProgress(0);
+      setIsLoading(false);
+      setProgress(0);
     }, 1000);
   };
 

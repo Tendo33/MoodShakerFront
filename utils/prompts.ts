@@ -733,4 +733,3 @@ You must strictly follow this JSON format for your response, do not include any 
       : chinese_creative_bartender_prompt;
   }
 }
-

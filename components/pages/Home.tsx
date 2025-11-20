@@ -57,50 +57,53 @@ const Home = React.memo(function Home() {
     tags: string[];
   }
 
-  const featuredCocktails = useMemo<FeaturedCocktail[]>(() => [
-    {
-      id: "mojito",
-      name: language === "en" ? "Mojito" : "莫吉托",
-      englishName: "Mojito",
-      description:
-        language === "en"
-          ? "A refreshing blend of mint and lime"
-          : "清新薄荷与青柠的完美结合",
-      image: cocktailImages.mojito,
-      tags:
-        language === "en"
-          ? ["Refreshing", "Mint", "Rum"]
-          : ["清爽", "薄荷", "朗姆酒"],
-    },
-    {
-      id: "margarita",
-      name: language === "en" ? "Margarita" : "玛格丽特",
-      englishName: "Margarita",
-      description:
-        language === "en"
-          ? "Classic tequila cocktail with perfect balance"
-          : "经典龙舌兰鸡尾酒，酸甜平衡",
-      image: cocktailImages.margarita,
-      tags:
-        language === "en"
-          ? ["Classic", "Tangy", "Tequila"]
-          : ["经典", "酸甜", "龙舌兰"],
-    },
-    {
-      id: "cosmopolitan",
-      name: language === "en" ? "Cosmopolitan" : "大都会",
-      englishName: "Cosmopolitan",
-      description:
-        language === "en"
-          ? "Stylish cranberry vodka cocktail"
-          : "时尚优雅的蔓越莓伏特加鸡尾酒",
-      image: cocktailImages.cosmopolitan,
-      tags:
-        language === "en"
-          ? ["Stylish", "Fruity", "Vodka"]
-          : ["时尚", "果味", "伏特加"],
-    },
-  ], [language]); // 仅在语言变化时重新计算
+  const featuredCocktails = useMemo<FeaturedCocktail[]>(
+    () => [
+      {
+        id: "mojito",
+        name: language === "en" ? "Mojito" : "莫吉托",
+        englishName: "Mojito",
+        description:
+          language === "en"
+            ? "A refreshing blend of mint and lime"
+            : "清新薄荷与青柠的完美结合",
+        image: cocktailImages.mojito,
+        tags:
+          language === "en"
+            ? ["Refreshing", "Mint", "Rum"]
+            : ["清爽", "薄荷", "朗姆酒"],
+      },
+      {
+        id: "margarita",
+        name: language === "en" ? "Margarita" : "玛格丽特",
+        englishName: "Margarita",
+        description:
+          language === "en"
+            ? "Classic tequila cocktail with perfect balance"
+            : "经典龙舌兰鸡尾酒，酸甜平衡",
+        image: cocktailImages.margarita,
+        tags:
+          language === "en"
+            ? ["Classic", "Tangy", "Tequila"]
+            : ["经典", "酸甜", "龙舌兰"],
+      },
+      {
+        id: "cosmopolitan",
+        name: language === "en" ? "Cosmopolitan" : "大都会",
+        englishName: "Cosmopolitan",
+        description:
+          language === "en"
+            ? "Stylish cranberry vodka cocktail"
+            : "时尚优雅的蔓越莓伏特加鸡尾酒",
+        image: cocktailImages.cosmopolitan,
+        tags:
+          language === "en"
+            ? ["Stylish", "Fruity", "Vodka"]
+            : ["时尚", "果味", "伏特加"],
+      },
+    ],
+    [language],
+  ); // 仅在语言变化时重新计算
 
   // 性能优化：预加载关键图片
   const imageUrls = useMemo(
@@ -157,17 +160,21 @@ const Home = React.memo(function Home() {
           />
           <motion.div
             className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
-            animate={{
-              ...floatAnimation,
-              transition: { ...floatAnimation.transition, delay: 1 },
-            } as any}
+            animate={
+              {
+                ...floatAnimation,
+                transition: { ...floatAnimation.transition, delay: 1 },
+              } as any
+            }
           />
           <motion.div
             className="absolute top-2/3 right-1/3 w-64 h-64 bg-accent/10 rounded-full blur-3xl"
-            animate={{
-              ...floatAnimation,
-              transition: { ...floatAnimation.transition, delay: 2 },
-            } as any}
+            animate={
+              {
+                ...floatAnimation,
+                transition: { ...floatAnimation.transition, delay: 2 },
+              } as any
+            }
           />
         </div>
 
@@ -233,18 +240,31 @@ const Home = React.memo(function Home() {
                     >
                       <span className="mr-1">🎈</span> {t("home.continue")}
                     </Button>
-                    <Button variant="outline" size="lg" href={galleryPath} icon={<span className="text-lg">🍹</span>}>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      href={galleryPath}
+                      icon={<span className="text-lg">🍹</span>}
+                    >
                       {language === "en" ? "Browse Gallery" : "浏览酒单库"}
                     </Button>
                   </div>
                   <div className="mt-4 text-center">
-                    <Link href={newQuestionPath} className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                       {language === "en" ? "Start a new session instead" : "开始新的对话"}
+                    <Link
+                      href={newQuestionPath}
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {language === "en"
+                        ? "Start a new session instead"
+                        : "开始新的对话"}
                     </Link>
                   </div>
                 </motion.div>
               ) : (
-                <motion.div variants={animations.slideUp as any} className="flex flex-col sm:flex-row gap-4">
+                <motion.div
+                  variants={animations.slideUp as any}
+                  className="flex flex-col sm:flex-row gap-4"
+                >
                   <Button
                     size="xl"
                     iconPosition="right"
@@ -262,7 +282,7 @@ const Home = React.memo(function Home() {
                     className="shadow-lg border-primary/30 hover:bg-primary/10"
                     icon={<span className="text-xl">🍹</span>}
                   >
-                     {language === "en" ? "View Gallery" : "浏览酒单"}
+                    {language === "en" ? "View Gallery" : "浏览酒单"}
                   </Button>
                 </motion.div>
               )}
@@ -292,11 +312,13 @@ const Home = React.memo(function Home() {
                         >
                           <motion.div
                             className="absolute -inset-8 bg-gradient-to-r from-primary/40 to-secondary/40 rounded-full blur-3xl opacity-60"
-                            animate={{
-                              ...pulseAnimation,
-                              scale: [1, 1.1, 1],
-                              opacity: [0.6, 0.8, 0.6],
-                            } as any}
+                            animate={
+                              {
+                                ...pulseAnimation,
+                                scale: [1, 1.1, 1],
+                                opacity: [0.6, 0.8, 0.6],
+                              } as any
+                            }
                             transition={{
                               duration: 3,
                               repeat: Number.POSITIVE_INFINITY,

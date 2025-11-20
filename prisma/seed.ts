@@ -1,20 +1,20 @@
-import { PrismaClient } from '@prisma/client'
-import { popularCocktails } from '../services/cocktailService'
+import { PrismaClient } from "@prisma/client";
+import { popularCocktails } from "../services/cocktailService";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const cocktailImages: Record<string, string> = {
   mojito: "/vibrant-mojito.png",
   margarita: "/vibrant-margarita.png",
   cosmopolitan: "/city-lights-cocktail.png",
-}
+};
 
 async function main() {
-  console.log('Start seeding...')
-  
+  console.log("Start seeding...");
+
   for (const [key, cocktail] of Object.entries(popularCocktails)) {
     const imagePath = cocktailImages[key] || cocktail.image;
-    
+
     try {
       await prisma.cocktail.upsert({
         where: { id: key },
@@ -62,23 +62,23 @@ async function main() {
           tools: cocktail.tools as any,
           steps: cocktail.steps as any,
           image: imagePath,
-        }
-      })
-      console.log(`Seeded cocktail: ${cocktail.name}`)
+        },
+      });
+      console.log(`Seeded cocktail: ${cocktail.name}`);
     } catch (e) {
-      console.error(`Error seeding ${key}:`, e)
+      console.error(`Error seeding ${key}:`, e);
     }
   }
-  
-  console.log('Seeding finished.')
+
+  console.log("Seeding finished.");
 }
 
 main()
   .then(async () => {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

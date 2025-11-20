@@ -85,11 +85,8 @@ export default function LanguageSelector() {
             variants={dropdownVariants}
           >
             <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
-            
-            <div
-              className="relative py-2"
-              role="listbox"
-            >
+
+            <div className="relative py-2" role="listbox">
               <div className="px-4 py-2 text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-white/5 mb-1">
                 {t("language.select")}
               </div>
@@ -125,7 +122,7 @@ export default function LanguageSelector() {
                       <Check className="h-4 w-4" />
                     </motion.div>
                   )}
-                  
+
                   {/* Hover glow effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </button>

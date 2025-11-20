@@ -45,7 +45,7 @@ export async function getCocktailFromDB(id: string): Promise<Cocktail | null> {
     // First check if it's a popular cocktail ID (hardcoded)
     // If it is, we might want to return the hardcoded one OR check if we seeded it.
     // For now, let's prioritize DB, then fallback to popularCocktails.
-    
+
     const dbCocktail = await prisma.cocktail.findUnique({
       where: { id },
     });
@@ -69,4 +69,3 @@ export async function getCocktailFromDB(id: string): Promise<Cocktail | null> {
     return null;
   }
 }
-

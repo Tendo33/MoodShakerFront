@@ -34,7 +34,7 @@ export default function Footer() {
       label: "Github",
     },
   ];
-  
+
   const footerLinks = [
     { text: t("footer.about"), href: "#" },
     { text: t("footer.privacy"), href: "#" },
@@ -120,7 +120,8 @@ export default function Footer() {
             >
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <p className="flex items-center justify-center">
-                  © {new Date().getFullYear()} MoodShaker. {t("footer.madeWith")}
+                  © {new Date().getFullYear()} MoodShaker.{" "}
+                  {t("footer.madeWith")}
                   <Heart
                     className="h-3.5 w-3.5 mx-1 text-pink-500 inline"
                     fill="currentColor"

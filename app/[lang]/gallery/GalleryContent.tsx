@@ -57,7 +57,9 @@ export default function GalleryContent({
             (i) =>
               i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
               (i.english_name &&
-                i.english_name.toLowerCase().includes(searchQuery.toLowerCase()))
+                i.english_name
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase())),
           )) ||
         (c.description &&
           c.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -67,24 +69,25 @@ export default function GalleryContent({
             .includes(searchQuery.toLowerCase())) ||
         (c.flavor_profiles &&
           c.flavor_profiles.some((f) =>
-            f.toLowerCase().includes(searchQuery.toLowerCase())
+            f.toLowerCase().includes(searchQuery.toLowerCase()),
           )) ||
         (c.english_flavor_profiles &&
           c.english_flavor_profiles.some((f) =>
-            f.toLowerCase().includes(searchQuery.toLowerCase())
+            f.toLowerCase().includes(searchQuery.toLowerCase()),
           ));
 
       const matchesSpirit = selectedSpirit
-        ? c.english_base_spirit?.toLowerCase().includes(selectedSpirit.toLowerCase()) ||
+        ? c.english_base_spirit
+            ?.toLowerCase()
+            .includes(selectedSpirit.toLowerCase()) ||
           c.base_spirit?.includes(selectedSpirit)
         : true;
 
       // For flavors, we check if any of the selected flavor keywords appear in the profile
       const matchesFlavor = selectedFlavor
         ? (c.english_flavor_profiles || []).some((f) =>
-            f.toLowerCase().includes(selectedFlavor.toLowerCase())
-          ) ||
-          (c.flavor_profiles || []).some((f) => f.includes(selectedFlavor))
+            f.toLowerCase().includes(selectedFlavor.toLowerCase()),
+          ) || (c.flavor_profiles || []).some((f) => f.includes(selectedFlavor))
         : true;
 
       return matchesSearch && matchesSpirit && matchesFlavor;
@@ -204,59 +207,63 @@ export default function GalleryContent({
             </div>
 
             {/* Expanded Filters */}
-            <div className={`${isFilterOpen ? 'block' : 'hidden'} md:block overflow-hidden transition-all duration-300 ease-in-out`}>
+            <div
+              className={`${isFilterOpen ? "block" : "hidden"} md:block overflow-hidden transition-all duration-300 ease-in-out`}
+            >
               <motion.div
                 initial={false}
                 animate={{ height: "auto", opacity: 1 }}
                 className="pt-4 flex flex-col gap-4 border-t border-white/10 mt-4"
               >
-                    {/* Spirit Filter */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs uppercase tracking-wider text-gray-500 mr-2 flex items-center gap-1">
-                        <GlassWater className="h-3 w-3" /> {t("gallery.filter.base")}
-                      </span>
-                      {BASE_SPIRITS.map((spirit) => (
-                        <button
-                          key={spirit}
-                          onClick={() =>
-                            setSelectedSpirit(
-                              selectedSpirit === spirit ? null : spirit
-                            )
-                          }
-                          className={`px-3 py-1.5 rounded-full text-sm transition-all duration-300 border ${
-                            selectedSpirit === spirit
-                              ? "bg-white text-black border-white font-medium shadow-[0_0_15px_rgba(255,255,255,0.3)]"
-                              : "bg-transparent text-gray-400 border-white/10 hover:border-white/30 hover:text-white"
-                          }`}
-                        >
-                          {t(`gallery.spirit.${spirit.toLowerCase()}`)}
-                        </button>
-                      ))}
-                    </div>
+                {/* Spirit Filter */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs uppercase tracking-wider text-gray-500 mr-2 flex items-center gap-1">
+                    <GlassWater className="h-3 w-3" />{" "}
+                    {t("gallery.filter.base")}
+                  </span>
+                  {BASE_SPIRITS.map((spirit) => (
+                    <button
+                      key={spirit}
+                      onClick={() =>
+                        setSelectedSpirit(
+                          selectedSpirit === spirit ? null : spirit,
+                        )
+                      }
+                      className={`px-3 py-1.5 rounded-full text-sm transition-all duration-300 border ${
+                        selectedSpirit === spirit
+                          ? "bg-white text-black border-white font-medium shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                          : "bg-transparent text-gray-400 border-white/10 hover:border-white/30 hover:text-white"
+                      }`}
+                    >
+                      {t(`gallery.spirit.${spirit.toLowerCase()}`)}
+                    </button>
+                  ))}
+                </div>
 
-                    {/* Flavor Filter */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs uppercase tracking-wider text-gray-500 mr-2 flex items-center gap-1">
-                        <Sparkles className="h-3 w-3" /> {t("gallery.filter.flavor")}
-                      </span>
-                      {FLAVORS.map((flavor) => (
-                        <button
-                          key={flavor}
-                          onClick={() =>
-                            setSelectedFlavor(
-                              selectedFlavor === flavor ? null : flavor
-                            )
-                          }
-                          className={`px-3 py-1.5 rounded-full text-sm transition-all duration-300 border ${
-                            selectedFlavor === flavor
-                              ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white border-transparent font-medium shadow-lg"
-                              : "bg-transparent text-gray-400 border-white/10 hover:border-white/30 hover:text-white"
-                          }`}
-                        >
-                          {t(`gallery.flavor.${flavor.toLowerCase()}`)}
-                        </button>
-                      ))}
-                    </div>
+                {/* Flavor Filter */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs uppercase tracking-wider text-gray-500 mr-2 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />{" "}
+                    {t("gallery.filter.flavor")}
+                  </span>
+                  {FLAVORS.map((flavor) => (
+                    <button
+                      key={flavor}
+                      onClick={() =>
+                        setSelectedFlavor(
+                          selectedFlavor === flavor ? null : flavor,
+                        )
+                      }
+                      className={`px-3 py-1.5 rounded-full text-sm transition-all duration-300 border ${
+                        selectedFlavor === flavor
+                          ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white border-transparent font-medium shadow-lg"
+                          : "bg-transparent text-gray-400 border-white/10 hover:border-white/30 hover:text-white"
+                      }`}
+                    >
+                      {t(`gallery.flavor.${flavor.toLowerCase()}`)}
+                    </button>
+                  ))}
+                </div>
               </motion.div>
             </div>
           </div>
@@ -271,7 +278,10 @@ export default function GalleryContent({
         >
           {filteredCocktails.map((cocktail) => (
             <motion.div key={cocktail.id} variants={itemVariants}>
-              <Link href={`/${lang}/cocktail/${cocktail.id}`} className="block h-full group">
+              <Link
+                href={`/${lang}/cocktail/${cocktail.id}`}
+                className="block h-full group"
+              >
                 <div className="relative h-full rounded-3xl overflow-hidden bg-gray-900/40 border border-white/5 shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-pink-500/10 group-hover:-translate-y-2">
                   {/* Image Area */}
                   <div className="relative aspect-[3/4] w-full overflow-hidden">
@@ -288,7 +298,7 @@ export default function GalleryContent({
                         <GlassWater className="h-12 w-12 text-gray-600" />
                       </div>
                     )}
-                    
+
                     {/* Overlay Gradient */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-80" />
                   </div>
@@ -297,19 +307,30 @@ export default function GalleryContent({
                   <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
                     <div className="transform transition-transform duration-300 group-hover:-translate-y-2">
                       <h3 className="text-2xl font-bold text-white mb-1 font-playfair leading-tight">
-                        {lang === 'en' ? cocktail.english_name || cocktail.name : cocktail.name}
+                        {lang === "en"
+                          ? cocktail.english_name || cocktail.name
+                          : cocktail.name}
                       </h3>
                       <p className="text-sm text-gray-300 mb-3 line-clamp-1 opacity-80">
-                        {lang === 'en' ? cocktail.english_description : cocktail.description}
+                        {lang === "en"
+                          ? cocktail.english_description
+                          : cocktail.description}
                       </p>
-                      
+
                       <div className="flex flex-wrap gap-2">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-white/10 text-xs font-medium text-pink-200 border border-pink-500/20">
-                           {lang === 'en' ? cocktail.english_base_spirit || cocktail.base_spirit : cocktail.base_spirit}
+                          {lang === "en"
+                            ? cocktail.english_base_spirit ||
+                              cocktail.base_spirit
+                            : cocktail.base_spirit}
                         </span>
-                        {(cocktail.alcohol_level || cocktail.english_alcohol_level) && (
+                        {(cocktail.alcohol_level ||
+                          cocktail.english_alcohol_level) && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-white/5 text-xs font-medium text-blue-200 border border-white/10">
-                             {lang === 'en' ? cocktail.english_alcohol_level || cocktail.alcohol_level : cocktail.alcohol_level}
+                            {lang === "en"
+                              ? cocktail.english_alcohol_level ||
+                                cocktail.alcohol_level
+                              : cocktail.alcohol_level}
                           </span>
                         )}
                       </div>
@@ -323,15 +344,17 @@ export default function GalleryContent({
 
         {/* Empty State */}
         {filteredCocktails.length === 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center py-32"
           >
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4">
-               <Search className="h-6 w-6 text-gray-500" />
+              <Search className="h-6 w-6 text-gray-500" />
             </div>
-            <h3 className="text-xl font-medium text-white mb-2">{t("gallery.noResults.title")}</h3>
+            <h3 className="text-xl font-medium text-white mb-2">
+              {t("gallery.noResults.title")}
+            </h3>
             <p className="text-gray-400">{t("gallery.noResults.desc")}</p>
           </motion.div>
         )}

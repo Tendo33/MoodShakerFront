@@ -104,9 +104,9 @@ const translations: TranslationDictionary = {
     "questions.base_spirits.description": "请选择您家中现有的基酒（可选多个）",
 
     "questions.feedback.title": "特殊要求",
-    "questions.feedback.description": "有什么过敏忌口、特殊喜好或者具体的想喝的味道吗？",
-    "questions.feedback.placeholder":
-      "例如：不要冰，加点辣，我特别喜欢薄荷...",
+    "questions.feedback.description":
+      "有什么过敏忌口、特殊喜好或者具体的想喝的味道吗？",
+    "questions.feedback.placeholder": "例如：不要冰，加点辣，我特别喜欢薄荷...",
 
     "questions.back": "返回",
     "questions.availableSpirits": "可用的基酒（可选）✨",
@@ -214,7 +214,7 @@ const translations: TranslationDictionary = {
     "gallery.noResults.title": "未找到鸡尾酒",
     "gallery.noResults.desc": "尝试调整筛选条件或搜索关键词。",
     "gallery.viewRecipe": "查看配方",
-    
+
     // Cocktail Detail
     "detail.baseSpirit": "基酒",
     "detail.alcohol": "酒精度",
@@ -429,7 +429,8 @@ const translations: TranslationDictionary = {
     "recommendation.card.preparation": "Preparation",
     "share.modal.title": "Your Cocktail Card",
     "share.modal.download": "Download Image",
-    "share.modal.description": "Save the image to share on your social media stories or posts.",
+    "share.modal.description":
+      "Save the image to share on your social media stories or posts.",
     "recommendation.share": "Share Recipe",
     "recommendation.copied": "Link copied to clipboard",
     "recommendation.yourRequirements": "Your Requirements",
@@ -462,7 +463,8 @@ const translations: TranslationDictionary = {
 
     // Gallery
     "gallery.title": "The Cellar",
-    "gallery.subtitle": "Discover unique cocktail recipes created by the community. Every drink tells a story.",
+    "gallery.subtitle":
+      "Discover unique cocktail recipes created by the community. Every drink tells a story.",
     "gallery.search.placeholder": "Search cocktails, ingredients, flavors...",
     "gallery.search.button": "Search",
     "gallery.filter.base": "Base",
@@ -529,7 +531,8 @@ const translations: TranslationDictionary = {
     "error.loadData": "Failed to load saved data",
     "error.saveAnswersProgress": "Error saving answers",
     "error.submitFailed": "Submission failed",
-    "error.generationFailed": "Failed to generate cocktail recommendation, please try again later",
+    "error.generationFailed":
+      "Failed to generate cocktail recommendation, please try again later",
     "error.invalidData": "Server returned invalid cocktail data",
     "error.parseFailed": "Failed to parse cocktail data",
 

@@ -20,4 +20,3 @@ export default async function GalleryPage({
 
   return <GalleryContent cocktails={cocktails} lang={lang} />;
 }
-

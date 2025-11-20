@@ -56,9 +56,7 @@ export default function Header() {
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? "glass-effect py-2"
-          : "bg-transparent py-4"
+        isScrolled ? "glass-effect py-2" : "bg-transparent py-4"
       }`}
       suppressHydrationWarning
     >
@@ -87,20 +85,20 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-4">
-          <Button 
+          <Button
             href={galleryLink}
             variant="outline"
             size="md"
             className="text-white border-white/20 hover:bg-white/10 hover:border-white/40 backdrop-blur-sm"
             icon={<span className="text-lg">🍹</span>}
           >
-            {language === 'cn' ? '酒单库' : 'Gallery'}
+            {language === "cn" ? "酒单库" : "Gallery"}
           </Button>
           <LanguageSelector />
-          <Button 
-            href={questionsLink} 
-            size="md" 
-            variant="primary" 
+          <Button
+            href={questionsLink}
+            size="md"
+            variant="primary"
             className="shadow-xl hover:shadow-primary/25"
             icon={<span className="text-lg">✨</span>}
           >
@@ -123,7 +121,7 @@ export default function Header() {
         </div>
       </div>
 
-        {/* Mobile Menu */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -133,11 +131,11 @@ export default function Header() {
             exit="exit"
             variants={mobileMenuVariants as any}
           >
-             {/* Backdrop blur overlay */}
+            {/* Backdrop blur overlay */}
             <div className="absolute inset-0 bg-background/60 backdrop-blur-xl" />
-            
+
             <div className="relative px-6 py-6 space-y-6 border-t border-white/10 bg-background/40">
-              <Button 
+              <Button
                 href={galleryLink}
                 variant="outline"
                 fullWidth
@@ -145,7 +143,7 @@ export default function Header() {
                 className="justify-start text-lg text-white border-white/20 hover:bg-white/10 hover:border-white/40"
                 icon={<span className="text-xl">🍹</span>}
               >
-                {language === 'cn' ? '酒单库' : 'Gallery'}
+                {language === "cn" ? "酒单库" : "Gallery"}
               </Button>
               <div className="pt-2 pb-4">
                 <Button

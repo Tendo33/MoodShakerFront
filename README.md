@@ -11,18 +11,22 @@ MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的 AI
 ## 📸 项目导览
 
 ### 1. 欢迎来到 MoodShaker
+
 首页是我们旅程的起点。在这里，你可以选择"开始探索"来获取 AI 推荐，或者直接去"酒单库"看看大家的收藏。
 ![MoodShaker Homepage](docs/screenshots/home_full.png)
 
 ### 2. 告诉我们你的心情
+
 点击"开始探索"后，AI 会问你几个简单的问题。你是想喝点经典的，还是来点创意的？你的心情如何？
 ![Questions](docs/screenshots/questions_start.png)
 
 ### 3. 探索酒单库 (The Cellar)
+
 在画廊页面，你可以看到各种各样的鸡尾酒。你可以根据基酒（如金酒、伏特加）或口味（如甜、酸）来筛选你喜欢的饮品。
 ![Gallery](docs/screenshots/gallery.png)
 
 ### 4. 制作你的鸡尾酒
+
 当你选中一款鸡尾酒，我们提供详细的配方、所需的工具和一步步的制作说明。不仅如此，还能了解到这杯酒背后的故事。
 ![Cocktail Detail](docs/screenshots/cocktail_detail.png)
 
@@ -39,21 +43,26 @@ MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的 AI
 如果你想在自己的电脑上运行这个项目，请按照以下步骤操作：
 
 ### 第一步：准备工作
+
 确保你的电脑上安装了 `Node.js` (建议版本 18 以上)。
 
 ### 第二步：下载项目
+
 ```bash
 git clone https://github.com/Tendo33/MoodShakerFront
 cd MoodShakerFront
 ```
 
 ### 第三步：配置环境
+
 你需要告诉程序如何连接 AI。
+
 1. 找到项目文件夹里的 `.env.example` 文件。
 2. 把它重命名为 `.env`。
 3. 用记事本打开它，填入你的 API Key (如果你没有，可以先跳过，但 AI 功能可能无法使用)。
 
 ### 第四步：启动！
+
 在终端（Terminal）中输入以下命令：
 
 ```bash

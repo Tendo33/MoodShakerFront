@@ -87,7 +87,7 @@ export async function getChatCompletion(
     if (!response.ok) {
       let errorText = "";
       let errorDetails = "";
-      
+
       try {
         errorText = await response.text();
         // 尝试解析JSON错误响应
@@ -135,7 +135,12 @@ export async function getChatCompletion(
     openaiLogger.info(`Request successful [${requestId}] (${duration}ms)`);
 
     // 验证响应数据格式
-    if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
+    if (
+      !data ||
+      !data.choices ||
+      !data.choices[0] ||
+      !data.choices[0].message
+    ) {
       openaiLogger.error(`Invalid response format [${requestId}]`, data);
       throw new Error("API返回了无效的响应格式");
     }

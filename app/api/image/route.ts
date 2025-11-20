@@ -15,7 +15,9 @@ async function imageUrlToBase64(url: string): Promise<string> {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch image: ${response.status} ${response.statusText}`,
+      );
     }
 
     const arrayBuffer = await response.arrayBuffer();
@@ -58,10 +60,12 @@ export async function POST(request: NextRequest) {
     let finalImage = imageUrl;
     if (cocktailName) {
       try {
-        imageLogger.info(`Attempting to convert and save image for: ${cocktailName}`);
+        imageLogger.info(
+          `Attempting to convert and save image for: ${cocktailName}`,
+        );
         const base64Image = await imageUrlToBase64(imageUrl);
         finalImage = base64Image; // Return Base64 to frontend to avoid expiration
-        
+
         await prisma.cocktail.updateMany({
           where: { name: cocktailName },
           data: { image: base64Image },
@@ -76,7 +80,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: finalImage });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
 
     imageLogger.error("Image generation failed", errorMessage);
 

@@ -8,7 +8,7 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   /* 锦囊二：质感 - 噪点纹理 */
   .noise-bg {
     position: fixed;
@@ -87,18 +87,20 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   /* Mobile optimization for touch targets */
-  button, 
+  button,
   [role="button"],
   a {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   /* Prevent iOS zoom on inputs */
   @media screen and (max-width: 768px) {
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       font-size: 16px !important;
     }
   }

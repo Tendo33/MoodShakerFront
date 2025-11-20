@@ -56,7 +56,8 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
       english_name: cocktail.english_name || "",
       description: cocktail.description || "No description available",
       english_description: cocktail.english_description || "",
-      match_reason: cocktail.match_reason || "This cocktail matches your preferences",
+      match_reason:
+        cocktail.match_reason || "This cocktail matches your preferences",
       english_match_reason: cocktail.english_match_reason || "",
       base_spirit: cocktail.base_spirit || "Various",
       english_base_spirit: cocktail.english_base_spirit || "",
@@ -176,7 +177,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data: cocktail });
   } catch (error) {
     const duration = Date.now() - startTime;
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
 
     cocktailLogger.error(
       `Cocktail request failed [${requestId}] (${duration}ms)`,
@@ -192,4 +194,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
