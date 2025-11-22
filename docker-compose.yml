@@ -1,7 +1,10 @@
 services:
   # Web 应用服务
   moodshaker-web:
-    image: ${DOCKER_IMAGE:-simonsun3/moodshaker:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKER_IMAGE:-moodshaker:local}
     container_name: moodshaker-web
     ports:
       - "${HOST_PORT:-3000}:3000"
