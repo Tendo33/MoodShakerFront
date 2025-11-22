@@ -50,8 +50,14 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.mjs ./
 # 注意：.env文件不复制，因为生产环境变量应该通过运行时传入
 
-# 复制 Prisma schema (在安装依赖之前)
+# 复制 Prisma schema 和种子数据脚本
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/services ./services
+COPY --from=builder /app/api ./api
+
+# 复制启动脚本
+COPY --from=builder /app/scripts/docker-entrypoint.sh ./scripts/
+RUN chmod +x ./scripts/docker-entrypoint.sh
 
 # 安装生产依赖 (包含 @prisma/client)
 # 注意: 使用 --prod 会排除 prisma CLI,所以我们需要单独安装
@@ -79,5 +85,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
 
-# 启动应用
-CMD ["pnpm", "start"]
+# 启动应用（通过启动脚本，会自动初始化数据库并写入三种酒的示例数据）
+CMD ["./scripts/docker-entrypoint.sh"]
