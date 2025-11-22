@@ -24,13 +24,13 @@ fi
 
 echo "✅ Database is ready!"
 
-# 运行数据库迁移
-echo "🔄 Running database migrations..."
-pnpm prisma:migrate
-
 # 生成 Prisma 客户端
 echo "🔧 Generating Prisma client..."
 pnpm prisma:generate
+
+# 同步数据库模式（使用 db push 而不是 migrate，更适合 Docker 环境）
+echo "🔄 Syncing database schema..."
+npx prisma db push --skip-generate --accept-data-loss
 
 # 初始化示例数据（三种酒）
 echo "🍸 Seeding database with sample cocktails (Mojito, Margarita, Cosmopolitan)..."
