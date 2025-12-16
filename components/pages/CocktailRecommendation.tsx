@@ -499,7 +499,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                       </svg>
                     </div>
                     <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                      Base Spirit
+                      {t("detail.baseSpirit")}
                     </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
@@ -520,7 +520,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   <div className="flex items-center mb-2">
                     <Droplet className="mr-2 h-5 w-5 text-blue-500" />
                     <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                      Alcohol
+                      {t("detail.alcohol")}
                     </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
@@ -544,7 +544,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   <div className="flex items-center mb-2">
                     <Clock className="mr-2 h-5 w-5 text-amber-500" />
                     <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                      Prep Time
+                      {t("detail.prepTime")}
                     </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
@@ -568,7 +568,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   <div className="flex items-center mb-2">
                     <GlassWater className="mr-2 h-5 w-5 text-emerald-500" />
                     <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                      Glass
+                      {t("detail.glass")}
                     </p>
                   </div>
                   <p className={`font-bold text-lg ${textColorClass}`}>
@@ -590,7 +590,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   }}
                 >
                   <p className="text-sm text-muted-foreground mb-3 uppercase tracking-wider">
-                    Flavor Profile
+                    {t("detail.flavorProfile")}
                   </p>
                   <div className="flex flex-wrap gap-3">
                     {(language === "en" && cocktail.english_flavor_profiles
@@ -640,7 +640,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               visible: { opacity: 1, transition: { duration: 0.5 } },
             }}
           >
-            Recipe
+            {t("detail.recipe")}
           </motion.h2>
 
           {/* Mobile accordion sections */}
@@ -966,17 +966,38 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
         {/* Action buttons with animation */}
         <motion.div
-          className="mt-16 flex flex-col sm:flex-row gap-6 justify-center"
+          className="mt-16 flex flex-col sm:flex-row gap-4 justify-center items-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
+          {/* 返回首页 */}
           <button
             onClick={handleBack}
-            className="flex items-center justify-center gap-2 px-8 py-4 border border-white/10 rounded-full transition-all duration-300 hover:bg-white/10 hover:scale-105 glass-effect"
+            className="flex items-center justify-center gap-2 px-6 py-3 border border-white/10 rounded-full transition-all duration-300 hover:bg-white/10 hover:scale-105 glass-effect text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-4 w-4" />
             <span>{t("recommendation.back")}</span>
+          </button>
+
+          {/* 重新获取推荐 - 主要 CTA */}
+          <motion.button
+            onClick={() => router.push(getPathWithLanguage("/questions?new=true"))}
+            className="flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-primary/25 font-medium"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <RefreshCcw className="h-5 w-5" />
+            <span>{t("recommendation.tryAgain")}</span>
+          </motion.button>
+
+          {/* 浏览更多 */}
+          <button
+            onClick={() => router.push(getPathWithLanguage("/gallery"))}
+            className="flex items-center justify-center gap-2 px-6 py-3 border border-primary/30 text-primary rounded-full transition-all duration-300 hover:bg-primary/10 hover:scale-105 glass-effect"
+          >
+            <span className="text-lg">🍹</span>
+            <span>{t("recommendation.browseMore")}</span>
           </button>
         </motion.div>
       </div>

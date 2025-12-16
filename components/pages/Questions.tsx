@@ -263,6 +263,22 @@ const Questions = memo(function Questions() {
     completeGeneration();
   };
 
+  // 回退功能
+  const handleGoBack = useCallback(() => {
+    if (showFeedbackForm) {
+      setShowFeedbackForm(false);
+      setShowBaseSpirits(true);
+    } else if (showBaseSpirits) {
+      setShowBaseSpirits(false);
+      setCurrentQuestion(questions.length);
+    } else if (currentQuestion > 1) {
+      setCurrentQuestion((prev) => prev - 1);
+    }
+  }, [showFeedbackForm, showBaseSpirits, currentQuestion, questions.length]);
+
+  // 判断是否可以回退
+  const canGoBack = currentQuestion > 1 || showBaseSpirits || showFeedbackForm;
+
   const navigateToRecommendation = useCallback(() => {
     router.push(getPathWithLanguage("/cocktail/recommendation"));
   }, [router, getPathWithLanguage]);
@@ -319,10 +335,26 @@ const Questions = memo(function Questions() {
               className="space-y-12"
             >
               <div className="text-center space-y-6">
-                <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
-                  <span className="text-primary font-bold text-sm tracking-wider">
-                    STEP {currentStep} / {totalSteps}
-                  </span>
+                {/* 回退按钮 + 步骤指示器 */}
+                <div className="flex items-center justify-center gap-4">
+                  {canGoBack && (
+                    <motion.button
+                      onClick={handleGoBack}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full glass-effect border border-white/10 hover:border-primary/30 hover:bg-white/5 transition-all text-muted-foreground hover:text-foreground"
+                      whileHover={{ x: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      <span className="text-sm font-medium">{t("questions.back")}</span>
+                    </motion.button>
+                  )}
+                  <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
+                    <span className="text-primary font-bold text-sm tracking-wider">
+                      {t("questions.step")} {currentStep} / {totalSteps}
+                    </span>
+                  </div>
                 </div>
 
                 <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
@@ -415,10 +447,24 @@ const Questions = memo(function Questions() {
               className="space-y-12"
             >
               <div className="text-center space-y-6">
-                <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
-                  <span className="text-primary font-bold text-sm tracking-wider">
-                    STEP {currentStep} / {totalSteps}
-                  </span>
+                {/* 回退按钮 + 步骤指示器 */}
+                <div className="flex items-center justify-center gap-4">
+                  <motion.button
+                    onClick={handleGoBack}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full glass-effect border border-white/10 hover:border-primary/30 hover:bg-white/5 transition-all text-muted-foreground hover:text-foreground"
+                    whileHover={{ x: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span className="text-sm font-medium">{t("questions.back")}</span>
+                  </motion.button>
+                  <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
+                    <span className="text-primary font-bold text-sm tracking-wider">
+                      {t("questions.step")} {currentStep} / {totalSteps}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
@@ -520,10 +566,24 @@ const Questions = memo(function Questions() {
               className="space-y-10 max-w-3xl mx-auto"
             >
               <div className="text-center space-y-6">
-                <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
-                  <span className="text-primary font-bold text-sm tracking-wider">
-                    CUSTOMIZE
-                  </span>
+                {/* 回退按钮 + 步骤指示器 */}
+                <div className="flex items-center justify-center gap-4">
+                  <motion.button
+                    onClick={handleGoBack}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full glass-effect border border-white/10 hover:border-primary/30 hover:bg-white/5 transition-all text-muted-foreground hover:text-foreground"
+                    whileHover={{ x: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span className="text-sm font-medium">{t("questions.back")}</span>
+                  </motion.button>
+                  <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
+                    <span className="text-primary font-bold text-sm tracking-wider">
+                      {t("questions.finalStep")}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
@@ -547,23 +607,31 @@ const Questions = memo(function Questions() {
                 </div>
               </div>
 
-              <div className="flex gap-6 justify-center items-center pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFeedbackForm(false)}
-                  size="lg"
-                >
-                  {t("questions.skip")}
-                </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+                {/* 主 CTA: 获取推荐 - 更大更突出 */}
                 <Button
                   onClick={handleFeedbackSubmit}
                   disabled={isGenerating}
                   variant="primary"
-                  size="lg"
+                  size="xl"
+                  className="w-full sm:w-auto min-w-[200px]"
                 >
                   {isGenerating
                     ? t("questions.generating")
                     : t("questions.get_recommendation")}
+                </Button>
+                {/* 次要: 跳过反馈直接获取 */}
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setFeedback("");
+                    handleFeedbackSubmit();
+                  }}
+                  size="md"
+                  className="text-muted-foreground hover:text-foreground"
+                  disabled={isGenerating}
+                >
+                  {t("questions.skipFeedback")}
                 </Button>
               </div>
             </motion.div>

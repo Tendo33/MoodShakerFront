@@ -55,7 +55,7 @@ const translations: TranslationDictionary = {
     "home.feature3.title": "创意灵感",
     "home.feature3.description":
       "发现新的口味组合和创意调酒技巧，提升您的调酒体验",
-    "home.start": "开始探索",
+    "home.start": "🍹 帮我选一杯酒",
     "home.continue": "继续上次问卷",
     "home.new": "开始新问卷",
     "home.savedSession": "检测到未完成的问卷",
@@ -65,11 +65,13 @@ const translations: TranslationDictionary = {
     // Questions page
     "questions.progress": "进度",
     "questions.step": "步骤",
+    "questions.finalStep": "最后一步 ✨",
     "questions.continue": "继续",
     "questions.skip": "跳过",
+    "questions.skipFeedback": "跳过此步，直接获取",
     "questions.reset": "重置",
     "questions.generating": "生成中...",
-    "questions.get_recommendation": "获取推荐",
+    "questions.get_recommendation": "🍹 获取我的专属推荐",
 
     // Question content
     "questions.cocktail_type.title": "您想要什么类型的鸡尾酒？🍸",
@@ -187,7 +189,8 @@ const translations: TranslationDictionary = {
     "recommendation.steps": "制作步骤",
     "recommendation.followSteps": "按照以下步骤制作您的鸡尾酒",
     "recommendation.tip": "小贴士",
-    "recommendation.tryAgain": "重试",
+    "recommendation.tryAgain": "🔄 换一杯试试",
+    "recommendation.browseMore": "浏览更多酒单",
     "recommendation.notFound": "未找到鸡尾酒",
     "recommendation.notFoundDesc": "抱歉，我们找不到您请求的鸡尾酒",
     "recommendation.loading": "正在加载鸡尾酒信息...",
@@ -208,6 +211,7 @@ const translations: TranslationDictionary = {
     "gallery.subtitle": "探索由社区创造的独特鸡尾酒配方，每一杯都是一个故事。",
     "gallery.search.placeholder": "搜索鸡尾酒、成分、口味...",
     "gallery.search.button": "搜索",
+    "gallery.filter.button": "筛选",
     "gallery.filter.base": "基酒",
     "gallery.filter.flavor": "风味",
     "gallery.filter.alcohol_level": "酒精度",
@@ -300,7 +304,7 @@ const translations: TranslationDictionary = {
     "home.feature3.title": "Creative Inspiration",
     "home.feature3.description":
       "Discover new flavor combinations and creative bartending techniques to enhance your cocktail experience",
-    "home.start": "Start Exploring",
+    "home.start": "🍹 Find My Perfect Drink",
     "home.continue": "Continue Previous Survey",
     "home.new": "Start New Survey",
     "home.savedSession": "Unfinished Survey Detected",
@@ -310,11 +314,13 @@ const translations: TranslationDictionary = {
     // Questions page
     "questions.progress": "Progress",
     "questions.step": "Step",
+    "questions.finalStep": "Final Step ✨",
     "questions.continue": "Continue",
     "questions.skip": "Skip",
+    "questions.skipFeedback": "Skip & Get Recommendation",
     "questions.reset": "Reset",
     "questions.generating": "Generating...",
-    "questions.get_recommendation": "Get Recommendation",
+    "questions.get_recommendation": "🍹 Get My Recommendation",
 
     // Question content
     "questions.cocktail_type.title": "What type of cocktail do you want? 🍸",
@@ -443,7 +449,8 @@ const translations: TranslationDictionary = {
     "recommendation.steps": "Preparation Steps",
     "recommendation.followSteps": "Follow these steps to make your cocktail",
     "recommendation.tip": "Tip",
-    "recommendation.tryAgain": "Try Again",
+    "recommendation.tryAgain": "🔄 Try Another",
+    "recommendation.browseMore": "Browse More Cocktails",
     "recommendation.notFound": "Cocktail Not Found",
     "recommendation.notFoundDesc":
       "Sorry, we couldn't find the cocktail you requested",
@@ -467,6 +474,7 @@ const translations: TranslationDictionary = {
       "Discover unique cocktail recipes created by the community. Every drink tells a story.",
     "gallery.search.placeholder": "Search cocktails, ingredients, flavors...",
     "gallery.search.button": "Search",
+    "gallery.filter.button": "Filter",
     "gallery.filter.base": "Base",
     "gallery.filter.flavor": "Flavor",
     "gallery.filter.alcohol_level": "Level",

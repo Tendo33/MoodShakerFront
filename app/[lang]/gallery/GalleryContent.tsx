@@ -193,16 +193,27 @@ export default function GalleryContent({
                 </button>
               </div>
 
-              {/* Filter Toggle Button (Mobile) */}
+              {/* Filter Toggle Button (Mobile) - 更显眼的设计 */}
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className={`md:hidden p-3 rounded-xl border border-white/10 transition-colors ${
+                className={`md:hidden flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all ${
                   isFilterOpen
                     ? "bg-pink-500/20 text-pink-300 border-pink-500/30"
-                    : "bg-white/5 text-gray-300 hover:bg-white/10"
+                    : (selectedSpirit || selectedFlavor)
+                      ? "bg-primary/20 text-primary border-primary/30"
+                      : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
                 }`}
               >
-                <Filter className="h-5 w-5" />
+                <Filter className="h-4 w-4" />
+                <span className="text-sm font-medium">
+                  {t("gallery.filter.button")}
+                </span>
+                {/* 显示已选筛选数量 */}
+                {(selectedSpirit || selectedFlavor) && (
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                    {(selectedSpirit ? 1 : 0) + (selectedFlavor ? 1 : 0)}
+                  </span>
+                )}
               </button>
             </div>
 
