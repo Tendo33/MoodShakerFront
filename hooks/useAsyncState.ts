@@ -319,30 +319,3 @@ export function useBatchAsyncState<T extends Record<string, any>>(
   };
 }
 
-/**
- * 预加载Hook - 提前加载可能需要的数据
- * @param keys 要预加载的存储键列表
- */
-export function usePreloadStorage(keys: string[]): void {
-  useEffect(() => {
-    const preload = async () => {
-      try {
-        const operations = keys.map((key) => ({
-          type: "get" as const,
-          key,
-        }));
-
-        await asyncStorage.batchOperations(operations);
-        appLogger.debug("Storage preloading completed");
-      } catch (error) {
-        appLogger.warn("Storage preloading failed", error);
-      }
-    };
-
-    if (keys.length > 0) {
-      // 延迟预加载，避免阻塞初始渲染
-      const timer = setTimeout(preload, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [keys]);
-}

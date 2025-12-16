@@ -292,31 +292,6 @@ export default function PerformanceMonitor() {
   );
 }
 
-/**
- * 性能监控Hook - 用于其他组件中测量性能
- */
-export function usePerformanceTimer(componentName: string) {
-  const startTime = useRef(performance.now());
-
-  useEffect(() => {
-    return () => {
-      const endTime = performance.now();
-      const duration = endTime - startTime.current;
-
-      if (process.env.NODE_ENV === "development" && duration > 16) {
-        safeLogger.performanceMetric("component render", duration);
-      }
-    };
-  });
-
-  return {
-    markTime: (label: string) => {
-      const currentTime = performance.now();
-      const elapsed = currentTime - startTime.current;
-      safeLogger.performanceMetric(label, elapsed);
-    },
-  };
-}
 
 // 获取Web Vitals指标
 function getWebVitals() {
@@ -377,8 +352,8 @@ function generateOptimizationSuggestions(metrics: PerformanceMetrics) {
 let globalApiCallTimes: number[] = [];
 let globalRenderCount = 0;
 
-// 性能监控工具函数
-export const performanceUtils = {
+// 性能监控工具函数 (internal use only)
+const performanceUtils = {
   // 记录API调用时间
   recordApiCall: (duration: number) => {
     globalApiCallTimes.push(duration);

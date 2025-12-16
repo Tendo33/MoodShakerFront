@@ -8,5 +8,3 @@ export const cocktailImages = {
   margarita: "/vibrant-margarita.png",
   cosmopolitan: "/city-lights-cocktail.png",
 } as const;
-
-export type CocktailImageKey = keyof typeof cocktailImages;

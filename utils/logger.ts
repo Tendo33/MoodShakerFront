@@ -3,7 +3,7 @@
  * 提供一致的日志格式和处理逻辑
  */
 
-export type LogLevel = "INFO" | "ERROR" | "DEBUG" | "WARN";
+type LogLevel = "INFO" | "ERROR" | "DEBUG" | "WARN";
 
 interface LoggerOptions {
   module?: string;
@@ -51,7 +51,7 @@ export function createLogger(moduleName: string, options: LoggerOptions = {}) {
  * @param moduleName 模块名称
  * @param options 日志选项
  */
-export function logDetail(
+function logDetail(
   type: LogLevel,
   message: string,
   data?: any,

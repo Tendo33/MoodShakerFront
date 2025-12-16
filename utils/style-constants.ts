@@ -34,6 +34,3 @@ export const commonStyles = {
   // 主标题样式
   primaryTitle: `text-3xl font-bold ${gradientStyles.primaryText} tracking-wider`,
 } as const;
-
-export type GradientStyleKey = keyof typeof gradientStyles;
-export type CommonStyleKey = keyof typeof commonStyles;

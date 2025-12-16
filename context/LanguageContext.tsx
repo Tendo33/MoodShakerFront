@@ -55,7 +55,7 @@ const translations: TranslationDictionary = {
     "home.feature3.title": "创意灵感",
     "home.feature3.description":
       "发现新的口味组合和创意调酒技巧，提升您的调酒体验",
-    "home.start": "🍹 帮我选一杯酒",
+    "home.start": "帮我选一杯酒",
     "home.continue": "继续上次问卷",
     "home.new": "开始新问卷",
     "home.savedSession": "检测到未完成的问卷",
@@ -304,7 +304,7 @@ const translations: TranslationDictionary = {
     "home.feature3.title": "Creative Inspiration",
     "home.feature3.description":
       "Discover new flavor combinations and creative bartending techniques to enhance your cocktail experience",
-    "home.start": "🍹 Find My Perfect Drink",
+    "home.start": "Find My Perfect Drink",
     "home.continue": "Continue Previous Survey",
     "home.new": "Start New Survey",
     "home.savedSession": "Unfinished Survey Detected",

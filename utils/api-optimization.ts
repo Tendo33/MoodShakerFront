@@ -51,7 +51,7 @@ export async function optimizedFetch(
   const key = cacheKey || generateCacheKey(url, options);
 
   // 1. 检查缓存
-  const cachedResponse = apiCache.get(key);
+  const cachedResponse = apiCache.get(key) as Response | null;
   if (cachedResponse) {
     cacheMetrics.recordHit();
     appLogger.debug("Request cache hit");
@@ -134,80 +134,6 @@ async function createRequestWithRetry(
 }
 
 /**
- * API请求专用封装
- */
-export class APIClient {
-  private baseUrl: string;
-  private defaultHeaders: Record<string, string>;
-
-  constructor(
-    baseUrl: string = "",
-    defaultHeaders: Record<string, string> = {},
-  ) {
-    this.baseUrl = baseUrl;
-    this.defaultHeaders = {
-      "Content-Type": "application/json",
-      ...defaultHeaders,
-    };
-  }
-
-  async get<T = any>(endpoint: string, config: RequestConfig = {}): Promise<T> {
-    const response = await optimizedFetch(
-      `${this.baseUrl}${endpoint}`,
-      { method: "GET", headers: this.defaultHeaders },
-      config,
-    );
-    return response.json();
-  }
-
-  async post<T = any>(
-    endpoint: string,
-    data: any,
-    config: RequestConfig = {},
-  ): Promise<T> {
-    const response = await optimizedFetch(
-      `${this.baseUrl}${endpoint}`,
-      {
-        method: "POST",
-        headers: this.defaultHeaders,
-        body: JSON.stringify(data),
-      },
-      config,
-    );
-    return response.json();
-  }
-
-  async put<T = any>(
-    endpoint: string,
-    data: any,
-    config: RequestConfig = {},
-  ): Promise<T> {
-    const response = await optimizedFetch(
-      `${this.baseUrl}${endpoint}`,
-      {
-        method: "PUT",
-        headers: this.defaultHeaders,
-        body: JSON.stringify(data),
-      },
-      config,
-    );
-    return response.json();
-  }
-
-  async delete<T = any>(
-    endpoint: string,
-    config: RequestConfig = {},
-  ): Promise<T> {
-    const response = await optimizedFetch(
-      `${this.baseUrl}${endpoint}`,
-      { method: "DELETE", headers: this.defaultHeaders },
-      config,
-    );
-    return response.json();
-  }
-}
-
-/**
  * 清理过期的pending请求
  */
 function cleanupExpiredPendingRequests(): void {
@@ -226,9 +152,6 @@ function cleanupExpiredPendingRequests(): void {
 if (typeof window !== "undefined") {
   setInterval(cleanupExpiredPendingRequests, 60 * 1000); // 每分钟清理一次
 }
-
-// 导出默认实例
-export const apiClient = new APIClient();
 
 // 导出工具函数
 export function createCacheKey(prefix: string, ...args: any[]): string {

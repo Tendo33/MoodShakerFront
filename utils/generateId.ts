@@ -49,11 +49,3 @@ export function generateImageId(): string {
   return generateId("cocktail_img", 13);
 }
 
-/**
- * 生成UI组件ID
- * @param componentType 组件类型
- * @returns 组件ID
- */
-export function generateComponentId(componentType: string): string {
-  return generateId(componentType, 7);
-}

@@ -402,33 +402,10 @@ export class AsyncStorageManager {
 export const asyncStorage = new AsyncStorageManager();
 
 // 便捷函数，兼容原有API
-export const getFromStorageAsync = <T>(
-  key: string,
-  defaultValue?: T,
-): Promise<T | null> => {
-  return asyncStorage.getItem(key, defaultValue);
-};
-
 export const saveToStorageAsync = <T>(key: string, value: T): Promise<void> => {
   return asyncStorage.setItem(key, value);
 };
 
-export const removeFromStorageAsync = (key: string): Promise<void> => {
-  return asyncStorage.removeItem(key);
-};
-
 export const clearStorageWithPrefixAsync = (prefix: string): Promise<void> => {
   return asyncStorage.clearWithPrefix(prefix);
-};
-
-// 批量操作便捷函数
-export const batchStorageOperations = (
-  operations: Array<{
-    type: "get" | "set" | "remove";
-    key: string;
-    value?: any;
-    defaultValue?: any;
-  }>,
-): Promise<any[]> => {
-  return asyncStorage.batchOperations(operations);
 };
