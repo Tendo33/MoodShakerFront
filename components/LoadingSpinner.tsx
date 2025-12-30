@@ -37,7 +37,7 @@ export default function LoadingSpinner({
         <QuickLoadingDots size={size} />
         {text && (
           <motion.div
-            className={`${sizeConfig[size].text} text-gray-400`}
+            className={`${sizeConfig[size].text} text-muted-foreground`}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
           >
@@ -55,7 +55,7 @@ export default function LoadingSpinner({
       <div className="flex flex-col items-center justify-center space-y-4">
         <PulseRingLoader size={ringSize} color={colorClass} />
         {text && (
-          <div className={`${sizeConfig[size].text} text-gray-400`}>{text}</div>
+          <div className={`${sizeConfig[size].text} text-muted-foreground`}>{text}</div>
         )}
       </div>
     );
@@ -66,7 +66,7 @@ export default function LoadingSpinner({
       <div className="flex flex-col items-center justify-center space-y-6">
         <div className="relative">
           <div
-            className={`${sizeConfig[size].spinner} rounded-full border-4 border-gray-800`}
+            className={`${sizeConfig[size].spinner} rounded-full border-4 border-border/30`}
           ></div>
 
           <motion.div
@@ -95,7 +95,7 @@ export default function LoadingSpinner({
 
         {text && (
           <motion.div
-            className={`${sizeConfig[size].text} text-gray-300 text-center tracking-wide`}
+            className={`${sizeConfig[size].text} text-foreground/70 text-center tracking-wide`}
             animate={{ opacity: [0.7, 1, 0.7] }}
             transition={{
               duration: 2.5,
@@ -115,7 +115,7 @@ export default function LoadingSpinner({
     <div className="flex items-center justify-center">
       <div className="relative">
         <div
-          className={`${sizeConfig[size].spinner} rounded-full absolute border-4 border-solid border-gray-200`}
+          className={`${sizeConfig[size].spinner} rounded-full absolute border-4 border-solid border-border/20`}
         ></div>
         <div
           className={`${sizeConfig[size].spinner} rounded-full animate-spin absolute border-4 border-solid border-transparent ${colorClass} border-t-current`}

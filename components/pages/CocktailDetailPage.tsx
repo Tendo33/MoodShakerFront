@@ -21,7 +21,7 @@ import { getCocktailById } from "@/services/cocktailService";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { CocktailImage } from "@/components/CocktailImage";
 import { cocktailLogger } from "@/utils/logger";
-import { commonStyles } from "@/utils/style-constants";
+import { Button } from "@/components/ui/core";
 import { PolaroidCard } from "@/components/share/PolaroidCard";
 import { ShareModal } from "@/components/share/ShareModal";
 import { cocktailImages } from "@/utils/cocktail-images";
@@ -217,12 +217,12 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
             <p className="text-muted-foreground mb-6">
               {t("recommendation.notFoundDesc")}
             </p>
-            <button
+            <Button
               onClick={handleBack}
-              className={commonStyles.primaryButtonFull}
+              variant="primary"
             >
               {t("recommendation.back")}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -271,33 +271,26 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           }}
         >
           <div className="flex items-center gap-4">
-            <button
+            <Button
               onClick={handleBack}
-              className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
+              variant="ghost"
+              icon={<ArrowLeft className="h-4 w-4" />}
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span>{t("recommendation.back")}</span>
-            </button>
+              {t("recommendation.back")}
+            </Button>
           </div>
 
           <div className="flex items-center gap-3">
-            <motion.button
+            <Button
               onClick={handleGenerateCard}
               disabled={isGeneratingCard}
-              className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all glass-effect border border-primary/30"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label={t("recommendation.saveImage")}
+              variant="outline"
+              size="lg"
+              icon={isGeneratingCard ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
+              className="text-primary border-primary/30 hover:bg-primary/10"
             >
-              {isGeneratingCard ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <ImageIcon className="h-5 w-5" />
-              )}
-              <span className="font-medium">
-                {t("recommendation.saveImage")}
-              </span>
-            </motion.button>
+              {t("recommendation.saveImage")}
+            </Button>
           </div>
         </motion.div>
 

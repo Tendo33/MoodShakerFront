@@ -21,11 +21,11 @@ export default function ErrorAlert() {
   return (
     <div className="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end z-50">
       <div
-        className={`max-w-sm w-full shadow-lg rounded-lg pointer-events-auto overflow-hidden transform ease-out duration-300 transition ${
+        className={`max-w-sm w-full shadow-lg rounded-2xl pointer-events-auto overflow-hidden transform ease-out duration-300 transition ${
           isVisible
             ? "translate-y-0 opacity-100 sm:translate-x-0"
             : "translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-        } bg-gray-800`}
+        } glass-effect`}
       >
         <div className="p-4">
           <div className="flex items-start">
@@ -46,15 +46,15 @@ export default function ErrorAlert() {
               </svg>
             </div>
             <div className="ml-3 w-0 flex-1 pt-0.5">
-              <p className="text-sm font-medium text-white">
+              <p className="text-sm font-medium text-foreground">
                 {t("common.error")}
               </p>
-              <p className="mt-1 text-sm text-gray-300">{message}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{message}</p>
             </div>
             <div className="ml-4 flex-shrink-0 flex">
               <button
                 onClick={() => clearError(errors[0].id)}
-                className="inline-flex text-gray-400 focus:outline-none focus:text-gray-300 transition ease-in-out duration-150 hover:text-gray-300"
+                className="inline-flex text-muted-foreground focus:outline-none focus:text-foreground transition ease-in-out duration-150 hover:text-foreground"
               >
                 <svg
                   className="h-5 w-5"
