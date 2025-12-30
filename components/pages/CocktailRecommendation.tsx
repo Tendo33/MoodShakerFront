@@ -425,7 +425,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                       <div className="flex-1">
                         <p className="text-sm font-medium">{imageError}</p>
                       </div>
-                      {!cocktailId && refreshImage && (
+                      {!cocktailId && (
                         <button
                           onClick={handleRefreshImage}
                           disabled={isRefreshingImage}
@@ -1022,7 +1022,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           </button>
 
           {/* 换一个推荐（保持偏好）- 只对推荐页面显示 */}
-          {!cocktailId && submitRequest && (
+          {!cocktailId && (
             <motion.button
               onClick={handleRegenerateRecommendation}
               disabled={isLoading}
