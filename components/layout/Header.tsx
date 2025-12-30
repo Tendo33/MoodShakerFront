@@ -84,26 +84,34 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-4">
-          <Button
-            href={galleryLink}
-            variant="outline"
-            size="md"
-            className="text-white border-white/20 hover:bg-white/10 hover:border-white/40 backdrop-blur-sm"
-            icon={<span className="text-lg">🍹</span>}
-          >
-            {language === "cn" ? "酒单库" : "Gallery"}
-          </Button>
+        <div className="hidden md:flex items-center space-x-3">
+          {/* 主要按钮组 */}
+          <div className="flex items-center space-x-3">
+            <Button
+              href={galleryLink}
+              variant="outline"
+              size="md"
+              className="text-white border-white/20 hover:bg-white/10 hover:border-white/40 backdrop-blur-sm"
+              icon={<span className="text-lg">🍹</span>}
+            >
+              {language === "cn" ? "酒单库" : "Gallery"}
+            </Button>
+            <Button
+              href={questionsLink}
+              size="md"
+              variant="primary"
+              className="shadow-xl hover:shadow-primary/25"
+              icon={<span className="text-lg">✨</span>}
+            >
+              {t("home.start")}
+            </Button>
+          </div>
+          
+          {/* 分隔符 */}
+          <div className="h-6 w-px bg-white/20 mx-1" />
+          
+          {/* 语言选择器 */}
           <LanguageSelector />
-          <Button
-            href={questionsLink}
-            size="md"
-            variant="primary"
-            className="shadow-xl hover:shadow-primary/25"
-            icon={<span className="text-lg">✨</span>}
-          >
-            {t("home.start")}
-          </Button>
         </div>
 
         {/* Mobile Menu Button */}
