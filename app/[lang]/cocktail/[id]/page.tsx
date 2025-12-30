@@ -29,7 +29,7 @@ export async function generateMetadata({
         icon: "logo.png",
       },
     };
-  } catch (error) {
+  } catch {
     return {
       title: "Cocktail | MoodShaker",
       description: "Discover delicious cocktail recipes on MoodShaker",

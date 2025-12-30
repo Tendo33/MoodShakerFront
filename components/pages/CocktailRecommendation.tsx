@@ -38,8 +38,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     imageData,
     isLoading: isContextLoading,
     isImageLoading,
+    imageError,
     loadSavedData,
     refreshImage,
+    submitRequest,
   } = useCocktail();
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
@@ -188,6 +190,21 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
       } finally {
         setIsRefreshingImage(false);
       }
+    }
+  };
+
+  const handleRegenerateRecommendation = async () => {
+    if (!submitRequest || cocktailId) return; // 只对推荐页面有效，不对数据库中的酒有效
+
+    try {
+      setIsLoading(true);
+      await submitRequest(true); // 传入 regenerate = true
+      // submitRequest 会自动更新 recommendation，页面会重新渲染
+      router.push(getPathWithLanguage("/cocktail/recommendation"));
+    } catch (error) {
+      cocktailLogger.error("Error regenerating recommendation", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -393,6 +410,30 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                       <p className="text-sm text-white font-medium">
                         {t("recommendation.imageLoading")}
                       </p>
+                    </div>
+                  </div>
+                )}
+
+                {imageError && !isImageLoading && (
+                  <div className="absolute bottom-4 left-4 right-4 bg-destructive/90 backdrop-blur-md text-white px-4 py-3 rounded-xl border border-destructive/50 shadow-lg">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-0.5">
+                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{imageError}</p>
+                      </div>
+                      {!cocktailId && refreshImage && (
+                        <button
+                          onClick={handleRefreshImage}
+                          disabled={isRefreshingImage}
+                          className="flex-shrink-0 px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-medium transition-colors"
+                        >
+                          {language === "en" ? "Retry" : "重试"}
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -980,21 +1021,24 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             <span>{t("recommendation.back")}</span>
           </button>
 
-          {/* 重新获取推荐 - 主要 CTA */}
-          <motion.button
-            onClick={() => router.push(getPathWithLanguage("/questions?new=true"))}
-            className="flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-primary/25 font-medium"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <RefreshCcw className="h-5 w-5" />
-            <span>{t("recommendation.tryAgain")}</span>
-          </motion.button>
+          {/* 换一个推荐（保持偏好）- 只对推荐页面显示 */}
+          {!cocktailId && submitRequest && (
+            <motion.button
+              onClick={handleRegenerateRecommendation}
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600 text-white rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-amber-500/25 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={{ scale: isLoading ? 1 : 1.05 }}
+              whileTap={{ scale: isLoading ? 1 : 0.95 }}
+            >
+              <span className="text-lg">🎲</span>
+              <span>{language === "en" ? "Try Another" : "换一个推荐"}</span>
+            </motion.button>
+          )}
 
           {/* 浏览更多 */}
           <button
             onClick={() => router.push(getPathWithLanguage("/gallery"))}
-            className="flex items-center justify-center gap-2 px-6 py-3 border border-primary/30 text-primary rounded-full transition-all duration-300 hover:bg-primary/10 hover:scale-105 glass-effect"
+            className="flex items-center justify-center gap-2 px-6 py-3 border border-white/10 rounded-full transition-all duration-300 hover:bg-white/10 hover:scale-105 glass-effect text-muted-foreground hover:text-foreground"
           >
             <span className="text-lg">🍹</span>
             <span>{t("recommendation.browseMore")}</span>

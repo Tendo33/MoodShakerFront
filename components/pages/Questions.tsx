@@ -273,11 +273,14 @@ const Questions = memo(function Questions() {
       setCurrentQuestion(questions.length);
     } else if (currentQuestion > 1) {
       setCurrentQuestion((prev) => prev - 1);
+    } else {
+      // 第1题时，返回首页
+      router.push(getPathWithLanguage("/"));
     }
-  }, [showFeedbackForm, showBaseSpirits, currentQuestion, questions.length]);
+  }, [showFeedbackForm, showBaseSpirits, currentQuestion, questions.length, router, getPathWithLanguage]);
 
-  // 判断是否可以回退
-  const canGoBack = currentQuestion > 1 || showBaseSpirits || showFeedbackForm;
+  // 判断是否可以回退（现在第1题也可以回退到首页）
+  const canGoBack = true;
 
   const navigateToRecommendation = useCallback(() => {
     router.push(getPathWithLanguage("/cocktail/recommendation"));

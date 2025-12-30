@@ -1,7 +1,4 @@
-import Link from "next/link";
-import Image from "next/image";
 import { getAllCocktails } from "@/lib/cocktail-data";
-import { Cocktail } from "@/api/cocktail";
 
 // Since I don't know exactly how getDictionary works, I'll check how other pages handle text.
 // They use useLanguage hook which is client side.

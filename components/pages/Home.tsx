@@ -44,8 +44,16 @@ const Home = React.memo(function Home() {
     immediate: true, // 立即加载但不阻塞渲染
   });
 
-  // 计算是否有保存的会话
+  // 检查是否有推荐结果
+  const { data: savedRecommendation } = useAsyncState({
+    storageKey: "moodshaker-recommendation",
+    defaultValue: null,
+    immediate: true,
+  });
+
+  // 计算会话状态
   const hasSavedSession = savedAnswers && Object.keys(savedAnswers).length > 0;
+  const hasRecommendation = savedRecommendation !== null;
 
   // Featured cocktails for the hero section with translations - 使用 useMemo 优化性能
   interface FeaturedCocktail {
@@ -149,6 +157,7 @@ const Home = React.memo(function Home() {
   const questionsPath = getPathWithLanguage("/questions");
   const newQuestionPath = getPathWithLanguage("/questions?new=true");
   const galleryPath = getPathWithLanguage("/gallery");
+  const recommendationPath = getPathWithLanguage("/cocktail/recommendation");
 
   return (
     <div className="bg-background text-foreground">
@@ -210,7 +219,59 @@ const Home = React.memo(function Home() {
                 {t("home.subtitle")}
               </motion.p>
 
-              {hasSavedSession ? (
+              {hasRecommendation ? (
+                <motion.div
+                  className="glass-effect card-spacing rounded-2xl border border-border/50 glow-effect max-w-lg"
+                  variants={animations.slideUp as any}
+                >
+                  <div className="flex items-center mb-4">
+                    <motion.div
+                      className="w-10 h-10 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center mr-3"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Sparkles className="h-5 w-5 text-primary" />
+                    </motion.div>
+                    <h3 className="text-xl font-bold font-playfair">
+                      {language === "en" ? "Your Recommendation" : "您的推荐"}
+                    </h3>
+                  </div>
+                  <p className="mb-6 text-foreground/70 font-source-sans">
+                    {language === "en"
+                      ? "Your personalized cocktail is ready! View it now or explore more options."
+                      : "您的专属鸡尾酒已准备好！立即查看或探索更多选择。"}
+                  </p>
+                  <div className="button-group">
+                    <Button
+                      size="lg"
+                      iconPosition="right"
+                      icon={<ChevronRight />}
+                      href={recommendationPath}
+                      variant="primary"
+                    >
+                      <span className="mr-1">🍸</span> {language === "en" ? "View My Cocktail" : "查看我的鸡尾酒"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      href={galleryPath}
+                      icon={<span className="text-lg">🍹</span>}
+                    >
+                      {language === "en" ? "Browse More" : "浏览更多"}
+                    </Button>
+                  </div>
+                  <div className="mt-4 text-center">
+                    <Link
+                      href={newQuestionPath}
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {language === "en"
+                        ? "Start a new recommendation"
+                        : "重新开始推荐"}
+                    </Link>
+                  </div>
+                </motion.div>
+              ) : hasSavedSession ? (
                 <motion.div
                   className="glass-effect card-spacing rounded-2xl border border-border/50 glow-effect max-w-lg"
                   variants={animations.slideUp as any}

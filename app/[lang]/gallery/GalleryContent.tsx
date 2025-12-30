@@ -3,11 +3,10 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Cocktail } from "@/api/cocktail";
 import { useLanguage } from "@/context/LanguageContext";
-import { Search, X, Filter, GlassWater, Sparkles, Droplet } from "lucide-react";
-import { commonStyles, gradientStyles } from "@/utils/style-constants";
+import { Search, X, Filter, GlassWater, Sparkles } from "lucide-react";
 
 interface GalleryContentProps {
   cocktails: Cocktail[];
@@ -33,7 +32,6 @@ const FLAVORS = [
   "Smoky",
   "Spicy",
 ];
-const ALCOHOL_LEVELS = ["Low", "Medium", "High"];
 
 export default function GalleryContent({
   cocktails,

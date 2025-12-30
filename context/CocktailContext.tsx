@@ -47,6 +47,7 @@ interface CocktailContextType {
   isLoading: boolean;
   isImageLoading: boolean;
   error: string | null;
+  imageError: string | null;
   progressPercentage: number;
   loadSavedData: () => void;
   saveAnswer: (questionId: string, optionId: string) => void;
@@ -56,7 +57,7 @@ interface CocktailContextType {
     spiritId: string,
     allSpiritsOptions: SpiritOption[],
   ) => void;
-  submitRequest: () => Promise<Cocktail>;
+  submitRequest: (regenerate?: boolean) => Promise<Cocktail>;
   isQuestionAnswered: (questionId: string) => boolean;
   resetAll: () => void;
   setIsImageLoading: (loading: boolean) => void;
@@ -118,6 +119,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isImageLoading, setIsImageLoadingState] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
 
   // 检查数据加载错误
@@ -199,7 +201,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     [baseSpirits, updateItem, t],
   );
 
-  const submitRequest = useCallback(async (): Promise<Cocktail> => {
+  const submitRequest = useCallback(async (regenerate: boolean = false): Promise<Cocktail> => {
     setIsLoading(true);
     setError(null);
     setProgressPercentage(0);
@@ -214,7 +216,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         answers,
         baseSpirits,
         sessionId,
-        specialRequests: userFeedback,
+        specialRequests: regenerate
+          ? `${userFeedback}\n\n[REGENERATE] Please provide a different cocktail recommendation than before, while keeping the same preferences.`
+          : userFeedback,
       };
 
       await asyncStorage.setItem(STORAGE_KEYS.REQUEST, request);
@@ -248,34 +252,57 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       // 启动后台图片生成任务（不阻塞主流程）
       // 设置图片加载状态为 true，这样推荐页会显示加载动画
       setIsImageLoadingState(true);
+      setImageError(null); // 清除之前的图片错误
 
       const prompt = generateImagePrompt(recommendation);
 
       // 使用异步函数执行图片生成，不使用 await 阻塞主线程
       const generateImageTask = async () => {
         try {
-          const imageResponse = await fetch("/api/image", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              prompt,
-              sessionId,
-              cocktailName: recommendation?.name, // Pass cocktail name for saving image
+          // 添加超时机制
+          const IMAGE_GENERATION_TIMEOUT = 30000; // 30秒
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Image generation timeout")), IMAGE_GENERATION_TIMEOUT)
+          );
+
+          const imageResponse = await Promise.race([
+            fetch("/api/image", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                prompt,
+                sessionId,
+                cocktailName: recommendation?.name, // Pass cocktail name for saving image
+              }),
             }),
-          });
+            timeoutPromise
+          ]) as Response;
 
           if (!imageResponse.ok) {
             const errorData = await imageResponse.json();
+            const errorMsg = language === "en"
+              ? "Image generation failed. Using default image."
+              : "图片生成失败，使用默认图片。";
+            setImageError(errorMsg);
             cocktailLogger.warn("图片生成失败，使用默认图片", errorData.error);
             // 图片生成失败不影响整体流程，使用 null
             await updateItem("imageData", null);
           } else {
             const imageData = await imageResponse.json();
             await updateItem("imageData", imageData.data);
+            setImageError(null); // 成功后清除错误
           }
         } catch (error) {
+          const errorMsg = language === "en"
+            ? error instanceof Error && error.message === "Image generation timeout"
+              ? "Image generation timed out. Using default image."
+              : "Image generation failed. Using default image."
+            : error instanceof Error && error.message === "Image generation timeout"
+              ? "图片生成超时，使用默认图片。"
+              : "图片生成失败，使用默认图片。";
+          setImageError(errorMsg);
           cocktailLogger.error("后台图片生成出错", error);
           await updateItem("imageData", null);
         } finally {
@@ -327,7 +354,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
   const refreshImage = useCallback(async (): Promise<string | null> => {
     setIsImageLoading(true);
-    setError(null);
+    setImageError(null);
 
     try {
       if (!recommendation) {
@@ -338,27 +365,41 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         (await asyncStorage.getItem(STORAGE_KEYS.SESSION_ID, "")) || "";
       const prompt = generateImagePrompt(recommendation);
 
+      // 添加超时机制
+      const IMAGE_GENERATION_TIMEOUT = 30000; // 30秒
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Image generation timeout")), IMAGE_GENERATION_TIMEOUT)
+      );
+
       // 调用服务端 API 路由生成图片
-      const imageResponse = await fetch("/api/image", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-          sessionId,
-          forceRefresh: true,
-          cocktailName: recommendation.name, // Pass name
+      const imageResponse = await Promise.race([
+        fetch("/api/image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt,
+            sessionId,
+            forceRefresh: true,
+            cocktailName: recommendation.name, // Pass name
+          }),
         }),
-      });
+        timeoutPromise
+      ]) as Response;
 
       if (!imageResponse.ok) {
         const errorData = await imageResponse.json();
+        const errorMsg = language === "en"
+          ? "Failed to refresh image. Please try again."
+          : "刷新图片失败，请重试。";
+        setImageError(errorMsg);
         throw new Error(errorData.error || "Failed to refresh image");
       }
 
       const imageData = await imageResponse.json();
       await updateItem("imageData", imageData.data);
+      setImageError(null); // 成功后清除错误
 
       return imageData.data;
     } catch (err) {
@@ -366,13 +407,20 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         err instanceof Error
           ? err.message
           : "Failed to refresh cocktail image.";
-      setError(errorMessage);
+      const errorMsg = language === "en"
+        ? err instanceof Error && err.message === "Image generation timeout"
+          ? "Image refresh timed out. Please try again."
+          : "Failed to refresh image. Please try again."
+        : err instanceof Error && err.message === "Image generation timeout"
+          ? "图片刷新超时，请重试。"
+          : "刷新图片失败，请重试。";
+      setImageError(errorMsg);
       cocktailLogger.error("Error refreshing cocktail image", err);
       return null;
     } finally {
       setIsImageLoading(false);
     }
-  }, [recommendation, updateItem]);
+  }, [recommendation, updateItem, language]);
 
   // 移除原有的useEffect，因为批量异步状态管理已经处理了数据加载
 
@@ -386,6 +434,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       isLoading: isLoading || isDataLoading, // 合并加载状态
       isImageLoading,
       error,
+      imageError,
       progressPercentage,
       loadSavedData,
       saveAnswer,
@@ -408,6 +457,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     isDataLoading,
     isImageLoading,
     error,
+    imageError,
     progressPercentage,
     loadSavedData,
     saveAnswer,
