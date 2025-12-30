@@ -2,30 +2,75 @@ import { prisma } from "@/lib/prisma";
 import { Cocktail } from "@/api/cocktail";
 import { popularCocktails } from "@/services/cocktailService";
 
+function normalizeAlcoholLevel(level: string): string {
+	if (!level) return "中度";
+	if (level === "Low" || level === "低") return "低度";
+	if (level === "Medium" || level === "中") return "中度";
+	if (level === "High" || level === "高") return "高度";
+	return level;
+}
+
+function normalizeBaseSpirit(spirit: string): string {
+	if (!spirit) return "其他";
+	const s = spirit.toLowerCase();
+	if (s.includes("vodka")) return "伏特加";
+	if (s.includes("gin")) return "金酒";
+	if (s.includes("rum") || s.includes("朗姆")) return "朗姆酒";
+	if (s.includes("tequila")) return "龙舌兰";
+	if (s.includes("whiskey") || s.includes("whisky")) return "威士忌";
+	if (s.includes("brandy")) return "白兰地";
+	return spirit;
+}
+
+function inferEnglishBaseSpirit(spirit: string, englishSpirit: string | null | undefined): string {
+	if (englishSpirit) return englishSpirit;
+	if (!spirit) return "Other";
+	const s = spirit.toLowerCase();
+	if (s.includes("伏特加")) return "Vodka";
+	if (s.includes("金酒")) return "Gin";
+	if (s.includes("朗姆")) return "Rum";
+	if (s.includes("龙舌兰")) return "Tequila";
+	if (s.includes("威士忌")) return "Whiskey";
+	if (s.includes("白兰地")) return "Brandy";
+	return spirit; // Fallback to original if unknown
+}
+
+function inferEnglishAlcoholLevel(level: string, englishLevel: string | null | undefined): string {
+	if (englishLevel) return englishLevel;
+	if (!level) return "Medium";
+	if (level.includes("低")) return "Low";
+	if (level.includes("中")) return "Medium";
+	if (level.includes("高")) return "High";
+	return "Medium";
+}
+
 function mapDBCocktailToAppCocktail(dbCocktail: any): Cocktail {
-  return {
-    id: dbCocktail.id,
-    name: dbCocktail.name,
-    english_name: dbCocktail.englishName,
-    description: dbCocktail.description,
-    english_description: dbCocktail.englishDescription,
-    match_reason: dbCocktail.matchReason || "",
-    english_match_reason: dbCocktail.englishMatchReason,
-    base_spirit: dbCocktail.baseSpirit,
-    english_base_spirit: dbCocktail.englishBaseSpirit,
-    alcohol_level: dbCocktail.alcoholLevel,
-    english_alcohol_level: dbCocktail.englishAlcoholLevel,
-    serving_glass: dbCocktail.servingGlass,
-    english_serving_glass: dbCocktail.englishServingGlass,
-    time_required: dbCocktail.timeRequired,
-    english_time_required: dbCocktail.englishTimeRequired,
-    flavor_profiles: dbCocktail.flavorProfiles,
-    english_flavor_profiles: dbCocktail.englishFlavorProfiles,
-    ingredients: dbCocktail.ingredients as any,
-    tools: dbCocktail.tools as any,
-    steps: dbCocktail.steps as any,
-    image: dbCocktail.image,
-  };
+	const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
+	const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
+
+	return {
+		id: dbCocktail.id,
+		name: dbCocktail.name,
+		english_name: dbCocktail.englishName || dbCocktail.name,
+		description: dbCocktail.description,
+		english_description: dbCocktail.englishDescription || dbCocktail.description, // Fallback to description
+		match_reason: dbCocktail.matchReason || "",
+		english_match_reason: dbCocktail.englishMatchReason,
+		base_spirit: normalizedSpirit,
+		english_base_spirit: inferEnglishBaseSpirit(dbCocktail.baseSpirit, dbCocktail.englishBaseSpirit),
+		alcohol_level: normalizedLevel,
+		english_alcohol_level: inferEnglishAlcoholLevel(dbCocktail.alcoholLevel, dbCocktail.englishAlcoholLevel),
+		serving_glass: dbCocktail.servingGlass,
+		english_serving_glass: dbCocktail.englishServingGlass,
+		time_required: dbCocktail.timeRequired,
+		english_time_required: dbCocktail.englishTimeRequired,
+		flavor_profiles: dbCocktail.flavorProfiles,
+		english_flavor_profiles: dbCocktail.englishFlavorProfiles || [],
+		ingredients: dbCocktail.ingredients as any,
+		tools: dbCocktail.tools as any,
+		steps: dbCocktail.steps as any,
+		image: dbCocktail.image,
+	};
 }
 
 export async function getAllCocktails(): Promise<Cocktail[]> {

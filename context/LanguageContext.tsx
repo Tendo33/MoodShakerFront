@@ -246,9 +246,9 @@ const translations: TranslationDictionary = {
     "gallery.flavor.spicy": "辛辣",
 
     // Gallery Filters - Alcohol Levels
-    "gallery.level.low": "低",
-    "gallery.level.medium": "中",
-    "gallery.level.high": "高",
+    "gallery.level.low": "低度",
+    "gallery.level.medium": "中度",
+    "gallery.level.high": "高度",
 
     // Loading animations
     "loading.mixing": "正在为您调制专属鸡尾酒...",
