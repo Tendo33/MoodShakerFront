@@ -32,7 +32,7 @@ async function imageUrlToBase64(url: string): Promise<string> {
 
 /**
  * POST /api/image
- * 生成鸡尾酒图片
+ * Generates a cocktail image based on prompts.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -41,14 +41,14 @@ export async function POST(request: NextRequest) {
 
     if (!prompt) {
       return NextResponse.json(
-        { success: false, error: "缺少必要参数: prompt" },
+        { success: false, error: "Missing required parameter: prompt" },
         { status: 400 },
       );
     }
 
     imageLogger.info(`Processing image generation request`);
 
-    // 调用图片生成 API
+    // Call image generation API
     const imageUrl = await generateImage(prompt, {
       negative_prompt: "low quality, blurry, distorted",
       image_size: "1024x1024",

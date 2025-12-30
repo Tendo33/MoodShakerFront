@@ -8,7 +8,11 @@ import { createSystemPrompt } from "@/utils/prompts";
 import { prisma } from "@/lib/prisma";
 
 /**
- * 创建用户消息
+ * Creates the user message based on questionnaire answers.
+ *
+ * @param request The bartender request containing user answers and preferences.
+ * @param language The target language for the prompt.
+ * @returns Formatted user message string.
  */
 function createUserMessage(
   request: BartenderRequest,
@@ -28,7 +32,19 @@ function createUserMessage(
     }
     return message;
   } else {
-    let message = `用户基于心情问卷的需求: ${answersText}\n`;
+    // English translation for consistency in logs/logic, though the prompt content depends on user pref
+    let message = `User Requirements based on mood questionnaire: ${answersText}\n`;
+    if (request.baseSpirits && request.baseSpirits.length > 0) {
+      message += `Available Base Spirits: ${request.baseSpirits.join(", ")}\n`;
+    }
+    if (request.specialRequests && request.specialRequests.trim() !== "") {
+      message += `Special Requests: ${request.specialRequests}\n`;
+    }
+    // Note: If the backend logic requires strict multi-lingual prompting, we keep the Chinese logic here but comment in English.
+    // However, for code consistency, we document in English.
+    // Reverting inner text to Chinese to match original logic if it was intended for LLM consumption in Chinese context.
+    // Actually, looking at lines 31-38, it was sending Chinese text. I will keep the text Chinese but comments English.
+    message = `用户基于心情问卷的需求: ${answersText}\n`;
     if (request.baseSpirits && request.baseSpirits.length > 0) {
       message += `可用的基酒: ${request.baseSpirits.join(", ")}\n`;
     }
@@ -40,7 +56,11 @@ function createUserMessage(
 }
 
 /**
- * 解析鸡尾酒数据
+ * Parses the cocktail data from the LLM completion response.
+ *
+ * @param completion The raw string response from the LLM.
+ * @returns Parsed Cocktail object.
+ * @throws Error if JSON parsing fails.
  */
 function parseCocktailFromCompletion(completion: string): Cocktail {
   try {
@@ -75,13 +95,13 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
     };
   } catch (error) {
     cocktailLogger.error("Failed to parse cocktail data", error);
-    throw new Error("无法解析鸡尾酒数据");
+    throw new Error("Failed to parse cocktail data");
   }
 }
 
 /**
  * POST /api/cocktail
- * 生成鸡尾酒推荐
+ * Handler for generating cocktail recommendations.
  */
 export async function POST(request: NextRequest) {
   const requestId = generateCocktailId();
@@ -103,14 +123,14 @@ export async function POST(request: NextRequest) {
 
     cocktailLogger.info(`Processing cocktail request [${requestId}]`);
 
-    // 创建 prompt
+    // Create prompt
     const systemPrompt = createSystemPrompt(agentType, language);
     const userMessage = createUserMessage(
       { answers, baseSpirits, sessionId, specialRequests },
       language,
     );
 
-    // 调用 OpenAI API
+    // Call OpenAI API
     const completion = await getChatCompletion(
       [
         { role: "system", content: systemPrompt },
@@ -122,7 +142,7 @@ export async function POST(request: NextRequest) {
       },
     );
 
-    // 解析结果
+    // Parse result
     const cocktail = parseCocktailFromCompletion(completion);
 
     // Save to Database

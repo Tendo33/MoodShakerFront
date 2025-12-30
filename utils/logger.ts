@@ -1,6 +1,6 @@
 /**
- * 统一的日志工具
- * 提供一致的日志格式和处理逻辑
+ * Unified Logging Utility
+ * Provides consistent logging format and handling logic across the application.
  */
 
 type LogLevel = "INFO" | "ERROR" | "DEBUG" | "WARN";
@@ -12,9 +12,9 @@ interface LoggerOptions {
 }
 
 /**
- * 创建模块化的日志记录器
- * @param moduleName 模块名称，用于标识日志来源
- * @param options 日志选项
+ * Creates a modular logger instance.
+ * @param moduleName Name of the module to identify log source.
+ * @param options Logging configuration options.
  */
 export function createLogger(moduleName: string, options: LoggerOptions = {}) {
   const { timestamp = true, maxDataLength = 500 } = options;
@@ -44,12 +44,12 @@ export function createLogger(moduleName: string, options: LoggerOptions = {}) {
 }
 
 /**
- * 通用日志详情记录函数
- * @param type 日志级别
- * @param message 日志消息
- * @param data 附加数据
- * @param moduleName 模块名称
- * @param options 日志选项
+ * General purpose function to log details.
+ * @param type Log severity level.
+ * @param message The main log message.
+ * @param data Additional data to log (will be stringified).
+ * @param moduleName Module name for context.
+ * @param options Formatting options.
  */
 function logDetail(
   type: LogLevel,
@@ -91,15 +91,15 @@ function logDetail(
   ](logMessage);
 }
 
-// 预定义的常用日志记录器
+// Pre-defined common loggers
 export const cocktailLogger = createLogger("Cocktail API");
 export const openaiLogger = createLogger("OpenAI API");
 export const imageLogger = createLogger("Image API");
 export const appLogger = createLogger("App");
 
 /**
- * 安全的应用状态日志记录器
- * 只记录基本的应用状态和用户操作，不包含敏感信息
+ * Safe Application State Logger
+ * Logs basic app states and user interactions without including sensitive information.
  */
 export const safeLogger = {
   // Application lifecycle

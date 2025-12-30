@@ -46,7 +46,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  // 移动端手机section展开状态 - 默认全部展开
+  // Mobile section expanded state - default all expanded
   const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
   const [isToolsExpanded, setIsToolsExpanded] = useState(true);
   const [isStepsExpanded, setIsStepsExpanded] = useState(true);
@@ -194,12 +194,12 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   };
 
   const handleRegenerateRecommendation = async () => {
-    if (!submitRequest || cocktailId) return; // 只对推荐页面有效，不对数据库中的酒有效
+    if (!submitRequest || cocktailId) return; // Only valid for recommendation page, not db saved items
 
     try {
       setIsLoading(true);
-      await submitRequest(true); // 传入 regenerate = true
-      // submitRequest 会自动更新 recommendation，页面会重新渲染
+      await submitRequest(true); // Pass regenerate = true
+      // submitRequest updates recommendation context, page re-renders
       router.push(getPathWithLanguage("/cocktail/recommendation"));
     } catch (error) {
       cocktailLogger.error("Error regenerating recommendation", error);
