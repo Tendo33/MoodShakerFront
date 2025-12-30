@@ -244,6 +244,8 @@ const translations: TranslationDictionary = {
     "gallery.flavor.herbal": "草本",
     "gallery.flavor.smoky": "烟熏",
     "gallery.flavor.spicy": "辛辣",
+    "gallery.flavor.salty": "咸味",
+    "gallery.flavor.creamy": "奶香",
 
     // Gallery Filters - Alcohol Levels
     "gallery.level.low": "低度",
@@ -507,6 +509,8 @@ const translations: TranslationDictionary = {
     "gallery.flavor.herbal": "Herbal",
     "gallery.flavor.smoky": "Smoky",
     "gallery.flavor.spicy": "Spicy",
+    "gallery.flavor.salty": "Salty",
+    "gallery.flavor.creamy": "Creamy",
 
     // Gallery Filters - Alcohol Levels
     "gallery.level.low": "Low",
