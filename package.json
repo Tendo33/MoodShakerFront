@@ -15,6 +15,7 @@
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
     "@eslint/js": "latest",
+    "@prisma/client": "^5.17.0",
     "@radix-ui/react-slot": "1.1.1",
     "@radix-ui/react-toast": "1.2.4",
     "autoprefixer": "^10.4.20",
@@ -27,13 +28,12 @@
     "globals": "latest",
     "html-to-image": "^1.11.13",
     "lucide-react": "^0.454.0",
-    "next": "15.2.4",
+    "next": "16.1.1",
     "react": "^19",
     "react-dom": "^19",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "typescript-eslint": "latest",
-    "@prisma/client": "^5.17.0"
+    "typescript-eslint": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
