@@ -14,8 +14,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | "link"
     | "neon"
     | "bubble"
-    | "shine";
+    | "shine"; // Kept for backward compatibility
   size?: "xs" | "sm" | "md" | "lg" | "xl";
+  effect?: "none" | "shine" | "pulse" | "glow" | "lift" | "ring";
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
   isLoading?: boolean;
@@ -31,6 +32,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       className = "",
       variant = "primary",
       size = "md",
+      effect = "none",
       icon,
       iconPosition = "left",
       isLoading = false,
@@ -43,24 +45,40 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const { t } = useLanguage();
     const baseStyles =
-      "relative font-medium rounded-full transition-all duration-300 flex items-center justify-center font-source-sans focus-ring transform-gpu active:scale-95";
+      "relative font-medium rounded-full transition-all duration-300 flex items-center justify-center font-source-sans focus-ring transform-gpu active:scale-95 disabled:active:scale-100 whitespace-nowrap";
 
     const variantStyles = {
       primary:
-        "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_hsl(var(--primary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.6)] hover:scale-105",
+        "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_hsl(var(--primary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.6)]",
       secondary:
-        "bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-[0_4px_14px_0_hsl(var(--secondary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--secondary)/0.6)] hover:scale-105",
+        "bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-[0_4px_14px_0_hsl(var(--secondary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--secondary)/0.6)]",
       outline:
-        "bg-transparent border-2 border-border hover:bg-accent/10 hover:border-accent text-foreground hover:scale-105 hover:shadow-[0_0_15px_hsl(var(--accent)/0.2)]",
+        "bg-transparent border-2 border-border hover:bg-accent/10 hover:border-accent text-foreground hover:shadow-[0_0_15px_hsl(var(--accent)/0.2)]",
       ghost:
-        "bg-transparent hover:bg-accent/10 text-foreground hover:scale-105",
+        "bg-transparent hover:bg-accent/10 text-foreground",
       link: "bg-transparent text-primary hover:text-secondary p-0 hover:underline font-medium",
-      neon: "bg-transparent border-2 border-primary text-primary shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.6)] hover:bg-primary/10 hover:scale-105",
+      neon: "bg-transparent border-2 border-primary text-primary shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.6)] hover:bg-primary/10",
       bubble:
-        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden before:content-[''] before:absolute before:inset-0 before:scale-0 hover:before:scale-100 before:rounded-full before:transition-transform before:duration-500 before:bg-white/20 hover:scale-105 shadow-lg hover:shadow-xl",
+        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden before:content-[''] before:absolute before:inset-0 before:scale-0 hover:before:scale-100 before:rounded-full before:transition-transform before:duration-500 before:bg-white/20 shadow-lg hover:shadow-xl",
       shine:
-        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 hover:scale-105 shadow-lg hover:shadow-xl",
+        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden shadow-lg hover:shadow-xl", // Logic moved to effect="shine"
     };
+
+    const effectStyles = {
+      none: "",
+      shine: "overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700",
+      pulse: "animate-pulse",
+      glow: "hover:shadow-[0_0_20px_currentColor] hover:border-current",
+      lift: "hover:-translate-y-1 hover:shadow-lg",
+      ring: "hover:ring-2 hover:ring-offset-2 hover:ring-primary",
+    };
+
+    // Apply default hover scale if no specific effect overrides it or if it's 'none'/'shine'/'glow' which usually pair well with scale
+    // But 'lift' does its own transform.
+    const defaultTransform = effect === "lift" ? "" : "hover:scale-105";
+    
+    // Compatibility: if variant is 'shine', force effect='shine' if not specified
+    const activeEffect = variant === 'shine' && effect === 'none' ? 'shine' : effect;
 
     const sizeStyles = {
       xs: "px-3 py-1 text-xs",
@@ -73,12 +91,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const widthStyles = fullWidth ? "w-full" : "w-auto";
     const disabledStyles =
       props.disabled || isLoading
-        ? "opacity-50 cursor-not-allowed"
+        ? "opacity-50 cursor-not-allowed pointer-events-none"
         : "cursor-pointer";
 
     const buttonStyles = `
       ${baseStyles} 
       ${variantStyles[variant]} 
+      ${effectStyles[activeEffect]}
+      ${defaultTransform}
       ${variant !== "link" ? sizeStyles[size] : ""} 
       ${disabledStyles}
       ${widthStyles}

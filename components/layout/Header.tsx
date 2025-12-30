@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Martini as Cocktail } from "lucide-react";
+import { Menu, X, Martini, Library, Sparkles } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/core";
@@ -71,7 +71,7 @@ export default function Header() {
             whileHover={{ scale: 1.1, rotate: 5 }}
             transition={{ duration: 0.2 }}
           >
-            <Cocktail className="h-5 w-5 md:h-6 md:w-6 text-white" />
+            <Martini className="h-5 w-5 md:h-6 md:w-6 text-white" />
           </motion.div>
           <motion.span
             className="gradient-text-bright font-bold font-playfair tracking-tight"
@@ -91,8 +91,9 @@ export default function Header() {
               href={galleryLink}
               variant="outline"
               size="md"
+              effect="lift"
               className="text-white border-white/20 hover:bg-white/10 hover:border-white/40 backdrop-blur-sm"
-              icon={<span className="text-lg">🍹</span>}
+              icon={<Library className="h-4 w-4" />}
             >
               {language === "cn" ? "酒单库" : "Gallery"}
             </Button>
@@ -100,8 +101,9 @@ export default function Header() {
               href={questionsLink}
               size="md"
               variant="primary"
+              effect="shine"
               className="shadow-xl hover:shadow-primary/25"
-              icon={<span className="text-lg">✨</span>}
+              icon={<Sparkles className="h-4 w-4" />}
             >
               {t("home.start")}
             </Button>
@@ -147,9 +149,10 @@ export default function Header() {
                 href={galleryLink}
                 variant="outline"
                 fullWidth
+                effect="lift"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="justify-start text-lg text-white border-white/20 hover:bg-white/10 hover:border-white/40"
-                icon={<span className="text-xl">🍹</span>}
+                icon={<Library className="h-5 w-5" />}
               >
                 {language === "cn" ? "酒单库" : "Gallery"}
               </Button>
@@ -158,10 +161,11 @@ export default function Header() {
                   href={questionsLink}
                   size="xl"
                   variant="primary"
+                  effect="shine"
                   fullWidth
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="shadow-lg text-lg"
-                  icon={<span className="text-xl">✨</span>}
+                  icon={<Sparkles className="h-5 w-5" />}
                 >
                   {t("home.start")}
                 </Button>

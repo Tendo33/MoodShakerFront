@@ -9,6 +9,8 @@ import {
   Sparkles,
   BookOpen,
   Beaker,
+  Martini,
+  Library,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
@@ -197,9 +199,10 @@ const Home = React.memo(function Home() {
             >
               <motion.div variants={animations.slideUp as any} className="mb-6">
                 <div className="inline-flex items-center bg-primary/20 text-primary border border-primary/30 px-3 py-1.5 text-sm rounded-full font-medium glass-effect">
+                  <Sparkles className="h-3.5 w-3.5 mr-2 fill-primary" />
                   {language === "en"
-                    ? "✨ AI-Powered Cocktail Recommendations"
-                    : "✨ AI 驱动的鸡尾酒推荐"}
+                    ? "AI-Powered Cocktail Recommendations"
+                    : "AI 驱动的鸡尾酒推荐"}
                 </div>
               </motion.div>
 
@@ -241,21 +244,26 @@ const Home = React.memo(function Home() {
                       ? "Your personalized cocktail is ready! View it now or explore more options."
                       : "您的专属鸡尾酒已准备好！立即查看或探索更多选择。"}
                   </p>
-                  <div className="button-group">
+                  <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-3">
                     <Button
                       size="lg"
                       iconPosition="right"
-                      icon={<ChevronRight />}
+                      icon={<ChevronRight className="h-4 w-4" />}
                       href={recommendationPath}
                       variant="primary"
+                      effect="shine"
                     >
-                      <span className="mr-1">🍸</span> {language === "en" ? "View My Cocktail" : "查看我的鸡尾酒"}
+                      <span className="flex items-center gap-2">
+                        <Martini className="h-4 w-4" /> 
+                        <span>{language === "en" ? "View My Cocktail" : "查看我的鸡尾酒"}</span>
+                      </span>
                     </Button>
                     <Button
                       variant="outline"
                       size="lg"
                       href={galleryPath}
-                      icon={<span className="text-lg">🍹</span>}
+                      effect="lift"
+                      icon={<Library className="h-5 w-5" />}
                     >
                       {language === "en" ? "Browse More" : "浏览更多"}
                     </Button>
@@ -291,21 +299,26 @@ const Home = React.memo(function Home() {
                   <p className="mb-6 text-foreground/70 font-source-sans">
                     {t("home.savedSessionDesc")}
                   </p>
-                  <div className="button-group">
+                  <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-3">
                     <Button
                       size="lg"
                       iconPosition="right"
-                      icon={<ChevronRight />}
+                      icon={<ChevronRight className="h-4 w-4" />}
                       href={questionsPath}
                       variant="primary"
+                      effect="pulse"
                     >
-                      <span className="mr-1">🎈</span> {t("home.continue")}
+                      <span className="flex items-center gap-2">
+                        <History className="h-4 w-4" /> 
+                        <span>{t("home.continue")}</span>
+                      </span>
                     </Button>
                     <Button
                       variant="outline"
                       size="lg"
                       href={galleryPath}
-                      icon={<span className="text-lg">🍹</span>}
+                      effect="lift"
+                      icon={<Library className="h-5 w-5" />}
                     >
                       {language === "en" ? "Browse Gallery" : "浏览酒单库"}
                     </Button>
@@ -324,7 +337,7 @@ const Home = React.memo(function Home() {
               ) : (
                 <motion.div
                   variants={animations.slideUp as any}
-                  className="flex flex-col sm:flex-row gap-4"
+                  className="flex flex-col sm:flex-row sm:flex-wrap gap-4"
                 >
                   <Button
                     size="xl"
@@ -332,16 +345,21 @@ const Home = React.memo(function Home() {
                     icon={<ArrowRight className="h-5 w-5" />}
                     href={questionsPath}
                     variant="primary"
+                    effect="shine"
                     className="shadow-2xl"
                   >
-                    <span className="mr-2">✨</span> {t("home.start")}
+                    <span className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5" /> 
+                      <span>{t("home.start")}</span>
+                    </span>
                   </Button>
                   <Button
                     size="xl"
                     variant="outline"
                     href={galleryPath}
+                    effect="lift"
                     className="shadow-lg border-primary/30 hover:bg-primary/10"
-                    icon={<span className="text-xl">🍹</span>}
+                    icon={<Library className="h-5 w-5" />}
                   >
                     {language === "en" ? "View Gallery" : "浏览酒单"}
                   </Button>
