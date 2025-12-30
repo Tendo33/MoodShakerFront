@@ -10,6 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build` - Build production version
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint code quality checks
+- `pnpm db:init` - Initialize database (generate, migrate, seed)
 
 ### Package Manager
 
@@ -19,7 +20,8 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 
 ### Framework Stack
 
-- **Next.js 15** - React framework with App Router
+- **Next.js 16** - React framework with App Router
+- **React 19** - Library for web and native user interfaces
 - **TypeScript** - Type-safe JavaScript
 - **Tailwind CSS** - Utility-first CSS framework
 - **Radix UI** - Accessible UI components (via shadcn/ui)
@@ -32,7 +34,7 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 
 - `app/[lang]/` - Internationalized routes with dynamic language support
 - `app/layout.tsx` - Root layout with context providers and font configuration
-- `app/middleware.ts` - Language detection and URL rewriting middleware
+- `proxy.ts` - Language detection and URL rewriting middleware (Next.js middleware alternative)
 
 #### Core Directories
 
@@ -41,14 +43,15 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
   - `pages/` - Page-specific components (Home, Questions, CocktailDetail, etc.)
   - `ui/` - shadcn/ui base components
   - `animations/` - Framer Motion animation components
+  - `share/` - Social sharing and card generation components
 - `context/` - React Context providers for state management
   - `CocktailContext.tsx` - Main cocktail recommendation state and logic
   - `LanguageContext.tsx` - Internationalization with English/Chinese support
   - `ErrorContext.tsx` - Global error handling
 - `api/` - External API integration modules
-  - `cocktail.ts` - AI cocktail recommendation logic with OpenAI integration
-  - `image.ts` - Image generation API integration
-  - `openai.ts` - OpenAI API client configuration
+  - `cocktail.ts` - AI cocktail recommendation types and local storage
+  - `image.ts` - Image generation types
+  - `openai.ts` - OpenAI and Image generation API client configuration
 - `services/` - Business logic services
 - `utils/` - Utility functions (localStorage, caching, logging, etc.)
 - `lib/` - Shared utilities and configuration
@@ -58,7 +61,7 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 #### Internationalization (i18n)
 
 - **Dynamic routing**: `/en/` and `/cn/` language prefixes
-- **Middleware**: Automatic language detection and URL rewriting
+- **Middleware**: Custom proxy (`proxy.ts`) for language detection and URL rewriting
 - **Context-based**: Language state managed through React Context
 - **Cookie persistence**: Language preference stored in cookies
 - **Default language**: Chinese (cn) with English fallback
@@ -96,7 +99,7 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 
 #### Language Handling
 
-1. Middleware detects language from URL/cookie/Accept-Language header
+1. Proxy detects language from URL/cookie/Accept-Language header
 2. Rewrites URL to include language prefix
 3. LanguageContext provides translations throughout app
 4. Components use `t()` function for translated strings
@@ -120,8 +123,8 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 
 #### API Integration
 
-- **OpenAI**: For cocktail recipe generation (uses DeepSeek model)
-- **Image Generation**: SiliconFlow API for cocktail images
+- **OpenAI**: For cocktail recipe generation (using DeepSeek or compatible model)
+- **Image Generation**: SiliconFlow API (Kolors model) for cocktail images
 - **Environment variables**: Required for API keys and configuration
 
 #### Build Configuration
