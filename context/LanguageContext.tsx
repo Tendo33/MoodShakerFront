@@ -12,11 +12,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { asyncStorage } from "@/utils/asyncStorage";
 import type { ReactNode } from "react";
 
-// Define available languages
-export type Language = "en" | "cn";
-
-// Define translation dictionary structure
-type TranslationDictionary = Record<string, Record<string, string>>;
+// Import translations from centralized locales
+import {
+  translations,
+  availableLanguages,
+  defaultLanguage,
+  type Language,
+  type TranslationKey,
+} from "@/locales";
 
 interface LanguageContextType {
   language: Language;
@@ -32,529 +35,6 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined,
 );
 
-// Translation dictionaries
-const translations: TranslationDictionary = {
-  cn: {
-    // App title
-    "app.title": "MoodShaker",
-    // Navigation
-    "nav.home": "首页",
-    "nav.discover": "探索",
-    "nav.questions": "问题",
-    "nav.about": "关于我们",
-
-    // Home page
-    "home.title": "找到适合您心情的鸡尾酒",
-    "home.subtitle": "通过回答几个简单问题，让我为您推荐完美的鸡尾酒",
-    "home.feature1.title": "个性化推荐",
-    "home.feature1.description":
-      "根据您的口味偏好和心情，为您量身定制鸡尾酒推荐",
-    "home.feature2.title": "详细配方",
-    "home.feature2.description":
-      "获取完整的配料清单和制作步骤，轻松在家调制美味鸡尾酒",
-    "home.feature3.title": "创意灵感",
-    "home.feature3.description":
-      "发现新的口味组合和创意调酒技巧，提升您的调酒体验",
-    "home.start": "帮我选一杯酒",
-    "home.continue": "继续上次问卷",
-    "home.new": "开始新问卷",
-    "home.savedSession": "检测到未完成的问卷",
-    "home.savedSessionDesc":
-      "您有一个未完成的鸡尾酒推荐问卷。您想继续之前的问卷还是开始一个新的？",
-
-    // Questions page
-    "questions.progress": "进度",
-    "questions.step": "步骤",
-    "questions.finalStep": "最后一步 ✨",
-    "questions.continue": "继续",
-    "questions.skip": "跳过",
-    "questions.skipFeedback": "跳过此步，直接获取",
-    "questions.reset": "重置",
-    "questions.generating": "生成中...",
-    "questions.get_recommendation": "🍹 获取我的专属推荐",
-
-    // Question content
-    "questions.cocktail_type.title": "您想要什么类型的鸡尾酒？🍸",
-    "questions.cocktail_type.classic": "经典鸡尾酒",
-    "questions.cocktail_type.creative": "创意特调",
-    "questions.cocktail_type.classic.description":
-      "经典马提尼、威士忌酸等传统鸡尾酒",
-    "questions.cocktail_type.creative.description":
-      "创新口味和独特配方的现代鸡尾酒",
-
-    "questions.alcohol_strength.title": "您希望酒精浓度如何？💪",
-    "questions.alcohol_strength.light": "轻度酒精",
-    "questions.alcohol_strength.medium": "中度酒精",
-    "questions.alcohol_strength.strong": "高度酒精",
-    "questions.alcohol_strength.surprise": "随机惊喜",
-    "questions.alcohol_strength.light.description": "酒精度较低，口感清爽",
-    "questions.alcohol_strength.medium.description": "适中的酒精浓度，平衡口感",
-    "questions.alcohol_strength.strong.description": "高酒精度，浓烈口感",
-    "questions.alcohol_strength.surprise.description":
-      "让我们为您选择合适的浓度",
-
-    "questions.skill_level.title": "您的调酒技能水平？🎯",
-    "questions.skill_level.beginner": "初学者",
-    "questions.skill_level.intermediate": "中级",
-    "questions.skill_level.advanced": "高级",
-    "questions.skill_level.beginner.description": "简单易做，无需复杂工具",
-    "questions.skill_level.intermediate.description":
-      "需要一些调酒技巧和基本工具",
-    "questions.skill_level.advanced.description": "复杂制作工艺，专业调酒技术",
-
-    "questions.base_spirits.title": "选择您拥有的基酒",
-    "questions.base_spirits.description": "请选择您家中现有的基酒（可选多个）",
-
-    "questions.feedback.title": "特殊要求",
-    "questions.feedback.description":
-      "有什么过敏忌口、特殊喜好或者具体的想喝的味道吗？",
-    "questions.feedback.placeholder": "例如：不要冰，加点辣，我特别喜欢薄荷...",
-
-    "questions.back": "返回",
-    "questions.availableSpirits": "可用的基酒（可选）✨",
-    "questions.selectSpirits": "请选择您家中有的基酒",
-    "questions.submit": "查看推荐鸡尾酒",
-    "questions.loading": "正在为您匹配...",
-    "questions.ready.title": "准备好摇一摇了吗？🍸",
-    "questions.ready.description":
-      "让我们找到你的完美鸡尾酒！今天是想来点经典款还是想尝试新花样？",
-    "questions.strength.title": "想要多上头？💪",
-    "questions.strength.description": "选择你的酒精等级 - 从微醺到派对启动器！",
-    "questions.skill.title": "调酒技能点？🎯",
-    "questions.skill.description":
-      "想要多花哨的调酒方式？我们为每个技能等级都准备了选项！",
-
-    // Base spirits
-    "spirits.all": "全部🎉",
-    "spirits.all.desc": "使用所有基酒",
-    "spirits.gin": "金酒🌿",
-    "spirits.gin.desc": "Gin",
-    "spirits.rum": "朗姆酒🏝️",
-    "spirits.rum.desc": "Rum",
-    "spirits.vodka": "伏特加❄️",
-    "spirits.vodka.desc": "Vodka",
-    "spirits.whiskey": "威士忌🥃",
-    "spirits.whiskey.desc": "Whiskey",
-    "spirits.tequila": "龙舌兰🌵",
-    "spirits.tequila.desc": "Tequila",
-    "spirits.brandy": "白兰地🍇",
-    "spirits.brandy.desc": "Brandy",
-
-    // Footer
-    "footer.quickLinks": "快速链接",
-    "footer.about": "关于我们",
-    "footer.privacy": "隐私政策",
-    "footer.terms": "服务条款",
-    "footer.contact": "联系我们",
-    "footer.madeWith": "AI生成的回答未必正确无误，请仔细核查",
-    "footer.description":
-      "找到适合您心情的鸡尾酒，让每一次品尝都成为难忘的体验。我们的AI驱动推荐系统帮助您发现适合您口味的新风味。",
-    "footer.copyright": "版权所有",
-    "footer.rights": "保留所有权利",
-    "footer.social": "关注我们",
-    "footer.address": "上海市浦东新区张江高科技园区",
-
-    // Language selector
-    "language.select": "选择语言",
-    "language.en": "English",
-    "language.cn": "中文",
-
-    // Common
-    "common.loading": "加载中...",
-    "common.error": "错误",
-    "common.tryAgain": "重试",
-
-    // Error boundary
-    "error.boundary.title": "出现了一些问题",
-    "error.boundary.description": "很抱歉，在渲染此组件时出现了错误。",
-    "error.boundary.refresh": "刷新页面",
-
-    // Recommendation page
-    "recommendation.back": "返回首页",
-    "recommendation.saveImage": "保存图片",
-    "recommendation.card.ingredients": "所需原料",
-    "recommendation.card.preparation": "制作步骤",
-    "share.modal.title": "您的特调卡片",
-    "share.modal.download": "保存图片",
-    "share.modal.description": "保存这张卡片，分享给朋友们吧！",
-    "recommendation.share": "分享配方",
-    "recommendation.copied": "链接已复制到剪贴板",
-    "recommendation.yourRequirements": "您的需求",
-    "recommendation.recommendationReason": "为什么推荐这款",
-    "recommendation.ingredients": "配料",
-    "recommendation.prepareIngredients": "准备以下配料",
-    "recommendation.tools": "工具",
-    "recommendation.toolsNeeded": "需要的工具",
-    "recommendation.alternative": "替代方案",
-    "recommendation.steps": "制作步骤",
-    "recommendation.followSteps": "按照以下步骤制作您的鸡尾酒",
-    "recommendation.tip": "小贴士",
-    "recommendation.tryAgain": "🔄 换一杯试试",
-    "recommendation.browseMore": "浏览更多酒单",
-    "recommendation.notFound": "未找到鸡尾酒",
-    "recommendation.notFoundDesc": "抱歉，我们找不到您请求的鸡尾酒",
-    "recommendation.loading": "正在加载鸡尾酒信息...",
-    "recommendation.imageLoading": "正在生成鸡尾酒图片...",
-    "recommendation.analyzing": "正在分析您的偏好...",
-    "recommendation.mixing": "正在调配完美配方...",
-    "recommendation.crafting": "正在精心制作推荐...",
-    "recommendation.finalizing": "正在完善最后细节...",
-    "recommendation.loadingDesc": "我们正在为您量身定制完美的鸡尾酒",
-    "recommendation.complete": "完成",
-    "recommendation.error": "出现错误",
-    "recommendation.errorDesc":
-      "抱歉，生成鸡尾酒推荐时出现了问题。请重试或返回首页。",
-    "recommendation.startQuestions": "开始问卷",
-
-    // Gallery
-    "gallery.title": "酒单库",
-    "gallery.subtitle": "探索由社区创造的独特鸡尾酒配方，每一杯都是一个故事。",
-    "gallery.search.placeholder": "搜索鸡尾酒、成分、口味...",
-    "gallery.search.button": "搜索",
-    "gallery.filter.button": "筛选",
-    "gallery.filter.base": "基酒",
-    "gallery.filter.flavor": "风味",
-    "gallery.filter.alcohol_level": "酒精度",
-    "gallery.noResults.title": "未找到鸡尾酒",
-    "gallery.noResults.desc": "尝试调整筛选条件或搜索关键词。",
-    "gallery.viewRecipe": "查看配方",
-
-    // Cocktail Detail
-    "detail.baseSpirit": "基酒",
-    "detail.alcohol": "酒精度",
-    "detail.prepTime": "制作时间",
-    "detail.glass": "酒杯",
-    "detail.flavorProfile": "风味描述",
-    "detail.recipe": "配方",
-
-    // Gallery Filters - Spirits
-    "gallery.spirit.gin": "金酒",
-    "gallery.spirit.vodka": "伏特加",
-    "gallery.spirit.rum": "朗姆酒",
-    "gallery.spirit.tequila": "龙舌兰",
-    "gallery.spirit.whiskey": "威士忌",
-    "gallery.spirit.brandy": "白兰地",
-    "gallery.spirit.other": "其他",
-
-    // Gallery Filters - Flavors
-    "gallery.flavor.sweet": "甜味",
-    "gallery.flavor.sour": "酸味",
-    "gallery.flavor.bitter": "苦味",
-    "gallery.flavor.fruity": "果味",
-    "gallery.flavor.herbal": "草本",
-    "gallery.flavor.smoky": "烟熏",
-    "gallery.flavor.spicy": "辛辣",
-    "gallery.flavor.salty": "咸味",
-    "gallery.flavor.creamy": "奶香",
-
-    // Gallery Filters - Alcohol Levels
-    "gallery.level.low": "低度",
-    "gallery.level.medium": "中度",
-    "gallery.level.high": "高度",
-
-    // Loading animations
-    "loading.mixing": "正在为您调制专属鸡尾酒...",
-    "loading.analyzing": "正在分析您的口味偏好...",
-    "loading.generating": "正在生成精美图片...",
-    "loading.connecting": "正在连接服务器...",
-    "loading.navigating": "正在切换页面...",
-    "loading.default": "正在调制中",
-    "loading.subtitle": "为您精心调配完美口感",
-    "loading.dots": "加载中",
-    "loading.rotating.1": "正在挑选最优质的基酒...",
-    "loading.rotating.2": "正在平衡风味...",
-    "loading.rotating.3": "正在冰镇酒杯...",
-    "loading.rotating.4": "正在注入灵魂...",
-    "loading.rotating.5": "马上就好...",
-
-    // Error messages
-    "error.saveAnswers": "保存答案失败，请重试",
-    "error.saveFeedback": "保存反馈失败，请重试",
-    "error.saveBaseSpirits": "保存基酒选择失败，请重试",
-    "error.toggleBaseSpirit": "切换基酒失败，请重试",
-    "error.resetData": "重置数据失败，请刷新页面重试",
-    "error.loadData": "加载保存数据失败",
-    "error.saveAnswersProgress": "保存答案时出错",
-    "error.submitFailed": "提交失败",
-    "error.generationFailed": "生成鸡尾酒推荐失败，请稍后重试",
-    "error.invalidData": "服务器返回了无效的鸡尾酒数据",
-    "error.parseFailed": "无法解析鸡尾酒数据",
-
-    // Home page CTA
-    "home.cta.title": "准备好发现您的完美鸡尾酒了吗?",
-    "home.cta.subtitle": "立即开始，让我们为您推荐最适合您心情的饮品。",
-  },
-  en: {
-    // App title
-    "app.title": "MoodShaker",
-    // Navigation
-    "nav.home": "Home",
-    "nav.discover": "Discover",
-    "nav.questions": "Questions",
-    "nav.about": "About Us",
-
-    // Home page
-    "home.title": "Find the Perfect Cocktail for Your Mood",
-    "home.subtitle":
-      "Answer a few simple questions and let us recommend the perfect cocktail for you",
-    "home.feature1.title": "Personalized Recommendations",
-    "home.feature1.description":
-      "Get cocktail recommendations tailored to your taste preferences and mood",
-    "home.feature2.title": "Detailed Recipes",
-    "home.feature2.description":
-      "Get complete ingredient lists and step-by-step instructions to easily make delicious cocktails at home",
-    "home.feature3.title": "Creative Inspiration",
-    "home.feature3.description":
-      "Discover new flavor combinations and creative bartending techniques to enhance your cocktail experience",
-    "home.start": "Find My Perfect Drink",
-    "home.continue": "Continue Previous Survey",
-    "home.new": "Start New Survey",
-    "home.savedSession": "Unfinished Survey Detected",
-    "home.savedSessionDesc":
-      "You have an unfinished cocktail recommendation survey. Would you like to continue your previous survey or start a new one?",
-
-    // Questions page
-    "questions.progress": "Progress",
-    "questions.step": "Step",
-    "questions.finalStep": "Final Step ✨",
-    "questions.continue": "Continue",
-    "questions.skip": "Skip",
-    "questions.skipFeedback": "Skip & Get Recommendation",
-    "questions.reset": "Reset",
-    "questions.generating": "Generating...",
-    "questions.get_recommendation": "🍹 Get My Recommendation",
-
-    // Question content
-    "questions.cocktail_type.title": "What type of cocktail do you want? 🍸",
-    "questions.cocktail_type.classic": "Classic Cocktails",
-    "questions.cocktail_type.creative": "Creative Specials",
-    "questions.cocktail_type.classic.description":
-      "Traditional cocktails like Martini, Whiskey Sour",
-    "questions.cocktail_type.creative.description":
-      "Modern cocktails with innovative flavors and unique recipes",
-
-    "questions.alcohol_strength.title": "How strong do you want it? 💪",
-    "questions.alcohol_strength.light": "Light Alcohol",
-    "questions.alcohol_strength.medium": "Medium Alcohol",
-    "questions.alcohol_strength.strong": "Strong Alcohol",
-    "questions.alcohol_strength.surprise": "Surprise Me",
-    "questions.alcohol_strength.light.description":
-      "Lower alcohol content, refreshing taste",
-    "questions.alcohol_strength.medium.description":
-      "Moderate alcohol content, balanced flavor",
-    "questions.alcohol_strength.strong.description":
-      "High alcohol content, bold flavor",
-    "questions.alcohol_strength.surprise.description":
-      "Let us choose the perfect strength for you",
-
-    "questions.skill_level.title": "What's your bartending skill level? 🎯",
-    "questions.skill_level.beginner": "Beginner",
-    "questions.skill_level.intermediate": "Intermediate",
-    "questions.skill_level.advanced": "Advanced",
-    "questions.skill_level.beginner.description":
-      "Easy to make, no complex tools required",
-    "questions.skill_level.intermediate.description":
-      "Requires some bartending skills and basic tools",
-    "questions.skill_level.advanced.description":
-      "Complex preparation, professional bartending techniques",
-
-    "questions.base_spirits.title": "Select Your Available Spirits",
-    "questions.base_spirits.description":
-      "Choose the base spirits you have at home (optional)",
-
-    "questions.feedback.title": "Special Requests",
-    "questions.feedback.description":
-      "Any allergies, dislikes, or specific cravings?",
-    "questions.feedback.placeholder":
-      "e.g., No ice, extra spicy, I love mint...",
-
-    "questions.back": "Back",
-    "questions.availableSpirits": "Available Spirits (Optional) ✨",
-    "questions.selectSpirits": "Please select the spirits you have at home",
-    "questions.submit": "View Recommended Cocktail",
-    "questions.loading": "Finding your perfect match...",
-    "questions.ready.title": "Ready to shake things up? 🍸",
-    "questions.ready.description":
-      "Let's find your perfect cocktail match! Are you feeling classic or adventurous today?",
-    "questions.strength.title": "How strong do you want it? 💪",
-    "questions.strength.description":
-      "Choose your power level - from a gentle buzz to a full-on party starter!",
-    "questions.skill.title": "Mixology Level? 🎯",
-    "questions.skill.description":
-      "How fancy do you want to get with your cocktail making? We've got options for every skill level!",
-
-    // Base spirits
-    "spirits.all": "All",
-    "spirits.all.desc": "Use all base spirits",
-    "spirits.gin": "Gin",
-    "spirits.gin.desc": "Gin",
-    "spirits.rum": "Rum",
-    "spirits.rum.desc": "Rum",
-    "spirits.vodka": "Vodka",
-    "spirits.vodka.desc": "Vodka",
-    "spirits.whiskey": "Whiskey",
-    "spirits.whiskey.desc": "Whiskey",
-    "spirits.tequila": "Tequila",
-    "spirits.tequila.desc": "Tequila",
-    "spirits.brandy": "Brandy",
-    "spirits.brandy.desc": "Brandy",
-
-    // Footer
-    "footer.quickLinks": "Quick Links",
-    "footer.about": "About Us",
-    "footer.privacy": "Privacy Policy",
-    "footer.terms": "Terms of Service",
-    "footer.contact": "Contact Us",
-    "footer.madeWith":
-      "AI Generated answers may not be accurate, please verify carefully",
-    "footer.description":
-      "Find the perfect cocktail for your mood and make every tasting experience memorable. Our AI-powered recommendation system helps you discover new flavors tailored to your preferences.",
-    "footer.copyright": "Copyright",
-    "footer.rights": "All rights reserved",
-    "footer.social": "Follow Us",
-    "footer.address": "Zhangjiang Hi-Tech Park, Pudong, Shanghai",
-
-    // Language selector
-    "language.select": "Select Language",
-    "language.en": "English",
-    "language.cn": "中文",
-
-    // Common
-    "common.loading": "Loading...",
-    "common.error": "Error",
-    "common.tryAgain": "Try Again",
-
-    // Error boundary
-    "error.boundary.title": "Something went wrong",
-    "error.boundary.description":
-      "We're sorry, but there was an error rendering this component.",
-    "error.boundary.refresh": "Refresh the page",
-
-    // Recommendation page
-    "recommendation.back": "Back to Home",
-    "recommendation.saveImage": "Save as Image",
-    "recommendation.card.ingredients": "Ingredients",
-    "recommendation.card.preparation": "Preparation",
-    "share.modal.title": "Your Cocktail Card",
-    "share.modal.download": "Download Image",
-    "share.modal.description":
-      "Save the image to share on your social media stories or posts.",
-    "recommendation.share": "Share Recipe",
-    "recommendation.copied": "Link copied to clipboard",
-    "recommendation.yourRequirements": "Your Requirements",
-    "recommendation.recommendationReason": "Why We Recommend This",
-    "recommendation.ingredients": "Ingredients",
-    "recommendation.prepareIngredients": "Prepare the following ingredients",
-    "recommendation.tools": "Tools",
-    "recommendation.toolsNeeded": "Tools you'll need",
-    "recommendation.alternative": "Alternative",
-    "recommendation.steps": "Preparation Steps",
-    "recommendation.followSteps": "Follow these steps to make your cocktail",
-    "recommendation.tip": "Tip",
-    "recommendation.tryAgain": "🔄 Try Another",
-    "recommendation.browseMore": "Browse More Cocktails",
-    "recommendation.notFound": "Cocktail Not Found",
-    "recommendation.notFoundDesc":
-      "Sorry, we couldn't find the cocktail you requested",
-    "recommendation.loading": "Loading cocktail information...",
-    "recommendation.imageLoading": "Generating cocktail image...",
-    "recommendation.analyzing": "Analyzing your preferences...",
-    "recommendation.mixing": "Mixing the perfect recipe...",
-    "recommendation.crafting": "Crafting your recommendation...",
-    "recommendation.finalizing": "Adding finishing touches...",
-    "recommendation.loadingDesc":
-      "We're crafting the perfect cocktail just for you",
-    "recommendation.complete": "complete",
-    "recommendation.error": "Something Went Wrong",
-    "recommendation.errorDesc":
-      "Sorry, there was an issue generating your cocktail recommendation. Please try again or return to the homepage.",
-    "recommendation.startQuestions": "Start Questions",
-
-    // Gallery
-    "gallery.title": "The Cellar",
-    "gallery.subtitle":
-      "Discover unique cocktail recipes created by the community. Every drink tells a story.",
-    "gallery.search.placeholder": "Search cocktails, ingredients, flavors...",
-    "gallery.search.button": "Search",
-    "gallery.filter.button": "Filter",
-    "gallery.filter.base": "Base",
-    "gallery.filter.flavor": "Flavor",
-    "gallery.filter.alcohol_level": "Level",
-    "gallery.noResults.title": "No cocktails found",
-    "gallery.noResults.desc": "Try adjusting your filters or search terms.",
-    "gallery.viewRecipe": "View Recipe",
-
-    // Cocktail Detail
-    "detail.baseSpirit": "Base Spirit",
-    "detail.alcohol": "Alcohol",
-    "detail.prepTime": "Prep Time",
-    "detail.glass": "Glass",
-    "detail.flavorProfile": "Flavor Profile",
-    "detail.recipe": "Recipe",
-
-    // Gallery Filters - Spirits
-    "gallery.spirit.gin": "Gin",
-    "gallery.spirit.vodka": "Vodka",
-    "gallery.spirit.rum": "Rum",
-    "gallery.spirit.tequila": "Tequila",
-    "gallery.spirit.whiskey": "Whiskey",
-    "gallery.spirit.brandy": "Brandy",
-    "gallery.spirit.other": "Other",
-
-    // Gallery Filters - Flavors
-    "gallery.flavor.sweet": "Sweet",
-    "gallery.flavor.sour": "Sour",
-    "gallery.flavor.bitter": "Bitter",
-    "gallery.flavor.fruity": "Fruity",
-    "gallery.flavor.herbal": "Herbal",
-    "gallery.flavor.smoky": "Smoky",
-    "gallery.flavor.spicy": "Spicy",
-    "gallery.flavor.salty": "Salty",
-    "gallery.flavor.creamy": "Creamy",
-
-    // Gallery Filters - Alcohol Levels
-    "gallery.level.low": "Low",
-    "gallery.level.medium": "Medium",
-    "gallery.level.high": "High",
-
-    // Loading animations
-    "loading.mixing": "Crafting your perfect cocktail...",
-    "loading.analyzing": "Analyzing your taste preferences...",
-    "loading.generating": "Generating beautiful images...",
-    "loading.connecting": "Connecting to server...",
-    "loading.navigating": "Switching pages...",
-    "loading.default": "Mixing...",
-    "loading.subtitle": "Crafting the perfect flavor for you",
-    "loading.dots": "Loading",
-    "loading.rotating.1": "Selecting the finest spirits...",
-    "loading.rotating.2": "Balancing the flavors...",
-    "loading.rotating.3": "Chilling the glass...",
-    "loading.rotating.4": "Adding a touch of magic...",
-    "loading.rotating.5": "Almost ready...",
-
-    // Error messages
-    "error.saveAnswers": "Failed to save answers, please try again",
-    "error.saveFeedback": "Failed to save feedback, please try again",
-    "error.saveBaseSpirits":
-      "Failed to save spirit selection, please try again",
-    "error.toggleBaseSpirit": "Failed to toggle spirit, please try again",
-    "error.resetData":
-      "Failed to reset data, please refresh the page and try again",
-    "error.loadData": "Failed to load saved data",
-    "error.saveAnswersProgress": "Error saving answers",
-    "error.submitFailed": "Submission failed",
-    "error.generationFailed":
-      "Failed to generate cocktail recommendation, please try again later",
-    "error.invalidData": "Server returned invalid cocktail data",
-    "error.parseFailed": "Failed to parse cocktail data",
-
-    // Home page CTA
-    "home.cta.title": "Ready to discover your perfect cocktail?",
-    "home.cta.subtitle":
-      "Start now and let us recommend the perfect drink for your mood.",
-  },
-};
-
 interface LanguageProviderProps {
   children: ReactNode;
 }
@@ -562,14 +42,9 @@ interface LanguageProviderProps {
 export function LanguageProvider({ children }: LanguageProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [language, setLanguageState] = useState<Language>("cn");
+  const [language, setLanguageState] = useState<Language>(defaultLanguage);
   const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
-
-  const availableLanguages: Record<string, string> = {
-    en: "English",
-    cn: "中文",
-  };
 
   // Helper function to extract language from pathname
   const extractLanguageFromPathname = useCallback(
@@ -605,7 +80,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     setIsClient(true);
   }, []);
 
-  // Initialize language from URL or localStorage - 异步优化
+  // Initialize language from URL or localStorage
   useEffect(() => {
     const initializeLanguage = async () => {
       setIsLoading(true);
@@ -626,7 +101,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
           }
         }
 
-        // Then check localStorage (only on client) - 异步获取
+        // Then check localStorage (only on client)
         if (isClient) {
           const savedLanguage = await asyncStorage.getItem(
             "moodshaker-language",
@@ -643,16 +118,16 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
           }
         }
 
-        // Default to English (consistent with API)
-        setLanguageState("en");
+        // Default to configured default language
+        setLanguageState(defaultLanguage);
         if (isClient) {
-          await asyncStorage.setItem("moodshaker-language", "en");
+          await asyncStorage.setItem("moodshaker-language", defaultLanguage);
         }
         setIsLoading(false);
       } catch (error) {
         appLogger.error("Language initialization failed:", error);
-        // 降级到默认语言
-        setLanguageState("en");
+        // Fallback to default language
+        setLanguageState(defaultLanguage);
         setIsLoading(false);
       }
     };
@@ -694,14 +169,14 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         window.removeEventListener("popstate", handlePopState);
       };
     }
-  }, [language, isLoading, extractLanguageFromPathname, getPathWithLanguage]);
+  }, [language, isLoading, extractLanguageFromPathname, getPathWithLanguage, isClient]);
 
-  // Update URL when language changes - 异步优化
+  // Update URL when language changes
   const setLanguage = useCallback(
     async (lang: Language) => {
       setLanguageState(lang);
 
-      // Save to localStorage - 异步保存
+      // Save to localStorage
       if (isClient) {
         try {
           await asyncStorage.setItem("moodshaker-language", lang);
@@ -721,7 +196,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     [pathname, router, getPathWithoutLanguage, isClient],
   );
 
-  // Translation function
+  // Translation function - uses imported translations
   const t = useCallback(
     (key: string): string => {
       return translations[language]?.[key] || key;
@@ -760,3 +235,6 @@ export function useLanguage() {
   }
   return context;
 }
+
+// Re-export types for convenience
+export type { Language, TranslationKey };
