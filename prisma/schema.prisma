@@ -10,7 +10,7 @@ datasource db {
 
 model Cocktail {
   id                    String   @id @default(uuid())
-  name                  String
+  name                  String   @unique // Added unique constraint for cocktail names
   englishName           String?  @map("english_name")
   description           String
   englishDescription    String?  @map("english_description")
@@ -33,6 +33,10 @@ model Cocktail {
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
 
+  // Indexes for common query patterns
+  @@index([baseSpirit], name: "idx_cocktail_base_spirit")
+  @@index([alcoholLevel], name: "idx_cocktail_alcohol_level")
+  @@index([createdAt], name: "idx_cocktail_created_at")
+  @@index([englishName], name: "idx_cocktail_english_name")
   @@map("cocktails")
 }
-

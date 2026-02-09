@@ -28,6 +28,25 @@ import { useAsyncState } from "@/hooks/useAsyncState";
 
 import { cocktailImages } from "@/utils/cocktail-images";
 
+// Robust Image component that handles errors without direct DOM manipulation
+const SafeImage = React.memo(({ src, fallbackSrc, alt, ...props }: any) => {
+  const [imgSrc, setImgSrc] = useState(src || fallbackSrc);
+
+  useEffect(() => {
+    setImgSrc(src || fallbackSrc);
+  }, [src, fallbackSrc]);
+
+  return (
+    <Image
+      {...props}
+      src={imgSrc}
+      alt={alt}
+      onError={() => setImgSrc(fallbackSrc)}
+    />
+  );
+});
+SafeImage.displayName = "SafeImage";
+
 const Home = React.memo(function Home() {
   const { t, language } = useLanguage();
   const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0);
@@ -405,21 +424,14 @@ const Home = React.memo(function Home() {
                             }}
                           />
                           <div className="relative h-full rounded-3xl overflow-hidden glass-effect border border-border/30 shadow-2xl shadow-primary/10 group-hover:shadow-primary/20 transition-all duration-500">
-                            <Image
-                              src={
-                                cocktail.image ||
-                                `/placeholder.svg?height=600&width=500&query=${encodeURIComponent(cocktail.name)}`
-                              }
+                            <SafeImage
+                              src={cocktail.image}
+                              fallbackSrc={`/placeholder.svg?height=600&width=500&query=${encodeURIComponent(cocktail.name)}`}
                               alt={cocktail.name}
                               fill
                               sizes="(max-width: 768px) 100vw, 50vw"
                               priority={index === currentCocktailIndex}
                               className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-                              onError={(e) => {
-                                e.currentTarget.src = `/placeholder.svg?height=600&width=500&query=${encodeURIComponent(
-                                  cocktail.name,
-                                )}`;
-                              }}
                             />
                             <motion.div
                               className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-background/98 via-background/85 to-transparent backdrop-blur-sm"
@@ -466,7 +478,7 @@ const Home = React.memo(function Home() {
                   <motion.button
                     key={index}
                     onClick={() => setCurrentCocktailIndex(index)}
-                    className={`w-4 h-4 rounded-full transition-all duration-500 ${
+                    className={`w-4 h-4 rounded-full transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       index === currentCocktailIndex
                         ? "bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/40 ring-2 ring-primary/20"
                         : "bg-muted/40 hover:bg-muted/70 hover:shadow-md"
@@ -599,21 +611,14 @@ const Home = React.memo(function Home() {
                         whileHover={{ scale: 1.08 }}
                         transition={{ duration: 0.6, ease: "easeOut" }}
                       >
-                        <Image
-                          src={
-                            cocktail.image ||
-                            `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name)}`
-                          }
+                        <SafeImage
+                          src={cocktail.image}
+                          fallbackSrc={`/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name)}`}
                           alt={cocktail.name}
                           fill
                           sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                           className="object-cover transition-all duration-600 group-hover:brightness-110 group-hover:contrast-110"
                           loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.src = `/placeholder.svg?height=300&width=400&query=${encodeURIComponent(
-                              cocktail.name,
-                            )}`;
-                          }}
                         />
                       </motion.div>
                       <div className="absolute inset-0 bg-gradient-to-t from-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
