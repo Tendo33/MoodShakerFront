@@ -7,6 +7,7 @@ import WaitingAnimation from "./WaitingAnimation";
 interface SmartLoadingSystemProps {
   isShowing: boolean;
   onComplete?: () => void;
+  onCancel?: () => void;
   message?: string;
   type?:
     | "cocktail-mixing"
@@ -29,6 +30,7 @@ interface LoadingConfig {
 const SmartLoadingSystem = memo(function SmartLoadingSystem({
   isShowing,
   onComplete,
+  onCancel,
   message,
   type = "cocktail-mixing",
   actualProgress = 0,
@@ -161,6 +163,7 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
     <WaitingAnimation
       isShowing={isShowing}
       onComplete={onComplete}
+      onCancel={onCancel}
       message={displayMessage}
       progress={simulatedProgress}
     />

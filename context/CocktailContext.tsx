@@ -7,6 +7,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
 } from "react";
 import type { ReactNode } from "react";
 import type { Cocktail, BartenderRequest } from "@/api/cocktail";
@@ -121,6 +122,19 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
+
+  // AbortController for background image generation to prevent memory leaks
+  const imageAbortControllerRef = useRef<AbortController | null>(null);
+
+  // Cleanup on unmount: abort any in-flight image generation
+  useEffect(() => {
+    return () => {
+      if (imageAbortControllerRef.current) {
+        imageAbortControllerRef.current.abort();
+        imageAbortControllerRef.current = null;
+      }
+    };
+  }, []);
 
   // 检查数据加载错误
   useEffect(() => {
@@ -256,29 +270,37 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
 
       const prompt = generateImagePrompt(recommendation);
 
+      // Abort any previous in-flight image generation
+      if (imageAbortControllerRef.current) {
+        imageAbortControllerRef.current.abort();
+      }
+      const abortController = new AbortController();
+      imageAbortControllerRef.current = abortController;
+
       // 使用异步函数执行图片生成，不使用 await 阻塞主线程
       const generateImageTask = async () => {
         try {
           // 添加超时机制
           const IMAGE_GENERATION_TIMEOUT = 30000; // 30秒
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Image generation timeout")), IMAGE_GENERATION_TIMEOUT)
-          );
+          const timeoutId = setTimeout(() => abortController.abort(), IMAGE_GENERATION_TIMEOUT);
 
-          const imageResponse = await Promise.race([
-            fetch("/api/image", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                prompt,
-                sessionId,
-                cocktailName: recommendation?.name, // Pass cocktail name for saving image
-              }),
+          const imageResponse = await fetch("/api/image", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              prompt,
+              sessionId,
+              cocktailName: recommendation?.name,
             }),
-            timeoutPromise
-          ]) as Response;
+            signal: abortController.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          // If aborted after fetch but before state update, bail out
+          if (abortController.signal.aborted) return;
 
           if (!imageResponse.ok) {
             const errorData = await imageResponse.json();
@@ -287,27 +309,28 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
               : "图片生成失败，使用默认图片。";
             setImageError(errorMsg);
             cocktailLogger.warn("图片生成失败，使用默认图片", errorData.error);
-            // 图片生成失败不影响整体流程，使用 null
             await updateItem("imageData", null);
           } else {
             const imageData = await imageResponse.json();
+            if (abortController.signal.aborted) return;
             await updateItem("imageData", imageData.data);
-            setImageError(null); // 成功后清除错误
+            setImageError(null);
           }
         } catch (error) {
+          // If aborted (component unmounted or new request), silently exit
+          if (abortController.signal.aborted) return;
+
           const errorMsg = language === "en"
-            ? error instanceof Error && error.message === "Image generation timeout"
-              ? "Image generation timed out. Using default image."
-              : "Image generation failed. Using default image."
-            : error instanceof Error && error.message === "Image generation timeout"
-              ? "图片生成超时，使用默认图片。"
-              : "图片生成失败，使用默认图片。";
+            ? "Image generation failed. Using default image."
+            : "图片生成失败，使用默认图片。";
           setImageError(errorMsg);
           cocktailLogger.error("后台图片生成出错", error);
           await updateItem("imageData", null);
         } finally {
-          // 无论成功失败，都结束图片加载状态
-          setIsImageLoadingState(false);
+          // Only update state if this controller is still the active one
+          if (!abortController.signal.aborted) {
+            setIsImageLoadingState(false);
+          }
         }
       };
 

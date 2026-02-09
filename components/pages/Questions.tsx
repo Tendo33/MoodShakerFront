@@ -11,6 +11,7 @@ import SmartLoadingSystem, {
   useSmartLoading,
 } from "@/components/animations/SmartLoadingSystem";
 import { appLogger, safeLogger } from "@/utils/logger";
+import { toast } from "@/hooks/use-toast";
 
 const Questions = memo(function Questions() {
   const router = useRouter();
@@ -217,13 +218,15 @@ const Questions = memo(function Questions() {
     setShowFeedbackForm(true);
   };
 
-  const handleFeedbackSubmit = async () => {
+  const handleFeedbackSubmit = async (overrideFeedback?: string) => {
     safeLogger.userInteraction("submit questionnaire");
     startGeneration();
 
+    const finalFeedback = overrideFeedback !== undefined ? overrideFeedback : feedback;
+
     try {
-      if (feedback.trim()) {
-        await saveFeedback(feedback);
+      if (finalFeedback.trim()) {
+        await saveFeedback(finalFeedback);
       }
 
       updateProgress(20);
@@ -247,10 +250,11 @@ const Questions = memo(function Questions() {
       appLogger.error("Questionnaire submission failed", errorMessage);
       completeGeneration();
 
-      // 显示用户友好的错误提示
-      if (typeof window !== "undefined") {
-        alert(`⚠️ ${errorMessage}`);
-      }
+      toast({
+        variant: "destructive",
+        title: t("error.title") || "Error",
+        description: errorMessage,
+      });
     }
   };
 
@@ -286,15 +290,21 @@ const Questions = memo(function Questions() {
     router.push(getPathWithLanguage("/cocktail/recommendation"));
   }, [router, getPathWithLanguage]);
 
+  const handleCancelGeneration = useCallback(() => {
+    completeGeneration();
+    setShowFeedbackForm(true);
+  }, [completeGeneration]);
+
   if (isGenerating) {
     return (
       <SmartLoadingSystem
         isShowing={isGenerating}
         actualProgress={progress}
         type="cocktail-mixing"
-        message={loadingMessage} // Use rotating message
+        message={loadingMessage}
         estimatedDuration={3000}
         onComplete={navigateToRecommendation}
+        onCancel={handleCancelGeneration}
       />
     );
   }
@@ -628,7 +638,7 @@ const Questions = memo(function Questions() {
                   variant="ghost"
                   onClick={() => {
                     setFeedback("");
-                    handleFeedbackSubmit();
+                    handleFeedbackSubmit("");
                   }}
                   size="md"
                   className="text-muted-foreground hover:text-foreground"
