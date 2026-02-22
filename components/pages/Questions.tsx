@@ -368,12 +368,12 @@ const Questions = memo(function Questions() {
               </div>
 
               <div
-                className={`grid gap-4 mx-auto ${
+                className={`grid gap-4 mx-auto min-h-[400px] content-start ${
                   questions[currentQuestion - 1]?.options.length === 2
                     ? "grid-cols-1 sm:grid-cols-2 max-w-xl"
                     : questions[currentQuestion - 1]?.options.length === 3
                       ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-3xl"
-                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-4 max-w-4xl"
+                      : "grid-cols-2 sm:grid-cols-2 md:grid-cols-4 max-w-4xl"
                 }`}
               >
                 {questions[currentQuestion - 1]?.options.map(
@@ -385,9 +385,10 @@ const Questions = memo(function Questions() {
                       transition={{ duration: 0.5, delay: index * 0.1 }}
                       whileHover={{ y: -10, scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
+                      className="h-full"
                     >
                       <div
-                        className={`cursor-pointer h-full group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 ${
+                        className={`cursor-pointer h-full min-h-[180px] group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 ${
                           selectedOption === option.value
                             ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.2)] scale-[1.01]"
                             : "border-transparent"
@@ -396,7 +397,6 @@ const Questions = memo(function Questions() {
                           handleAnswer(currentQuestion, option.value)
                         }
                       >
-                        {/* Micro-interaction Ripple */}
                         {selectedOption === option.value && (
                           <motion.div
                             className="absolute inset-0 bg-primary/10 z-20"

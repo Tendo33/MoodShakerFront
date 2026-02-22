@@ -42,10 +42,10 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
   );
   const [isLoading, setIsLoading] = useState(!initialData);
 
-  // Match Recommendation Page State
+  // Mobile accordion: ingredients open by default, tools/steps collapsed
   const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
-  const [isToolsExpanded, setIsToolsExpanded] = useState(true);
-  const [isStepsExpanded, setIsStepsExpanded] = useState(true);
+  const [isToolsExpanded, setIsToolsExpanded] = useState(false);
+  const [isStepsExpanded, setIsStepsExpanded] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
@@ -718,8 +718,8 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
             </motion.div>
           </div>
 
-          <div className="hidden lg:grid lg:grid-cols-12 gap-10">
-            <div className="lg:col-span-4 space-y-8">
+          <div className="hidden lg:grid lg:grid-cols-12 gap-10 items-start">
+            <div className="lg:col-span-4 space-y-8 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin">
               <motion.div
                 className={`rounded-2xl overflow-hidden ${cardClasses}`}
                 variants={{

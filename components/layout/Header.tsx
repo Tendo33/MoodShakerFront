@@ -14,44 +14,51 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Handle scroll effect - only run on client side
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-
-    // Only add scroll listener on client side
     if (typeof window !== "undefined") {
       window.addEventListener("scroll", handleScroll);
       return () => window.removeEventListener("scroll", handleScroll);
     }
   }, []);
 
-  // Animation variants
-  const mobileMenuVariants = {
-    hidden: { opacity: 0, height: 0 },
-    visible: {
-      opacity: 1,
-      height: "auto",
-      transition: {
-        duration: 0.3,
-        ease: "easeInOut",
-      },
-    },
-    exit: {
-      opacity: 0,
-      height: 0,
-      transition: {
-        duration: 0.2,
-        ease: "easeInOut",
-      },
-    },
-  };
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
-  // Get the correct home link based on language
   const homeLink = getPathWithLanguage("/");
   const questionsLink = getPathWithLanguage("/questions");
   const galleryLink = getPathWithLanguage("/gallery");
+
+  const drawerVariants = {
+    hidden: { x: "100%", opacity: 0 },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: { type: "spring" as const, stiffness: 300, damping: 30 },
+    },
+    exit: {
+      x: "100%",
+      opacity: 0,
+      transition: { duration: 0.25, ease: "easeInOut" as const },
+    },
+  };
+
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.25 } },
+    exit: { opacity: 0, transition: { duration: 0.2 } },
+  };
 
   return (
     <header
@@ -85,7 +92,6 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-3">
-          {/* 主要按钮组 */}
           <div className="flex items-center space-x-3">
             <Button
               href={galleryLink}
@@ -108,70 +114,130 @@ export default function Header() {
               {t("home.start")}
             </Button>
           </div>
-          
-          {/* 分隔符 */}
+
           <div className="h-6 w-px bg-white/20 mx-1" />
-          
-          {/* 语言选择器 */}
+
           <LanguageSelector />
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="md:hidden flex items-center">
+        <div className="md:hidden flex items-center gap-2">
           <LanguageSelector />
-
-          <button
+          <motion.button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-gray-300 hover:text-white p-2 ml-2 rounded-full hover:bg-white/10 transition-colors"
+            className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
+            whileTap={{ scale: 0.9 }}
           >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+            <AnimatePresence mode="wait" initial={false}>
+              {isMobileMenuOpen ? (
+                <motion.span
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <X size={24} />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="open"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <Menu size={24} />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Drawer (right-side slide-in) */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
-            className="md:hidden fixed inset-x-0 top-[64px] z-40 overflow-hidden"
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            variants={mobileMenuVariants as any}
-          >
-            {/* Backdrop blur overlay */}
-            <div className="absolute inset-0 bg-background/60 backdrop-blur-xl" />
+          <>
+            {/* Backdrop */}
+            <motion.div
+              className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+              variants={backdropVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
 
-            <div className="relative px-6 py-6 space-y-6 border-t border-white/10 bg-background/40">
-              <Button
-                href={galleryLink}
-                variant="outline"
-                fullWidth
-                effect="lift"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="justify-start text-lg text-white border-white/20 hover:bg-white/10 hover:border-white/40"
-                icon={<Library className="h-5 w-5" />}
-              >
-                {language === "cn" ? "酒单库" : "Gallery"}
-              </Button>
-              <div className="pt-2 pb-4">
+            {/* Drawer Panel */}
+            <motion.div
+              className="md:hidden fixed top-0 right-0 bottom-0 z-50 w-72 glass-popup flex flex-col"
+              variants={drawerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-8 h-8 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center`}
+                  >
+                    <Martini className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="gradient-text-bright font-bold font-playfair text-lg">
+                    MoodShaker
+                  </span>
+                </div>
+                <motion.button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 rounded-full hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+                  whileTap={{ scale: 0.9 }}
+                  aria-label="Close menu"
+                >
+                  <X size={20} />
+                </motion.button>
+              </div>
+
+              {/* Drawer Nav Links */}
+              <nav className="flex-1 flex flex-col gap-3 px-6 py-8">
+                <Button
+                  href={galleryLink}
+                  variant="outline"
+                  fullWidth
+                  effect="lift"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="justify-start text-base text-white border-white/20 hover:bg-white/10 hover:border-white/40"
+                  icon={<Library className="h-5 w-5" />}
+                >
+                  {language === "cn" ? "酒单库" : "Gallery"}
+                </Button>
+
                 <Button
                   href={questionsLink}
-                  size="xl"
+                  size="lg"
                   variant="primary"
                   effect="shine"
                   fullWidth
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="shadow-lg text-lg"
+                  className="shadow-lg text-base mt-2"
                   icon={<Sparkles className="h-5 w-5" />}
                 >
                   {t("home.start")}
                 </Button>
+              </nav>
+
+              {/* Drawer Footer: Language Selector */}
+              <div className="px-6 py-6 border-t border-white/10">
+                <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">
+                  {language === "cn" ? "语言" : "Language"}
+                </p>
+                <LanguageSelector />
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </header>

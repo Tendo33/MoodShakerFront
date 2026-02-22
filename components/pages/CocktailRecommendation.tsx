@@ -46,10 +46,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  // Mobile section expanded state - default all expanded
+  // Mobile accordion: ingredients expanded by default, tools/steps collapsed
   const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
-  const [isToolsExpanded, setIsToolsExpanded] = useState(true);
-  const [isStepsExpanded, setIsStepsExpanded] = useState(true);
+  const [isToolsExpanded, setIsToolsExpanded] = useState(false);
+  const [isStepsExpanded, setIsStepsExpanded] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
@@ -245,31 +245,99 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     );
   }
 
-  // If no cocktail found
+  // If no cocktail found — emotional empty state
   if (!cocktail) {
     return (
-      <div className="min-h-screen">
-        <div className="container mx-auto py-16 md:py-24">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+          className="text-center py-16 px-8 glass-panel rounded-3xl border border-white/10 max-w-md w-full"
+        >
+          {/* Illustrated empty state icon */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center py-12 glass-effect rounded-2xl"
+            className="flex items-center justify-center mb-8"
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
-            <h2 className={`text-2xl font-medium mb-4 ${textColorClass}`}>
-              {t("recommendation.notFound")}
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              {t("recommendation.notFoundDesc")}
-            </p>
+            <div className="relative">
+              <svg
+                width="100"
+                height="100"
+                viewBox="0 0 100 100"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="opacity-60"
+              >
+                {/* Martini glass — inverted / empty */}
+                <path
+                  d="M20 20 L50 60 L80 20 Z"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth="3"
+                  strokeLinejoin="round"
+                  fill="none"
+                  opacity="0.5"
+                />
+                <line
+                  x1="50"
+                  y1="60"
+                  x2="50"
+                  y2="82"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="35"
+                  y1="82"
+                  x2="65"
+                  y2="82"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                {/* Drip drop */}
+                <circle
+                  cx="50"
+                  cy="45"
+                  r="4"
+                  fill="hsl(var(--secondary))"
+                  opacity="0.7"
+                />
+                {/* Question sparkles */}
+                <circle cx="30" cy="35" r="2" fill="hsl(var(--primary))" opacity="0.4" />
+                <circle cx="70" cy="28" r="1.5" fill="hsl(var(--secondary))" opacity="0.5" />
+                <circle cx="75" cy="50" r="1" fill="hsl(var(--primary))" opacity="0.3" />
+              </svg>
+            </div>
+          </motion.div>
+
+          <h2 className="text-2xl font-bold font-playfair gradient-text mb-3">
+            {t("recommendation.notFound")}
+          </h2>
+          <p className="text-muted-foreground font-source-sans leading-relaxed mb-8">
+            {t("recommendation.notFoundDesc")}
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <motion.button
+              onClick={() => router.push(getPathWithLanguage("/questions"))}
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium shadow-[0_4px_14px_hsl(var(--primary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.6)] transition-all hover:scale-105"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span>✨</span>
+              <span>{language === "en" ? "Shake One Up" : "重新调制一杯"}</span>
+            </motion.button>
             <button
               onClick={handleBack}
-              className={commonStyles.primaryButtonFull}
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-full glass-effect border border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all"
             >
               {t("recommendation.back")}
             </button>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -331,7 +399,8 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Desktop: Save Image button in top bar */}
+          <div className="hidden md:flex items-center gap-3">
             <motion.button
               onClick={handleGenerateCard}
               disabled={isGeneratingCard}
@@ -351,6 +420,26 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             </motion.button>
           </div>
         </motion.div>
+
+        {/* Mobile FAB: Save Image — fixed bottom-right */}
+        <motion.button
+          onClick={handleGenerateCard}
+          disabled={isGeneratingCard}
+          className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-primary text-primary-foreground shadow-[0_4px_20px_hsl(var(--primary)/0.5)] transition-all"
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={isPageLoaded ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
+          transition={{ delay: 0.6, type: "spring", stiffness: 300, damping: 25 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          aria-label={t("recommendation.saveImage")}
+        >
+          {isGeneratingCard ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <ImageIcon className="h-5 w-5" />
+          )}
+          <span className="font-medium text-sm">{t("recommendation.saveImage")}</span>
+        </motion.button>
 
         {/* Hero section with cocktail image and basic info */}
         <motion.div
@@ -853,9 +942,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           </div>
 
           {/* Desktop layout */}
-          <div className="hidden lg:grid lg:grid-cols-12 gap-10">
-            {/* Left column: Ingredients and Tools */}
-            <div className="lg:col-span-4 space-y-8 sticky top-24 self-start">
+          <div className="hidden lg:grid lg:grid-cols-12 gap-10 items-start">
+            {/* Left column: Ingredients and Tools — sticky within grid row */}
+            <div className="lg:col-span-4 space-y-8 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin">
               {/* Ingredients with animation */}
               <motion.div
                 className={`rounded-2xl overflow-hidden ${cardClasses}`}
