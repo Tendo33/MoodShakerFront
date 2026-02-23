@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
 } from "react";
 import { appLogger } from "@/utils/logger";
 import { usePathname, useRouter } from "next/navigation";
@@ -211,15 +212,18 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     }
   }, [language, isLoading, t]);
 
-  const contextValue = {
-    language,
-    setLanguage,
-    t,
-    availableLanguages,
-    isLoading,
-    locale: language === "en" ? "en" : "cn",
-    getPathWithLanguage,
-  };
+  const contextValue = useMemo(
+    () => ({
+      language,
+      setLanguage,
+      t,
+      availableLanguages,
+      isLoading,
+      locale: language === "en" ? "en" : "cn",
+      getPathWithLanguage,
+    }),
+    [language, setLanguage, t, isLoading, getPathWithLanguage],
+  );
 
   return (
     <LanguageContext.Provider value={contextValue}>

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { X, Download, Check } from "lucide-react";
+import React from "react";
+import { X, Download } from "lucide-react";
 import { Button } from "@/components/ui/core";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -10,7 +10,6 @@ interface ShareModalProps {
 }
 
 export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
-  const [copied, setCopied] = useState(false);
   const { t } = useLanguage();
 
   if (!isOpen || !imageUrl) return null;

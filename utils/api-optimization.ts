@@ -7,8 +7,15 @@ import { apiCache, cacheMetrics } from "@/utils/cache-utils";
 import { appLogger } from "@/utils/logger";
 
 interface PendingRequest {
-  promise: Promise<any>;
+  promise: Promise<CachedResponseData>;
   timestamp: number;
+}
+
+interface CachedResponseData {
+  status: number;
+  statusText: string;
+  headers: Array<[string, string]>;
+  body: string;
 }
 
 // 正在进行的请求映射
@@ -51,11 +58,11 @@ export async function optimizedFetch(
   const key = cacheKey || generateCacheKey(url, options);
 
   // 1. 检查缓存
-  const cachedResponse = apiCache.get(key) as Response | null;
+  const cachedResponse = apiCache.get(key) as CachedResponseData | null;
   if (cachedResponse) {
     cacheMetrics.recordHit();
     appLogger.debug("Request cache hit");
-    return cachedResponse;
+    return buildResponseFromCache(cachedResponse);
   }
 
   cacheMetrics.recordMiss();
@@ -65,17 +72,18 @@ export async function optimizedFetch(
     const existingRequest = pendingRequests.get(key);
     if (existingRequest) {
       appLogger.debug("Request deduplication");
-      return existingRequest.promise;
+      const cachedData = await existingRequest.promise;
+      return buildResponseFromCache(cachedData);
     }
   }
 
-  // 3. 创建新请求
+  // 3. 创建新请求（并序列化，避免缓存不可复用的 Response 实例）
   const requestPromise = createRequestWithRetry(
     url,
     options,
     retryCount,
     retryDelay,
-  );
+  ).then(serializeResponse);
 
   if (deduplicate) {
     pendingRequests.set(key, {
@@ -85,11 +93,12 @@ export async function optimizedFetch(
   }
 
   try {
-    const response = await requestPromise;
+    const responseData = await requestPromise;
+    const response = buildResponseFromCache(responseData);
 
     // 4. 缓存成功响应
     if (response.ok) {
-      apiCache.set(key, response, cacheTTL);
+      apiCache.set(key, responseData, cacheTTL);
     }
 
     return response;
@@ -99,6 +108,24 @@ export async function optimizedFetch(
       pendingRequests.delete(key);
     }
   }
+}
+
+async function serializeResponse(response: Response): Promise<CachedResponseData> {
+  const body = await response.text();
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    headers: Array.from(response.headers.entries()),
+    body,
+  };
+}
+
+function buildResponseFromCache(data: CachedResponseData): Response {
+  return new Response(data.body, {
+    status: data.status,
+    statusText: data.statusText,
+    headers: data.headers,
+  });
 }
 
 /**

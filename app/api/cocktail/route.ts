@@ -156,6 +156,9 @@ export async function POST(request: NextRequest) {
         if (existingCocktail.image) {
           cocktail.image = existingCocktail.image;
         }
+        if (existingCocktail.thumbnail) {
+          cocktail.thumbnail = existingCocktail.thumbnail;
+        }
         cocktailLogger.info(`Found existing cocktail in DB: ${cocktail.name}`);
       } else {
         const newCocktail = await prisma.cocktail.create({

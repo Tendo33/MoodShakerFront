@@ -70,6 +70,24 @@ export interface Cocktail {
   tools: Tool[];
   steps: Step[];
   image?: string;
+  thumbnail?: string;
+}
+
+export interface GalleryCocktail {
+  id?: string | number;
+  name: string;
+  english_name?: string;
+  description: string;
+  english_description?: string;
+  base_spirit: string;
+  english_base_spirit?: string;
+  alcohol_level: string;
+  english_alcohol_level?: string;
+  flavor_profiles: string[];
+  english_flavor_profiles?: string[];
+  ingredients?: Ingredient[];
+  image?: string;
+  thumbnail?: string;
 }
 
 export interface BartenderRequest {

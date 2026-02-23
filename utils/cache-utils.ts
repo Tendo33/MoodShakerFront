@@ -7,15 +7,32 @@ interface CacheItem<T> {
 }
 
 class SimpleCache<T> {
+  private readonly maxEntries: number;
   private cache = new Map<string, CacheItem<T>>();
+
+  constructor(maxEntries: number = 200) {
+    this.maxEntries = maxEntries;
+  }
 
   set(key: string, data: T, ttl: number = 5 * 60 * 1000): void {
     const timestamp = Date.now();
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    }
+
     this.cache.set(key, {
       data,
       timestamp,
       expiry: timestamp + ttl,
     });
+
+    while (this.cache.size > this.maxEntries) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey === undefined) {
+        break;
+      }
+      this.cache.delete(oldestKey);
+    }
   }
 
   get(key: string): T | null {
@@ -29,6 +46,10 @@ class SimpleCache<T> {
       this.cache.delete(key);
       return null;
     }
+
+    // LRU: refresh recency
+    this.cache.delete(key);
+    this.cache.set(key, item);
 
     return item.data;
   }
@@ -73,7 +94,7 @@ class SimpleCache<T> {
 }
 
 // API 缓存实例
-export const apiCache = new SimpleCache<unknown>();
+export const apiCache = new SimpleCache<unknown>(200);
 
 // 性能监控
 export const cacheMetrics = {

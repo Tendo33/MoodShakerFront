@@ -4,12 +4,12 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Cocktail } from "@/api/cocktail";
+import type { GalleryCocktail } from "@/api/cocktail";
 import { useLanguage } from "@/context/LanguageContext";
 import { Search, X, Filter, GlassWater, Sparkles, Activity } from "lucide-react";
 
 interface GalleryContentProps {
-  cocktails: Cocktail[];
+  cocktails: GalleryCocktail[];
   lang: string;
 }
 
@@ -48,64 +48,78 @@ export default function GalleryContent({
   const [selectedAlcohol, setSelectedAlcohol] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+
+  const searchableCocktails = useMemo(
+    () =>
+      cocktails.map((cocktail) => {
+        const searchText = [
+          cocktail.name,
+          cocktail.english_name,
+          cocktail.description,
+          cocktail.english_description,
+          cocktail.base_spirit,
+          cocktail.english_base_spirit,
+          ...(cocktail.flavor_profiles || []),
+          ...(cocktail.english_flavor_profiles || []),
+          ...(cocktail.ingredients || []).flatMap((ingredient) => [
+            ingredient.name,
+            ingredient.english_name,
+          ]),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return {
+          cocktail,
+          searchText,
+        };
+      }),
+    [cocktails],
+  );
+
   // Filter Logic
   const filteredCocktails = useMemo(() => {
-    return cocktails.filter((c) => {
-      const matchesSearch =
-        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (c.english_name &&
-          c.english_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (c.ingredients &&
-          c.ingredients.some(
-            (i) =>
-              i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              (i.english_name &&
-                i.english_name
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase())),
-          )) ||
-        (c.description &&
-          c.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (c.english_description &&
-          c.english_description
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())) ||
-        (c.flavor_profiles &&
-          c.flavor_profiles.some((f) =>
-            f.toLowerCase().includes(searchQuery.toLowerCase()),
-          )) ||
-        (c.english_flavor_profiles &&
-          c.english_flavor_profiles.some((f) =>
-            f.toLowerCase().includes(searchQuery.toLowerCase()),
-          ));
+    return searchableCocktails
+      .filter(({ cocktail: c, searchText }) => {
+        const matchesSearch = normalizedSearchQuery
+          ? searchText.includes(normalizedSearchQuery)
+          : true;
 
-      const matchesSpirit = selectedSpirit
-        ? c.english_base_spirit
-            ?.toLowerCase()
-            .includes(selectedSpirit.toLowerCase()) ||
-          c.base_spirit?.includes(selectedSpirit)
-        : true;
+        const matchesSpirit = selectedSpirit
+          ? c.english_base_spirit
+              ?.toLowerCase()
+              .includes(selectedSpirit.toLowerCase()) ||
+            c.base_spirit?.includes(selectedSpirit)
+          : true;
 
-      const matchesFlavor = selectedFlavor
-        ? (c.english_flavor_profiles || []).some((f) =>
-            f.toLowerCase().includes(selectedFlavor.toLowerCase()),
-          ) || (c.flavor_profiles || []).some((f) => f.includes(selectedFlavor))
-        : true;
+        const matchesFlavor = selectedFlavor
+          ? (c.english_flavor_profiles || []).some((f) =>
+              f.toLowerCase().includes(selectedFlavor.toLowerCase()),
+            ) || (c.flavor_profiles || []).some((f) => f.includes(selectedFlavor))
+          : true;
 
-      const matchesAlcohol = selectedAlcohol
-        ? (c.english_alcohol_level &&
-            c.english_alcohol_level.toLowerCase() ===
-              selectedAlcohol.toLowerCase()) ||
-          (c.alcohol_level && c.alcohol_level === selectedAlcohol) ||
-           // Mapping Chinese values if data isn't normalized efficiently
-           (selectedAlcohol === "Low" && c.alcohol_level?.includes("低")) ||
-           (selectedAlcohol === "Medium" && c.alcohol_level?.includes("中")) ||
-           (selectedAlcohol === "High" && c.alcohol_level?.includes("高"))
-        : true;
+        const matchesAlcohol = selectedAlcohol
+          ? (c.english_alcohol_level &&
+              c.english_alcohol_level.toLowerCase() ===
+                selectedAlcohol.toLowerCase()) ||
+            (c.alcohol_level && c.alcohol_level === selectedAlcohol) ||
+            (selectedAlcohol === "Low" && c.alcohol_level?.includes("低")) ||
+            (selectedAlcohol === "Medium" && c.alcohol_level?.includes("中")) ||
+            (selectedAlcohol === "High" && c.alcohol_level?.includes("高"))
+          : true;
 
-      return matchesSearch && matchesSpirit && matchesFlavor && matchesAlcohol;
-    });
-  }, [cocktails, searchQuery, selectedSpirit, selectedFlavor, selectedAlcohol]);
+        return matchesSearch && matchesSpirit && matchesFlavor && matchesAlcohol;
+      })
+      .map(({ cocktail }) => cocktail);
+  }, [
+    searchableCocktails,
+    normalizedSearchQuery,
+    selectedSpirit,
+    selectedFlavor,
+    selectedAlcohol,
+  ]);
 
   // Animation Variants
   const containerVariants = {
@@ -308,9 +322,9 @@ export default function GalleryContent({
                   
                   {/* Image Container */}
                   <div className="relative aspect-[3/4] w-full overflow-hidden">
-                    {cocktail.image ? (
+                    {cocktail.thumbnail || cocktail.image ? (
                       <Image
-                        src={cocktail.image}
+                        src={cocktail.thumbnail || cocktail.image || "/placeholder.svg"}
                         alt={cocktail.name}
                         fill
                         className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"

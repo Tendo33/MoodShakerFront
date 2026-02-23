@@ -71,6 +71,20 @@ const addToRemoveQueue = (toastId: string) => {
   toastTimeouts.set(toastId, timeout);
 };
 
+const clearFromRemoveQueue = (toastId?: string) => {
+  if (toastId) {
+    const timeout = toastTimeouts.get(toastId);
+    if (timeout) {
+      clearTimeout(timeout);
+      toastTimeouts.delete(toastId);
+    }
+    return;
+  }
+
+  toastTimeouts.forEach((timeout) => clearTimeout(timeout));
+  toastTimeouts.clear();
+};
+
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "ADD_TOAST":
@@ -114,11 +128,13 @@ export const reducer = (state: State, action: Action): State => {
     }
     case "REMOVE_TOAST":
       if (action.toastId === undefined) {
+        clearFromRemoveQueue();
         return {
           ...state,
           toasts: [],
         };
       }
+      clearFromRemoveQueue(action.toastId);
       return {
         ...state,
         toasts: state.toasts.filter((t) => t.id !== action.toastId),
@@ -179,7 +195,7 @@ function useToast() {
         listeners.splice(index, 1);
       }
     };
-  }, [state]);
+  }, []);
 
   return {
     ...state,

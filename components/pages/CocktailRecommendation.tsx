@@ -1,17 +1,13 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { toPng } from "html-to-image";
 import {
   ArrowLeft,
   Clock,
   Droplet,
   GlassWater,
-  ChevronDown,
-  ChevronUp,
-  Lightbulb,
   RefreshCcw,
   Image as ImageIcon,
   Loader2,
@@ -19,13 +15,13 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { useCocktail } from "@/context/CocktailContext";
 import { getCocktailById } from "@/api/cocktail";
-import type { Cocktail, Ingredient, Tool, Step } from "@/api/cocktail";
+import type { Cocktail, Tool } from "@/api/cocktail";
 import { CocktailImage } from "@/components/CocktailImage";
 import { cocktailLogger, imageLogger } from "@/utils/logger";
-import { commonStyles } from "@/utils/style-constants";
 import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem";
-import { PolaroidCard } from "@/components/share/PolaroidCard";
-import { ShareModal } from "@/components/share/ShareModal";
+import { useLocalizedCocktail } from "@/hooks/useLocalizedCocktail";
+import { CocktailSharePortal } from "@/components/share/CocktailSharePortal";
+import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSections";
 
 const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const router = useRouter();
@@ -34,7 +30,6 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const { t, getPathWithLanguage, language } = useLanguage();
   const {
     recommendation: contextCocktail,
-    userFeedback,
     imageData,
     isLoading: isContextLoading,
     isImageLoading,
@@ -46,79 +41,22 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  // Mobile accordion: ingredients expanded by default, tools/steps collapsed
-  const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
-  const [isToolsExpanded, setIsToolsExpanded] = useState(false);
-  const [isStepsExpanded, setIsStepsExpanded] = useState(false);
-  const [activeStep, setActiveStep] = useState<number | null>(null);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
-
-  // Share Card State
-  const [generatedCardUrl, setGeneratedCardUrl] = useState<string | null>(null);
-  const [isGeneratingCard, setIsGeneratingCard] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   // Updated design system classes
   const textColorClass = "text-foreground";
   const cardClasses =
     "glass-effect text-foreground transition-all duration-300 hover:shadow-primary/10";
-  const borderClasses = "border-white/10";
   const gradientText = "gradient-text-bright";
-
-  const getLocalizedContent = (
-    field: string,
-    englishField: string,
-  ): string | undefined => {
-    if (language === "en" && cocktail?.[englishField as keyof Cocktail]) {
-      return cocktail[englishField as keyof Cocktail] as string;
-    }
-    return cocktail?.[field as keyof Cocktail] as string;
-  };
-
-  const getLocalizedIngredientName = (ingredient: Ingredient): string => {
-    if (language === "en" && ingredient.english_name) {
-      return ingredient.english_name;
-    }
-    return ingredient.name;
-  };
-
-  const getLocalizedIngredientAmount = (ingredient: Ingredient): string => {
-    if (language === "en" && ingredient.english_amount) {
-      return ingredient.english_amount;
-    }
-    return ingredient.amount;
-  };
-
-  const getLocalizedIngredientUnit = (ingredient: Ingredient): string => {
-    if (language === "en" && ingredient.english_unit) {
-      return ingredient.english_unit;
-    }
-    return ingredient.unit || "";
-  };
-
-  const getLocalizedToolName = (tool: Tool): string => {
-    if (language === "en" && tool.english_name) {
-      return tool.english_name;
-    }
-    return tool.name;
-  };
-
-  const getLocalizedStepContent = (
-    step: Step,
-  ): { description: string; tips?: string } => {
-    if (language === "en") {
-      return {
-        description: step.english_description || step.description,
-        tips: step.english_tips || step.tips,
-      };
-    }
-    return {
-      description: step.description,
-      tips: step.tips,
-    };
-  };
+  const {
+    getLocalizedContent,
+    getLocalizedIngredientName,
+    getLocalizedIngredientAmount,
+    getLocalizedIngredientUnit,
+    getLocalizedToolName,
+    getLocalizedStepContent,
+  } = useLocalizedCocktail(cocktail);
 
   // Set page title based on language
   useEffect(() => {
@@ -163,23 +101,6 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     router.push(getPathWithLanguage("/"));
   };
 
-  const toggleSection = useCallback(
-    (section: string) => {
-      switch (section) {
-        case "ingredients":
-          setIsIngredientsExpanded(!isIngredientsExpanded);
-          break;
-        case "tools":
-          setIsToolsExpanded(!isToolsExpanded);
-          break;
-        case "steps":
-          setIsStepsExpanded(!isStepsExpanded);
-          break;
-      }
-    },
-    [isIngredientsExpanded, isToolsExpanded, isStepsExpanded],
-  );
-
   const handleRefreshImage = async () => {
     if (refreshImage && cocktail) {
       setIsRefreshingImage(true);
@@ -208,30 +129,12 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     }
   };
 
-  const handleGenerateCard = useCallback(async () => {
-    if (!cardRef.current) return;
-
-    setIsGeneratingCard(true);
-    try {
-      // Add a small delay to ensure rendering
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const dataUrl = await toPng(cardRef.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-        // Removed forced white background to respect component's dark theme
-        skipAutoScale: true,
-      });
-
-      setGeneratedCardUrl(dataUrl);
-      setShowShareModal(true);
-    } catch (error) {
-      console.error("Failed to generate card", error);
-      // Fallback or alert
-    } finally {
-      setIsGeneratingCard(false);
+  const getRecommendationToolAlternative = (tool: Tool): string | undefined => {
+    if (language === "en" && tool.english_alternative) {
+      return tool.english_alternative;
     }
-  }, []);
+    return tool.alternative;
+  };
 
   if (isLoading || isContextLoading) {
     return (
@@ -399,47 +302,59 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             </button>
           </div>
 
-          {/* Desktop: Save Image button in top bar */}
-          <div className="hidden md:flex items-center gap-3">
-            <motion.button
-              onClick={handleGenerateCard}
-              disabled={isGeneratingCard}
-              className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all glass-effect border border-primary/30"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label={t("recommendation.saveImage")}
-            >
-              {isGeneratingCard ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <ImageIcon className="h-5 w-5" />
-              )}
-              <span className="font-medium">
-                {t("recommendation.saveImage")}
-              </span>
-            </motion.button>
-          </div>
+          <CocktailSharePortal
+            cocktail={cocktail}
+            imageUrl={
+              imageData ||
+              cocktail.image ||
+              `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`
+            }
+          >
+            {({ isGeneratingCard, generateCard }) => (
+              <>
+              <div className="hidden md:flex items-center gap-3">
+                <motion.button
+                  onClick={generateCard}
+                  disabled={isGeneratingCard}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all glass-effect border border-primary/30"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label={t("recommendation.saveImage")}
+                >
+                  {isGeneratingCard ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <ImageIcon className="h-5 w-5" />
+                  )}
+                  <span className="font-medium">
+                    {t("recommendation.saveImage")}
+                  </span>
+                </motion.button>
+              </div>
+              <motion.button
+                onClick={generateCard}
+                disabled={isGeneratingCard}
+                className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-primary text-primary-foreground shadow-[0_4px_20px_hsl(var(--primary)/0.5)] transition-all"
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={isPageLoaded ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
+                transition={{ delay: 0.6, type: "spring", stiffness: 300, damping: 25 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label={t("recommendation.saveImage")}
+              >
+                {isGeneratingCard ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <ImageIcon className="h-5 w-5" />
+                )}
+                <span className="font-medium text-sm">
+                  {t("recommendation.saveImage")}
+                </span>
+              </motion.button>
+              </>
+            )}
+          </CocktailSharePortal>
         </motion.div>
-
-        {/* Mobile FAB: Save Image — fixed bottom-right */}
-        <motion.button
-          onClick={handleGenerateCard}
-          disabled={isGeneratingCard}
-          className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-primary text-primary-foreground shadow-[0_4px_20px_hsl(var(--primary)/0.5)] transition-all"
-          initial={{ opacity: 0, scale: 0.8, y: 20 }}
-          animate={isPageLoaded ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
-          transition={{ delay: 0.6, type: "spring", stiffness: 300, damping: 25 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          aria-label={t("recommendation.saveImage")}
-        >
-          {isGeneratingCard ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <ImageIcon className="h-5 w-5" />
-          )}
-          <span className="font-medium text-sm">{t("recommendation.saveImage")}</span>
-        </motion.button>
 
         {/* Hero section with cocktail image and basic info */}
         <motion.div
@@ -748,351 +663,19 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           </div>
         </motion.div>
 
-        {/* Recipe section with animation */}
-        <motion.div
-          className="mb-20"
-          initial="hidden"
-          animate={isPageLoaded ? "visible" : "hidden"}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1,
-              },
-            },
-          }}
-        >
-          <motion.h2
-            className={`text-3xl md:text-4xl font-bold font-playfair mb-10 ${gradientText} inline-block`}
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { duration: 0.5 } },
-            }}
-          >
-            {t("detail.recipe")}
-          </motion.h2>
-
-          {/* Mobile accordion sections */}
-          <div className="lg:hidden space-y-6">
-            {/* Ingredients Section */}
-            <motion.div
-              className={`rounded-xl overflow-hidden ${cardClasses}`}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-              }}
-            >
-              <button
-                className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
-                onClick={() => toggleSection("ingredients")}
-              >
-                <h3 className={`text-xl font-bold ${textColorClass}`}>
-                  {t("recommendation.ingredients")}
-                </h3>
-                {isIngredientsExpanded ? (
-                  <ChevronUp className="h-5 w-5" />
-                ) : (
-                  <ChevronDown className="h-5 w-5" />
-                )}
-              </button>
-              {isIngredientsExpanded && (
-                <div className="p-5 md:p-6 bg-black/20">
-                  <ul className="divide-y divide-white/10">
-                    {cocktail?.ingredients?.map((ingredient, index) => (
-                      <motion.li
-                        key={index}
-                        className="py-4 flex justify-between items-center"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <span className={`${textColorClass} font-medium`}>
-                          {getLocalizedIngredientName(ingredient)}
-                        </span>
-                        <span className="text-primary font-medium">
-                          {getLocalizedIngredientAmount(ingredient)}
-                          {getLocalizedIngredientUnit(ingredient)
-                            ? ` ${getLocalizedIngredientUnit(ingredient)}`
-                            : ""}
-                        </span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </motion.div>
-
-            {/* Tools Section */}
-            <motion.div
-              className={`rounded-xl overflow-hidden ${cardClasses}`}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-              }}
-            >
-              <button
-                className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
-                onClick={() => toggleSection("tools")}
-              >
-                <h3 className={`text-xl font-bold ${textColorClass}`}>
-                  {t("recommendation.tools")}
-                </h3>
-                {isToolsExpanded ? (
-                  <ChevronUp className="h-5 w-5" />
-                ) : (
-                  <ChevronDown className="h-5 w-5" />
-                )}
-              </button>
-              {isToolsExpanded && (
-                <div className="p-5 md:p-6 bg-black/20">
-                  <ul className="space-y-4">
-                    {cocktail?.tools?.map((tool, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex flex-col"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <span className={`${textColorClass} font-medium`}>
-                          {getLocalizedToolName(tool)}
-                        </span>
-                        {tool.alternative && (
-                          <span className="text-sm text-muted-foreground mt-1 italic">
-                            {t("recommendation.alternative")}:{" "}
-                            {language === "en" && tool.english_alternative
-                              ? tool.english_alternative
-                              : tool.alternative}
-                          </span>
-                        )}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </motion.div>
-
-            {/* Steps Section */}
-            <motion.div
-              className={`rounded-xl overflow-hidden ${cardClasses}`}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-              }}
-            >
-              <button
-                className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
-                onClick={() => toggleSection("steps")}
-              >
-                <h3 className={`text-xl font-bold ${textColorClass}`}>
-                  {t("recommendation.steps")}
-                </h3>
-                {isStepsExpanded ? (
-                  <ChevronUp className="h-5 w-5" />
-                ) : (
-                  <ChevronDown className="h-5 w-5" />
-                )}
-              </button>
-              {isStepsExpanded && (
-                <div className="p-5 md:p-6 bg-black/20">
-                  <ol className="space-y-10">
-                    {cocktail?.steps?.map((step) => {
-                      const localizedStep = getLocalizedStepContent(step);
-                      return (
-                        <motion.li
-                          key={step.step_number}
-                          className="flex gap-5"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: step.step_number * 0.1 }}
-                          onMouseEnter={() => setActiveStep(step.step_number)}
-                          onMouseLeave={() => setActiveStep(null)}
-                        >
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10 text-sm">
-                            {step.step_number}
-                          </div>
-                          <div className="flex-1 pt-0.5">
-                            <p
-                              className={`${textColorClass} text-lg leading-relaxed`}
-                            >
-                              {localizedStep.description}
-                            </p>
-                            {localizedStep.tips && (
-                              <motion.div
-                                className="mt-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.3 }}
-                              >
-                                <p className="text-amber-400/70 text-xs flex items-center gap-1.5">
-                                  <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
-                                  <span>{localizedStep.tips}</span>
-                                </p>
-                              </motion.div>
-                            )}
-                          </div>
-                        </motion.li>
-                      );
-                    })}
-                  </ol>
-                </div>
-              )}
-            </motion.div>
-          </div>
-
-          {/* Desktop layout */}
-          <div className="hidden lg:grid lg:grid-cols-12 gap-10 items-start">
-            {/* Left column: Ingredients and Tools — sticky within grid row */}
-            <div className="lg:col-span-4 space-y-8 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin">
-              {/* Ingredients with animation */}
-              <motion.div
-                className={`rounded-2xl overflow-hidden ${cardClasses}`}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-                }}
-              >
-                <div className="p-6 bg-white/5 border-b border-white/5">
-                  <h3 className={`text-xl font-bold ${textColorClass}`}>
-                    {t("recommendation.ingredients")}
-                  </h3>
-                </div>
-                <div className="p-6 bg-black/10">
-                  <ul className="divide-y divide-white/10">
-                    {cocktail?.ingredients?.map((ingredient, index) => (
-                      <motion.li
-                        key={index}
-                        className="py-4 flex justify-between items-center"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        whileHover={{ x: 5 }}
-                      >
-                        <span className={`${textColorClass} font-medium`}>
-                          {getLocalizedIngredientName(ingredient)}
-                        </span>
-                        <span className="text-primary font-bold">
-                          {getLocalizedIngredientAmount(ingredient)}
-                          {getLocalizedIngredientUnit(ingredient)
-                            ? ` ${getLocalizedIngredientUnit(ingredient)}`
-                            : ""}
-                        </span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-
-              {/* Tools with animation */}
-              <motion.div
-                className={`rounded-2xl overflow-hidden ${cardClasses}`}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-                }}
-              >
-                <div className="p-6 bg-white/5 border-b border-white/5">
-                  <h3 className={`text-xl font-bold ${textColorClass}`}>
-                    {t("recommendation.tools")}
-                  </h3>
-                </div>
-                <div className="p-6 bg-black/10">
-                  <ul className="space-y-4">
-                    {cocktail?.tools?.map((tool, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex flex-col"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <span className={`${textColorClass} font-medium`}>
-                          {getLocalizedToolName(tool)}
-                        </span>
-                        {tool.alternative && (
-                          <span className="text-sm text-muted-foreground mt-1 italic">
-                            {t("recommendation.alternative")}:{" "}
-                            {language === "en" && tool.english_alternative
-                              ? tool.english_alternative
-                              : tool.alternative}
-                          </span>
-                        )}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Right column: Steps (wider) */}
-            <div className="lg:col-span-8">
-              <motion.div
-                className={`rounded-2xl overflow-hidden ${cardClasses}`}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-                }}
-              >
-                <div className="p-8 bg-white/5 border-b border-white/5">
-                  <h3 className={`text-2xl font-bold ${textColorClass}`}>
-                    {t("recommendation.steps")}
-                  </h3>
-                </div>
-                <div className="p-8 bg-black/10">
-                  <ol className="space-y-12">
-                    {cocktail?.steps?.map((step) => {
-                      const localizedStep = getLocalizedStepContent(step);
-                      return (
-                        <motion.li
-                          key={step.step_number}
-                          className="relative pl-2"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: step.step_number * 0.1 }}
-                          onMouseEnter={() => setActiveStep(step.step_number)}
-                          onMouseLeave={() => setActiveStep(null)}
-                        >
-                          <div className="flex gap-6">
-                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10">
-                              {step.step_number}
-                            </div>
-                            <div className="flex-1 pt-1">
-                              <p
-                                className={`${textColorClass} text-xl leading-relaxed`}
-                              >
-                                {localizedStep.description}
-                              </p>
-                              {localizedStep.tips && (
-                                <motion.div
-                                  className="mt-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
-                                  initial={{ opacity: 0, y: 5 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ duration: 0.3 }}
-                                >
-                                  <p className="text-amber-200/90 text-xs flex items-start gap-1.5">
-                                    <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
-                                    <span>{localizedStep.tips}</span>
-                                  </p>
-                                </motion.div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Step progress line */}
-                          {step.step_number <
-                            (cocktail?.steps?.length || 0) && (
-                            <div className="absolute left-[1.7rem] top-14 bottom-[-2rem] w-px bg-gradient-to-b from-white/20 to-white/5"></div>
-                          )}
-                        </motion.li>
-                      );
-                    })}
-                  </ol>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.div>
+        <CocktailRecipeSections
+          cocktail={cocktail}
+          isPageLoaded={isPageLoaded}
+          textColorClass={textColorClass}
+          cardClasses={cardClasses}
+          getLocalizedIngredientName={getLocalizedIngredientName}
+          getLocalizedIngredientAmount={getLocalizedIngredientAmount}
+          getLocalizedIngredientUnit={getLocalizedIngredientUnit}
+          getLocalizedToolName={getLocalizedToolName}
+          getLocalizedStepContent={getLocalizedStepContent}
+          getToolAlternative={getRecommendationToolAlternative}
+          toolAlternativeLabelKey="recommendation.alternative"
+        />
 
         {/* Action buttons with animation */}
         <motion.div
@@ -1157,27 +740,6 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           }
         }
       `}</style>
-
-      {/* Hidden Polaroid Card for Generation */}
-      <div style={{ position: "fixed", top: "-9999px", left: "-9999px" }}>
-        {cocktail && (
-          <PolaroidCard
-            ref={cardRef}
-            cocktail={cocktail}
-            imageUrl={
-              imageData ||
-              cocktail.image ||
-              `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`
-            }
-          />
-        )}
-      </div>
-
-      <ShareModal
-        isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
-        imageUrl={generatedCardUrl}
-      />
     </div>
   );
 });

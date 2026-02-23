@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo, useMemo, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -11,23 +11,17 @@ import SmartLoadingSystem, {
   useSmartLoading,
 } from "@/components/animations/SmartLoadingSystem";
 import { appLogger, safeLogger } from "@/utils/logger";
+import { withTimeout } from "@/utils/withTimeout";
 
 const Questions = memo(function Questions() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { t, locale, getPathWithLanguage } = useLanguage();
+  const { t, getPathWithLanguage } = useLanguage();
   const {
-    answers,
-    userFeedback,
     baseSpirits,
-    isLoading,
-    progressPercentage,
-    loadSavedData,
     saveAnswer,
     saveFeedback,
     toggleBaseSpirit,
     submitRequest,
-    isQuestionAnswered,
     resetAll,
   } = useCocktail();
 
@@ -171,18 +165,6 @@ const Questions = memo(function Questions() {
     { value: "brandy", label: t("spirits.brandy"), image: "/brandy.png" },
   ];
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        await loadSavedData();
-      } catch (error) {
-        appLogger.error("Data loading failed");
-      }
-    };
-
-    loadData();
-  }, [loadSavedData]);
-
   const handleAnswer = useCallback(
     async (questionId: number, option: string) => {
       safeLogger.userInteraction("select questionnaire option");
@@ -228,12 +210,7 @@ const Questions = memo(function Questions() {
 
       updateProgress(20);
 
-      // Add safety timeout to prevent hanging
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out")), 60000),
-      );
-
-      await Promise.race([submitRequest(), timeoutPromise]);
+      await withTimeout(submitRequest(), 60000, "Request timed out");
 
       updateProgress(70);
 
@@ -499,13 +476,7 @@ const Questions = memo(function Questions() {
                           : "glass-effect border-transparent hover:border-primary/20 hover:bg-white/5"
                       }`}
                       onClick={() =>
-                        toggleBaseSpirit(
-                          spirit.value,
-                          baseSpiritsOptions.map((s) => ({
-                            id: s.value,
-                            name: s.label,
-                          })),
-                        )
+                        toggleBaseSpirit(spirit.value)
                       }
                     >
                       {baseSpirits.includes(spirit.value) && (

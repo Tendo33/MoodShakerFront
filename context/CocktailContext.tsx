@@ -7,12 +7,12 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
 } from "react";
 import type { ReactNode } from "react";
 import type { Cocktail, BartenderRequest } from "@/api/cocktail";
 import {
   asyncStorage,
-  saveToStorageAsync,
   clearStorageWithPrefixAsync,
 } from "@/utils/asyncStorage";
 import { useBatchAsyncState } from "@/hooks/useAsyncState";
@@ -20,6 +20,7 @@ import { generateImagePrompt } from "@/api/image";
 import { generateSessionId } from "@/utils/generateId";
 import { cocktailLogger } from "@/utils/logger";
 import { useLanguage } from "@/context/LanguageContext";
+import { withTimeout } from "@/utils/withTimeout";
 
 // 存储键常量
 const STORAGE_KEYS = {
@@ -31,12 +32,6 @@ const STORAGE_KEYS = {
   REQUEST: "moodshaker-request",
   IMAGE_DATA: "moodshaker-image-data",
 };
-
-interface SpiritOption {
-  id: string;
-  name: string;
-  description?: string;
-}
 
 interface CocktailContextType {
   answers: Record<string, string>;
@@ -53,10 +48,7 @@ interface CocktailContextType {
   saveAnswer: (questionId: string, optionId: string) => void;
   saveFeedback: (feedback: string) => void;
   saveBaseSpirits: (spirits: string[]) => void;
-  toggleBaseSpirit: (
-    spiritId: string,
-    allSpiritsOptions: SpiritOption[],
-  ) => void;
+  toggleBaseSpirit: (spiritId: string) => void;
   submitRequest: (regenerate?: boolean) => Promise<Cocktail>;
   isQuestionAnswered: (questionId: string) => boolean;
   resetAll: () => void;
@@ -67,6 +59,9 @@ interface CocktailContextType {
 const CocktailContext = createContext<CocktailContextType | undefined>(
   undefined,
 );
+
+const MAX_PERSISTED_IMAGE_BYTES = 320 * 1024;
+const IMAGE_PERSIST_DEBOUNCE_MS = 5000;
 
 interface CocktailProviderProps {
   children: ReactNode;
@@ -113,7 +108,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   const userFeedback = savedData.feedback || "";
   const baseSpirits = savedData.baseSpirits || [];
   const recommendation = savedData.recommendation || null;
-  const imageData = savedData.imageData || null;
+  const persistedImageData = savedData.imageData || null;
 
   // 其他状态
   const [isLoading, setIsLoading] = useState(false);
@@ -121,24 +116,69 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
+  const [volatileImageData, setVolatileImageData] = useState<string | null>(null);
+  const imagePersistenceRef = useRef<{ signature: string; timestamp: number }>({
+    signature: "",
+    timestamp: 0,
+  });
+  const imageData = volatileImageData || persistedImageData;
 
   // 检查数据加载错误
   useEffect(() => {
     const errorKeys = Object.keys(dataErrors);
     if (errorKeys.length > 0) {
-      const errorMessages = errorKeys.map(
-        (key) => `${key}: ${dataErrors[key].message}`,
-      );
       cocktailLogger.error("Data loading error");
     }
   }, [dataErrors]);
 
   // 兼容原有的 loadSavedData 方法
   const loadSavedData = useCallback(() => {
-    reloadData().catch((error) => {
+    reloadData().catch(() => {
       cocktailLogger.error("Failed to reload data");
     });
   }, [reloadData]);
+
+  const estimateDataUrlBytes = useCallback((dataUrl: string): number => {
+    const base64Part = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
+    return Math.floor((base64Part.length * 3) / 4);
+  }, []);
+
+  const persistImageData = useCallback(
+    async (nextImageData: string | null, force: boolean = false) => {
+      setVolatileImageData(nextImageData);
+
+      if (!nextImageData) {
+        await updateItem("imageData", null);
+        imagePersistenceRef.current = { signature: "", timestamp: 0 };
+        return;
+      }
+
+      const signature = `${nextImageData.length}:${nextImageData.slice(0, 32)}`;
+      const now = Date.now();
+      if (
+        !force &&
+        imagePersistenceRef.current.signature === signature &&
+        now - imagePersistenceRef.current.timestamp < IMAGE_PERSIST_DEBOUNCE_MS
+      ) {
+        return;
+      }
+
+      if (nextImageData.startsWith("data:")) {
+        const bytes = estimateDataUrlBytes(nextImageData);
+        if (bytes > MAX_PERSISTED_IMAGE_BYTES) {
+          cocktailLogger.warn("Skip persisting oversized image payload", {
+            bytes,
+            limit: MAX_PERSISTED_IMAGE_BYTES,
+          });
+          return;
+        }
+      }
+
+      await updateItem("imageData", nextImageData);
+      imagePersistenceRef.current = { signature, timestamp: now };
+    },
+    [estimateDataUrlBytes, updateItem],
+  );
 
   const saveAnswer = useCallback(
     async (questionId: string, optionId: string) => {
@@ -185,7 +225,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   );
 
   const toggleBaseSpirit = useCallback(
-    async (spiritId: string, allSpiritsOptions: SpiritOption[]) => {
+    async (spiritId: string) => {
       const updatedSpirits = baseSpirits.includes(spiritId)
         ? baseSpirits.filter((id) => id !== spiritId)
         : [...baseSpirits, spiritId];
@@ -205,6 +245,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     setIsLoading(true);
     setError(null);
     setProgressPercentage(0);
+    setVolatileImageData(null);
 
     let recommendation: Cocktail | null = null;
 
@@ -259,13 +300,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       // 使用异步函数执行图片生成，不使用 await 阻塞主线程
       const generateImageTask = async () => {
         try {
-          // 添加超时机制
-          const IMAGE_GENERATION_TIMEOUT = 30000; // 30秒
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Image generation timeout")), IMAGE_GENERATION_TIMEOUT)
-          );
-
-          const imageResponse = await Promise.race([
+          const imageResponse = await withTimeout(
             fetch("/api/image", {
               method: "POST",
               headers: {
@@ -277,8 +312,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
                 cocktailName: recommendation?.name, // Pass cocktail name for saving image
               }),
             }),
-            timeoutPromise
-          ]) as Response;
+            30000,
+            "Image generation timeout",
+          );
 
           if (!imageResponse.ok) {
             const errorData = await imageResponse.json();
@@ -288,10 +324,10 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
             setImageError(errorMsg);
             cocktailLogger.warn("图片生成失败，使用默认图片", errorData.error);
             // 图片生成失败不影响整体流程，使用 null
-            await updateItem("imageData", null);
+            await persistImageData(null, true);
           } else {
             const imageData = await imageResponse.json();
-            await updateItem("imageData", imageData.data);
+            await persistImageData(imageData.data);
             setImageError(null); // 成功后清除错误
           }
         } catch (error) {
@@ -304,7 +340,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
               : "图片生成失败，使用默认图片。";
           setImageError(errorMsg);
           cocktailLogger.error("后台图片生成出错", error);
-          await updateItem("imageData", null);
+          await persistImageData(null, true);
         } finally {
           // 无论成功失败，都结束图片加载状态
           setIsImageLoadingState(false);
@@ -327,7 +363,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [answers, baseSpirits, language, userFeedback, updateItem]);
+  }, [answers, baseSpirits, language, userFeedback, updateItem, persistImageData]);
 
   const isQuestionAnswered = useCallback(
     (questionId: string) => !!answers[questionId],
@@ -341,6 +377,8 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       await reloadData();
       setError(null);
       setProgressPercentage(0);
+      setVolatileImageData(null);
+      imagePersistenceRef.current = { signature: "", timestamp: 0 };
       cocktailLogger.debug("All data reset successfully");
     } catch (error) {
       cocktailLogger.error("Failed to reset data");
@@ -365,14 +403,8 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
         (await asyncStorage.getItem(STORAGE_KEYS.SESSION_ID, "")) || "";
       const prompt = generateImagePrompt(recommendation);
 
-      // 添加超时机制
-      const IMAGE_GENERATION_TIMEOUT = 30000; // 30秒
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Image generation timeout")), IMAGE_GENERATION_TIMEOUT)
-      );
-
       // 调用服务端 API 路由生成图片
-      const imageResponse = await Promise.race([
+      const imageResponse = await withTimeout(
         fetch("/api/image", {
           method: "POST",
           headers: {
@@ -385,8 +417,9 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
             cocktailName: recommendation.name, // Pass name
           }),
         }),
-        timeoutPromise
-      ]) as Response;
+        30000,
+        "Image generation timeout",
+      );
 
       if (!imageResponse.ok) {
         const errorData = await imageResponse.json();
@@ -398,15 +431,11 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       }
 
       const imageData = await imageResponse.json();
-      await updateItem("imageData", imageData.data);
+      await persistImageData(imageData.data, true);
       setImageError(null); // 成功后清除错误
 
       return imageData.data;
     } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Failed to refresh cocktail image.";
       const errorMsg = language === "en"
         ? err instanceof Error && err.message === "Image generation timeout"
           ? "Image refresh timed out. Please try again."
@@ -420,7 +449,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     } finally {
       setIsImageLoading(false);
     }
-  }, [recommendation, updateItem, language]);
+  }, [recommendation, language, persistImageData]);
 
   // 移除原有的useEffect，因为批量异步状态管理已经处理了数据加载
 

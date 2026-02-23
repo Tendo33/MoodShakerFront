@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Cocktail } from "@/api/cocktail";
+import type { Cocktail, GalleryCocktail } from "@/api/cocktail";
 import { popularCocktails } from "@/services/cocktailService";
 
 function normalizeAlcoholLevel(level: string): string {
@@ -70,7 +70,55 @@ function mapDBCocktailToAppCocktail(dbCocktail: any): Cocktail {
 		tools: dbCocktail.tools as any,
 		steps: dbCocktail.steps as any,
 		image: dbCocktail.image,
+		thumbnail: dbCocktail.thumbnail || undefined,
 	};
+}
+
+function mapCocktailToGalleryCocktail(cocktail: Cocktail): GalleryCocktail {
+  return {
+    id: cocktail.id,
+    name: cocktail.name,
+    english_name: cocktail.english_name,
+    description: cocktail.description,
+    english_description: cocktail.english_description,
+    base_spirit: cocktail.base_spirit,
+    english_base_spirit: cocktail.english_base_spirit,
+    alcohol_level: cocktail.alcohol_level,
+    english_alcohol_level: cocktail.english_alcohol_level,
+    flavor_profiles: cocktail.flavor_profiles,
+    english_flavor_profiles: cocktail.english_flavor_profiles,
+    ingredients: cocktail.ingredients,
+    image: cocktail.image,
+    thumbnail: cocktail.thumbnail,
+  };
+}
+
+function mapDBGalleryCocktail(dbCocktail: any): GalleryCocktail {
+  const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
+  const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
+
+  return {
+    id: dbCocktail.id,
+    name: dbCocktail.name,
+    english_name: dbCocktail.englishName || dbCocktail.name,
+    description: dbCocktail.description,
+    english_description: dbCocktail.englishDescription || dbCocktail.description,
+    base_spirit: normalizedSpirit,
+    english_base_spirit: inferEnglishBaseSpirit(
+      dbCocktail.baseSpirit,
+      dbCocktail.englishBaseSpirit,
+    ),
+    alcohol_level: normalizedLevel,
+    english_alcohol_level: inferEnglishAlcoholLevel(
+      dbCocktail.alcoholLevel,
+      dbCocktail.englishAlcoholLevel,
+    ),
+    flavor_profiles: dbCocktail.flavorProfiles,
+    english_flavor_profiles: dbCocktail.englishFlavorProfiles || [],
+    ingredients: dbCocktail.ingredients as any,
+    image: dbCocktail.image,
+    thumbnail: dbCocktail.thumbnail || undefined,
+  };
 }
 
 export async function getAllCocktails(): Promise<Cocktail[]> {
@@ -91,6 +139,41 @@ export async function getAllCocktails(): Promise<Cocktail[]> {
   } catch (error) {
     console.error("Error fetching cocktails from DB:", error);
     return Object.values(popularCocktails);
+  }
+}
+
+export async function getGalleryCocktails(): Promise<GalleryCocktail[]> {
+  const isBuildTime =
+    !process.env.DATABASE_URL || process.env.DATABASE_URL.includes("placeholder");
+
+  if (isBuildTime) {
+    return Object.values(popularCocktails).map(mapCocktailToGalleryCocktail);
+  }
+
+  try {
+    const cocktails = await prisma.cocktail.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        englishName: true,
+        description: true,
+        englishDescription: true,
+        baseSpirit: true,
+        englishBaseSpirit: true,
+        alcoholLevel: true,
+        englishAlcoholLevel: true,
+        flavorProfiles: true,
+        englishFlavorProfiles: true,
+        ingredients: true,
+        image: true,
+        thumbnail: true,
+      },
+    });
+    return cocktails.map(mapDBGalleryCocktail);
+  } catch (error) {
+    console.error("Error fetching gallery cocktails from DB:", error);
+    return Object.values(popularCocktails).map(mapCocktailToGalleryCocktail);
   }
 }
 

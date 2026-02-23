@@ -10,6 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:backfill-thumbnails": "tsx prisma/backfill-thumbnails.ts",
     "db:init": "pnpm prisma:generate && pnpm prisma:migrate && pnpm prisma:seed"
   },
   "dependencies": {

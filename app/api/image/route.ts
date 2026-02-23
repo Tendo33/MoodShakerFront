@@ -3,10 +3,54 @@ import { generateImage } from "@/api/openai";
 import { imageLogger } from "@/utils/logger";
 import { prisma } from "@/lib/prisma";
 
+interface SharpTransformer {
+  rotate(): SharpTransformer;
+  resize(options: {
+    width: number;
+    withoutEnlargement: boolean;
+    fit: "inside";
+  }): SharpTransformer;
+  webp(options: { quality: number }): SharpTransformer;
+  toBuffer(): Promise<Buffer>;
+}
+
+type SharpFactory = (input: Buffer) => SharpTransformer;
+
+let sharpFactory: SharpFactory | null | undefined;
+let sharpFactoryPromise: Promise<SharpFactory | null> | null = null;
+
+async function getSharpFactory(): Promise<SharpFactory | null> {
+  if (sharpFactory !== undefined) {
+    return sharpFactory;
+  }
+
+  if (!sharpFactoryPromise) {
+    sharpFactoryPromise = (async () => {
+      try {
+        const dynamicImport = new Function(
+          "moduleName",
+          "return import(moduleName)",
+        ) as (moduleName: string) => Promise<{ default?: SharpFactory }>;
+        const loaded = await dynamicImport("sharp");
+        sharpFactory = (loaded.default || loaded) as SharpFactory;
+        return sharpFactory;
+      } catch {
+        sharpFactory = null;
+        imageLogger.warn("Sharp unavailable, using original image URLs");
+        return null;
+      }
+    })();
+  }
+
+  return sharpFactoryPromise;
+}
+
 /**
- * Convert URL image to Base64
+ * Convert remote image URL to Buffer
  */
-async function imageUrlToBase64(url: string): Promise<string> {
+async function imageUrlToBuffer(
+  url: string,
+): Promise<Buffer> {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
@@ -21,13 +65,34 @@ async function imageUrlToBase64(url: string): Promise<string> {
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const contentType = response.headers.get("content-type") || "image/png";
-    return `data:${contentType};base64,${buffer.toString("base64")}`;
+    return Buffer.from(arrayBuffer);
   } catch (error) {
-    imageLogger.error("Failed to convert image to base64", error);
+    imageLogger.error("Failed to fetch image buffer", error);
     throw error;
   }
+}
+
+function bufferToDataUrl(buffer: Buffer, mimeType: string): string {
+  return `data:${mimeType};base64,${buffer.toString("base64")}`;
+}
+
+async function createOptimizedImageData(
+  sharp: SharpFactory,
+  buffer: Buffer,
+  width: number,
+  quality: number,
+): Promise<string> {
+  const optimized = await sharp(buffer)
+    .rotate()
+    .resize({
+      width,
+      withoutEnlargement: true,
+      fit: "inside",
+    })
+    .webp({ quality })
+    .toBuffer();
+
+  return bufferToDataUrl(optimized, "image/webp");
 }
 
 /**
@@ -37,7 +102,7 @@ async function imageUrlToBase64(url: string): Promise<string> {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { prompt, sessionId, forceRefresh = false, cocktailName } = body;
+    const { prompt, cocktailName } = body;
 
     if (!prompt) {
       return NextResponse.json(
@@ -56,25 +121,43 @@ export async function POST(request: NextRequest) {
 
     imageLogger.info(`Image generation completed`);
 
-    // Convert to Base64 and save to DB if cocktailName is provided
+    // Convert to optimized Base64 images and save to DB if cocktailName is provided
     let finalImage = imageUrl;
     if (cocktailName) {
       try {
         imageLogger.info(
-          `Attempting to convert and save image for: ${cocktailName}`,
+          `Attempting to optimize and save image for: ${cocktailName}`,
         );
-        const base64Image = await imageUrlToBase64(imageUrl);
-        finalImage = base64Image; // Return Base64 to frontend to avoid expiration
+        const sharp = await getSharpFactory();
+        let optimizedImage = imageUrl;
+        let thumbnailImage = imageUrl;
+
+        if (sharp) {
+          const buffer = await imageUrlToBuffer(imageUrl);
+          optimizedImage = await createOptimizedImageData(
+            sharp,
+            buffer,
+            1024,
+            80,
+          );
+          thumbnailImage = await createOptimizedImageData(
+            sharp,
+            buffer,
+            320,
+            60,
+          );
+        }
+
+        finalImage = optimizedImage;
 
         await prisma.cocktail.updateMany({
           where: { name: cocktailName },
-          data: { image: base64Image },
+          data: { image: optimizedImage, thumbnail: thumbnailImage },
         });
         imageLogger.info(`Saved image for cocktail: ${cocktailName}`);
       } catch (dbError) {
         imageLogger.error("Failed to save image to DB", dbError);
-        // Fallback: Return original URL if Base64 conversion/save fails
-        // But note: original URL might expire or be inaccessible
+        // Fallback: return original URL if optimization/save fails
       }
     }
 

@@ -30,6 +30,7 @@ model Cocktail {
   tools                 Json
   steps                 Json
   image                 String?  @db.Text // Base64 string, using Text type for large content
+  thumbnail             String?  @db.Text
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
 
