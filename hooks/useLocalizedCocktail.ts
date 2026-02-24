@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import type { Cocktail, Ingredient, Step, Tool } from "@/api/cocktail";
+import type { Cocktail, Ingredient, Step, Tool } from "@/lib/cocktail-types";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function useLocalizedCocktail(cocktail: Cocktail | null) {

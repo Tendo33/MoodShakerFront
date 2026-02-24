@@ -5,11 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, Image as ImageIcon, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import type { Cocktail } from "@/api/cocktail";
-import { getCocktailById } from "@/services/cocktailService";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import type { Cocktail } from "@/lib/cocktail-types";
 import { CocktailImage } from "@/components/CocktailImage";
-import { cocktailLogger } from "@/utils/logger";
 import { Button } from "@/components/ui/core";
 import { useLocalizedCocktail } from "@/hooks/useLocalizedCocktail";
 import { CocktailSharePortal } from "@/components/share/CocktailSharePortal";
@@ -28,11 +25,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
 }: CocktailDetailPageProps) {
   const router = useRouter();
   const { t, getPathWithLanguage, language } = useLanguage();
-  const [cocktail, setCocktail] = useState<Cocktail | null>(
-    initialData || null,
-  );
-  const [isLoading, setIsLoading] = useState(!initialData);
-
+  const cocktail = initialData || null;
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
   // Style constants matching Recommendation Page
@@ -50,42 +43,13 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
   } = useLocalizedCocktail(cocktail);
 
   useEffect(() => {
-    if (initialData) {
-      setCocktail(initialData);
-      setIsLoading(false);
-      setTimeout(() => setIsPageLoaded(true), 100);
-      return;
-    }
-
-    const fetchCocktail = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getCocktailById(id);
-        setCocktail(data);
-        setTimeout(() => setIsPageLoaded(true), 100);
-      } catch (error) {
-        cocktailLogger.error("Error fetching cocktail", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCocktail();
-  }, [id, initialData]);
+    const timer = setTimeout(() => setIsPageLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleBack = () => {
     router.push(getPathWithLanguage("/"));
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <LoadingSpinner variant="modern" text={t("recommendation.loading")} />
-        </motion.div>
-      </div>
-    );
-  }
 
   if (!cocktail) {
     return (

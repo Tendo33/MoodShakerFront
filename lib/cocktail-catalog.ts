@@ -1,4 +1,4 @@
-import type { Cocktail } from "@/api/cocktail";
+import type { Cocktail } from "@/lib/cocktail-types";
 
 // Sample popular cocktail data
 export const popularCocktails: Record<string, Cocktail> = {
@@ -318,14 +318,4 @@ export const popularCocktails: Record<string, Cocktail> = {
 			},
 		],
 	},
-};
-
-// Get cocktail by ID
-export const getCocktailById = async (id: string): Promise<Cocktail | null> => {
-  return popularCocktails[id] || null;
-};
-
-// Get popular cocktail IDs
-export const getPopularCocktailIds = (): string[] => {
-  return Object.keys(popularCocktails);
 };

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import type { Cocktail } from "@/api/cocktail";
+import type { Cocktail } from "@/lib/cocktail-types";
 import { CocktailSpecs } from "@/components/pages/shared/CocktailSpecs";
 
 interface CocktailHeroProps {

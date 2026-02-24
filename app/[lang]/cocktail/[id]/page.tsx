@@ -4,8 +4,7 @@ import { Suspense } from "react";
 import CocktailDetailPage from "@/components/pages/CocktailDetailPage";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { getCocktailFromDB } from "@/lib/cocktail-data";
-import { getPopularCocktailIds } from "@/services/cocktailService";
+import { getCocktailById, getPopularCocktailIds } from "@/lib/cocktail-data";
 
 interface CocktailPageProps {
   params: {
@@ -19,7 +18,7 @@ export async function generateMetadata({
 }: CocktailPageProps): Promise<Metadata> {
   const { id } = await params;
   try {
-    const cocktail = await getCocktailFromDB(id);
+    const cocktail = await getCocktailById(id);
     return {
       title: `${cocktail?.name || "Cocktail"} | MoodShaker`,
       description:
@@ -64,7 +63,7 @@ export default async function CocktailPage({ params }: CocktailPageProps) {
   }
 
   // Fetch cocktail from DB (or fallback to popular)
-  const cocktail = await getCocktailFromDB(id);
+  const cocktail = await getCocktailById(id);
 
   if (!cocktail) {
     notFound();

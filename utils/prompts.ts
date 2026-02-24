@@ -1,4 +1,4 @@
-import { AgentType } from "@/api/cocktail";
+import { AgentType } from "@/lib/cocktail-types";
 
 /**
  * 创建系统提示词

@@ -10,7 +10,7 @@ import {
   useRef,
 } from "react";
 import type { ReactNode } from "react";
-import type { Cocktail, BartenderRequest } from "@/api/cocktail";
+import type { Cocktail, BartenderRequest } from "@/lib/cocktail-types";
 import {
   asyncStorage,
   clearStorageWithPrefixAsync,

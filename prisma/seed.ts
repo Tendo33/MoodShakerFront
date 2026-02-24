@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { popularCocktails } from "../services/cocktailService";
+import { popularCocktails } from "../lib/cocktail-catalog";
 
 const prisma = new PrismaClient();
 

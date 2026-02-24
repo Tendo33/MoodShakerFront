@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { toPng } from "html-to-image";
-import type { Cocktail } from "@/api/cocktail";
+import type { Cocktail } from "@/lib/cocktail-types";
 import { PolaroidCard } from "@/components/share/PolaroidCard";
 import { ShareModal } from "@/components/share/ShareModal";
 

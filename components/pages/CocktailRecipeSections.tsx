@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
-import type { Cocktail, Ingredient, Step, Tool } from "@/api/cocktail";
+import type { Cocktail, Ingredient, Step, Tool } from "@/lib/cocktail-types";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface CocktailRecipeSectionsProps {

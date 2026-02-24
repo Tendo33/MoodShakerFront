@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Clock, Droplet, GlassWater } from "lucide-react";
-import type { Cocktail } from "@/api/cocktail";
+import type { Cocktail } from "@/lib/cocktail-types";
 
 interface CocktailSpecsProps {
   t: (key: string) => string;

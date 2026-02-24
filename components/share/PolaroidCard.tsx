@@ -1,4 +1,4 @@
-import { Cocktail } from "@/api/cocktail";
+import type { Cocktail } from "@/lib/cocktail-types";
 import { forwardRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import {

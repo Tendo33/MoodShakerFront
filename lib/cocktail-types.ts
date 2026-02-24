@@ -1,6 +1,3 @@
-import { cocktailLogger } from "@/utils/logger";
-
-// Simplified enums
 export enum AlcoholLevel {
   ANY = "any",
   NONE = "none",
@@ -21,7 +18,6 @@ export enum AgentType {
   CREATIVE_BARTENDER = "creative_bartender",
 }
 
-// Interface definitions
 export interface Ingredient {
   name: string;
   english_name?: string;
@@ -95,32 +91,4 @@ export interface BartenderRequest {
   baseSpirits: string[];
   sessionId: string;
   specialRequests?: string;
-}
-
-/**
- * Get cocktail by ID from local storage
- * This function is used to retrieve saved cocktail recommendations
- */
-export async function getCocktailById(id: string): Promise<Cocktail | null> {
-  try {
-    // Try to get from local storage first
-    if (typeof window !== "undefined") {
-      const savedRecommendation = localStorage.getItem(
-        "moodshaker-recommendation",
-      );
-      if (savedRecommendation) {
-        const cocktail = JSON.parse(savedRecommendation);
-        if (cocktail && cocktail.id === id) {
-          return cocktail;
-        }
-      }
-    }
-
-    // If not found in storage, return null
-    // In a real app, this would make an API call to fetch by ID
-    return null;
-  } catch (error) {
-    cocktailLogger.error("Error getting cocktail by ID", error);
-    return null;
-  }
 }

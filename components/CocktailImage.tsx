@@ -3,7 +3,6 @@
 import { useState, useEffect, memo } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { getCocktailImage } from "@/api/image";
 import { cocktailImages } from "@/utils/cocktail-images";
 import { imageLogger } from "@/utils/logger";
 
@@ -43,15 +42,6 @@ const CocktailImage = memo(function CocktailImage({
             cocktailImages[cocktailId as keyof typeof cocktailImages],
           );
           return;
-        }
-
-        // If no static image, try to get the image from the session
-        if (cocktailId) {
-          const sessionImage = await getCocktailImage(cocktailId);
-          if (sessionImage) {
-            setImageSrc(sessionImage);
-            return;
-          }
         }
 
         // Fallback to placeholder

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import type { Cocktail, GalleryCocktail } from "@/api/cocktail";
-import { popularCocktails } from "@/services/cocktailService";
+import type { Cocktail, GalleryCocktail } from "@/lib/cocktail-types";
+import { popularCocktails } from "@/lib/cocktail-catalog";
 
 export interface GalleryQueryFilters {
   search?: string;
@@ -441,7 +441,7 @@ export async function getGalleryCocktails(
   }
 }
 
-export async function getCocktailFromDB(id: string): Promise<Cocktail | null> {
+export async function getCocktailById(id: string): Promise<Cocktail | null> {
   // Check if we're in build time (no DATABASE_URL means we're building)
   const isBuildTime = !process.env.DATABASE_URL || 
     process.env.DATABASE_URL.includes('placeholder');
@@ -475,4 +475,8 @@ export async function getCocktailFromDB(id: string): Promise<Cocktail | null> {
     }
     return null;
   }
+}
+
+export function getPopularCocktailIds(): string[] {
+  return Object.keys(popularCocktails);
 }

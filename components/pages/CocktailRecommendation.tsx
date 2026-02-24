@@ -11,8 +11,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCocktail } from "@/context/CocktailContext";
-import { getCocktailById } from "@/api/cocktail";
-import type { Cocktail, Tool } from "@/api/cocktail";
+import type { Cocktail, Tool } from "@/lib/cocktail-types";
 import { CocktailImage } from "@/components/CocktailImage";
 import { cocktailLogger, imageLogger } from "@/utils/logger";
 import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem";
@@ -21,6 +20,19 @@ import { CocktailSharePortal } from "@/components/share/CocktailSharePortal";
 import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSections";
 import { CocktailHero } from "@/components/pages/shared/CocktailHero";
 import { CocktailActions } from "@/components/pages/shared/CocktailActions";
+
+async function fetchCocktailById(id: string): Promise<Cocktail | null> {
+  const response = await fetch(`/api/cocktail/${encodeURIComponent(id)}`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const payload = (await response.json()) as { data?: Cocktail | null };
+  return payload.data || null;
+}
 
 const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const router = useRouter();
@@ -58,23 +70,22 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   } = useLocalizedCocktail(cocktail);
 
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
     const fetchCocktail = async () => {
       setIsLoading(true);
       try {
         if (cocktailId) {
-          const data = await getCocktailById(cocktailId);
+          const data = await fetchCocktailById(cocktailId);
           setCocktail(data);
         } else if (contextCocktail) {
           setCocktail(contextCocktail);
         } else {
           loadSavedData();
-          if (contextCocktail) {
-            setCocktail(contextCocktail);
-          }
         }
 
         // Add a small delay before showing animations
-        setTimeout(() => setIsPageLoaded(true), 100);
+        timer = setTimeout(() => setIsPageLoaded(true), 100);
       } catch (error) {
         cocktailLogger.error("Error fetching cocktail", error);
       } finally {
@@ -82,7 +93,13 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
       }
     };
 
-    fetchCocktail();
+    void fetchCocktail();
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
   }, [cocktailId, contextCocktail, loadSavedData]);
 
   const handleBack = () => {
