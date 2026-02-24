@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import type { GalleryCocktail } from "@/api/cocktail";
 import { useLanguage } from "@/context/LanguageContext";
@@ -11,6 +12,12 @@ import { Search, X, Filter, GlassWater, Sparkles, Activity } from "lucide-react"
 interface GalleryContentProps {
   cocktails: GalleryCocktail[];
   lang: string;
+  initialFilters: {
+    search?: string;
+    spirit?: string;
+    flavor?: string;
+    alcohol?: string;
+  };
 }
 
 // --- Constants for Filtering ---
@@ -40,86 +47,88 @@ const ALCOHOL_LEVELS = ["Low", "Medium", "High"];
 export default function GalleryContent({
   cocktails,
   lang,
+  initialFilters,
 }: GalleryContentProps) {
   const { t } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSpirit, setSelectedSpirit] = useState<string | null>(null);
-  const [selectedFlavor, setSelectedFlavor] = useState<string | null>(null);
-  const [selectedAlcohol, setSelectedAlcohol] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
+  const [searchQuery, setSearchQuery] = useState(initialFilters.search || "");
+  const [selectedSpirit, setSelectedSpirit] = useState<string | null>(
+    initialFilters.spirit || null,
+  );
+  const [selectedFlavor, setSelectedFlavor] = useState<string | null>(
+    initialFilters.flavor || null,
+  );
+  const [selectedAlcohol, setSelectedAlcohol] = useState<string | null>(
+    initialFilters.alcohol || null,
+  );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+  useEffect(() => {
+    setSearchQuery(initialFilters.search || "");
+    setSelectedSpirit(initialFilters.spirit || null);
+    setSelectedFlavor(initialFilters.flavor || null);
+    setSelectedAlcohol(initialFilters.alcohol || null);
+  }, [
+    initialFilters.search,
+    initialFilters.spirit,
+    initialFilters.flavor,
+    initialFilters.alcohol,
+  ]);
 
-  const searchableCocktails = useMemo(
-    () =>
-      cocktails.map((cocktail) => {
-        const searchText = [
-          cocktail.name,
-          cocktail.english_name,
-          cocktail.description,
-          cocktail.english_description,
-          cocktail.base_spirit,
-          cocktail.english_base_spirit,
-          ...(cocktail.flavor_profiles || []),
-          ...(cocktail.english_flavor_profiles || []),
-          ...(cocktail.ingredients || []).flatMap((ingredient) => [
-            ingredient.name,
-            ingredient.english_name,
-          ]),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+  const updateServerFilters = useCallback(
+    (next: {
+      search: string;
+      spirit: string | null;
+      flavor: string | null;
+      alcohol: string | null;
+    }) => {
+      const params = new URLSearchParams();
+      const normalizedSearch = next.search.trim();
 
-        return {
-          cocktail,
-          searchText,
-        };
-      }),
-    [cocktails],
+      if (normalizedSearch) {
+        params.set("q", normalizedSearch);
+      }
+      if (next.spirit) {
+        params.set("spirit", next.spirit);
+      }
+      if (next.flavor) {
+        params.set("flavor", next.flavor);
+      }
+      if (next.alcohol) {
+        params.set("alcohol", next.alcohol);
+      }
+
+      if (typeof window !== "undefined") {
+        const currentQuery = window.location.search.replace(/^\?/, "");
+        if (currentQuery === params.toString()) {
+          return;
+        }
+      }
+
+      const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+      startTransition(() => {
+        router.replace(nextUrl, { scroll: false });
+      });
+    },
+    [pathname, router],
   );
 
-  // Filter Logic
-  const filteredCocktails = useMemo(() => {
-    return searchableCocktails
-      .filter(({ cocktail: c, searchText }) => {
-        const matchesSearch = normalizedSearchQuery
-          ? searchText.includes(normalizedSearchQuery)
-          : true;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateServerFilters({
+        search: searchQuery,
+        spirit: selectedSpirit,
+        flavor: selectedFlavor,
+        alcohol: selectedAlcohol,
+      });
+    }, 250);
 
-        const matchesSpirit = selectedSpirit
-          ? c.english_base_spirit
-              ?.toLowerCase()
-              .includes(selectedSpirit.toLowerCase()) ||
-            c.base_spirit?.includes(selectedSpirit)
-          : true;
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedSpirit, selectedFlavor, selectedAlcohol, updateServerFilters]);
 
-        const matchesFlavor = selectedFlavor
-          ? (c.english_flavor_profiles || []).some((f) =>
-              f.toLowerCase().includes(selectedFlavor.toLowerCase()),
-            ) || (c.flavor_profiles || []).some((f) => f.includes(selectedFlavor))
-          : true;
-
-        const matchesAlcohol = selectedAlcohol
-          ? (c.english_alcohol_level &&
-              c.english_alcohol_level.toLowerCase() ===
-                selectedAlcohol.toLowerCase()) ||
-            (c.alcohol_level && c.alcohol_level === selectedAlcohol) ||
-            (selectedAlcohol === "Low" && c.alcohol_level?.includes("低")) ||
-            (selectedAlcohol === "Medium" && c.alcohol_level?.includes("中")) ||
-            (selectedAlcohol === "High" && c.alcohol_level?.includes("高"))
-          : true;
-
-        return matchesSearch && matchesSpirit && matchesFlavor && matchesAlcohol;
-      })
-      .map(({ cocktail }) => cocktail);
-  }, [
-    searchableCocktails,
-    normalizedSearchQuery,
-    selectedSpirit,
-    selectedFlavor,
-    selectedAlcohol,
-  ]);
+  const filteredCocktails = useMemo(() => cocktails, [cocktails]);
 
   // Animation Variants
   const containerVariants = {
@@ -302,6 +311,9 @@ export default function GalleryContent({
                 </div>
               </div>
             </div>
+            {isPending && (
+              <p className="px-3 pt-2 text-xs text-gray-500">{t("common.loading")}</p>
+            )}
           </div>
         </motion.div>
 

@@ -205,13 +205,6 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     [language],
   );
 
-  // Update document title when language changes
-  useEffect(() => {
-    if (!isLoading) {
-      document.title = t("app.title") || "MoodShaker";
-    }
-  }, [language, isLoading, t]);
-
   const contextValue = useMemo(
     () => ({
       language,

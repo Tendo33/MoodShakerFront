@@ -1,6 +1,145 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import type { Cocktail, GalleryCocktail } from "@/api/cocktail";
 import { popularCocktails } from "@/services/cocktailService";
+
+export interface GalleryQueryFilters {
+  search?: string;
+  spirit?: string;
+  flavor?: string;
+  alcohol?: string;
+}
+
+const SPIRIT_FILTER_KEYWORDS: Record<string, string[]> = {
+  gin: ["gin", "金酒"],
+  vodka: ["vodka", "伏特加"],
+  rum: ["rum", "朗姆"],
+  tequila: ["tequila", "龙舌兰"],
+  whiskey: ["whiskey", "whisky", "威士忌"],
+  brandy: ["brandy", "白兰地"],
+  other: ["other", "其他"],
+};
+
+const FLAVOR_FILTER_KEYWORDS: Record<string, string[]> = {
+  sweet: ["sweet", "甜"],
+  sour: ["sour", "酸"],
+  bitter: ["bitter", "苦"],
+  fruity: ["fruity", "果"],
+  herbal: ["herbal", "草本"],
+  smoky: ["smoky", "烟"],
+  spicy: ["spicy", "辛"],
+  salty: ["salty", "咸"],
+  creamy: ["creamy", "奶"],
+};
+
+const ALCOHOL_FILTER_KEYWORDS: Record<string, string[]> = {
+  low: ["low", "低"],
+  medium: ["medium", "中"],
+  high: ["high", "高"],
+};
+
+function normalizeFilterValue(value?: string): string | null {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeSearchValue(value?: string): string | null {
+  if (!value) return null;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function getFilterKeywords(
+  value: string | null,
+  mapping: Record<string, string[]>,
+): string[] {
+  if (!value) return [];
+  if (mapping[value]) return mapping[value];
+  return [value];
+}
+
+function capitalizeKeyword(value: string): string {
+  if (!value) return value;
+  return `${value[0].toUpperCase()}${value.slice(1)}`;
+}
+
+function getQueryValues(filters?: GalleryQueryFilters) {
+  const searchValue = normalizeSearchValue(filters?.search);
+  const spiritValue = normalizeFilterValue(filters?.spirit);
+  const flavorValue = normalizeFilterValue(filters?.flavor);
+  const alcoholValue = normalizeFilterValue(filters?.alcohol);
+
+  return {
+    searchValue,
+    spiritKeywords: getFilterKeywords(spiritValue, SPIRIT_FILTER_KEYWORDS),
+    flavorKeywords: getFilterKeywords(flavorValue, FLAVOR_FILTER_KEYWORDS),
+    alcoholKeywords: getFilterKeywords(alcoholValue, ALCOHOL_FILTER_KEYWORDS),
+  };
+}
+
+function filterGalleryCocktailsInMemory(
+  cocktails: GalleryCocktail[],
+  filters?: GalleryQueryFilters,
+): GalleryCocktail[] {
+  const { searchValue, spiritKeywords, flavorKeywords, alcoholKeywords } =
+    getQueryValues(filters);
+
+  return cocktails.filter((cocktail) => {
+    if (searchValue) {
+      const searchText = [
+        cocktail.name,
+        cocktail.english_name,
+        cocktail.description,
+        cocktail.english_description,
+        cocktail.base_spirit,
+        cocktail.english_base_spirit,
+        ...(cocktail.flavor_profiles || []),
+        ...(cocktail.english_flavor_profiles || []),
+        ...(cocktail.ingredients || []).flatMap((ingredient) => [
+          ingredient.name,
+          ingredient.english_name,
+        ]),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      if (!searchText.includes(searchValue.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (spiritKeywords.length > 0) {
+      const spiritText = `${cocktail.base_spirit || ""} ${cocktail.english_base_spirit || ""}`.toLowerCase();
+      if (!spiritKeywords.some((keyword) => spiritText.includes(keyword.toLowerCase()))) {
+        return false;
+      }
+    }
+
+    if (alcoholKeywords.length > 0) {
+      const alcoholText = `${cocktail.alcohol_level || ""} ${cocktail.english_alcohol_level || ""}`.toLowerCase();
+      if (!alcoholKeywords.some((keyword) => alcoholText.includes(keyword.toLowerCase()))) {
+        return false;
+      }
+    }
+
+    if (flavorKeywords.length > 0) {
+      const flavorText = [
+        ...(cocktail.flavor_profiles || []),
+        ...(cocktail.english_flavor_profiles || []),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      if (!flavorKeywords.some((keyword) => flavorText.includes(keyword.toLowerCase()))) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
 
 function normalizeAlcoholLevel(level: string): string {
 	if (!level) return "中度";
@@ -142,16 +281,138 @@ export async function getAllCocktails(): Promise<Cocktail[]> {
   }
 }
 
-export async function getGalleryCocktails(): Promise<GalleryCocktail[]> {
+export async function getGalleryCocktails(
+  filters?: GalleryQueryFilters,
+): Promise<GalleryCocktail[]> {
+  const { searchValue, spiritKeywords, flavorKeywords, alcoholKeywords } =
+    getQueryValues(filters);
   const isBuildTime =
     !process.env.DATABASE_URL || process.env.DATABASE_URL.includes("placeholder");
 
   if (isBuildTime) {
-    return Object.values(popularCocktails).map(mapCocktailToGalleryCocktail);
+    return filterGalleryCocktailsInMemory(
+      Object.values(popularCocktails).map(mapCocktailToGalleryCocktail),
+      filters,
+    );
   }
 
   try {
+    const andFilters: Prisma.CocktailWhereInput[] = [];
+
+    if (searchValue) {
+      andFilters.push({
+        OR: [
+          { name: { contains: searchValue, mode: Prisma.QueryMode.insensitive } },
+          {
+            englishName: {
+              contains: searchValue,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+          {
+            description: {
+              contains: searchValue,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+          {
+            englishDescription: {
+              contains: searchValue,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+          {
+            baseSpirit: {
+              contains: searchValue,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+          {
+            englishBaseSpirit: {
+              contains: searchValue,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+        ],
+      });
+    }
+
+    if (spiritKeywords.length > 0) {
+      andFilters.push({
+        OR: spiritKeywords.flatMap((keyword) => [
+          {
+            baseSpirit: {
+              contains: keyword,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+          {
+            englishBaseSpirit: {
+              contains: keyword,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+        ]),
+      });
+    }
+
+    if (alcoholKeywords.length > 0) {
+      andFilters.push({
+        OR: alcoholKeywords.flatMap((keyword) => [
+          {
+            alcoholLevel: {
+              contains: keyword,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+          {
+            englishAlcoholLevel: {
+              contains: keyword,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+        ]),
+      });
+    }
+
+    if (flavorKeywords.length > 0) {
+      const flavorCandidates = Array.from(
+        new Set(
+          flavorKeywords.flatMap((keyword) => [
+            keyword,
+            keyword.toLowerCase(),
+            capitalizeKeyword(keyword),
+          ]),
+        ),
+      );
+      const flavorTextFilters: Prisma.CocktailWhereInput[] = flavorKeywords.flatMap(
+        (keyword) => [
+          {
+            description: {
+              contains: keyword,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+          {
+            englishDescription: {
+              contains: keyword,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+        ],
+      );
+
+      andFilters.push({
+        OR: [
+          { flavorProfiles: { hasSome: flavorCandidates } },
+          { englishFlavorProfiles: { hasSome: flavorCandidates } },
+          ...flavorTextFilters,
+        ],
+      });
+    }
+
     const cocktails = await prisma.cocktail.findMany({
+      where: andFilters.length > 0 ? { AND: andFilters } : undefined,
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -173,7 +434,10 @@ export async function getGalleryCocktails(): Promise<GalleryCocktail[]> {
     return cocktails.map(mapDBGalleryCocktail);
   } catch (error) {
     console.error("Error fetching gallery cocktails from DB:", error);
-    return Object.values(popularCocktails).map(mapCocktailToGalleryCocktail);
+    return filterGalleryCocktailsInMemory(
+      Object.values(popularCocktails).map(mapCocktailToGalleryCocktail),
+      filters,
+    );
   }
 }
 

@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function NotFound() {
+  const { getPathWithLanguage } = useLanguage();
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center p-8 max-w-md">
@@ -13,7 +18,7 @@ export default function NotFound() {
           been removed or doesn't exist.
         </p>
         <Link
-          href="/"
+          href={getPathWithLanguage("/")}
           className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:opacity-90 transition-all shadow-lg"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />

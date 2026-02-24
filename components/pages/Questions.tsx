@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, memo, useMemo, useCallback } from "react";
+import { useState, useEffect, memo, useMemo, useCallback, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCocktail } from "@/context/CocktailContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { Container, Button, GradientText } from "@/components/ui/core";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { motion, AnimatePresence } from "framer-motion";
 import SmartLoadingSystem, {
   useSmartLoading,
@@ -15,7 +17,7 @@ import { withTimeout } from "@/utils/withTimeout";
 
 const Questions = memo(function Questions() {
   const router = useRouter();
-  const { t, getPathWithLanguage } = useLanguage();
+  const { t, getPathWithLanguage, language } = useLanguage();
   const {
     baseSpirits,
     saveAnswer,
@@ -24,12 +26,22 @@ const Questions = memo(function Questions() {
     submitRequest,
     resetAll,
   } = useCocktail();
+  const { toast } = useToast();
 
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [showBaseSpirits, setShowBaseSpirits] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [answerError, setAnswerError] = useState<{
+    questionId: number;
+    option: string;
+    message: string;
+  } | null>(null);
+  const [submitError, setSubmitError] = useState<{
+    message: string;
+    context: string;
+  } | null>(null);
 
   // Loading message rotation
   const [loadingMessage, setLoadingMessage] = useState("");
@@ -165,36 +177,78 @@ const Questions = memo(function Questions() {
     { value: "brandy", label: t("spirits.brandy"), image: "/brandy.png" },
   ];
 
+  const advanceQuestionStep = useCallback(
+    (questionId: number) => {
+      if (questionId < questions.length) {
+        setCurrentQuestion(questionId + 1);
+      } else {
+        setShowBaseSpirits(true);
+      }
+    },
+    [questions.length],
+  );
+
+  const handleCardKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLButtonElement>, action: () => void) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        action();
+      }
+    },
+    [],
+  );
+
   const handleAnswer = useCallback(
     async (questionId: number, option: string) => {
+      if (selectedOption) {
+        return;
+      }
+
       safeLogger.userInteraction("select questionnaire option");
       setSelectedOption(option);
+      setAnswerError(null);
 
       // Add delay for micro-interaction
       await new Promise((resolve) => setTimeout(resolve, 400));
 
       try {
         await saveAnswer(questionId.toString(), option);
-        if (questionId < questions.length) {
-          setCurrentQuestion(questionId + 1);
-        } else {
-          setShowBaseSpirits(true);
-        }
+        advanceQuestionStep(questionId);
         setSelectedOption(null); // Reset selection
       } catch (error) {
-        appLogger.error("Answer progress save failed");
-        if (questionId < questions.length) {
-          setCurrentQuestion(questionId + 1);
-        } else {
-          setShowBaseSpirits(true);
-        }
+        const errorMessage =
+          error instanceof Error && error.message ? error.message : t("error.saveAnswers");
+        appLogger.error("Answer progress save failed", errorMessage);
+
+        setAnswerError({
+          questionId,
+          option,
+          message: errorMessage,
+        });
         setSelectedOption(null);
+
+        toast({
+          variant: "destructive",
+          title: t("common.error"),
+          description: `${errorMessage} (${t("questions.step")} ${questionId}/${questions.length})`,
+          action: (
+            <ToastAction
+              altText={t("common.tryAgain")}
+              onClick={() => {
+                void handleAnswer(questionId, option);
+              }}
+            >
+              {t("common.tryAgain")}
+            </ToastAction>
+          ),
+        });
       }
     },
-    [saveAnswer, questions.length],
+    [advanceQuestionStep, saveAnswer, selectedOption, t, toast, questions.length],
   );
 
   const handleBaseSpiritsDone = () => {
+    setAnswerError(null);
     setShowBaseSpirits(false);
     setShowFeedbackForm(true);
   };
@@ -202,6 +256,7 @@ const Questions = memo(function Questions() {
   const handleFeedbackSubmit = async () => {
     safeLogger.userInteraction("submit questionnaire");
     startGeneration();
+    setSubmitError(null);
 
     try {
       if (feedback.trim()) {
@@ -220,14 +275,31 @@ const Questions = memo(function Questions() {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : t("error.generationFailed");
+      const trimmedFeedback = feedback.trim();
+      const contextText =
+        language === "en"
+          ? `Context: final submit, spirits=${baseSpirits.length}, feedback=${trimmedFeedback ? `"${trimmedFeedback.slice(0, 60)}"` : "empty"}`
+          : `上下文：最终提交，基酒数=${baseSpirits.length}，反馈=${trimmedFeedback ? `“${trimmedFeedback.slice(0, 60)}”` : "空"}`;
 
       appLogger.error("Questionnaire submission failed", errorMessage);
       completeGeneration();
+      setSubmitError({ message: errorMessage, context: contextText });
 
-      // 显示用户友好的错误提示
-      if (typeof window !== "undefined") {
-        alert(`⚠️ ${errorMessage}`);
-      }
+      toast({
+        variant: "destructive",
+        title: t("error.submitFailed"),
+        description: `${errorMessage} ${contextText}`,
+        action: (
+          <ToastAction
+            altText={t("common.tryAgain")}
+            onClick={() => {
+              void handleFeedbackSubmit();
+            }}
+          >
+            {t("common.tryAgain")}
+          </ToastAction>
+        ),
+      });
     }
   };
 
@@ -237,6 +309,8 @@ const Questions = memo(function Questions() {
     setShowFeedbackForm(false);
     setShowBaseSpirits(false);
     setFeedback("");
+    setAnswerError(null);
+    setSubmitError(null);
     completeGeneration();
   };
 
@@ -245,6 +319,7 @@ const Questions = memo(function Questions() {
     if (showFeedbackForm) {
       setShowFeedbackForm(false);
       setShowBaseSpirits(true);
+      setSubmitError(null);
     } else if (showBaseSpirits) {
       setShowBaseSpirits(false);
       setCurrentQuestion(questions.length);
@@ -342,6 +417,24 @@ const Questions = memo(function Questions() {
                     {questions[currentQuestion - 1]?.title}
                   </GradientText>
                 </h2>
+                {answerError && answerError.questionId === currentQuestion && (
+                  <div className="max-w-2xl mx-auto mt-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-left">
+                    <p className="text-sm text-foreground">
+                      {answerError.message}
+                    </p>
+                    <div className="mt-2">
+                      <button
+                        type="button"
+                        className="inline-flex items-center rounded-lg border border-destructive/40 bg-destructive/20 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-destructive/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/70"
+                        onClick={() => {
+                          void handleAnswer(answerError.questionId, answerError.option);
+                        }}
+                      >
+                        {t("common.tryAgain")}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div
@@ -364,8 +457,9 @@ const Questions = memo(function Questions() {
                       whileTap={{ scale: 0.98 }}
                       className="h-full"
                     >
-                      <div
-                        className={`cursor-pointer h-full min-h-[180px] group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 ${
+                      <button
+                        type="button"
+                        className={`w-full text-left h-full min-h-[180px] group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 ${
                           selectedOption === option.value
                             ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.2)] scale-[1.01]"
                             : "border-transparent"
@@ -373,6 +467,13 @@ const Questions = memo(function Questions() {
                         onClick={() =>
                           handleAnswer(currentQuestion, option.value)
                         }
+                        onKeyDown={(event) =>
+                          handleCardKeyDown(event, () => {
+                            void handleAnswer(currentQuestion, option.value);
+                          })
+                        }
+                        aria-pressed={selectedOption === option.value}
+                        disabled={selectedOption !== null}
                       >
                         {selectedOption === option.value && (
                           <motion.div
@@ -411,7 +512,7 @@ const Questions = memo(function Questions() {
                             )}
                           </div>
                         </div>
-                      </div>
+                      </button>
                     </motion.div>
                   ),
                 )}
@@ -469,8 +570,9 @@ const Questions = memo(function Questions() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <div
-                      className={`cursor-pointer transition-all duration-300 relative overflow-hidden rounded-xl p-3 text-center h-full group border ${
+                    <button
+                      type="button"
+                      className={`w-full transition-all duration-300 relative overflow-hidden rounded-xl p-3 text-center h-full group border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 ${
                         baseSpirits.includes(spirit.value)
                           ? "glass-effect border-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.2)] bg-primary/5"
                           : "glass-effect border-transparent hover:border-primary/20 hover:bg-white/5"
@@ -478,6 +580,12 @@ const Questions = memo(function Questions() {
                       onClick={() =>
                         toggleBaseSpirit(spirit.value)
                       }
+                      onKeyDown={(event) =>
+                        handleCardKeyDown(event, () => {
+                          void toggleBaseSpirit(spirit.value);
+                        })
+                      }
+                      aria-pressed={baseSpirits.includes(spirit.value)}
                     >
                       {baseSpirits.includes(spirit.value) && (
                         <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center shadow-md z-20">
@@ -515,7 +623,7 @@ const Questions = memo(function Questions() {
                       >
                         {spirit.label}
                       </h3>
-                    </div>
+                    </button>
                   </motion.div>
                 ))}
               </div>
@@ -580,6 +688,23 @@ const Questions = memo(function Questions() {
                   />
                 </div>
               </div>
+              {submitError && (
+                <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3">
+                  <p className="text-sm font-medium text-foreground">
+                    {submitError.message}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{submitError.context}</p>
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex items-center rounded-lg border border-destructive/40 bg-destructive/20 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-destructive/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/70"
+                    onClick={() => {
+                      void handleFeedbackSubmit();
+                    }}
+                  >
+                    {t("common.tryAgain")}
+                  </button>
+                </div>
+              )}
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
                 {/* 主 CTA: 获取推荐 - 更大更突出 */}

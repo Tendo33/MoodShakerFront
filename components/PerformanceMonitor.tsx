@@ -7,7 +7,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { asyncStorage } from "@/utils/asyncStorage";
-import { appLogger, safeLogger } from "@/utils/logger";
+import { appLogger } from "@/utils/logger";
 import { cacheMetrics } from "@/utils/cache-utils";
 
 interface PerformanceMetrics {
@@ -20,9 +20,6 @@ interface PerformanceMetrics {
   largestContentfulPaint?: number;
   cumulativeLayoutShift?: number;
   firstInputDelay?: number;
-  apiCallCount: number;
-  averageApiTime: number;
-  componentRenderCount: number;
 }
 
 export default function PerformanceMonitor() {
@@ -31,9 +28,6 @@ export default function PerformanceMonitor() {
     storageOperations: 0,
     cacheHitRate: 0,
     renderTime: 0,
-    apiCallCount: 0,
-    averageApiTime: 0,
-    componentRenderCount: 0,
   });
   const [isVisible, setIsVisible] = useState(false);
   const [optimizationSuggestions, setOptimizationSuggestions] = useState<
@@ -59,9 +53,6 @@ export default function PerformanceMonitor() {
     // 获取Web Vitals指标
     const vitals = getWebVitals();
 
-    // 获取API调用数据
-    const apiData = performanceUtils.getApiCallData();
-
     const newMetrics = {
       pageLoadTime,
       storageOperations: storageStats.queueLength,
@@ -72,9 +63,6 @@ export default function PerformanceMonitor() {
       largestContentfulPaint: vitals.lcp,
       cumulativeLayoutShift: vitals.cls,
       firstInputDelay: vitals.fid,
-      apiCallCount: apiData.count,
-      averageApiTime: apiData.average,
-      componentRenderCount: performanceUtils.getRenderCount(),
     };
 
     setMetrics(newMetrics);
@@ -174,33 +162,6 @@ export default function PerformanceMonitor() {
               </span>
             </div>
 
-            {/* API指标 */}
-            <div className="flex justify-between">
-              <span>API调用次数:</span>
-              <span
-                className={
-                  metrics.apiCallCount < 5
-                    ? "text-green-400"
-                    : "text-yellow-400"
-                }
-              >
-                {metrics.apiCallCount}
-              </span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>平均API时间:</span>
-              <span
-                className={
-                  metrics.averageApiTime < 500
-                    ? "text-green-400"
-                    : "text-orange-400"
-                }
-              >
-                {metrics.averageApiTime.toFixed(0)}ms
-              </span>
-            </div>
-
             {/* 内存指标 */}
             {metrics.memoryUsage && (
               <div className="flex justify-between">
@@ -248,18 +209,6 @@ export default function PerformanceMonitor() {
               </div>
             )}
 
-            <div className="flex justify-between">
-              <span>组件渲染次数:</span>
-              <span
-                className={
-                  metrics.componentRenderCount < 10
-                    ? "text-green-400"
-                    : "text-yellow-400"
-                }
-              >
-                {metrics.componentRenderCount}
-              </span>
-            </div>
           </div>
 
           {/* 优化建议 */}
@@ -336,51 +285,5 @@ function generateOptimizationSuggestions(metrics: PerformanceMetrics) {
     suggestions.push("⚠️ 缓存命中率较低，建议优化缓存策略");
   }
 
-  // API调用
-  if (metrics.apiCallCount > 10) {
-    suggestions.push("⚠️ API调用次数过多，建议实现请求去重");
-  }
-
-  if (metrics.averageApiTime > 1000) {
-    suggestions.push("⚠️ API响应时间过长，建议优化API性能");
-  }
-
   return suggestions;
 }
-
-// 创建全局状态来跟踪性能数据
-let globalApiCallTimes: number[] = [];
-let globalRenderCount = 0;
-
-// 性能监控工具函数 (internal use only)
-const performanceUtils = {
-  // 记录API调用时间
-  recordApiCall: (duration: number) => {
-    globalApiCallTimes.push(duration);
-  },
-
-  // 记录组件渲染
-  recordComponentRender: () => {
-    globalRenderCount += 1;
-  },
-
-  // 获取当前API调用数据
-  getApiCallData: () => ({
-    times: [...globalApiCallTimes],
-    count: globalApiCallTimes.length,
-    average:
-      globalApiCallTimes.length > 0
-        ? globalApiCallTimes.reduce((a, b) => a + b, 0) /
-          globalApiCallTimes.length
-        : 0,
-  }),
-
-  // 获取渲染计数
-  getRenderCount: () => globalRenderCount,
-
-  // 重置计数器
-  resetCounters: () => {
-    globalApiCallTimes = [];
-    globalRenderCount = 0;
-  },
-};

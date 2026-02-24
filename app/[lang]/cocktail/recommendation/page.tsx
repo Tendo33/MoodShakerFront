@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-
+import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -16,6 +16,22 @@ const CocktailRecommendation = dynamic(
     ),
   },
 );
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { lang: string };
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const isEnglish = lang === "en";
+
+  return {
+    title: isEnglish ? "Your Recommendation | MoodShaker" : "你的专属推荐 | MoodShaker",
+    description: isEnglish
+      ? "Your personalized cocktail recommendation is ready."
+      : "你的个性化鸡尾酒推荐已生成。",
+  };
+}
 
 export default async function RecommendationPage({
   params,
