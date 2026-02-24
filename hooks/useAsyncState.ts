@@ -44,7 +44,6 @@ export function useAsyncState<T>(
     storageKey,
     defaultValue,
     immediate = true,
-    cacheDuration = 5 * 60 * 1000, // 5分钟
     onSuccess,
     onError,
   } = options;
@@ -115,7 +114,7 @@ export function useAsyncState<T>(
         loadingRef.current = false;
       }
     }
-  }, [storageKey]); // 移除defaultValue, onSuccess, onError避免循环依赖
+  }, [storageKey, defaultValue, onSuccess, onError]);
 
   /**
    * 更新数据函数
@@ -175,11 +174,11 @@ export function useAsyncState<T>(
  * @param configs 配置数组
  * @returns 批量状态结果
  */
-export function useBatchAsyncState<T extends Record<string, any>>(
+export function useBatchAsyncState<T extends Record<string, unknown>>(
   configs: Array<{
     key: keyof T;
     storageKey: string;
-    defaultValue?: any;
+    defaultValue?: unknown;
   }>,
 ): {
   data: Partial<T>;
@@ -318,4 +317,3 @@ export function useBatchAsyncState<T extends Record<string, any>>(
     updateItem,
   };
 }
-

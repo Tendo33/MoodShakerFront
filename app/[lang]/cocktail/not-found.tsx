@@ -14,8 +14,8 @@ export default function NotFound() {
           Cocktail Not Found
         </h1>
         <p className="text-muted-foreground mb-8">
-          Sorry, we couldn't find the cocktail you're looking for. It might have
-          been removed or doesn't exist.
+          Sorry, we couldn&apos;t find the cocktail you&apos;re looking for. It might
+          have been removed or doesn&apos;t exist.
         </p>
         <Link
           href={getPathWithLanguage("/")}

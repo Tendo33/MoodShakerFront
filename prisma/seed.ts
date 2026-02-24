@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { popularCocktails } from "../lib/cocktail-catalog";
 
 const prisma = new PrismaClient();
@@ -35,9 +35,9 @@ async function main() {
           englishTimeRequired: cocktail.english_time_required,
           flavorProfiles: cocktail.flavor_profiles,
           englishFlavorProfiles: cocktail.english_flavor_profiles || [],
-          ingredients: cocktail.ingredients as any,
-          tools: cocktail.tools as any,
-          steps: cocktail.steps as any,
+          ingredients: cocktail.ingredients as Prisma.InputJsonValue,
+          tools: cocktail.tools as Prisma.InputJsonValue,
+          steps: cocktail.steps as Prisma.InputJsonValue,
           image: imagePath,
         },
         create: {
@@ -58,9 +58,9 @@ async function main() {
           englishTimeRequired: cocktail.english_time_required,
           flavorProfiles: cocktail.flavor_profiles,
           englishFlavorProfiles: cocktail.english_flavor_profiles || [],
-          ingredients: cocktail.ingredients as any,
-          tools: cocktail.tools as any,
-          steps: cocktail.steps as any,
+          ingredients: cocktail.ingredients as Prisma.InputJsonValue,
+          tools: cocktail.tools as Prisma.InputJsonValue,
+          steps: cocktail.steps as Prisma.InputJsonValue,
           image: imagePath,
         },
       });

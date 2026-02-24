@@ -45,7 +45,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const pathname = usePathname();
   const [language, setLanguageState] = useState<Language>(defaultLanguage);
   const [isLoading, setIsLoading] = useState(true);
-  const [isClient, setIsClient] = useState(false);
+  const isClient = typeof window !== "undefined";
 
   // Helper function to extract language from pathname
   const extractLanguageFromPathname = useCallback(
@@ -76,10 +76,6 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     },
     [language, getPathWithoutLanguage],
   );
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // Initialize language from URL or localStorage
   useEffect(() => {

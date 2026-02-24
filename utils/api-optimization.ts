@@ -181,8 +181,17 @@ if (typeof window !== "undefined") {
 }
 
 // 导出工具函数
-export function createCacheKey(prefix: string, ...args: any[]): string {
+export function createCacheKey(prefix: string, ...args: unknown[]): string {
   return `${prefix}:${args
-    .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+    .map((arg) => {
+      if (typeof arg === "object" && arg !== null) {
+        try {
+          return JSON.stringify(arg);
+        } catch {
+          return "[unserializable-object]";
+        }
+      }
+      return String(arg);
+    })
     .join(":")}`;
 }

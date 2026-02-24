@@ -22,6 +22,12 @@ interface PerformanceMetrics {
   firstInputDelay?: number;
 }
 
+interface PerformanceWithMemory extends Performance {
+  memory?: {
+    usedJSHeapSize: number;
+  };
+}
+
 export default function PerformanceMonitor() {
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
     pageLoadTime: 0,
@@ -33,7 +39,11 @@ export default function PerformanceMonitor() {
   const [optimizationSuggestions, setOptimizationSuggestions] = useState<
     string[]
   >([]);
-  const startTime = useRef(performance.now());
+  const startTime = useRef(0);
+
+  useEffect(() => {
+    startTime.current = performance.now();
+  }, []);
 
   // 将measurePerformance函数移到useCallback中，在组件顶层定义
   const measurePerformance = useCallback(() => {
@@ -45,8 +55,8 @@ export default function PerformanceMonitor() {
 
     // 获取内存使用情况（如果支持）
     let memoryUsage;
-    if ("memory" in performance) {
-      const perfMemory = (performance as any).memory;
+    const perfMemory = (performance as PerformanceWithMemory).memory;
+    if (perfMemory) {
       memoryUsage = perfMemory.usedJSHeapSize / 1024 / 1024; // MB
     }
 

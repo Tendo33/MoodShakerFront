@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+
 import type { Cocktail } from "@/lib/cocktail-types";
 import { forwardRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -104,7 +106,6 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
         <div className="relative z-10 flex flex-col h-full">
           {/* 1. Hero Image */}
           <div className="w-full aspect-[1/1] rounded-2xl overflow-hidden shadow-2xl mb-8 relative bg-white/5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             {imageUrl ? (
               <img
                 src={imageUrl}

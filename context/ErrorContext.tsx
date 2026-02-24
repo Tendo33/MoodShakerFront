@@ -105,9 +105,10 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   );
 
   useEffect(() => {
+    const timeoutMap = timeoutMapRef.current;
     return () => {
-      timeoutMapRef.current.forEach((timeout) => clearTimeout(timeout));
-      timeoutMapRef.current.clear();
+      timeoutMap.forEach((timeout) => clearTimeout(timeout));
+      timeoutMap.clear();
     };
   }, []);
 

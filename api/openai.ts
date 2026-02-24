@@ -227,10 +227,10 @@ export async function generateImage(
 		try {
 			const responseText = await response.text();
 			data = JSON.parse(responseText);
-		} catch (e) {
-			openaiLogger.error(`Failed to parse response JSON [${requestId}]`);
-			throw new Error("Failed to parse response as JSON");
-		}
+			} catch {
+				openaiLogger.error(`Failed to parse response JSON [${requestId}]`);
+				throw new Error("Failed to parse response as JSON");
+			}
 
 		openaiLogger.info(`Image generation successful [${requestId}] (${duration}ms)`);
 

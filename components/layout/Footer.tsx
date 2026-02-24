@@ -6,9 +6,6 @@ import {
   Facebook,
   Instagram,
   Twitter,
-  Mail,
-  Phone,
-  MapPin,
   Github,
   Heart,
   Martini as Cocktail,
@@ -18,7 +15,7 @@ import { Container, Divider } from "@/components/ui/core";
 import { gradientStyles } from "@/utils/style-constants";
 
 export default function Footer() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   const socialLinks = [
     { icon: <Facebook size={18} />, href: "#", label: "Facebook" },

@@ -1,20 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useError } from "@/context/ErrorContext";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function ErrorAlert() {
   const { errors, clearError } = useError();
   const { t } = useLanguage();
-  const [isVisible, setIsVisible] = useState(false);
 
   // Get the first error message (if any)
   const message = errors.length > 0 ? errors[0].message : null;
-
-  useEffect(() => {
-    setIsVisible(!!message);
-  }, [message]);
+  const isVisible = Boolean(message);
 
   if (!message) return null;
 

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import React, { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import type { TargetAndTransition, Variants } from "framer-motion";
 import {
   ArrowRight,
   History,
@@ -29,19 +30,32 @@ import { useAsyncState } from "@/hooks/useAsyncState";
 import { cocktailImages } from "@/utils/cocktail-images";
 
 // Robust Image component that handles errors without direct DOM manipulation
-const SafeImage = React.memo(({ src, fallbackSrc, alt, ...props }: any) => {
-  const [imgSrc, setImgSrc] = useState(src || fallbackSrc);
+type SafeImageProps = Omit<React.ComponentProps<typeof Image>, "src" | "alt"> & {
+  src?: string;
+  fallbackSrc: string;
+  alt: string;
+};
 
-  useEffect(() => {
-    setImgSrc(src || fallbackSrc);
-  }, [src, fallbackSrc]);
+const SafeImage = React.memo(function SafeImage({
+  src,
+  fallbackSrc,
+  alt,
+  onError,
+  ...props
+}: SafeImageProps) {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const preferredSrc = src ?? fallbackSrc;
+  const imgSrc = failedSrc === preferredSrc ? fallbackSrc : preferredSrc;
 
   return (
     <Image
       {...props}
       src={imgSrc}
       alt={alt}
-      onError={() => setImgSrc(fallbackSrc)}
+      onError={(event) => {
+        setFailedSrc(preferredSrc);
+        onError?.(event);
+      }}
     />
   );
 });
@@ -59,7 +73,7 @@ const Home = React.memo(function Home() {
   const [ctaRef, ctaInView] = useInViewAnimation();
 
   // 使用异步状态检查保存的会话 - 性能优化核心
-  const { data: savedAnswers, isLoading: isCheckingSession } = useAsyncState({
+  const { data: savedAnswers } = useAsyncState({
     storageKey: "moodshaker-answers",
     defaultValue: {},
     immediate: true, // 立即加载但不阻塞渲染
@@ -179,6 +193,18 @@ const Home = React.memo(function Home() {
   const newQuestionPath = getPathWithLanguage("/questions?new=true");
   const galleryPath = getPathWithLanguage("/gallery");
   const recommendationPath = getPathWithLanguage("/cocktail/recommendation");
+  const floatAnimationTarget = floatAnimation as TargetAndTransition;
+  const delayedFloatAnimation = (delay: number): TargetAndTransition => ({
+    ...floatAnimation,
+    transition: { ...floatAnimation.transition, delay },
+  });
+  const pulseGlowAnimation: TargetAndTransition = {
+    ...pulseAnimation,
+    scale: [1, 1.1, 1],
+    opacity: [0.6, 0.8, 0.6],
+  };
+  const staggerContainerVariants = animations.staggerContainer as Variants;
+  const slideUpVariants = animations.slideUp as Variants;
 
   return (
     <div className="bg-background text-foreground">
@@ -186,25 +212,15 @@ const Home = React.memo(function Home() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
             className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
-            animate={floatAnimation as any}
+            animate={floatAnimationTarget}
           />
           <motion.div
             className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
-            animate={
-              {
-                ...floatAnimation,
-                transition: { ...floatAnimation.transition, delay: 1 },
-              } as any
-            }
+            animate={delayedFloatAnimation(1)}
           />
           <motion.div
             className="absolute top-2/3 right-1/3 w-64 h-64 bg-accent/10 rounded-full blur-3xl"
-            animate={
-              {
-                ...floatAnimation,
-                transition: { ...floatAnimation.transition, delay: 2 },
-              } as any
-            }
+            animate={delayedFloatAnimation(2)}
           />
         </div>
 
@@ -213,10 +229,10 @@ const Home = React.memo(function Home() {
             <motion.div
               initial="hidden"
               animate={shouldAnimate ? "visible" : "hidden"}
-              variants={animations.staggerContainer as any}
+              variants={staggerContainerVariants}
               className="content-spacing"
             >
-              <motion.div variants={animations.slideUp as any} className="mb-6">
+              <motion.div variants={slideUpVariants} className="mb-6">
                 <div className="inline-flex items-center bg-primary/20 text-primary border border-primary/30 px-3 py-1.5 text-sm rounded-full font-medium glass-effect">
                   <Sparkles className="h-3.5 w-3.5 mr-2 fill-primary" />
                   {language === "en"
@@ -227,7 +243,7 @@ const Home = React.memo(function Home() {
 
               <motion.h1
                 className="font-playfair font-bold text-shadow mb-6"
-                variants={animations.slideUp as any}
+                variants={slideUpVariants}
               >
                 <GradientText as="span" className="block leading-tight">
                   {t("home.title")}
@@ -236,7 +252,7 @@ const Home = React.memo(function Home() {
 
               <motion.p
                 className="text-lg md:text-xl text-foreground/80 font-source-sans leading-relaxed max-w-xl mb-8"
-                variants={animations.slideUp as any}
+                variants={slideUpVariants}
               >
                 {t("home.subtitle")}
               </motion.p>
@@ -244,7 +260,7 @@ const Home = React.memo(function Home() {
               {hasRecommendation ? (
                 <motion.div
                   className="glass-effect card-spacing rounded-2xl border border-border/50 glow-effect max-w-lg"
-                  variants={animations.slideUp as any}
+                  variants={slideUpVariants}
                 >
                   <div className="flex items-center mb-4">
                     <motion.div
@@ -301,7 +317,7 @@ const Home = React.memo(function Home() {
               ) : hasSavedSession ? (
                 <motion.div
                   className="glass-effect card-spacing rounded-2xl border border-border/50 glow-effect max-w-lg"
-                  variants={animations.slideUp as any}
+                  variants={slideUpVariants}
                 >
                   <div className="flex items-center mb-4">
                     <motion.div
@@ -355,7 +371,7 @@ const Home = React.memo(function Home() {
                 </motion.div>
               ) : (
                 <motion.div
-                  variants={animations.slideUp as any}
+                  variants={slideUpVariants}
                   className="flex flex-col sm:flex-row sm:flex-wrap gap-4"
                 >
                   <Button
@@ -410,13 +426,7 @@ const Home = React.memo(function Home() {
                         >
                           <motion.div
                             className="absolute -inset-8 bg-gradient-to-r from-primary/40 to-secondary/40 rounded-full blur-3xl opacity-60"
-                            animate={
-                              {
-                                ...pulseAnimation,
-                                scale: [1, 1.1, 1],
-                                opacity: [0.6, 0.8, 0.6],
-                              } as any
-                            }
+                            animate={pulseGlowAnimation}
                             transition={{
                               duration: 3,
                               repeat: Number.POSITIVE_INFINITY,

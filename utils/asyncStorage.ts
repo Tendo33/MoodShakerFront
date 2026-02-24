@@ -12,15 +12,9 @@ interface StorageOperation {
   id: string;
   type: "get" | "set" | "remove" | "clear";
   key?: string;
-  value?: any;
-  resolve: (value: any) => void;
+  value?: unknown;
+  resolve: (value: unknown) => void;
   reject: (error: Error) => void;
-}
-
-// 批量操作队列
-interface BatchOperation {
-  operations: StorageOperation[];
-  timeout: NodeJS.Timeout;
 }
 
 // 缓存项结构
@@ -37,7 +31,7 @@ interface CacheItem<T> {
 export class AsyncStorageManager {
   private operationQueue: StorageOperation[] = [];
   private batchTimeout: NodeJS.Timeout | null = null;
-  private cache = new Map<string, CacheItem<any>>();
+  private cache = new Map<string, CacheItem<unknown>>();
   private readonly BATCH_DELAY = 4; // 减少到4ms，更快的响应
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5分钟缓存
   private isProcessing = false;
@@ -86,7 +80,7 @@ export class AsyncStorageManager {
       });
 
       appLogger.info("AsyncStorageManager cache initialization completed");
-    } catch (error) {
+    } catch {
       appLogger.error("Cache initialization failed");
     }
   }
@@ -179,10 +173,10 @@ export class AsyncStorageManager {
     operations: Array<{
       type: "get" | "set" | "remove";
       key: string;
-      value?: any;
-      defaultValue?: any;
+      value?: unknown;
+      defaultValue?: unknown;
     }>,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const promises = operations.map((op) => {
       switch (op.type) {
         case "get":
@@ -318,7 +312,7 @@ export class AsyncStorageManager {
           }, 0);
         });
       }
-    } catch (error) {
+    } catch {
       appLogger.error("Batch operation processing failed");
       // 执行失败时通知所有待处理的操作
       operations.forEach((op) => {
@@ -360,7 +354,11 @@ export class AsyncStorageManager {
         }
       } catch (error) {
         appLogger.error("localStorage operation failed");
-        operation.reject(error as Error);
+        operation.reject(
+          error instanceof Error
+            ? error
+            : new Error("Unknown localStorage operation error"),
+        );
       }
     });
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, memo, useCallback, useRef } from "react";
+import { useEffect, useState, memo, useCallback, useRef, useMemo } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import WaitingAnimation from "./WaitingAnimation";
 
@@ -36,13 +36,11 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
 }: SmartLoadingSystemProps) {
   const { t } = useLanguage();
   const [simulatedProgress, setSimulatedProgress] = useState(0);
-  const [loadingConfig, setLoadingConfig] = useState<LoadingConfig>();
-
   // Use ref to persist start time across re-renders (prevent reset on message change)
   const startTimeRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  useEffect(() => {
+  const loadingConfig = useMemo(() => {
     const configs: Record<string, LoadingConfig> = {
       "cocktail-mixing": {
         variant: "cocktail",
@@ -81,14 +79,13 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
       },
     };
 
-    setLoadingConfig(configs[type] || configs["cocktail-mixing"]);
-  }, [type]); // Removed 'message' dependency to avoid unnecessary config re-sets
+    return configs[type] || configs["cocktail-mixing"];
+  }, [type]);
 
   // Initialize start time when showing
   useEffect(() => {
     if (isShowing && startTimeRef.current === null) {
       startTimeRef.current = Date.now();
-      setSimulatedProgress(0);
     } else if (!isShowing) {
       startTimeRef.current = null;
       if (animationFrameRef.current) {
@@ -99,41 +96,44 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
   }, [isShowing]);
 
   const updateProgress = useCallback(() => {
-    if (!startTimeRef.current || !isShowing) return;
+    const tick = () => {
+      if (!startTimeRef.current || !isShowing) return;
 
-    const elapsed = Date.now() - startTimeRef.current;
+      const elapsed = Date.now() - startTimeRef.current;
 
-    // Calculate purely simulated progress (0-95%)
-    const estimatedProgress = Math.min((elapsed / estimatedDuration) * 100, 95);
+      // Calculate purely simulated progress (0-95%)
+      const estimatedProgress = Math.min((elapsed / estimatedDuration) * 100, 95);
 
-    // Merge with actual progress if provided
-    // Logic: actual progress is the floor. If actual > estimated, jump to actual.
-    // If estimated > actual, continue simulating but don't exceed 98% until actual hits 100%.
+      // Merge with actual progress if provided
+      // Logic: actual progress is the floor. If actual > estimated, jump to actual.
+      // If estimated > actual, continue simulating but don't exceed 98% until actual hits 100%.
+      let combinedProgress = estimatedProgress;
 
-    let combinedProgress = estimatedProgress;
-
-    if (actualProgress > 0) {
-      if (actualProgress >= 100) {
-        combinedProgress = 100;
-      } else {
-        // Allow simulation to run ahead, but smoothly blend
-        combinedProgress = Math.max(estimatedProgress, actualProgress);
-        // Cap at 98% if actual is not done
-        combinedProgress = Math.min(combinedProgress, 98);
+      if (actualProgress > 0) {
+        if (actualProgress >= 100) {
+          combinedProgress = 100;
+        } else {
+          // Allow simulation to run ahead, but smoothly blend
+          combinedProgress = Math.max(estimatedProgress, actualProgress);
+          // Cap at 98% if actual is not done
+          combinedProgress = Math.min(combinedProgress, 98);
+        }
       }
-    }
 
-    setSimulatedProgress(combinedProgress);
+      setSimulatedProgress(combinedProgress);
 
-    if (combinedProgress < 100) {
-      animationFrameRef.current = requestAnimationFrame(updateProgress);
-    } else {
-      // Ensure we hit exactly 100 and call complete
-      setSimulatedProgress(100);
-      setTimeout(() => {
-        onComplete?.();
-      }, 800); // Wait a bit at 100% before firing complete
-    }
+      if (combinedProgress < 100) {
+        animationFrameRef.current = requestAnimationFrame(tick);
+      } else {
+        // Ensure we hit exactly 100 and call complete
+        setSimulatedProgress(100);
+        setTimeout(() => {
+          onComplete?.();
+        }, 800); // Wait a bit at 100% before firing complete
+      }
+    };
+
+    tick();
   }, [actualProgress, estimatedDuration, onComplete, isShowing]);
 
   // Start animation loop

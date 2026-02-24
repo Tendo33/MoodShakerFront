@@ -44,7 +44,9 @@ const Questions = memo(function Questions() {
   } | null>(null);
 
   // Loading message rotation
-  const [loadingMessage, setLoadingMessage] = useState("");
+  const [loadingMessage, setLoadingMessage] = useState(() =>
+    t("loading.rotating.1"),
+  );
 
   const {
     isLoading: isGenerating,
@@ -65,8 +67,6 @@ const Questions = memo(function Questions() {
       t("loading.rotating.4"),
       t("loading.rotating.5"),
     ];
-
-    setLoadingMessage(messages[0]); // Start with first message
 
     let msgIndex = 0;
     const interval = setInterval(() => {
@@ -235,7 +235,8 @@ const Questions = memo(function Questions() {
             <ToastAction
               altText={t("common.tryAgain")}
               onClick={() => {
-                void handleAnswer(questionId, option);
+                setAnswerError(null);
+                setSelectedOption(null);
               }}
             >
               {t("common.tryAgain")}

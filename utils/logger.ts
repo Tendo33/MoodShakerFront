@@ -20,22 +20,22 @@ export function createLogger(moduleName: string, options: LoggerOptions = {}) {
   const { timestamp = true, maxDataLength = 500 } = options;
 
   return {
-    info: (message: string, data?: any) =>
+    info: (message: string, data?: unknown) =>
       logDetail("INFO", message, data, moduleName, {
         timestamp,
         maxDataLength,
       }),
-    error: (message: string, data?: any) =>
+    error: (message: string, data?: unknown) =>
       logDetail("ERROR", message, data, moduleName, {
         timestamp,
         maxDataLength,
       }),
-    debug: (message: string, data?: any) =>
+    debug: (message: string, data?: unknown) =>
       logDetail("DEBUG", message, data, moduleName, {
         timestamp,
         maxDataLength,
       }),
-    warn: (message: string, data?: any) =>
+    warn: (message: string, data?: unknown) =>
       logDetail("WARN", message, data, moduleName, {
         timestamp,
         maxDataLength,
@@ -54,7 +54,7 @@ export function createLogger(moduleName: string, options: LoggerOptions = {}) {
 function logDetail(
   type: LogLevel,
   message: string,
-  data?: any,
+  data?: unknown,
   moduleName = "App",
   options: { timestamp?: boolean; maxDataLength?: number } = {},
 ): void {
@@ -67,15 +67,19 @@ function logDetail(
 
   let logMessage = `${prefix} ${message}`;
 
-  if (data) {
+  if (data !== undefined) {
     try {
-      if (typeof data === "object") {
+      if (typeof data === "object" && data !== null) {
         const stringified = JSON.stringify(data);
-        logMessage += `\n${stringified.length > maxDataLength ? stringified.substring(0, maxDataLength) + "..." : stringified}`;
+        if (stringified) {
+          logMessage += `\n${stringified.length > maxDataLength ? stringified.substring(0, maxDataLength) + "..." : stringified}`;
+        } else {
+          logMessage += "\n[Unserializable object]";
+        }
       } else {
         logMessage += `\n${data}`;
       }
-    } catch (e) {
+    } catch {
       logMessage += `\n[Object cannot be stringified]`;
     }
   }

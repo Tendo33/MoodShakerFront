@@ -106,9 +106,15 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
   ]);
 
   // 解构批量加载的数据
-  const answers = savedData.answers || {};
+  const answers = useMemo(
+    () => savedData.answers ?? {},
+    [savedData.answers],
+  );
   const userFeedback = savedData.feedback || "";
-  const baseSpirits = savedData.baseSpirits || [];
+  const baseSpirits = useMemo(
+    () => savedData.baseSpirits ?? [],
+    [savedData.baseSpirits],
+  );
   const recommendation = savedData.recommendation || null;
   const persistedImageData = savedData.imageData || null;
 
@@ -192,7 +198,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       try {
         await updateItem("answers", newAnswers);
         cocktailLogger.debug("User answer saved successfully");
-      } catch (error) {
+      } catch {
         cocktailLogger.error("Failed to save answer");
         const errorMessage = t("error.saveAnswers");
         setError(errorMessage);
@@ -207,7 +213,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       try {
         await updateItem("feedback", feedback);
         cocktailLogger.debug("User feedback saved successfully");
-      } catch (error) {
+      } catch {
         cocktailLogger.error("Failed to save feedback");
         const errorMessage = t("error.saveFeedback");
         setError(errorMessage);
@@ -222,7 +228,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       try {
         await updateItem("baseSpirits", spirits);
         cocktailLogger.debug("Base spirits saved successfully");
-      } catch (error) {
+      } catch {
         cocktailLogger.error("Failed to save base spirits");
         setError(t("error.saveBaseSpirits"));
       }
@@ -239,7 +245,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       try {
         await updateItem("baseSpirits", updatedSpirits);
         cocktailLogger.debug("Base spirit toggled successfully");
-      } catch (error) {
+      } catch {
         cocktailLogger.error("Failed to toggle base spirit");
         setError(t("error.toggleBaseSpirit"));
       }
@@ -451,7 +457,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
       setVolatileImageData(null);
       imagePersistenceRef.current = { signature: "", timestamp: 0 };
       cocktailLogger.debug("All data reset successfully");
-    } catch (error) {
+    } catch {
       cocktailLogger.error("Failed to reset data");
       setError(t("error.resetData"));
     }
@@ -520,7 +526,7 @@ export const CocktailProvider = ({ children }: CocktailProviderProps) => {
     } finally {
       setIsImageLoading(false);
     }
-  }, [recommendation, language, persistImageData]);
+  }, [recommendation, language, persistImageData, setIsImageLoading]);
 
   // 移除原有的useEffect，因为批量异步状态管理已经处理了数据加载
 

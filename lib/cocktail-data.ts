@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, type Cocktail as DBCocktail } from "@prisma/client";
 import type { Cocktail, GalleryCocktail } from "@/lib/cocktail-types";
 import { popularCocktails } from "@/lib/cocktail-catalog";
 
@@ -183,7 +183,7 @@ function inferEnglishAlcoholLevel(level: string, englishLevel: string | null | u
 	return "Medium";
 }
 
-function mapDBCocktailToAppCocktail(dbCocktail: any): Cocktail {
+function mapDBCocktailToAppCocktail(dbCocktail: DBCocktail): Cocktail {
 	const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
 	const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
 
@@ -205,9 +205,9 @@ function mapDBCocktailToAppCocktail(dbCocktail: any): Cocktail {
 		english_time_required: dbCocktail.englishTimeRequired,
 		flavor_profiles: dbCocktail.flavorProfiles,
 		english_flavor_profiles: dbCocktail.englishFlavorProfiles || [],
-		ingredients: dbCocktail.ingredients as any,
-		tools: dbCocktail.tools as any,
-		steps: dbCocktail.steps as any,
+			ingredients: dbCocktail.ingredients as Cocktail["ingredients"],
+			tools: dbCocktail.tools as Cocktail["tools"],
+			steps: dbCocktail.steps as Cocktail["steps"],
 		image: dbCocktail.image,
 		thumbnail: dbCocktail.thumbnail || undefined,
 	};
@@ -232,7 +232,7 @@ function mapCocktailToGalleryCocktail(cocktail: Cocktail): GalleryCocktail {
   };
 }
 
-function mapDBGalleryCocktail(dbCocktail: any): GalleryCocktail {
+function mapDBGalleryCocktail(dbCocktail: DBCocktail): GalleryCocktail {
   const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
   const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
 
@@ -254,7 +254,7 @@ function mapDBGalleryCocktail(dbCocktail: any): GalleryCocktail {
     ),
     flavor_profiles: dbCocktail.flavorProfiles,
     english_flavor_profiles: dbCocktail.englishFlavorProfiles || [],
-    ingredients: dbCocktail.ingredients as any,
+    ingredients: dbCocktail.ingredients as GalleryCocktail["ingredients"],
     image: dbCocktail.image,
     thumbnail: dbCocktail.thumbnail || undefined,
   };

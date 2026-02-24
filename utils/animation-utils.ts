@@ -129,7 +129,8 @@ export function useInViewAnimation(
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!ref.current) return;
+    const target = ref.current;
+    if (!target) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -138,12 +139,10 @@ export function useInViewAnimation(
       { threshold },
     );
 
-    observer.observe(ref.current);
+    observer.observe(target);
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
+      observer.unobserve(target);
     };
   }, [threshold]);
 

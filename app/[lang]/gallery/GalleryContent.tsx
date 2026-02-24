@@ -66,10 +66,14 @@ export default function GalleryContent({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
-    setSearchQuery(initialFilters.search || "");
-    setSelectedSpirit(initialFilters.spirit || null);
-    setSelectedFlavor(initialFilters.flavor || null);
-    setSelectedAlcohol(initialFilters.alcohol || null);
+    const timer = setTimeout(() => {
+      setSearchQuery(initialFilters.search || "");
+      setSelectedSpirit(initialFilters.spirit || null);
+      setSelectedFlavor(initialFilters.flavor || null);
+      setSelectedAlcohol(initialFilters.alcohol || null);
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [
     initialFilters.search,
     initialFilters.spirit,
@@ -146,7 +150,7 @@ export default function GalleryContent({
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" as any },
+      transition: { duration: 0.6, ease: "easeOut" },
     },
   };
 

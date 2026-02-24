@@ -245,6 +245,8 @@ export const GradientText = forwardRef<HTMLSpanElement, GradientTextProps>(
     },
     ref,
   ) => {
+    void from;
+    void to;
     return (
       <Component
         ref={ref}
