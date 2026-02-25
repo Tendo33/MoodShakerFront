@@ -3,7 +3,8 @@
 import { useState, useEffect, memo, useMemo, useCallback, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useCocktail } from "@/context/CocktailContext";
+import { useCocktailForm } from "@/context/CocktailFormContext";
+import { useCocktailResult } from "@/context/CocktailResultContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { Container, Button, GradientText } from "@/components/ui/core";
 import { useToast } from "@/hooks/use-toast";
@@ -23,9 +24,9 @@ const Questions = memo(function Questions() {
     saveAnswer,
     saveFeedback,
     toggleBaseSpirit,
-    submitRequest,
-    resetAll,
-  } = useCocktail();
+    resetForm,
+  } = useCocktailForm();
+  const { submitRequest, resetResult } = useCocktailResult();
   const { toast } = useToast();
 
   const [currentQuestion, setCurrentQuestion] = useState(1);
@@ -305,7 +306,8 @@ const Questions = memo(function Questions() {
   };
 
   const handleReset = () => {
-    resetAll();
+    resetForm();
+    resetResult();
     setCurrentQuestion(1);
     setShowFeedbackForm(false);
     setShowBaseSpirits(false);

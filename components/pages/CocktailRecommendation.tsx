@@ -10,7 +10,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { useCocktail } from "@/context/CocktailContext";
+import { useCocktailResult } from "@/context/CocktailResultContext";
 import type { Cocktail, Tool } from "@/lib/cocktail-types";
 import { CocktailImage } from "@/components/CocktailImage";
 import { cocktailLogger, imageLogger } from "@/utils/logger";
@@ -48,7 +48,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     loadSavedData,
     refreshImage,
     submitRequest,
-  } = useCocktail();
+  } = useCocktailResult();
 
   const [cocktail, setCocktail] = useState<Cocktail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
