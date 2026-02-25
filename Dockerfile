@@ -1,5 +1,5 @@
 # 构建阶段
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -33,7 +33,7 @@ RUN ls -la node_modules/.prisma/ || echo "Warning: .prisma directory not found"
 RUN pnpm build
 
 # 生产阶段
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
@@ -52,7 +52,6 @@ COPY --from=builder /app/next.config.mjs ./
 
 # 复制 Prisma schema 和种子数据脚本
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/services ./services
 COPY --from=builder /app/api ./api
 
 # 复制启动脚本

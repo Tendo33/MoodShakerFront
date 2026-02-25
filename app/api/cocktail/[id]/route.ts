@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getCocktailById } from "@/lib/cocktail-data";
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { id: string } },
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json(

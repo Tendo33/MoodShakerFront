@@ -238,7 +238,8 @@ export function useBatchAsyncState<T extends Record<string, unknown>>(
       // 构建结果对象
       const newData: Partial<T> = {};
       currentConfigs.forEach((config, index) => {
-        newData[config.key] = results[index];
+        const value = results[index] as T[typeof config.key] | undefined;
+        newData[config.key] = value;
       });
 
       setData(newData);

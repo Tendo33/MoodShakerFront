@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import type { Variants } from "framer-motion";
 import type { GalleryCocktail } from "@/lib/cocktail-types";
 import { useLanguage } from "@/context/LanguageContext";
 import { Search, X, Filter, GlassWater, Sparkles, Activity } from "lucide-react";
@@ -135,7 +136,7 @@ export default function GalleryContent({
   const filteredCocktails = useMemo(() => cocktails, [cocktails]);
 
   // Animation Variants
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -145,7 +146,7 @@ export default function GalleryContent({
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
