@@ -52,7 +52,6 @@ COPY --from=builder /app/next.config.mjs ./
 
 # 复制 Prisma schema 和种子数据脚本
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/services ./services
 COPY --from=builder /app/api ./api
 
 # 复制启动脚本
