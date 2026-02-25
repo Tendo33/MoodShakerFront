@@ -109,7 +109,9 @@ export class AsyncStorageManager {
           if (value !== null) {
             this.updateCache(key, value);
           }
-          resolve(value !== null ? value : (defaultValue ?? null));
+          const resolvedValue =
+            value !== null ? (value as T) : ((defaultValue ?? null) as T | null);
+          resolve(resolvedValue);
         },
         reject,
       };
@@ -134,7 +136,7 @@ export class AsyncStorageManager {
         type: "set",
         key,
         value,
-        resolve,
+        resolve: () => resolve(),
         reject,
       };
 
@@ -156,7 +158,7 @@ export class AsyncStorageManager {
         id: `remove_${key}_${Date.now()}`,
         type: "remove",
         key,
-        resolve,
+        resolve: () => resolve(),
         reject,
       };
 

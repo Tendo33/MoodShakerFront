@@ -183,6 +183,28 @@ function inferEnglishAlcoholLevel(level: string, englishLevel: string | null | u
 	return "Medium";
 }
 
+function asTypedArray<T>(value: Prisma.JsonValue): T[] {
+  return (Array.isArray(value) ? value : []) as unknown as T[];
+}
+
+type DBGalleryCocktail = Pick<
+  DBCocktail,
+  | "id"
+  | "name"
+  | "englishName"
+  | "description"
+  | "englishDescription"
+  | "baseSpirit"
+  | "englishBaseSpirit"
+  | "alcoholLevel"
+  | "englishAlcoholLevel"
+  | "flavorProfiles"
+  | "englishFlavorProfiles"
+  | "ingredients"
+  | "image"
+  | "thumbnail"
+>;
+
 function mapDBCocktailToAppCocktail(dbCocktail: DBCocktail): Cocktail {
 	const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
 	const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
@@ -194,21 +216,21 @@ function mapDBCocktailToAppCocktail(dbCocktail: DBCocktail): Cocktail {
 		description: dbCocktail.description,
 		english_description: dbCocktail.englishDescription || dbCocktail.description, // Fallback to description
 		match_reason: dbCocktail.matchReason || "",
-		english_match_reason: dbCocktail.englishMatchReason,
+		english_match_reason: dbCocktail.englishMatchReason ?? undefined,
 		base_spirit: normalizedSpirit,
 		english_base_spirit: inferEnglishBaseSpirit(dbCocktail.baseSpirit, dbCocktail.englishBaseSpirit),
 		alcohol_level: normalizedLevel,
 		english_alcohol_level: inferEnglishAlcoholLevel(dbCocktail.alcoholLevel, dbCocktail.englishAlcoholLevel),
 		serving_glass: dbCocktail.servingGlass,
-		english_serving_glass: dbCocktail.englishServingGlass,
+		english_serving_glass: dbCocktail.englishServingGlass ?? undefined,
 		time_required: dbCocktail.timeRequired,
-		english_time_required: dbCocktail.englishTimeRequired,
+		english_time_required: dbCocktail.englishTimeRequired ?? undefined,
 		flavor_profiles: dbCocktail.flavorProfiles,
 		english_flavor_profiles: dbCocktail.englishFlavorProfiles || [],
-			ingredients: dbCocktail.ingredients as Cocktail["ingredients"],
-			tools: dbCocktail.tools as Cocktail["tools"],
-			steps: dbCocktail.steps as Cocktail["steps"],
-		image: dbCocktail.image,
+		ingredients: asTypedArray<Cocktail["ingredients"][number]>(dbCocktail.ingredients),
+		tools: asTypedArray<Cocktail["tools"][number]>(dbCocktail.tools),
+		steps: asTypedArray<Cocktail["steps"][number]>(dbCocktail.steps),
+		image: dbCocktail.image ?? undefined,
 		thumbnail: dbCocktail.thumbnail || undefined,
 	};
 }
@@ -232,7 +254,7 @@ function mapCocktailToGalleryCocktail(cocktail: Cocktail): GalleryCocktail {
   };
 }
 
-function mapDBGalleryCocktail(dbCocktail: DBCocktail): GalleryCocktail {
+function mapDBGalleryCocktail(dbCocktail: DBGalleryCocktail): GalleryCocktail {
   const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
   const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
 
@@ -254,8 +276,10 @@ function mapDBGalleryCocktail(dbCocktail: DBCocktail): GalleryCocktail {
     ),
     flavor_profiles: dbCocktail.flavorProfiles,
     english_flavor_profiles: dbCocktail.englishFlavorProfiles || [],
-    ingredients: dbCocktail.ingredients as GalleryCocktail["ingredients"],
-    image: dbCocktail.image,
+    ingredients: asTypedArray<NonNullable<GalleryCocktail["ingredients"]>[number]>(
+      dbCocktail.ingredients,
+    ),
+    image: dbCocktail.image ?? undefined,
     thumbnail: dbCocktail.thumbnail || undefined,
   };
 }
