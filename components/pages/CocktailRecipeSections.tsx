@@ -90,33 +90,34 @@ export function CocktailRecipeSections({
           }}
         >
           <button
-            className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
+            className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-colors group"
             onClick={() => toggleSection("ingredients")}
           >
-            <h3 className={`text-xl font-bold ${textColorClass}`}>
+            <h3 className={`text-xl font-bold ${textColorClass} group-hover:text-primary transition-colors`}>
               {t("recommendation.ingredients")}
             </h3>
             {isIngredientsExpanded ? (
-              <ChevronUp className="h-5 w-5" />
+              <ChevronUp className="h-5 w-5 text-primary transition-transform duration-300" />
             ) : (
-              <ChevronDown className="h-5 w-5" />
+              <ChevronDown className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-transform duration-300" />
             )}
           </button>
           {isIngredientsExpanded && (
             <div className="p-5 md:p-6 bg-black/20">
-              <ul className="divide-y divide-white/10">
+              <ul className="divide-y divide-white/5">
                 {cocktail.ingredients?.map((ingredient, index) => (
                   <motion.li
                     key={index}
-                    className="py-3 flex justify-between items-center"
+                    className="py-3 flex justify-between items-baseline gap-4 group"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <span className={`${textColorClass} font-medium`}>
+                    <span className={`${textColorClass} font-medium relative`}>
                       {getLocalizedIngredientName(ingredient)}
                     </span>
-                    <span className="text-primary font-medium">
+                    <div className="flex-1 border-b border-dotted border-white/20 relative -top-1 opacity-50 group-hover:opacity-100 group-hover:border-primary/50 transition-all"></div>
+                    <span className="text-primary font-bold shrink-0">
                       {getLocalizedIngredientAmount(ingredient)}
                       {getLocalizedIngredientUnit(ingredient)
                         ? ` ${getLocalizedIngredientUnit(ingredient)}`
@@ -211,7 +212,7 @@ export function CocktailRecipeSections({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: step.step_number * 0.1 }}
                     >
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10 text-sm">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)] font-bold text-primary shrink-0 z-10 text-sm">
                         {step.step_number}
                       </div>
                       <div className="flex-1 pt-0.5">
@@ -220,7 +221,7 @@ export function CocktailRecipeSections({
                         </p>
                         {localizedStep.tips && (
                           <motion.div
-                            className="mt-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
+                            className="mt-3 p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl relative overflow-hidden"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.3 }}
@@ -256,11 +257,11 @@ export function CocktailRecipeSections({
               </h3>
             </div>
             <div className="p-6 bg-black/20">
-              <ul className="divide-y divide-white/10">
+              <ul className="divide-y divide-white/5">
                 {cocktail.ingredients?.map((ingredient, index) => (
                   <motion.li
                     key={index}
-                    className="py-4 flex justify-between items-center"
+                    className="py-4 flex justify-between items-baseline gap-4 group"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
@@ -268,7 +269,8 @@ export function CocktailRecipeSections({
                     <span className={`${textColorClass} font-medium`}>
                       {getLocalizedIngredientName(ingredient)}
                     </span>
-                    <span className="text-primary font-bold">
+                    <div className="flex-1 border-b border-dotted border-white/20 relative -top-1.5 opacity-50 group-hover:opacity-100 group-hover:border-primary/50 transition-all"></div>
+                    <span className="text-primary font-bold shrink-0">
                       {getLocalizedIngredientAmount(ingredient)}
                       {getLocalizedIngredientUnit(ingredient)
                         ? ` ${getLocalizedIngredientUnit(ingredient)}`
@@ -340,13 +342,13 @@ export function CocktailRecipeSections({
                   return (
                     <motion.li
                       key={step.step_number}
-                      className="relative pl-2"
+                      className="relative pl-2 group"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: step.step_number * 0.1 }}
                     >
                       <div className="flex gap-6">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 font-bold text-foreground shrink-0 z-10">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:border-primary group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.4)] transition-all duration-300 font-bold text-primary shrink-0 z-10">
                           {step.step_number}
                         </div>
                         <div className="flex-1 pt-1">
@@ -355,12 +357,13 @@ export function CocktailRecipeSections({
                           </p>
                           {localizedStep.tips && (
                             <motion.div
-                              className="mt-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
+                              className="mt-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl relative overflow-hidden"
                               initial={{ opacity: 0, y: 5 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.3 }}
                             >
-                              <p className="text-amber-200/90 text-xs flex items-start gap-1.5">
+                              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-transparent pointer-events-none" />
+                              <p className="text-amber-200/90 text-sm flex items-start gap-2 relative z-10">
                                 <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
                                 <span>{localizedStep.tips}</span>
                               </p>

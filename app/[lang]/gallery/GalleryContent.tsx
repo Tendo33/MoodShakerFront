@@ -193,16 +193,16 @@ export default function GalleryContent({
           transition={{ delay: 0.3 }}
           className="sticky top-24 z-30 mb-10"
         >
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-2 shadow-2xl backdrop-blur-2xl max-w-3xl mx-auto transition-all duration-300 hover:bg-white/[0.07] hover:border-white/20 hover:shadow-pink-500/5">
-            <div className="flex flex-col md:flex-row gap-2 items-center">
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-3xl max-w-3xl mx-auto transition-all duration-300 hover:bg-black/50 hover:border-white/20 hover:shadow-[0_8px_40px_rgba(236,72,153,0.15)] ring-1 ring-white/5">
+            <div className="flex flex-col md:flex-row gap-3 items-center">
               {/* Search Field */}
               <div className="flex-1 w-full relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-500 group-focus-within:text-pink-400 transition-colors" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-400 group-focus-within:text-pink-400 transition-colors duration-300" />
                 </div>
                 <input
                   type="text"
-                  className="block w-full pl-10 pr-8 py-2.5 bg-transparent rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all text-sm"
+                  className="block w-full pl-11 pr-8 py-3 bg-white/5 border border-transparent focus:border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500/20 transition-all text-sm shadow-inner"
                   placeholder={t("gallery.search.placeholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -257,10 +257,10 @@ export default function GalleryContent({
                       <button
                         key={spirit}
                         onClick={() => setSelectedSpirit(selectedSpirit === spirit ? null : spirit)}
-                        className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-300 border backdrop-blur-md ${
+                        className={`px-4 py-2 rounded-full text-xs transition-all duration-400 border backdrop-blur-md active:scale-95 flex items-center gap-1.5 ${
                           selectedSpirit === spirit
-                            ? "bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.2)] scale-105 font-medium"
-                            : "bg-white/5 text-gray-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-white/10"
+                            ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.3)] font-semibold"
+                            : "bg-black/40 text-gray-400 border-white/10 hover:border-white/30 hover:text-white hover:bg-white/10"
                         }`}
                       >
                         {t(`gallery.spirit.${spirit.toLowerCase()}`)}
@@ -280,10 +280,10 @@ export default function GalleryContent({
                       <button
                         key={level}
                         onClick={() => setSelectedAlcohol(selectedAlcohol === level ? null : level)}
-                        className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-300 border backdrop-blur-md ${
+                        className={`px-4 py-2 rounded-full text-xs transition-all duration-400 border backdrop-blur-md active:scale-95 flex items-center gap-1.5 ${
                           selectedAlcohol === level
-                            ? "bg-blue-500 text-white border-blue-400 shadow-[0_4px_15px_rgba(59,130,246,0.3)] scale-105 font-medium"
-                            : "bg-white/5 text-gray-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-white/10"
+                            ? "bg-blue-500 text-white border-blue-400 shadow-[0_4px_20px_rgba(59,130,246,0.4)] font-semibold"
+                            : "bg-black/40 text-gray-400 border-white/10 hover:border-white/30 hover:text-white hover:bg-white/10"
                         }`}
                       >
                         {t(`gallery.level.${level.toLowerCase()}`)}
@@ -303,10 +303,10 @@ export default function GalleryContent({
                       <button
                         key={flavor}
                         onClick={() => setSelectedFlavor(selectedFlavor === flavor ? null : flavor)}
-                        className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-300 border backdrop-blur-md ${
+                        className={`px-4 py-2 rounded-full text-xs transition-all duration-400 border backdrop-blur-md active:scale-95 flex items-center gap-1.5 ${
                           selectedFlavor === flavor
-                            ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white border-transparent shadow-[0_4px_15px_rgba(236,72,153,0.3)] scale-105 font-medium"
-                            : "bg-white/5 text-gray-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-white/10"
+                            ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white border-transparent shadow-[0_4px_20px_rgba(236,72,153,0.4)] font-semibold"
+                            : "bg-black/40 text-gray-400 border-white/10 hover:border-white/30 hover:text-white hover:bg-white/10"
                         }`}
                       >
                         {t(`gallery.flavor.${flavor.toLowerCase()}`)}
@@ -335,10 +335,10 @@ export default function GalleryContent({
                 href={`/${lang}/cocktail/${cocktail.id}`}
                 className="block group relative h-full"
               >
-                <div className="relative h-full rounded-[2rem] overflow-hidden bg-gray-900 border border-white/5 shadow-2xl transition-all duration-500 group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group-hover:border-white/10 group-hover:-translate-y-2">
+                <div className="relative h-full rounded-[2rem] overflow-hidden bg-gray-900 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-[1px] px-[1px] transition-all duration-500 group-hover:shadow-[0_30px_60px_-15px_rgba(236,72,153,0.2)] group-hover:border-pink-500/30 group-hover:-translate-y-3 group-hover:scale-[1.02] will-change-transform">
                   
                   {/* Image Container */}
-                  <div className="relative aspect-[3/4] w-full overflow-hidden">
+                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[calc(2rem-1px)]">
                     {cocktail.thumbnail || cocktail.image ? (
                       <Image
                         src={cocktail.thumbnail || cocktail.image || "/placeholder.svg"}
@@ -400,8 +400,11 @@ export default function GalleryContent({
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-32"
           >
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 mb-6 animate-pulse">
-              <Search className="h-8 w-8 text-gray-600" />
+            <div className="relative w-32 h-32 mx-auto mb-8">
+              <div className="absolute inset-0 bg-primary/20 rounded-full blur-[40px] animate-pulse" />
+              <div className="relative z-10 flex items-center justify-center w-full h-full rounded-full bg-black/40 border border-white/10 backdrop-blur-xl shadow-2xl">
+                <Search className="h-10 w-10 text-gray-400" />
+              </div>
             </div>
             <h3 className="text-2xl font-medium text-white mb-3 font-playfair">
               {t("gallery.noResults.title")}

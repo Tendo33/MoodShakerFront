@@ -66,11 +66,11 @@ export default function LoadingSpinner({
       <div className="flex flex-col items-center justify-center space-y-6">
         <div className="relative">
           <div
-            className={`${sizeConfig[size].spinner} rounded-full border-4 border-border/30`}
+            className={`${sizeConfig[size].spinner} rounded-full border-4 border-white/5 shadow-inner`}
           ></div>
 
           <motion.div
-            className={`${sizeConfig[size].spinner} rounded-full absolute top-0 border-4 border-transparent ${colorClass} border-t-current`}
+            className={`${sizeConfig[size].spinner} rounded-full absolute top-0 border-4 border-transparent ${colorClass} border-t-current drop-shadow-[0_0_15px_rgba(var(--primary),0.5)]`}
             animate={{ rotate: 360 }}
             transition={{
               duration: 1.5,
@@ -80,13 +80,13 @@ export default function LoadingSpinner({
           />
 
           <motion.div
-            className="absolute top-1/2 left-1/2 w-2 h-2 bg-gradient-to-br from-amber-400 to-pink-400 rounded-full -translate-x-1/2 -translate-y-1/2"
+            className="absolute top-1/2 left-1/2 w-3 h-3 bg-gradient-to-br from-amber-400 to-pink-500 rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_20px_rgba(245,158,11,0.8)]"
             animate={{
-              scale: [0.8, 1.2, 0.8],
-              opacity: [0.5, 1, 0.5],
+              scale: [0.8, 1.5, 0.8],
+              opacity: [0.6, 1, 0.6],
             }}
             transition={{
-              duration: 1.5,
+              duration: 2,
               repeat: Number.POSITIVE_INFINITY,
               ease: "easeInOut",
             }}
@@ -95,8 +95,8 @@ export default function LoadingSpinner({
 
         {text && (
           <motion.div
-            className={`${sizeConfig[size].text} text-foreground/70 text-center tracking-wide`}
-            animate={{ opacity: [0.7, 1, 0.7] }}
+            className={`${sizeConfig[size].text} font-medium text-foreground/80 text-center tracking-widest uppercase text-xs mt-4`}
+            animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{
               duration: 2.5,
               repeat: Number.POSITIVE_INFINITY,

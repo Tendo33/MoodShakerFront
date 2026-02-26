@@ -78,14 +78,14 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
     <div className="min-h-screen">
       {/* Shared Background with Recommendation Page */}
       <motion.div
-        className="fixed inset-0 overflow-hidden opacity-20 pointer-events-none"
+        className="fixed inset-0 overflow-hidden opacity-30 pointer-events-none"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.2 }}
+        animate={{ opacity: 0.3 }}
         transition={{ duration: 1 }}
       >
         <motion.div
-          className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/30 rounded-full blur-3xl"
-          animate={{ y: [0, -20, 0], scale: [1, 1.05, 1] }}
+          className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/40 rounded-full blur-[120px] mix-blend-screen"
+          animate={{ y: [0, -20, 0], scale: [1, 1.05, 1], rotate: [0, 5, 0] }}
           transition={{
             duration: 8,
             repeat: Number.POSITIVE_INFINITY,
@@ -93,8 +93,8 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           }}
         />
         <motion.div
-          className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/30 rounded-full blur-3xl"
-          animate={{ y: [0, 20, 0], scale: [1, 1.1, 1] }}
+          className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/40 rounded-full blur-[120px] mix-blend-screen"
+          animate={{ y: [0, 20, 0], scale: [1, 1.1, 1], rotate: [0, -5, 0] }}
           transition={{
             duration: 10,
             repeat: Number.POSITIVE_INFINITY,
@@ -146,7 +146,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
                       <ImageIcon className="h-5 w-5" />
                     )
                   }
-                  className="text-primary border-primary/30 hover:bg-primary/10"
+                  className="text-primary border-primary/30 hover:bg-primary/20 hover:border-primary/50 hover:shadow-[0_0_20px_hsl(var(--primary)/0.2)] transition-all duration-300"
                 >
                   {t("recommendation.saveImage")}
                 </Button>
