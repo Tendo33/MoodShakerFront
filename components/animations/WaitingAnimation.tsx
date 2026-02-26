@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -23,6 +24,11 @@ const WaitingAnimation = memo(function WaitingAnimation({
 }: WaitingAnimationProps) {
   const { t } = useLanguage();
   const [animationProgress, setAnimationProgress] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Get display text: custom message > translated message > fallback
   const displayMessage = message || t(messageKey) || t("loading.default");
@@ -67,8 +73,8 @@ const WaitingAnimation = memo(function WaitingAnimation({
   const currentProgress =
     externalProgress !== undefined ? externalProgress : animationProgress;
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6 fixed inset-0 z-50">
+  const content = (
+    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6 fixed inset-0 z-[100] overflow-hidden">
       <motion.div
         className="max-w-3xl w-full text-center space-y-20"
         initial={{ opacity: 0, scale: 0.95 }}
@@ -157,6 +163,12 @@ const WaitingAnimation = memo(function WaitingAnimation({
       </motion.div>
     </div>
   );
+
+  if (!mounted || typeof document === "undefined") {
+    return content;
+  }
+
+  return createPortal(content, document.body);
 });
 
 WaitingAnimation.displayName = "WaitingAnimation";
