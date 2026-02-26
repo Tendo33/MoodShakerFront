@@ -42,8 +42,11 @@ const WaitingAnimation = memo(function WaitingAnimation({
     const updateAnimation = () => {
       const elapsed = (Date.now() - startTime) % cycleDuration;
       const progress = (elapsed / cycleDuration) * 100;
-      setAnimationProgress(progress);
-      animationFrame = requestAnimationFrame(updateAnimation);
+      // Use setTimeout instead of pure requestAnimationFrame to throttle state updates to ~20fps (50ms)
+      // This significantly reduces React re-renders and CPU usage
+      animationFrame = requestAnimationFrame(() => {
+        setTimeout(updateAnimation, 50);
+      });
     };
 
     // Only run internal animation loop if no external progress is provided
@@ -83,19 +86,14 @@ const WaitingAnimation = memo(function WaitingAnimation({
       >
         <div className="relative mx-auto w-40 h-40">
           <motion.div className="absolute inset-0 rounded-full border-2 border-slate-700/30" />
-          <motion.div
-            className="absolute inset-0 rounded-full border-4 border-transparent"
+          <div
+            className="absolute inset-0 rounded-full border-4 border-transparent animate-spin"
             style={{
               background:
                 "conic-gradient(from 0deg, transparent, #fbbf24, #f43f5e, #fb923c, transparent)",
               borderRadius: "50%",
               mask: "radial-gradient(circle at center, transparent 68%, black 72%, black 100%)",
-            }}
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: 2,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
+              animationDuration: "2s",
             }}
           />
           <motion.div

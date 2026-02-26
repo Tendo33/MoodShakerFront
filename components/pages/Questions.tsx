@@ -10,9 +10,13 @@ import { Container, Button, GradientText } from "@/components/ui/core";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { motion, AnimatePresence } from "framer-motion";
-import SmartLoadingSystem, {
-  useSmartLoading,
-} from "@/components/animations/SmartLoadingSystem";
+import dynamic from "next/dynamic";
+import { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
+
+const SmartLoadingSystem = dynamic(
+  () => import("@/components/animations/SmartLoadingSystem"),
+  { ssr: false }
+);
 import { appLogger, safeLogger } from "@/utils/logger";
 import { withTimeout } from "@/utils/withTimeout";
 

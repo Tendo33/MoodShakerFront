@@ -123,7 +123,9 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
       setSimulatedProgress(combinedProgress);
 
       if (combinedProgress < 100) {
-        animationFrameRef.current = requestAnimationFrame(tick);
+        animationFrameRef.current = requestAnimationFrame(() => {
+          setTimeout(tick, 30);
+        });
       } else {
         // Ensure we hit exactly 100 and call complete
         setSimulatedProgress(100);
