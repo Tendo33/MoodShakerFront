@@ -26,8 +26,8 @@
 
   /* Level 1: 极淡 — 大背景装饰区域 */
   .glass-subtle {
-    @apply backdrop-blur-sm border border-white/5;
-    background: rgba(255, 255, 255, 0.02);
+    @apply backdrop-blur-md border border-white/5;
+    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
     transform: translateZ(0);
   }
 
@@ -36,22 +36,22 @@
     @apply backdrop-blur-xl border border-white/10 shadow-2xl;
     background: linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.02) 100%
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.03) 100%
     );
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
     transform: translateZ(0);
   }
 
   /* Level 3: 高对比 — Modal、Dropdown、Popup */
   .glass-popup {
-    @apply backdrop-blur-2xl border border-white/15 shadow-2xl;
+    @apply backdrop-blur-2xl border border-white/20 shadow-2xl;
     background: linear-gradient(
       135deg,
-      rgba(30, 35, 48, 0.85) 0%,
-      rgba(20, 25, 38, 0.92) 100%
+      rgba(40, 45, 60, 0.85) 0%,
+      rgba(25, 30, 45, 0.95) 100%
     );
-    box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
     transform: translateZ(0);
   }
 
@@ -60,10 +60,10 @@
     @apply backdrop-blur-xl border border-white/10 shadow-2xl;
     background: linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.02) 100%
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.03) 100%
     );
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
     transform: translateZ(0);
     will-change: transform, opacity;
   }
@@ -139,36 +139,35 @@
 
 /* Enhanced scrollbar with design system colors */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.1);
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted) / 0.3);
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+  background: hsl(var(--muted) / 0.2);
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted) / 0.5);
+  background: hsl(var(--muted) / 0.4);
 }
 
 /* Enhanced card hover effects with design system colors */
 .card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-hover:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow:
-    0 20px 25px -5px hsl(var(--background) / 0.4),
-    0 10px 10px -5px hsl(var(--background) / 0.3),
-    0 0 0 1px hsl(var(--border) / 0.1);
+    0 30px 40px -10px hsl(var(--background) / 0.5),
+    0 15px 15px -10px hsl(var(--background) / 0.3),
+    0 0 0 1px hsl(var(--border) / 0.2);
 }
 
 /* Updated gradient text to use design system colors */
@@ -299,7 +298,7 @@
 
 /* Smooth page transitions */
 .page-transition {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ===== 流体排版 (Fluid Typography) — 用 clamp() 替代多层媒体查询覆盖 ===== */

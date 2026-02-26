@@ -211,15 +211,15 @@ const Home = React.memo(function Home() {
       <section className="relative hero-height flex items-center section-spacing pt-16 md:pt-20 lg:pt-24 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
-            className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
+            className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/30 rounded-full blur-[100px] mix-blend-plus-lighter"
             animate={floatAnimationTarget}
           />
           <motion.div
-            className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/20 rounded-full blur-3xl"
+            className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/30 rounded-full blur-[100px] mix-blend-plus-lighter"
             animate={delayedFloatAnimation(1)}
           />
           <motion.div
-            className="absolute top-2/3 right-1/3 w-64 h-64 bg-accent/10 rounded-full blur-3xl"
+            className="absolute top-2/3 right-1/3 w-64 h-64 bg-accent/20 rounded-full blur-[80px] mix-blend-plus-lighter"
             animate={delayedFloatAnimation(2)}
           />
         </div>
@@ -547,7 +547,7 @@ const Home = React.memo(function Home() {
                 }
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
-                <div className="relative overflow-hidden rounded-xl border border-border glass-effect card-hover h-full text-center group p-8">
+                <div className="relative overflow-hidden rounded-2xl border border-white/5 glass-panel card-hover h-full text-center group p-8 transition-all duration-500 hover:border-primary/30 hover:shadow-[0_0_30px_hsl(var(--primary)/0.15)]">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 pointer-events-none" />
                   <div className="relative z-10 text-spacing">
                     <motion.div
@@ -614,7 +614,7 @@ const Home = React.memo(function Home() {
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
                 <Link href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}>
-                  <div className="relative overflow-hidden rounded-xl border border-border/30 glass-effect card-hover h-full group hover:border-primary/20 transition-all duration-500 p-8">
+                  <div className="relative overflow-hidden rounded-2xl border border-white/5 glass-panel card-hover h-full group hover:border-primary/30 hover:shadow-[0_0_30px_hsl(var(--primary)/0.15)] transition-all duration-500 p-8">
                     <div className="relative h-40 md:h-48 overflow-hidden mb-4 rounded-xl">
                       <motion.div
                         className="w-full h-full relative"

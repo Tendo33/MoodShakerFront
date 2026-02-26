@@ -87,7 +87,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
             className="absolute inset-0 rounded-full border-4 border-transparent"
             style={{
               background:
-                "conic-gradient(from 0deg, transparent, #FFB74D, #FF4081, #FF6B35, transparent)",
+                "conic-gradient(from 0deg, transparent, #fbbf24, #f43f5e, #fb923c, transparent)",
               borderRadius: "50%",
               mask: "radial-gradient(circle at center, transparent 68%, black 72%, black 100%)",
             }}
@@ -132,7 +132,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
                 exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
                 transition={{ duration: 0.5 }}
               >
-                <h2 className="text-4xl md:text-5xl font-medium bg-gradient-to-r from-amber-300 via-orange-300 to-pink-300 bg-clip-text text-transparent tracking-wide pb-2 leading-relaxed px-4">
+                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400 bg-clip-text text-transparent tracking-tight pb-2 leading-relaxed px-4 drop-shadow-[0_0_15px_rgba(251,191,36,0.3)]">
                   {displayMessage}
                 </h2>
                 <motion.p

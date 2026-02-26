@@ -367,12 +367,12 @@ const Questions = memo(function Questions() {
             </span>
           </div>
 
-          <div className="relative w-full bg-white/5 rounded-full h-3 overflow-hidden shadow-inner backdrop-blur-sm border border-white/5">
+          <div className="relative w-full bg-black/20 rounded-full h-3 overflow-hidden shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)] backdrop-blur-md border border-white/5">
             <motion.div
-              className="h-full bg-gradient-to-r from-primary to-secondary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)] relative overflow-hidden"
+              className="h-full bg-gradient-to-r from-primary via-orange-400 to-secondary rounded-full shadow-[0_0_20px_hsl(var(--primary)/0.6)] relative overflow-hidden"
               initial={{ width: "0%" }}
               animate={{ width: `${calculatedProgress}%` }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
               <div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"
@@ -462,10 +462,10 @@ const Questions = memo(function Questions() {
                     >
                       <button
                         type="button"
-                        className={`w-full text-left h-full min-h-[180px] group relative overflow-hidden glass-effect rounded-3xl p-1 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 ${
+                        className={`w-full text-left h-full min-h-[180px] group relative overflow-hidden glass-panel rounded-3xl p-1 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 active:scale-[0.98] ${
                           selectedOption === option.value
-                            ? "border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.2)] scale-[1.01]"
-                            : "border-transparent"
+                            ? "border-primary shadow-[0_0_30px_hsl(var(--primary)/0.3)] scale-[1.02] ring-1 ring-primary/50"
+                            : "border-white/5"
                         }`}
                         onClick={() =>
                           handleAnswer(currentQuestion, option.value)
@@ -575,10 +575,10 @@ const Questions = memo(function Questions() {
                   >
                     <button
                       type="button"
-                      className={`w-full transition-all duration-300 relative overflow-hidden rounded-xl p-3 text-center h-full group border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 ${
+                      className={`w-full transition-all duration-500 relative overflow-hidden rounded-2xl p-3 text-center h-full group border focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 active:scale-[0.96] ${
                         baseSpirits.includes(spirit.value)
-                          ? "glass-effect border-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.2)] bg-primary/5"
-                          : "glass-effect border-transparent hover:border-primary/20 hover:bg-white/5"
+                          ? "glass-panel border-primary shadow-[0_0_25px_hsl(var(--primary)/0.25)] bg-primary/10 ring-1 ring-primary/50"
+                          : "glass-panel border-white/5 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] hover:bg-white/5"
                       }`}
                       onClick={() =>
                         toggleBaseSpirit(spirit.value)

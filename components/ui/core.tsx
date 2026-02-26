@@ -45,7 +45,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const { t } = useLanguage();
     const baseStyles =
-      "relative font-medium rounded-full transition-all duration-300 flex items-center justify-center font-source-sans focus-ring transform-gpu active:scale-95 disabled:active:scale-100 whitespace-nowrap";
+      "relative font-medium rounded-full transition-all duration-300 flex items-center justify-center font-source-sans focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transform-gpu active:scale-[0.98] disabled:active:scale-100 whitespace-nowrap";
 
     const variantStyles = {
       primary:
@@ -67,9 +67,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const effectStyles = {
       none: "",
       shine: "overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700",
-      pulse: "animate-pulse",
-      glow: "hover:shadow-[0_0_20px_currentColor] hover:border-current",
-      lift: "hover:-translate-y-1 hover:shadow-lg",
+      pulse: "animate-pulse hover:animate-none hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)]",
+      glow: "hover:shadow-[0_0_30px_currentColor] hover:border-current z-10",
+      lift: "hover:-translate-y-1 hover:shadow-[0_10px_25px_-5px_var(--shadow-color,rgba(0,0,0,0.5))]",
       ring: "hover:ring-2 hover:ring-offset-2 hover:ring-primary",
     };
 
@@ -217,7 +217,7 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
     return (
       <div
         ref={ref}
-        className={`w-full px-4 mx-auto ${sizeStyles[size]} ${centered ? "flex flex-col items-center" : ""} ${className}`}
+        className={`w-full px-4 md:px-6 lg:px-8 mx-auto ${sizeStyles[size]} ${centered ? "flex flex-col items-center" : ""} ${className}`}
         {...props}
       >
         {children}

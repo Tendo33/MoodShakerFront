@@ -45,25 +45,25 @@ export default function Header() {
     visible: {
       x: 0,
       opacity: 1,
-      transition: { type: "spring" as const, stiffness: 300, damping: 30 },
+      transition: { type: "spring" as const, stiffness: 400, damping: 35, mass: 0.8 },
     },
     exit: {
       x: "100%",
       opacity: 0,
-      transition: { duration: 0.25, ease: "easeInOut" as const },
+      transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] as const },
     },
   };
 
   const backdropVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.25 } },
-    exit: { opacity: 0, transition: { duration: 0.2 } },
+    hidden: { opacity: 0, backdropFilter: "blur(0px)" },
+    visible: { opacity: 1, backdropFilter: "blur(4px)", transition: { duration: 0.3 } },
+    exit: { opacity: 0, backdropFilter: "blur(0px)", transition: { duration: 0.2 } },
   };
 
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${
-        isScrolled ? "glass-effect py-2" : "bg-transparent py-4"
+        isScrolled ? "glass-popup py-2 shadow-[0_8px_32px_rgba(0,0,0,0.6)] border-b border-white/10 before:absolute before:bottom-0 before:left-0 before:w-full before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-primary/30 before:to-transparent" : "bg-transparent py-4"
       }`}
       suppressHydrationWarning
     >
