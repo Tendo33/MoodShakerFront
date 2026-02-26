@@ -10,6 +10,7 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 import type { Cocktail, BartenderRequest } from "@/lib/cocktail-types";
+import { AgentType } from "@/lib/cocktail-types";
 import { asyncStorage } from "@/utils/asyncStorage";
 import { useBatchAsyncState } from "@/hooks/useAsyncState";
 import { generateImagePrompt } from "@/api/image";
@@ -185,6 +186,10 @@ export const CocktailResultProvider = ({
             : userFeedback,
         };
 
+        const agentType = answers["1"] === "creative" 
+          ? AgentType.CREATIVE_BARTENDER 
+          : AgentType.CLASSIC_BARTENDER;
+
         await asyncStorage.setItem(STORAGE_KEYS.REQUEST, request);
 
         let cocktailResponse: Response | null = null;
@@ -205,6 +210,7 @@ export const CocktailResultProvider = ({
                 body: JSON.stringify({
                   ...request,
                   language,
+                  agentType,
                 }),
               }),
               COCKTAIL_REQUEST_TIMEOUT_MS,
