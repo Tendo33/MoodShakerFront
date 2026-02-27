@@ -8,8 +8,6 @@ import {
   History,
   ChevronRight,
   Sparkles,
-  BookOpen,
-  Beaker,
   Martini,
   Library,
 } from "lucide-react";
@@ -72,8 +70,6 @@ const Home = React.memo(function Home() {
   const shouldAnimate = useDelayedAnimation(100);
 
   // Use in-view animation hooks for sections
-  const [featuresRef, featuresInView] = useInViewAnimation();
-  const [popularRef, popularInView] = useInViewAnimation();
   const [ctaRef, ctaInView] = useInViewAnimation();
 
   // 使用异步状态检查保存的会话 - 性能优化核心

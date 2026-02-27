@@ -24,11 +24,6 @@ const WaitingAnimation = memo(function WaitingAnimation({
 }: WaitingAnimationProps) {
   const { t } = useLanguage();
   const [animationProgress, setAnimationProgress] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Get display text: custom message > translated message > fallback
   const displayMessage = message || t(messageKey) || t("loading.default");
@@ -42,6 +37,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
     const updateAnimation = () => {
       const elapsed = (Date.now() - startTime) % cycleDuration;
       const progress = (elapsed / cycleDuration) * 100;
+      setAnimationProgress(progress);
       // Use setTimeout instead of pure requestAnimationFrame to throttle state updates to ~20fps (50ms)
       // This significantly reduces React re-renders and CPU usage
       animationFrame = requestAnimationFrame(() => {
@@ -162,7 +158,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
     </div>
   );
 
-  if (!mounted || typeof document === "undefined") {
+  if (typeof document === "undefined") {
     return content;
   }
 

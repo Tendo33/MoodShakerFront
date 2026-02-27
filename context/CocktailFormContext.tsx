@@ -3,14 +3,12 @@
 import {
   createContext,
   useContext,
-  useState,
   useCallback,
   useEffect,
   useMemo,
 } from "react";
 import type { ReactNode } from "react";
 import {
-  asyncStorage,
   clearStorageWithPrefixAsync,
 } from "@/utils/asyncStorage";
 import { useBatchAsyncState } from "@/hooks/useAsyncState";
@@ -58,7 +56,6 @@ export const CocktailFormProvider = ({
   children,
 }: CocktailFormProviderProps) => {
   const { t } = useLanguage();
-  const [error, setError] = useState<string | null>(null);
 
   const {
     data: savedData,
@@ -120,7 +117,6 @@ export const CocktailFormProvider = ({
       } catch {
         cocktailLogger.error("Failed to save answer");
         const errorMessage = t("error.saveAnswers");
-        setError(errorMessage);
         throw new Error(errorMessage);
       }
     },
@@ -135,7 +131,6 @@ export const CocktailFormProvider = ({
       } catch {
         cocktailLogger.error("Failed to save feedback");
         const errorMessage = t("error.saveFeedback");
-        setError(errorMessage);
         throw new Error(errorMessage);
       }
     },
@@ -149,10 +144,9 @@ export const CocktailFormProvider = ({
         cocktailLogger.debug("Base spirits saved successfully");
       } catch {
         cocktailLogger.error("Failed to save base spirits");
-        setError(t("error.saveBaseSpirits"));
       }
     },
-    [updateItem, t],
+    [updateItem],
   );
 
   const toggleBaseSpirit = useCallback(
@@ -166,10 +160,9 @@ export const CocktailFormProvider = ({
         cocktailLogger.debug("Base spirit toggled successfully");
       } catch {
         cocktailLogger.error("Failed to toggle base spirit");
-        setError(t("error.toggleBaseSpirit"));
       }
     },
-    [baseSpirits, updateItem, t],
+    [baseSpirits, updateItem],
   );
 
   const isQuestionAnswered = useCallback(
@@ -181,13 +174,11 @@ export const CocktailFormProvider = ({
     try {
       await clearStorageWithPrefixAsync("moodshaker-");
       await reloadData();
-      setError(null);
       cocktailLogger.debug("Form data reset successfully");
     } catch {
       cocktailLogger.error("Failed to reset form data");
-      setError(t("error.resetData"));
     }
-  }, [reloadData, t]);
+  }, [reloadData]);
 
   // ------ memo value ------
 
