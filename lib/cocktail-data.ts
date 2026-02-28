@@ -187,6 +187,128 @@ function asTypedArray<T>(value: Prisma.JsonValue): T[] {
   return (Array.isArray(value) ? value : []) as unknown as T[];
 }
 
+const THUMBNAIL_COLUMN_NAME = "cocktails.thumbnail";
+
+const cocktailSelectWithoutThumbnail = {
+  id: true,
+  name: true,
+  englishName: true,
+  description: true,
+  englishDescription: true,
+  matchReason: true,
+  englishMatchReason: true,
+  baseSpirit: true,
+  englishBaseSpirit: true,
+  alcoholLevel: true,
+  englishAlcoholLevel: true,
+  servingGlass: true,
+  englishServingGlass: true,
+  timeRequired: true,
+  englishTimeRequired: true,
+  flavorProfiles: true,
+  englishFlavorProfiles: true,
+  ingredients: true,
+  tools: true,
+  steps: true,
+  image: true,
+} satisfies Prisma.CocktailSelect;
+
+const cocktailSelectWithThumbnail = {
+  ...cocktailSelectWithoutThumbnail,
+  thumbnail: true,
+} satisfies Prisma.CocktailSelect;
+
+const gallerySelectWithoutThumbnail = {
+  id: true,
+  name: true,
+  englishName: true,
+  description: true,
+  englishDescription: true,
+  baseSpirit: true,
+  englishBaseSpirit: true,
+  alcoholLevel: true,
+  englishAlcoholLevel: true,
+  flavorProfiles: true,
+  englishFlavorProfiles: true,
+  ingredients: true,
+  image: true,
+} satisfies Prisma.CocktailSelect;
+
+const gallerySelectWithThumbnail = {
+  ...gallerySelectWithoutThumbnail,
+  thumbnail: true,
+} satisfies Prisma.CocktailSelect;
+
+function isMissingThumbnailColumnError(error: unknown): boolean {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+    return false;
+  }
+
+  if (error.code !== "P2022") {
+    return false;
+  }
+
+  const meta = error.meta as { column?: unknown } | undefined;
+  const column = typeof meta?.column === "string" ? meta.column : "";
+
+  return (
+    error.message.includes(THUMBNAIL_COLUMN_NAME) ||
+    column.includes(THUMBNAIL_COLUMN_NAME)
+  );
+}
+
+function logThumbnailMigrationHint(scope: string): void {
+  console.warn(
+    `[DB Compatibility][${scope}] Missing "${THUMBNAIL_COLUMN_NAME}". Falling back without thumbnail. Please run "pnpm prisma:migrate" or "pnpm db:init".`,
+  );
+}
+
+async function runWithThumbnailCompatibility<T>(
+  scope: string,
+  operation: (includeThumbnail: boolean) => Promise<T>,
+): Promise<T> {
+  try {
+    return await operation(true);
+  } catch (error) {
+    if (!isMissingThumbnailColumnError(error)) {
+      throw error;
+    }
+
+    logThumbnailMigrationHint(scope);
+    return operation(false);
+  }
+}
+
+function toCocktailWithFallbackId(cocktail: Cocktail, fallbackId: string): Cocktail {
+  return {
+    ...cocktail,
+    id: cocktail.id ?? fallbackId,
+  };
+}
+
+function getPopularCocktailById(id: string): Cocktail | null {
+  const cocktail = popularCocktails[id];
+
+  if (!cocktail) {
+    return null;
+  }
+
+  return toCocktailWithFallbackId(cocktail, id);
+}
+
+function getPopularCocktailList(): Cocktail[] {
+  return Object.entries(popularCocktails).map(([fallbackId, cocktail]) =>
+    toCocktailWithFallbackId(cocktail, fallbackId),
+  );
+}
+
+function getPopularGalleryCocktails(filters?: GalleryQueryFilters): GalleryCocktail[] {
+  return filterGalleryCocktailsInMemory(
+    getPopularCocktailList().map(mapCocktailToGalleryCocktail),
+    filters,
+  );
+}
+
 type DBGalleryCocktail = Pick<
   DBCocktail,
   | "id"
@@ -205,7 +327,17 @@ type DBGalleryCocktail = Pick<
   | "thumbnail"
 >;
 
-function mapDBCocktailToAppCocktail(dbCocktail: DBCocktail): Cocktail {
+type DBCocktailWithOptionalThumbnail = Omit<DBCocktail, "thumbnail"> & {
+  thumbnail?: string | null;
+};
+
+type DBGalleryCocktailWithOptionalThumbnail = Omit<DBGalleryCocktail, "thumbnail"> & {
+  thumbnail?: string | null;
+};
+
+function mapDBCocktailToAppCocktail(
+  dbCocktail: DBCocktailWithOptionalThumbnail,
+): Cocktail {
 	const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
 	const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
 
@@ -254,7 +386,9 @@ function mapCocktailToGalleryCocktail(cocktail: Cocktail): GalleryCocktail {
   };
 }
 
-function mapDBGalleryCocktail(dbCocktail: DBGalleryCocktail): GalleryCocktail {
+function mapDBGalleryCocktail(
+  dbCocktail: DBGalleryCocktailWithOptionalThumbnail,
+): GalleryCocktail {
   const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
   const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
 
@@ -291,17 +425,26 @@ export async function getAllCocktails(): Promise<Cocktail[]> {
 
   // During build time, return empty array or popular cocktails
   if (isBuildTime) {
-    return Object.values(popularCocktails);
+    return getPopularCocktailList();
   }
 
   try {
-    const cocktails = await prisma.cocktail.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-    return cocktails.map(mapDBCocktailToAppCocktail);
+    const cocktails = await runWithThumbnailCompatibility(
+      "getAllCocktails",
+      (includeThumbnail) =>
+        prisma.cocktail.findMany({
+          orderBy: { createdAt: "desc" },
+          select: includeThumbnail
+            ? cocktailSelectWithThumbnail
+            : cocktailSelectWithoutThumbnail,
+        }),
+    );
+    return cocktails.map((cocktail) =>
+      mapDBCocktailToAppCocktail(cocktail as DBCocktailWithOptionalThumbnail),
+    );
   } catch (error) {
     console.error("Error fetching cocktails from DB:", error);
-    return Object.values(popularCocktails);
+    return getPopularCocktailList();
   }
 }
 
@@ -314,10 +457,7 @@ export async function getGalleryCocktails(
     !process.env.DATABASE_URL || process.env.DATABASE_URL.includes("placeholder");
 
   if (isBuildTime) {
-    return filterGalleryCocktailsInMemory(
-      Object.values(popularCocktails).map(mapCocktailToGalleryCocktail),
-      filters,
-    );
+    return getPopularGalleryCocktails(filters);
   }
 
   try {
@@ -435,33 +575,23 @@ export async function getGalleryCocktails(
       });
     }
 
-    const cocktails = await prisma.cocktail.findMany({
-      where: andFilters.length > 0 ? { AND: andFilters } : undefined,
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        englishName: true,
-        description: true,
-        englishDescription: true,
-        baseSpirit: true,
-        englishBaseSpirit: true,
-        alcoholLevel: true,
-        englishAlcoholLevel: true,
-        flavorProfiles: true,
-        englishFlavorProfiles: true,
-        ingredients: true,
-        image: true,
-        thumbnail: true,
-      },
-    });
-    return cocktails.map(mapDBGalleryCocktail);
+    const cocktails = await runWithThumbnailCompatibility(
+      "getGalleryCocktails",
+      (includeThumbnail) =>
+        prisma.cocktail.findMany({
+          where: andFilters.length > 0 ? { AND: andFilters } : undefined,
+          orderBy: { createdAt: "desc" },
+          select: includeThumbnail
+            ? gallerySelectWithThumbnail
+            : gallerySelectWithoutThumbnail,
+        }),
+    );
+    return cocktails.map((cocktail) =>
+      mapDBGalleryCocktail(cocktail as DBGalleryCocktailWithOptionalThumbnail),
+    );
   } catch (error) {
     console.error("Error fetching gallery cocktails from DB:", error);
-    return filterGalleryCocktailsInMemory(
-      Object.values(popularCocktails).map(mapCocktailToGalleryCocktail),
-      filters,
-    );
+    return getPopularGalleryCocktails(filters);
   }
 }
 
@@ -472,32 +602,34 @@ export async function getCocktailById(id: string): Promise<Cocktail | null> {
 
   // During build time, only use popular cocktails
   if (isBuildTime) {
-    return popularCocktails[id] || null;
+    return getPopularCocktailById(id);
   }
 
   try {
     // At runtime, try to fetch from DB first
-    const dbCocktail = await prisma.cocktail.findUnique({
-      where: { id },
-    });
+    const dbCocktail = await runWithThumbnailCompatibility(
+      "getCocktailById",
+      (includeThumbnail) =>
+        prisma.cocktail.findUnique({
+          where: { id },
+          select: includeThumbnail
+            ? cocktailSelectWithThumbnail
+            : cocktailSelectWithoutThumbnail,
+        }),
+    );
 
     if (dbCocktail) {
-      return mapDBCocktailToAppCocktail(dbCocktail);
+      return mapDBCocktailToAppCocktail(
+        dbCocktail as DBCocktailWithOptionalThumbnail,
+      );
     }
 
     // Fallback to popular cocktails if ID matches a key
-    if (popularCocktails[id]) {
-      return popularCocktails[id];
-    }
-
-    return null;
+    return getPopularCocktailById(id);
   } catch (error) {
     console.error("Error fetching cocktail from DB:", error);
     // Fallback to popular cocktails on error
-    if (popularCocktails[id]) {
-      return popularCocktails[id];
-    }
-    return null;
+    return getPopularCocktailById(id);
   }
 }
 

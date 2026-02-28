@@ -71,7 +71,7 @@ const CocktailImage = memo(function CocktailImage({
           initial={{ opacity: 0 }}
           animate={{ opacity: isLoading ? 0 : 1 }}
           transition={{ duration: 0.5 }}
-          className="w-full h-full"
+          className="relative w-full h-full"
         >
           <Image
             src={imageSrc || "/placeholder.svg"}
@@ -80,7 +80,7 @@ const CocktailImage = memo(function CocktailImage({
             sizes="(max-width: 768px) 100vw, 50vw"
             priority={false} // 移除priority，只对首屏图片使用
             className="object-cover"
-            onLoadingComplete={() => setIsLoading(false)}
+            onLoad={() => setIsLoading(false)}
             onError={() => {
               setError("Failed to load image");
               setImageSrc(placeholderUrl);

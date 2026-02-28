@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateImage } from "@/api/openai";
 import { imageLogger } from "@/utils/logger";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 interface SharpTransformer {
   rotate(): SharpTransformer;
@@ -18,6 +19,25 @@ type SharpFactory = (input: Buffer) => SharpTransformer;
 
 let sharpFactory: SharpFactory | null | undefined;
 let sharpFactoryPromise: Promise<SharpFactory | null> | null = null;
+const THUMBNAIL_COLUMN_NAME = "thumbnail";
+
+function isMissingThumbnailColumnError(error: unknown): boolean {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+    return false;
+  }
+
+  if (error.code !== "P2022") {
+    return false;
+  }
+
+  const meta = error.meta as { column?: unknown } | undefined;
+  const column = typeof meta?.column === "string" ? meta.column : "";
+
+  return (
+    error.message.toLowerCase().includes(THUMBNAIL_COLUMN_NAME) ||
+    column.toLowerCase().includes(THUMBNAIL_COLUMN_NAME)
+  );
+}
 
 async function getSharpFactory(): Promise<SharpFactory | null> {
   if (sharpFactory !== undefined) {
@@ -150,10 +170,25 @@ export async function POST(request: NextRequest) {
 
         finalImage = optimizedImage;
 
-        await prisma.cocktail.updateMany({
-          where: { name: cocktailName },
-          data: { image: optimizedImage, thumbnail: thumbnailImage },
-        });
+        try {
+          await prisma.cocktail.updateMany({
+            where: { name: cocktailName },
+            data: { image: optimizedImage, thumbnail: thumbnailImage },
+          });
+        } catch (dbError) {
+          if (!isMissingThumbnailColumnError(dbError)) {
+            throw dbError;
+          }
+
+          imageLogger.warn(
+            `[DB Compatibility][api/image] Missing "${THUMBNAIL_COLUMN_NAME}". Retrying with image only. Please run "pnpm prisma:migrate" or "pnpm db:init".`,
+          );
+
+          await prisma.cocktail.updateMany({
+            where: { name: cocktailName },
+            data: { image: optimizedImage },
+          });
+        }
         imageLogger.info(`Saved image for cocktail: ${cocktailName}`);
       } catch (dbError) {
         imageLogger.error("Failed to save image to DB", dbError);

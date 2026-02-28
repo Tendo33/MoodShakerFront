@@ -73,6 +73,25 @@ cd MoodShakerFront
 pnpm db:init
 ```
 
+### 常见问题排查（Troubleshooting）
+
+如果你在开发日志里看到类似以下错误：
+
+```text
+PrismaClientKnownRequestError (P2022)
+The column `cocktails.thumbnail` does not exist in the current database.
+```
+
+说明本地数据库结构还没同步到最新迁移。请执行以下任一命令进行修复：
+
+```bash
+# 推荐：完整初始化（生成客户端 + 迁移 + seed）
+pnpm db:init
+
+# 或仅执行 Prisma 迁移
+pnpm prisma:migrate
+```
+
 ### 第五步：启动！
 
 在终端（Terminal）中输入以下命令：

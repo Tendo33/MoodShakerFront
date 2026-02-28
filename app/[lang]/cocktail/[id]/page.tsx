@@ -25,7 +25,7 @@ export async function generateMetadata({
         cocktail?.description ||
         "Discover this delicious cocktail recipe on MoodShaker",
       icons: {
-        icon: "logo.png",
+        icon: "/logo.png",
       },
     };
   } catch {
@@ -33,7 +33,7 @@ export async function generateMetadata({
       title: "Cocktail | MoodShaker",
       description: "Discover delicious cocktail recipes on MoodShaker",
       icons: {
-        icon: "logo.png",
+        icon: "/logo.png",
       },
     };
   }

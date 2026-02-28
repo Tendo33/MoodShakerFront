@@ -72,6 +72,10 @@ async function persistCocktail(cocktail: Cocktail): Promise<Cocktail> {
   try {
     const existingCocktail = await prisma.cocktail.findFirst({
       where: { name: cocktail.name },
+      select: {
+        id: true,
+        image: true,
+      },
     });
 
     if (existingCocktail) {
@@ -79,7 +83,7 @@ async function persistCocktail(cocktail: Cocktail): Promise<Cocktail> {
         ...cocktail,
         id: existingCocktail.id,
         image: existingCocktail.image || cocktail.image,
-        thumbnail: existingCocktail.thumbnail || cocktail.thumbnail,
+        thumbnail: cocktail.thumbnail,
       };
     }
 
@@ -104,6 +108,9 @@ async function persistCocktail(cocktail: Cocktail): Promise<Cocktail> {
         ingredients: cocktail.ingredients as unknown as Prisma.InputJsonValue,
         tools: cocktail.tools as unknown as Prisma.InputJsonValue,
         steps: cocktail.steps as unknown as Prisma.InputJsonValue,
+      },
+      select: {
+        id: true,
       },
     });
 

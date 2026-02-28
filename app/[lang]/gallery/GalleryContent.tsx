@@ -133,7 +133,18 @@ export default function GalleryContent({
     return () => clearTimeout(timer);
   }, [searchQuery, selectedSpirit, selectedFlavor, selectedAlcohol, updateServerFilters]);
 
-  const filteredCocktails = useMemo(() => cocktails, [cocktails]);
+  const renderableCocktails = useMemo(
+    () =>
+      cocktails.filter(
+        (
+          cocktail,
+        ): cocktail is GalleryCocktail & { id: string | number } =>
+          cocktail.id !== undefined &&
+          cocktail.id !== null &&
+          String(cocktail.id).trim().length > 0,
+      ),
+    [cocktails],
+  );
 
   // Animation Variants
   const containerVariants: Variants = {
@@ -241,9 +252,10 @@ export default function GalleryContent({
 
             {/* Expandable Filters */}
             <div
-              className={`overflow-hidden transition-all duration-500 ease-[0.22,1,0.36,1] ${
+              className={`overflow-hidden transition-all duration-500 ease-linear ${
                 isFilterOpen ? "max-h-[700px] opacity-100 mt-2 pb-1" : "max-h-0 opacity-0"
               }`}
+              style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
             >
               <div className="px-1 pt-1 space-y-4">
                 {/* Spirits */}
@@ -329,10 +341,10 @@ export default function GalleryContent({
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
         >
-          {filteredCocktails.map((cocktail) => (
+          {renderableCocktails.map((cocktail, index) => (
             <motion.div key={cocktail.id} variants={itemVariants}>
               <Link
-                href={`/${lang}/cocktail/${cocktail.id}`}
+                href={`/${lang}/cocktail/${String(cocktail.id)}`}
                 className="block group relative h-full"
               >
                 <div className="relative h-full rounded-[2rem] overflow-hidden bg-gray-900 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)] py-[1px] px-[1px] transition-all duration-500 group-hover:shadow-[0_30px_60px_-15px_rgba(236,72,153,0.2)] group-hover:border-pink-500/30 group-hover:-translate-y-3 group-hover:scale-[1.02] will-change-transform">
@@ -346,6 +358,8 @@ export default function GalleryContent({
                         fill
                         className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        loading={index === 0 ? "eager" : "lazy"}
+                        fetchPriority={index === 0 ? "high" : "auto"}
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
@@ -394,8 +408,8 @@ export default function GalleryContent({
         </motion.div>
 
         {/* Empty State */}
-        {filteredCocktails.length === 0 && (
-          <motion.div
+        {renderableCocktails.length === 0 && (
+          <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-32"

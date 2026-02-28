@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   title: "Questions | MoodShaker",
   description: "Answer a few questions to find your perfect cocktail",
   icons: {
-    icon: "logo.png",
+    icon: "/logo.png",
   },
 };
 
