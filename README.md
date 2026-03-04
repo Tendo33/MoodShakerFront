@@ -60,9 +60,10 @@ cd MoodShakerFront
 1. 找到项目文件夹里的 `.env.example` 文件。
 2. 把它重命名为 `.env`。
 3. 用记事本打开它，填入你的配置信息：
-   - **OpenAI 配置**: `OPENAI_API_KEY`, `OPENAI_BASE_URL` (用于生成配方)
-   - **图像生成配置**: `IMAGE_API_KEY` (用于生成鸡尾酒图片)
-   - **数据库配置**: 确保 `DATABASE_URL` 指向你的 PostgreSQL 数据库
+   - **OpenAI 配置**: `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`（用于生成配方）
+   - **图像生成配置**: `IMAGE_API_URL`, `IMAGE_API_KEY`, `IMAGE_MODEL`（用于生成鸡尾酒图片）
+   - **数据库配置**: `DATABASE_URL`（本地开发连 `localhost`；Docker 内部连 `db`）
+   - **Docker Compose 可选配置**: `HOST_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
 
 ### 第四步：初始化数据库
 

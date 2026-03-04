@@ -15,13 +15,13 @@ services:
       
       # OpenAI 配置
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
-      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4-turbo-preview}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.siliconflow.cn/v1/}
+      - OPENAI_MODEL=${OPENAI_MODEL:-deepseek-v3}
       
       # 图像生成配置
-      - IMAGE_API_URL=${IMAGE_API_URL}
+      - IMAGE_API_URL=${IMAGE_API_URL:-https://api.siliconflow.cn/v1/images/generations}
       - IMAGE_API_KEY=${IMAGE_API_KEY}
-      - IMAGE_MODEL=${IMAGE_MODEL:-dall-e-3}
+      - IMAGE_MODEL=${IMAGE_MODEL:-Qwen/Qwen-Image}
     restart: unless-stopped
     depends_on:
       db:
