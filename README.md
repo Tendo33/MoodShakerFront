@@ -1,129 +1,229 @@
-# 🎭 MoodShaker - 你的心情调酒师
+# MoodShaker Frontend
 
-> "生活就像一杯鸡尾酒，有时候需要一点调味，有时候需要一点摇晃，但最重要的是要找到属于自己的配方。"
+[简体中文](README.zh.md) · English
 
-## 🎨 这是什么？
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![React](https://img.shields.io/badge/React-19-149eca?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)
+![Prisma](https://img.shields.io/badge/Prisma-5-2d3748?logo=prisma)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38bdf8?logo=tailwind-css)
 
-MoodShaker 是一个让你心情变好的神奇应用！就像一位专业的 AI 调酒师，它能够根据你的心情，为你调制出最适合的"心情鸡尾酒"。无论是开心、难过、焦虑还是兴奋，MoodShaker 都能帮你找到最合适的解决方案。
+MoodShaker is an AI-powered, bilingual cocktail recommendation web app.  
+It turns a short mood questionnaire into a personalized cocktail recipe with ingredients, tools, steps, and a shareable visual card.
 
-不需要你是调酒大师，也不需要复杂的知识，只需要跟着我们的向导，回答几个简单的问题，一杯完美契合当下的鸡尾酒就会出现在你面前。
+## Highlights
 
-## 📸 项目导览
+- **AI recommendation pipeline** with two bartender modes (`classic_bartender` / `creative_bartender`).
+- **Localized UX** in Chinese and English (`/cn`, `/en`) with path-based routing and auto language redirect.
+- **Full cocktail journey**: home → questions → recommendation → gallery → detail page.
+- **Image generation + optimization** via external image API, optional `sharp` processing, and DB thumbnail backfill support.
+- **Performance-focused client state** using split contexts, async storage batching, request dedup/cache, and dev performance overlay.
 
-### 1. 欢迎来到 MoodShaker
+## Screenshots
 
-首页是我们旅程的起点。在这里，你可以选择"开始探索"来获取 AI 推荐，或者直接去"酒单库"看看大家的收藏。
-![MoodShaker Homepage](docs/screenshots/home_full.png)
+| Home | Questionnaire |
+| --- | --- |
+| ![Home](docs/screenshots/home_full.png) | ![Questions](docs/screenshots/questions_start.png) |
 
-### 2. 告诉我们你的心情
+| Gallery | Detail |
+| --- | --- |
+| ![Gallery](docs/screenshots/gallery.png) | ![Cocktail Detail](docs/screenshots/cocktail_detail.png) |
 
-点击"开始探索"后，AI 会问你几个简单的问题。你是想喝点经典的，还是来点创意的？你的心情如何？
-![Questions](docs/screenshots/questions_start.png)
+## Tech Stack
 
-### 3. 探索酒单库 (The Cellar)
+- **Framework**: Next.js 16 (App Router), React 19
+- **Language**: TypeScript
+- **Styling/UI**: Tailwind CSS, Framer Motion, Radix UI, Lucide
+- **Data layer**: Prisma + PostgreSQL
+- **AI integration**: OpenAI-compatible chat endpoint + image generation endpoint
+- **Tooling**: pnpm, ESLint (`next/core-web-vitals` + TypeScript rules)
 
-在画廊页面，你可以看到各种各样的鸡尾酒。你可以根据基酒（如金酒、伏特加）或口味（如甜、酸）来筛选你喜欢的饮品。
-![Gallery](docs/screenshots/gallery.png)
+## Architecture Overview
 
-### 4. 制作你的鸡尾酒
-
-当你选中一款鸡尾酒，我们提供详细的配方、所需的工具和一步步的制作说明。不仅如此，还能了解到这杯酒背后的故事。
-![Cocktail Detail](docs/screenshots/cocktail_detail.png)
-
-## ✨ 主要特点
-
-- **🧠 AI 智能推荐**: 懂你的心情，更懂你的口味。
-- **📱 完美适配手机与电脑**: 无论在地铁上还是沙发上，随时随地都能用。
-- **🎨 现代化设计**: 简洁、优雅的暗色主题界面，保护视力又充满高级感。
-- **📚 丰富的知识库**: 不只是喝，还能学到鸡尾酒文化。
-- **🌍 多语言支持**: 支持中文和英文，方便不同用户使用。
-
-## 🚀 快速开始（新手指南）
-
-如果你想在自己的电脑上运行这个项目，请按照以下步骤操作：
-
-### 第一步：准备工作
-
-确保你的电脑上安装了 `Node.js` (建议版本 18 以上)。
-
-### 第二步：下载项目
-
-```bash
-git clone https://github.com/Tendo33/MoodShakerFront
-cd MoodShakerFront
+```mermaid
+flowchart LR
+  A["User (Web)"] --> B["App Router Pages (/cn, /en)"]
+  B --> C["Client Contexts (Language / Form / Result)"]
+  C --> D["API Routes (/api/cocktail, /api/image)"]
+  D --> E["LLM + Image Providers"]
+  D --> F["Prisma"]
+  F --> G["PostgreSQL"]
+  B --> H["Gallery / Detail (DB + fallback catalog)"]
 ```
 
-### 第三步：配置环境
-
-你需要配置 AI 和数据库连接。
-
-1. 找到项目文件夹里的 `.env.example` 文件。
-2. 把它重命名为 `.env`。
-3. 用记事本打开它，填入你的配置信息：
-   - **OpenAI 配置**: `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`（用于生成配方）
-   - **图像生成配置**: `IMAGE_API_URL`, `IMAGE_API_KEY`, `IMAGE_MODEL`（用于生成鸡尾酒图片）
-   - **数据库配置**: `DATABASE_URL`（本地开发连 `localhost`；Docker 内部连 `db`）
-   - **Docker Compose 可选配置**: `HOST_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
-
-### 第四步：初始化数据库
-
-项目需要数据库支持。请确保你的 PostgreSQL 数据库正在运行，然后执行：
-
-```bash
-# 初始化数据库 (生成客户端、迁移表结构、填充初始数据)
-pnpm db:init
-```
-
-### 常见问题排查（Troubleshooting）
-
-如果你在开发日志里看到类似以下错误：
+## Project Structure
 
 ```text
-PrismaClientKnownRequestError (P2022)
-The column `cocktails.thumbnail` does not exist in the current database.
+app/
+  [lang]/
+    page.tsx
+    questions/page.tsx
+    gallery/page.tsx
+    cocktail/[id]/page.tsx
+    cocktail/recommendation/page.tsx
+  api/
+    cocktail/route.ts
+    cocktail/[id]/route.ts
+    image/route.ts
+components/
+context/
+locales/
+lib/
+prisma/
+proxy.ts
 ```
 
-说明本地数据库结构还没同步到最新迁移。请执行以下任一命令进行修复：
+## Getting Started
+
+### 1) Prerequisites
+
+- Node.js **20+**
+- pnpm **9+**
+- PostgreSQL **15+** (or Docker)
+
+### 2) Install dependencies
 
 ```bash
-# 推荐：完整初始化（生成客户端 + 迁移 + seed）
-pnpm db:init
-
-# 或仅执行 Prisma 迁移
-pnpm prisma:migrate
-```
-
-### 第五步：启动！
-
-在终端（Terminal）中输入以下命令：
-
-```bash
-# 安装需要的工具包 (如果还没安装)
 pnpm install
+```
 
-# 启动网站
+### 3) Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Fill in required API/database values in `.env` (see [Environment Variables](#environment-variables)).
+
+### 4) Prepare database
+
+Make sure PostgreSQL is running and `DATABASE_URL` is reachable, then:
+
+```bash
+pnpm db:init
+```
+
+This runs Prisma client generation, migration deploy, and seed data.
+
+### 5) Run development server
+
+```bash
 pnpm dev
 ```
 
-现在，打开浏览器访问 `http://localhost:3000`，你的专属调酒师就在那里等你！
+Open [http://localhost:3000](http://localhost:3000).  
+Root path redirects to language routes (default `/cn`).
 
-## 🛠️ 技术栈
+## Environment Variables
 
-对于对技术感兴趣的朋友，我们使用了以下最前沿的技术：
+| Variable | Required | Description |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | Yes | API key for chat completion endpoint |
+| `OPENAI_BASE_URL` | Yes | OpenAI-compatible base URL (keep trailing `/`, e.g. `.../v1/`) |
+| `OPENAI_MODEL` | Yes | Chat model name |
+| `IMAGE_API_URL` | Yes (for image generation) | Image generation endpoint |
+| `IMAGE_API_KEY` | Yes (for image generation) | Image API key |
+| `IMAGE_MODEL` | No | Image model name |
+| `DATABASE_URL` | Yes for persistent DB mode | PostgreSQL connection string |
+| `HOST_PORT` | Optional (Docker Compose) | Exposed web port |
+| `POSTGRES_USER` | Optional (Docker Compose) | Database username |
+| `POSTGRES_PASSWORD` | Optional (Docker Compose) | Database password |
+| `POSTGRES_DB` | Optional (Docker Compose) | Database name |
 
-- **框架**: Next.js 16 (React 19 的超集，更快更强)
-- **语言**: TypeScript (给 JavaScript 加上了类型安全)
-- **样式**: Tailwind CSS (写样式从未如此简单)
-- **组件**: Radix UI & shadcn/ui (无障碍、高质量的组件库)
+## Available Scripts
 
-## 🤝 加入我们
+| Command | Description |
+| --- | --- |
+| `pnpm dev` | Start local development server |
+| `pnpm build` | Build production bundle |
+| `pnpm start` | Run built app |
+| `pnpm lint` | Run ESLint |
+| `pnpm db:init` | Prisma generate + migrate deploy + seed |
+| `pnpm prisma:generate` | Generate Prisma client |
+| `pnpm prisma:migrate` | Apply Prisma migrations |
+| `pnpm prisma:seed` | Seed popular cocktails |
+| `pnpm prisma:backfill-thumbnails` | Backfill `thumbnail` column from existing images |
 
-想要成为我们的调酒师吗？欢迎提交 Pull Request！让我们一起调制出更多精彩的心情鸡尾酒！
+## API Endpoints
 
-## 📝 许可证
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/cocktail` | Generate cocktail recommendation from questionnaire payload |
+| `GET` | `/api/cocktail/:id` | Fetch cocktail detail by id |
+| `POST` | `/api/image` | Generate cocktail image and optionally persist optimized image/thumbnail |
 
-[MIT](https://opensource.org/licenses/MIT)
+## Localization & Routing
 
-## 👨‍💻 作者
+- Supported languages: `cn`, `en`
+- `proxy.ts` handles language detection from URL, cookie, and `Accept-Language`
+- Missing language prefix paths are redirected to localized routes
+- Translation dictionaries live in `locales/cn.ts` and `locales/en.ts`
 
-## [Tendo33](https://simonsun.cc)
+## Docker Deployment
+
+This repo includes:
+
+- `Dockerfile` for multi-stage app image build
+- `docker-compose.yml` with `moodshaker-web` + `postgres` services
+- `scripts/docker-entrypoint.sh` to init DB schema and seed on container startup
+
+Run:
+
+```bash
+docker compose up -d
+```
+
+## Troubleshooting
+
+### Prisma `P2022` missing `thumbnail` column
+
+If you see:
+
+```text
+The column `cocktails.thumbnail` does not exist in the current database
+```
+
+Run:
+
+```bash
+pnpm db:init
+# or
+pnpm prisma:migrate
+```
+
+### Recommendation or image API errors
+
+- Verify `.env` keys and endpoint URLs
+- Ensure `OPENAI_BASE_URL` is OpenAI-compatible and includes `/v1/`
+- Check server logs from `api/openai.ts` and `app/api/*` handlers
+
+## Quality & Validation
+
+There is no automated test runner configured yet. Recommended checks:
+
+```bash
+pnpm lint
+pnpm build
+```
+
+Manual smoke checks:
+
+1. Questionnaire flow and recommendation generation
+2. Gallery search + filters
+3. Detail page rendering and language switch
+4. Share card generation/download
+
+## Contributing
+
+PRs are welcome. Suggested PR content:
+
+- short summary
+- related issue (if any)
+- verification steps
+- screenshots for UI changes
+- env/database notes when applicable
+
+## Notes
+
+- AI outputs can be inaccurate; always review recipes and safety constraints.
+- Do not commit `.env` or any secret values.
