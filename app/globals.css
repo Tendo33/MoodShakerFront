@@ -1,125 +1,209 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ===== Container (removed from Tailwind v4 core) ===== */
+@utility container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= 1536px) {
+    max-width: 1400px;
+  }
+}
+
+/* ===== Theme — replaces tailwind.config.ts ===== */
+@theme inline {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-fadeIn: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  --animate-fadeOut: fadeOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  --animate-float: float 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  --animate-gentleFloat: gentleFloat 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  --animate-pulse: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shimmer: shimmer 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  --animate-slideUp: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-scaleIn: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes slideUp {
+  0% { transform: translateY(40px); opacity: 0; filter: blur(8px); }
+  100% { transform: translateY(0); opacity: 1; filter: blur(0); }
+}
+@keyframes scaleIn {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
 
 /* Font is handled by Playfair Display and Source Sans Pro in layout.tsx */
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* ===== Custom Utilities (Tailwind v4: @utility replaces @layer utilities + @apply) ===== */
 
-  /* 噪点纹理 */
-  .noise-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 50;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  }
-
-  /* ===== 标准化玻璃拟态体系 (3 levels) ===== */
-
-  /* Level 1: 极淡 — 大背景装饰区域 */
-  .glass-subtle {
-    @apply backdrop-blur-md border border-white/5;
-    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-    transform: translateZ(0);
-  }
-
-  /* Level 2: 标准卡片 — 内容卡片、面板 */
-  .glass-panel {
-    @apply backdrop-blur-xl border border-white/10 shadow-2xl;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.03) 100%
-    );
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-    transform: translateZ(0);
-  }
-
-  /* Level 3: 高对比 — Modal、Dropdown、Popup */
-  .glass-popup {
-    @apply backdrop-blur-2xl border border-white/20 shadow-2xl;
-    background: linear-gradient(
-      135deg,
-      rgba(40, 45, 60, 0.85) 0%,
-      rgba(25, 30, 45, 0.95) 100%
-    );
-    box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
-    transform: translateZ(0);
-  }
-
-  /* 兼容别名：保留 .glass-effect 映射到 glass-panel */
-  .glass-effect {
-    @apply backdrop-blur-xl border border-white/10 shadow-2xl;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.03) 100%
-    );
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-    transform: translateZ(0);
-    will-change: transform, opacity;
-  }
+@utility text-balance {
+  text-wrap: balance;
 }
 
+@utility noise-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Level 1: 极淡 — 大背景装饰区域 */
+@utility glass-subtle {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 0.05);
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  transform: translateZ(0);
+}
+
+/* Level 2: 标准卡片 — 内容卡片、面板 */
+@utility glass-panel {
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  transform: translateZ(0);
+}
+
+/* Level 3: 高对比 — Modal、Dropdown、Popup */
+@utility glass-popup {
+  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(40px);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  background: linear-gradient(135deg, rgba(40, 45, 60, 0.85) 0%, rgba(25, 30, 45, 0.95) 100%);
+  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  transform: translateZ(0);
+}
+
+/* 兼容别名：保留 .glass-effect 映射到 glass-panel */
+@utility glass-effect {
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* ===== Design Tokens ===== */
 @layer base {
   :root {
-    /* Updated color tokens to match sophisticated design brief */
-    --background: 220 26% 14%; /* #1f2937 - Dark background */
-    --foreground: 0 0% 98%; /* #ffffff - Primary text color */
-    --card: 220 23% 18%; /* #2a2d34 - Card background */
-    --card-foreground: 0 0% 98%; /* #ffffff - Card text color */
-    --popover: 220 23% 18%; /* #2a2d34 - Popover background */
-    --popover-foreground: 0 0% 98%; /* #ffffff - Popover text color */
-    --primary: 35 81% 65%; /* #FFB74D - Primary accent color (amber) */
-    --primary-foreground: 220 26% 14%; /* #1f2937 - Primary button text */
-    --secondary: 340 82% 62%; /* #FF4081 - Secondary accent color (pink) */
-    --secondary-foreground: 0 0% 98%; /* #ffffff - Secondary button text */
-    --muted: 220 9% 46%; /* #6b7280 - Muted text color */
-    --muted-foreground: 220 9% 70%; /* #9ca3af - Proper muted text color */
-    --accent: 340 82% 62%; /* #FF4081 - Accent color for highlights */
-    --accent-foreground: 220 26% 14%; /* #1f2937 - Accent text color */
-    --destructive: 348 83% 47%; /* #be123c - Color for destructive actions */
-    --destructive-foreground: 0 0% 98%; /* #ffffff - Text for destructive actions */
-    --border: 220 13% 36%; /* #4b5563 - Border color */
-    --input: 220 23% 18%; /* #2a2d34 - Input field background */
-    --ring: 0 0% 98% / 0.1; /* rgba(255, 255, 255, 0.1) - Ring color for focus */
-    --chart-1: 35 81% 65%; /* #FFB74D - Chart color 1 */
-    --chart-2: 340 82% 62%; /* #FF4081 - Chart color 2 */
-    --chart-3: 220 9% 46%; /* #6b7280 - Chart color 3 */
-    --chart-4: 220 13% 36%; /* #4b5563 - Chart color 4 */
-    --chart-5: 220 23% 18%; /* #2a2d34 - Chart color 5 */
-    --radius: 0.75rem; /* Increased corner rounding for modern look */
-    --sidebar: 220 23% 18%; /* #2a2d34 - Sidebar background */
-    --sidebar-foreground: 0 0% 98%; /* #ffffff - Sidebar text color */
-    --sidebar-primary: 35 81% 65%; /* #FFB74D - Primary sidebar accent */
-    --sidebar-primary-foreground: 220 26% 14%; /* #1f2937 - Sidebar primary text */
-    --sidebar-accent: 340 82% 62%; /* #FF4081 - Sidebar accent color */
-    --sidebar-accent-foreground: 0 0% 98%; /* #ffffff - Sidebar accent text */
-    --sidebar-border: 220 13% 36%; /* #4b5563 - Sidebar border color */
-    --sidebar-ring: 0 0% 98% / 0.1; /* rgba(255, 255, 255, 0.1) - Sidebar focus ring */
+    --background: 220 26% 14%;
+    --foreground: 0 0% 98%;
+    --card: 220 23% 18%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 23% 18%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 35 81% 65%;
+    --primary-foreground: 220 26% 14%;
+    --secondary: 340 82% 62%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 9% 46%;
+    --muted-foreground: 220 9% 70%;
+    --accent: 340 82% 62%;
+    --accent-foreground: 220 26% 14%;
+    --destructive: 348 83% 47%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 36%;
+    --input: 220 23% 18%;
+    --ring: 0 0% 98% / 0.1;
+    --chart-1: 35 81% 65%;
+    --chart-2: 340 82% 62%;
+    --chart-3: 220 9% 46%;
+    --chart-4: 220 13% 36%;
+    --chart-5: 220 23% 18%;
+    --radius: 0.75rem;
+    --sidebar: 220 23% 18%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 35 81% 65%;
+    --sidebar-primary-foreground: 220 26% 14%;
+    --sidebar-accent: 340 82% 62%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 220 13% 36%;
+    --sidebar-ring: 0 0% 98% / 0.1;
   }
 }
 
+/* ===== Base Styles (raw CSS — no @apply inside @layer in v4) ===== */
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
-    /* Enhanced font smoothing for better readability */
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Mobile optimization for touch targets */
   button,
   [role="button"],
   a {
@@ -127,7 +211,6 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Prevent iOS zoom on inputs */
   @media screen and (max-width: 768px) {
     input,
     select,
@@ -137,7 +220,7 @@
   }
 }
 
-/* Enhanced scrollbar with design system colors */
+/* ===== Scrollbar ===== */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -157,7 +240,7 @@
   background: hsl(var(--muted) / 0.4);
 }
 
-/* Enhanced card hover effects with design system colors */
+/* ===== Component Styles ===== */
 .card-hover {
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -170,7 +253,6 @@
     0 0 0 1px hsl(var(--border) / 0.2);
 }
 
-/* Updated gradient text to use design system colors */
 .gradient-text {
   background: linear-gradient(
     135deg,
@@ -184,7 +266,6 @@
   animation: gradient-shift 3s ease infinite;
 }
 
-/* Enhanced gradient text with bright colors for dark backgrounds */
 .gradient-text-bright {
   background: linear-gradient(135deg, #fde047, #f87171, #ec4899);
   background-clip: text;
@@ -204,23 +285,19 @@
   }
 }
 
-/* 锦囊一：呼吸感 - 宽松的间距定义 */
+/* ===== Spacing Utilities (@apply outside @layer works in v4) ===== */
 .section-spacing {
-  /* Increased section padding for luxury feel */
   @apply py-16 md:py-24 lg:py-32;
 }
 
 .content-spacing {
-  /* Relaxed content spacing */
   @apply space-y-8 md:space-y-12 lg:space-y-16;
 }
 
 .card-spacing {
-  /* More generous card padding */
   @apply p-6 md:p-8 lg:p-10;
 }
 
-/* Container utilities */
 .container-narrow {
   @apply max-w-4xl mx-auto;
 }
@@ -229,11 +306,7 @@
   @apply max-w-6xl mx-auto;
 }
 
-/* Removed 'compact' variants to enforce spacious design */
-
-/* Mobile responsive overrides - consolidated */
 @media (max-width: 640px) {
-  /* Optimize container padding for small screens */
   .container {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
@@ -250,9 +323,7 @@
   }
 }
 
-/* Optimized hero section for better screen utilization */
 .hero-height {
-  /* Taller hero for impact */
   min-height: 85vh;
 }
 
@@ -268,40 +339,31 @@
   }
 }
 
-/* Optimized grid spacing for cards */
 .card-grid {
-  /* Wider grid gaps */
   @apply grid gap-6 md:gap-8 lg:gap-10;
 }
 
-/* Improved text spacing for better readability */
 .text-spacing {
-  /* Relaxed text spacing */
   @apply space-y-4 md:space-y-6;
 }
 
 .text-spacing p {
-  /* More paragraph spacing */
   @apply mb-4 last:mb-0;
 }
 
-/* Enhanced button spacing */
 .button-group {
-  /* Relaxed button group spacing */
   @apply flex flex-col sm:flex-row gap-4 md:gap-6;
 }
 
-/* Enhanced focus states for better accessibility */
 .focus-ring {
   @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background;
 }
 
-/* Smooth page transitions */
 .page-transition {
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ===== 流体排版 (Fluid Typography) — 用 clamp() 替代多层媒体查询覆盖 ===== */
+/* ===== Fluid Typography ===== */
 @layer base {
   h1 {
     font-size: clamp(1.875rem, 5vw, 4.5rem);

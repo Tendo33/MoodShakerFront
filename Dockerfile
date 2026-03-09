@@ -1,5 +1,5 @@
 # 构建阶段
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -7,8 +7,8 @@ WORKDIR /app
 # 安装系统依赖 (OpenSSL 3.0 compatibility)
 RUN apk add --no-cache openssl libc6-compat
 
-# 安装 pnpm
-RUN npm install -g pnpm
+# 安装 pnpm (锁定版本)
+RUN npm install -g pnpm@10.9.0
 
 # 复制 package.json 和 pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
@@ -33,15 +33,15 @@ RUN ls -la node_modules/.prisma/ || echo "Warning: .prisma directory not found"
 RUN pnpm build
 
 # 生产阶段
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
 # 安装系统依赖 (OpenSSL 3.0 compatibility)
 RUN apk add --no-cache openssl libc6-compat
 
-# 安装 pnpm
-RUN npm install -g pnpm
+# 安装 pnpm (锁定版本)
+RUN npm install -g pnpm@10.9.0
 
 # 复制必要的文件
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
