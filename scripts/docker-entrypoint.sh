@@ -24,9 +24,9 @@ fi
 
 echo "✅ Database is ready!"
 
-# 生成 Prisma 客户端
-echo "🔧 Generating Prisma client..."
-pnpm prisma:generate
+# Prisma Client is generated at image build time.
+# Regenerating at runtime can fail under non-root user due to node_modules permissions.
+echo "🔧 Using pre-generated Prisma client from build stage..."
 
 # 同步数据库模式（使用 db push 而不是 migrate，更适合 Docker 环境）
 echo "🔄 Syncing database schema..."
