@@ -44,20 +44,20 @@ RUN apk add --no-cache openssl libc6-compat
 RUN npm install -g pnpm@10.9.0
 
 # 复制必要的文件
-COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder --chown=node:node /app/package.json /app/pnpm-lock.yaml ./
+COPY --from=builder --chown=node:node /app/.next ./.next
+COPY --from=builder --chown=node:node /app/public ./public
+COPY --from=builder --chown=node:node /app/next.config.mjs ./
 # 注意：.env文件不复制，因为生产环境变量应该通过运行时传入
 
 # 复制 Prisma schema 和种子数据脚本
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/api ./api
-COPY --from=builder /app/lib ./lib
-COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder --chown=node:node /app/prisma ./prisma
+COPY --from=builder --chown=node:node /app/api ./api
+COPY --from=builder --chown=node:node /app/lib ./lib
+COPY --from=builder --chown=node:node /app/tsconfig.json ./
 
 # 复制启动脚本
-COPY --from=builder /app/scripts/docker-entrypoint.sh ./scripts/
+COPY --from=builder --chown=node:node /app/scripts/docker-entrypoint.sh ./scripts/
 RUN chmod +x ./scripts/docker-entrypoint.sh
 
 # 安装生产依赖 (包含 @prisma/client)
@@ -78,6 +78,9 @@ ENV NODE_ENV=production
 ENV PORT=3000
 # 注意：环境变量应该在构建时通过 --build-arg 传入
 # 或者在运行时通过 docker run -e 传入
+
+# 使用非 root 用户运行应用（配合 COPY --chown=node:node）
+USER node
 
 # 暴露端口
 EXPOSE 3000
