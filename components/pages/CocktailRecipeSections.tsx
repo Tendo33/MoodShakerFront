@@ -72,7 +72,7 @@ export function CocktailRecipeSections({
       }}
     >
       <motion.h2
-        className="text-3xl md:text-4xl font-bold text-center mb-12 font-playfair gradient-text-bright"
+        className="text-3xl md:text-4xl font-black text-center mb-12 font-heading tracking-widest uppercase gradient-text drop-shadow-[0_0_15px_rgba(255,0,255,0.4)]"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -83,17 +83,17 @@ export function CocktailRecipeSections({
 
       <div className="lg:hidden space-y-6">
         <motion.div
-          className={`rounded-xl overflow-hidden ${cardClasses}`}
+          className={`rounded-none overflow-hidden border-2 border-primary ${cardClasses}`}
           variants={{
             hidden: { opacity: 0, y: 20 },
             visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
           }}
         >
           <button
-            className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-colors group"
+            className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-primary/20 transition-colors group"
             onClick={() => toggleSection("ingredients")}
           >
-            <h3 className={`text-xl font-bold ${textColorClass} group-hover:text-primary transition-colors`}>
+            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-primary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
               {t("recommendation.ingredients")}
             </h3>
             {isIngredientsExpanded ? (
@@ -131,17 +131,17 @@ export function CocktailRecipeSections({
         </motion.div>
 
         <motion.div
-          className={`rounded-xl overflow-hidden ${cardClasses}`}
+          className={`rounded-none overflow-hidden border-2 border-secondary ${cardClasses}`}
           variants={{
             hidden: { opacity: 0, y: 20 },
             visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
           }}
         >
           <button
-            className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
+            className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-secondary/20 transition-colors group"
             onClick={() => toggleSection("tools")}
           >
-            <h3 className={`text-xl font-bold ${textColorClass}`}>
+            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-secondary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
               {t("recommendation.tools")}
             </h3>
             {isToolsExpanded ? (
@@ -180,17 +180,17 @@ export function CocktailRecipeSections({
         </motion.div>
 
         <motion.div
-          className={`rounded-xl overflow-hidden ${cardClasses}`}
+          className={`rounded-none overflow-hidden border-2 border-accent ${cardClasses}`}
           variants={{
             hidden: { opacity: 0, y: 20 },
             visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
           }}
         >
           <button
-            className="w-full p-5 md:p-6 flex justify-between items-center bg-white/5"
+            className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-accent/20 transition-colors group"
             onClick={() => toggleSection("steps")}
           >
-            <h3 className={`text-xl font-bold ${textColorClass}`}>
+            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-accent transition-colors drop-shadow-[0_0_5px_currentColor]`}>
               {t("recommendation.steps")}
             </h3>
             {isStepsExpanded ? (
@@ -212,7 +212,7 @@ export function CocktailRecipeSections({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: step.step_number * 0.1 }}
                     >
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)] font-bold text-primary shrink-0 z-10 text-sm">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-none border-2 border-primary/50 bg-black/40 shadow-[0_0_10px_rgba(255,0,255,0.3)] font-bold text-primary font-mono shrink-0 z-10 text-sm">
                         {step.step_number}
                       </div>
                       <div className="flex-1 pt-0.5">
@@ -221,13 +221,14 @@ export function CocktailRecipeSections({
                         </p>
                         {localizedStep.tips && (
                           <motion.div
-                            className="mt-3 p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl relative overflow-hidden"
+                            className="mt-3 p-3 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden shadow-[0_0_15px_rgba(255,191,0,0.15)]"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.3 }}
                           >
-                            <p className="text-amber-400/70 text-xs flex items-center gap-1.5">
-                              <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
+                            <div className="absolute inset-0 bg-linear-to-r from-amber-500/5 to-transparent pointer-events-none" />
+                            <p className="text-amber-200/90 text-xs flex items-center gap-1.5 relative z-10">
+                              <Lightbulb className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
                               <span>{localizedStep.tips}</span>
                             </p>
                           </motion.div>
@@ -245,14 +246,14 @@ export function CocktailRecipeSections({
       <div className="hidden lg:grid lg:grid-cols-12 gap-10 items-start">
         <div className="lg:col-span-4 space-y-8 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin">
           <motion.div
-            className={`rounded-2xl overflow-hidden ${cardClasses}`}
+            className={`rounded-none overflow-hidden border-2 border-primary shadow-[0_0_20px_rgba(255,0,255,0.15)] ${cardClasses}`}
             variants={{
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
             }}
           >
-            <div className="p-5 bg-white/5 border-b border-white/10">
-              <h3 className={`text-2xl font-bold ${textColorClass} font-playfair`}>
+            <div className="p-5 bg-primary/10 border-b-2 border-primary">
+              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass} drop-shadow-[0_0_8px_rgba(255,0,255,0.6)]`}>
                 {t("recommendation.ingredients")}
               </h3>
             </div>
@@ -283,14 +284,14 @@ export function CocktailRecipeSections({
           </motion.div>
 
           <motion.div
-            className={`rounded-2xl overflow-hidden ${cardClasses}`}
+            className={`rounded-none overflow-hidden border-2 border-secondary shadow-[0_0_20px_rgba(0,255,255,0.15)] ${cardClasses}`}
             variants={{
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.1 } },
             }}
           >
-            <div className="p-5 bg-white/5 border-b border-white/10">
-              <h3 className={`text-2xl font-bold ${textColorClass} font-playfair`}>
+            <div className="p-5 bg-secondary/10 border-b-2 border-secondary">
+              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass} drop-shadow-[0_0_8px_rgba(0,255,255,0.6)]`}>
                 {t("recommendation.tools")}
               </h3>
             </div>
@@ -324,14 +325,14 @@ export function CocktailRecipeSections({
 
         <div className="lg:col-span-8">
           <motion.div
-            className={`rounded-2xl overflow-hidden ${cardClasses} h-full`}
+            className={`rounded-none overflow-hidden border-2 border-accent shadow-[0_0_30px_rgba(255,153,0,0.15)] ${cardClasses} h-full`}
             variants={{
               hidden: { opacity: 0, x: 20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
             }}
           >
-            <div className="p-5 bg-white/5 border-b border-white/10">
-              <h3 className={`text-2xl font-bold ${textColorClass} font-playfair`}>
+            <div className="p-5 bg-accent/10 border-b-2 border-accent">
+              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass} drop-shadow-[0_0_8px_rgba(255,153,0,0.6)]`}>
                 {t("recommendation.steps")}
               </h3>
             </div>
@@ -348,7 +349,7 @@ export function CocktailRecipeSections({
                       transition={{ delay: step.step_number * 0.1 }}
                     >
                       <div className="flex gap-6">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:border-primary group-hover:shadow-[0_0_20px_hsl(var(--primary)/0.4)] transition-all duration-300 font-bold text-primary shrink-0 z-10">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-none border-2 border-primary/50 bg-black/40 shadow-[0_0_15px_rgba(255,0,255,0.4)] group-hover:border-primary group-hover:shadow-[0_0_25px_hsl(var(--primary)/0.6)] font-mono transition-all duration-300 font-bold text-primary shrink-0 z-10">
                           {step.step_number}
                         </div>
                         <div className="flex-1 pt-1">
@@ -357,14 +358,14 @@ export function CocktailRecipeSections({
                           </p>
                           {localizedStep.tips && (
                             <motion.div
-                              className="mt-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl relative overflow-hidden"
+                              className="mt-4 p-4 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden shadow-[0_0_20px_rgba(255,191,0,0.15)]"
                               initial={{ opacity: 0, y: 5 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.3 }}
                             >
-                              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-transparent pointer-events-none" />
+                              <div className="absolute inset-0 bg-linear-to-r from-amber-500/5 to-transparent pointer-events-none" />
                               <p className="text-amber-200/90 text-sm flex items-start gap-2 relative z-10">
-                                <Lightbulb className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
+                                <Lightbulb className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
                                 <span>{localizedStep.tips}</span>
                               </p>
                             </motion.div>
@@ -373,7 +374,7 @@ export function CocktailRecipeSections({
                       </div>
 
                       {step.step_number < (cocktail.steps?.length || 0) && (
-                        <div className="absolute left-[1.7rem] top-14 bottom-[-2rem] w-px bg-gradient-to-b from-white/20 to-white/5"></div>
+                        <div className="absolute left-[1.7rem] top-14 -bottom-8 w-px bg-linear-to-b from-primary/50 to-transparent"></div>
                       )}
                     </motion.li>
                   );

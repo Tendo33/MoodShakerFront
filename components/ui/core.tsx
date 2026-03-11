@@ -45,53 +45,50 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const { t } = useLanguage();
     const baseStyles =
-      "relative font-medium rounded-full transition-all duration-300 flex items-center justify-center font-source-sans focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background transform-gpu active:scale-[0.98] disabled:active:scale-100 whitespace-nowrap";
+      "relative rounded-none font-medium transition-all duration-200 flex items-center justify-center font-mono uppercase tracking-wider focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary/90 focus-visible:ring-offset-2 focus-visible:ring-offset-background transform-gpu active:scale-95 disabled:active:scale-100 whitespace-nowrap";
 
     const variantStyles = {
       primary:
-        "bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_14px_0_hsl(var(--primary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.6)]",
+        "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary hover:text-black hover:shadow-[0_0_20px_var(--color-secondary)]",
       secondary:
-        "bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-[0_4px_14px_0_hsl(var(--secondary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--secondary)/0.6)]",
+        "bg-primary border-2 border-primary text-black hover:scale-105 hover:opacity-90 neon-glow-primary",
       outline:
-        "bg-transparent border-2 border-border hover:bg-accent/10 hover:border-accent text-foreground hover:shadow-[0_0_15px_hsl(var(--accent)/0.2)]",
+        "bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-black",
       ghost:
-        "bg-transparent hover:bg-accent/10 text-foreground",
-      link: "bg-transparent text-primary hover:text-secondary p-0 hover:underline font-medium",
-      neon: "bg-transparent border-2 border-primary text-primary shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.6)] hover:bg-primary/10",
+        "bg-transparent text-foreground hover:bg-[rgba(0,255,255,0.1)] hover:text-secondary",
+      link: "bg-transparent text-secondary hover:text-primary p-0 hover:underline font-medium hover:neon-glow-secondary",
+      neon: "bg-transparent border-2 border-primary text-primary shadow-[0_0_20px_rgba(255,0,255,0.3)] hover:shadow-[0_0_40px_rgba(255,0,255,0.8)] hover:bg-primary hover:text-black",
       bubble:
-        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden before:content-[''] before:absolute before:inset-0 before:scale-0 hover:before:scale-100 before:rounded-full before:transition-transform before:duration-500 before:bg-white/20 shadow-lg hover:shadow-xl",
+        "bg-gradient-to-r from-accent via-primary to-secondary text-black hover:scale-105 shadow-[0_0_15px_rgba(255,0,255,0.5)]",
       shine:
-        "bg-gradient-to-r from-primary to-secondary text-white overflow-hidden shadow-lg hover:shadow-xl", // Logic moved to effect="shine"
+        "bg-secondary border-2 border-secondary text-black hover:shadow-[0_0_30px_var(--color-secondary)]",
     };
 
     const effectStyles = {
       none: "",
-      shine: "overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700",
-      pulse: "animate-pulse hover:animate-none hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)]",
-      glow: "hover:shadow-[0_0_30px_currentColor] hover:border-current z-10",
-      lift: "hover:-translate-y-1 hover:shadow-[0_10px_25px_-5px_var(--shadow-color,rgba(0,0,0,0.5))]",
-      ring: "hover:ring-2 hover:ring-offset-2 hover:ring-primary",
+      shine: "overflow-hidden hover:brightness-125",
+      pulse: "animate-neon-pulse hover:animate-none",
+      glow: "hover:shadow-[0_0_30px_currentColor] z-10",
+      lift: "hover:-translate-y-2 hover:shadow-[0_15px_30px_-5px_var(--color-primary)]",
+      ring: "hover:ring-2 hover:ring-offset-2 hover:ring-secondary",
     };
 
-    // Apply default hover scale if no specific effect overrides it or if it's 'none'/'shine'/'glow' which usually pair well with scale
-    // But 'lift' does its own transform.
-    const defaultTransform = effect === "lift" ? "" : "hover:scale-105";
-    
-    // Compatibility: if variant is 'shine', force effect='shine' if not specified
+    const defaultTransform = "";
+
     const activeEffect = variant === 'shine' && effect === 'none' ? 'shine' : effect;
 
     const sizeStyles = {
       xs: "px-3 py-1 text-xs",
-      sm: "px-4 py-1.5 text-sm",
-      md: "px-6 py-2.5 text-sm",
-      lg: "px-8 py-3 text-base",
-      xl: "px-10 py-3.5 text-lg",
+      sm: "px-4 py-2 text-sm",
+      md: "px-6 py-3 text-sm",
+      lg: "px-8 py-4 text-base",
+      xl: "px-10 py-4 text-lg",
     };
 
     const widthStyles = fullWidth ? "w-full" : "w-auto";
     const disabledStyles =
       props.disabled || isLoading
-        ? "opacity-50 cursor-not-allowed pointer-events-none"
+        ? "opacity-50 cursor-not-allowed pointer-events-none grayscale"
         : "cursor-pointer";
 
     const buttonStyles = `
@@ -107,25 +104,25 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Button content
     const buttonContent = (
-      <>
+      <span className="inline-flex items-center">
         {isLoading ? (
           <span className="flex items-center justify-center">
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-2 h-4 w-4 animate-spin text-current" />
             <span>{t("common.loading")}</span>
           </span>
         ) : (
           <>
             {icon && iconPosition === "left" && (
-              <span className="mr-2 flex items-center">{icon}</span>
+              <span className="mr-2 flex items-center drop-shadow-[0_0_8px_currentColor]">{icon}</span>
             )}
-            <span>{children}</span>
+            <span className="drop-shadow-[0_0_8px_currentColor]">{children}</span>
             {icon && iconPosition === "right" && (
-              <span className="ml-2 flex items-center">{icon}</span>
+              <span className="ml-2 flex items-center drop-shadow-[0_0_8px_currentColor]">{icon}</span>
             )}
-            {external && <ExternalLink className="ml-1.5 h-3.5 w-3.5" />}
+            {external && <ExternalLink className="ml-1.5 h-3.5 w-3.5 drop-shadow-[0_0_8px_currentColor]" />}
           </>
         )}
-      </>
+      </span>
     );
 
     // Render as Link if href is provided
@@ -164,7 +161,7 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
       return (
         <div
           ref={ref}
-          className={`h-full w-px bg-gray-700 mx-2 ${className}`}
+          className={`h-full w-px bg-primary/50 shadow-[0_0_10px_var(--color-primary)] mx-2 ${className}`}
           {...props}
         />
       );
@@ -177,9 +174,9 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
           className={`relative w-full flex items-center my-4 ${className}`}
           {...props}
         >
-          <div className="flex-grow h-px bg-gray-700" />
-          <span className="px-3 text-sm text-gray-400">{label}</span>
-          <div className="flex-grow h-px bg-gray-700" />
+          <div className="grow h-0.5 bg-linear-to-r from-transparent to-primary shadow-[0_0_10px_var(--color-primary)]" />
+          <span className="px-4 text-sm font-mono tracking-widest text-primary uppercase">{label}</span>
+          <div className="grow h-0.5 bg-linear-to-l from-transparent to-primary shadow-[0_0_10px_var(--color-primary)]" />
         </div>
       );
     }
@@ -187,7 +184,7 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
     return (
       <div
         ref={ref}
-        className={`w-full h-px bg-gray-700 my-4 ${className}`}
+        className={`w-full h-0.5 bg-linear-to-r from-primary via-secondary to-accent shadow-[0_0_15px_var(--color-secondary)] my-4 ${className}`}
         {...props}
       />
     );
@@ -250,7 +247,7 @@ export const GradientText = forwardRef<HTMLSpanElement, GradientTextProps>(
     return (
       <Component
         ref={ref}
-        className={`gradient-text font-playfair font-bold ${className}`}
+        className={`gradient-text font-heading font-black tracking-tight ${className}`}
         {...props}
       >
         {children}

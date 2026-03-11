@@ -54,10 +54,10 @@ export default function LanguageSelector() {
     <div className="relative" ref={dropdownRef}>
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-5 py-2.5 text-sm rounded-full transition-all duration-300 border ${
+        className={`flex items-center gap-2 px-5 py-2 text-sm rounded-none font-mono tracking-widest uppercase transition-all duration-300 border-2 ${
           isOpen
-            ? "bg-primary/20 border-primary/40 text-primary shadow-[0_0_20px_rgba(var(--primary),0.3)]"
-            : "glass-effect backdrop-blur-xl border-white/10 hover:bg-white/10 hover:border-white/30 text-foreground/80 hover:text-foreground hover:shadow-[0_4px_20px_rgba(255,255,255,0.05)]"
+            ? "bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(255,0,255,0.4)]"
+            : "bg-black/40 border-primary/30 text-primary/80 hover:bg-black/80 hover:border-primary hover:text-primary hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]"
         }`}
         aria-label={t("language.select")}
         aria-expanded={isOpen}
@@ -65,9 +65,11 @@ export default function LanguageSelector() {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        <Globe className={`h-4 w-4 ${isOpen ? "text-primary" : ""}`} />
-        <span className="hidden md:inline text-sm font-medium font-source-sans tracking-wide">
-          {t(language === "en" ? "language.en" : "language.cn")}
+        <span className="flex items-center gap-2">
+          <Globe className={`h-4 w-4 ${isOpen ? "text-primary drop-shadow-[0_0_5px_currentColor]" : ""}`} />
+          <span className="hidden md:inline text-sm font-bold font-mono tracking-widest drop-shadow-[0_0_5px_currentColor]">
+            {t(language === "en" ? "language.en" : "language.cn")}
+          </span>
         </span>
         <ChevronDown
           className={`h-3 w-3 transition-transform duration-300 ${
@@ -79,26 +81,26 @@ export default function LanguageSelector() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="absolute right-0 mt-3 w-52 rounded-2xl overflow-hidden bg-black/40 backdrop-blur-3xl border border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)] ring-1 ring-white/5 z-50"
+            className="absolute right-0 mt-3 w-48 rounded-none overflow-hidden bg-black/90 backdrop-blur-3xl border-2 border-primary shadow-[0_10px_40px_rgba(255,0,255,0.3)] z-50"
             initial="hidden"
             animate="visible"
             exit="exit"
             variants={dropdownVariants}
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-white/10 to-transparent pointer-events-none" />
 
             <div className="relative py-2" role="listbox">
-              <div className="px-5 py-2 text-xs font-bold text-muted-foreground uppercase tracking-widest border-b border-white/10 mb-1">
+              <div className="px-5 py-2 text-xs font-bold text-primary/70 font-mono uppercase tracking-widest border-b-2 border-primary/30 mb-1">
                 {t("language.select")}
               </div>
 
               {Object.entries(availableLanguages).map(([code, name]) => (
                 <button
                   key={code}
-                  className={`relative flex items-center justify-between w-full px-5 py-3 text-sm transition-all duration-300 group overflow-hidden ${
+                  className={`relative flex items-center justify-between w-full px-5 py-3 text-sm font-mono tracking-widest uppercase transition-all duration-300 group overflow-hidden ${
                     language === code
-                      ? "bg-primary/15 text-primary font-medium"
-                      : "text-foreground/80 hover:text-foreground hover:pl-6"
+                      ? "bg-primary/20 text-primary font-bold shadow-[inset_4px_0_0_rgba(255,0,255,1)]"
+                      : "text-primary/70 hover:text-primary hover:bg-black/60 hover:pl-6"
                   }`}
                   role="option"
                   aria-selected={language === code}
@@ -108,10 +110,10 @@ export default function LanguageSelector() {
                   }}
                 >
                   <div className="flex items-center gap-3 z-10">
-                    <span className="text-lg shadow-sm filter drop-shadow-md">
+                    <span className="text-lg drop-shadow-[0_0_5px_rgba(255,0,255,0.5)]">
                       {code === "en" ? "🇺🇸" : "🇨🇳"}
                     </span>
-                    <span className="font-source-sans">{name}</span>
+                    <span className="font-mono">{name}</span>
                   </div>
 
                   {language === code && (
@@ -125,7 +127,7 @@ export default function LanguageSelector() {
                   )}
 
                   {/* Hover sweeping glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:animate-shimmer pointer-events-none" />
+                  <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 </button>
               ))}

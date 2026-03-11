@@ -214,8 +214,8 @@ const Home = React.memo(function Home() {
               className="content-spacing"
             >
               <motion.div variants={slideUpVariants} className="mb-6">
-                <div className="inline-flex items-center bg-primary/20 text-primary border border-primary/30 px-3 py-1.5 text-sm rounded-full font-medium glass-effect">
-                  <Sparkles className="h-3.5 w-3.5 mr-2 fill-primary" />
+                <div className="inline-flex items-center bg-transparent text-primary border-2 border-primary px-4 py-2 text-sm rounded-none font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(255,0,255,0.4)]">
+                  <Sparkles className="h-4 w-4 mr-2 text-secondary animate-neon-pulse" />
                   {language === "en"
                     ? "AI-Powered Cocktail Recommendations"
                     : "AI 驱动的鸡尾酒推荐"}
@@ -223,16 +223,16 @@ const Home = React.memo(function Home() {
               </motion.div>
 
               <motion.h1
-                className="font-playfair font-bold text-shadow mb-6"
+                className="font-heading font-black text-6xl md:text-8xl leading-none mb-6 text-shadow"
                 variants={slideUpVariants}
               >
-                <GradientText as="span" className="block leading-tight">
+                <GradientText as="span" className="block leading-tight drop-shadow-[0_0_20px_rgba(255,0,255,0.6)]">
                   {t("home.title")}
                 </GradientText>
               </motion.h1>
 
               <motion.p
-                className="text-lg md:text-xl text-foreground/80 font-source-sans leading-relaxed max-w-xl mb-8"
+                className="text-lg md:text-xl text-foreground font-mono leading-relaxed max-w-xl mb-8 tracking-wide drop-shadow-md"
                 variants={slideUpVariants}
               >
                 {t("home.subtitle")}
@@ -240,54 +240,55 @@ const Home = React.memo(function Home() {
 
               {hasRecommendation ? (
                 <motion.div
-                  className="glass-effect card-spacing rounded-2xl border border-border/50 glow-effect max-w-lg"
+                  className="glass-panel p-6 rounded-none border-t-2 border-t-secondary border-b-2 border-b-primary shadow-[0_0_30px_rgba(0,255,255,0.15)] max-w-lg mb-8 relative overflow-hidden"
                   variants={slideUpVariants}
                 >
-                  <div className="flex items-center mb-4">
+                  {/* Decorative Scanline inside card */}
+                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay"></div>
+                  
+                  <div className="flex items-center mb-6 relative z-10">
                     <motion.div
-                      className="w-10 h-10 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center mr-3"
-                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="w-12 h-12 bg-black border-2 border-secondary flex items-center justify-center mr-4 shadow-[0_0_15px_var(--color-secondary)] rotate-45"
+                      whileHover={{ scale: 1.1, rotate: 90 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Sparkles className="h-5 w-5 text-primary" />
+                      <Sparkles className="h-6 w-6 text-secondary -rotate-45 group-hover:rotate-0 transition-transform" />
                     </motion.div>
-                    <h3 className="text-xl font-bold font-playfair">
+                    <h3 className="text-xl font-heading font-bold text-secondary tracking-widest uppercase drop-shadow-[0_0_5px_rgba(0,255,255,0.8)]">
                       {language === "en" ? "Your Recommendation" : "您的推荐"}
                     </h3>
                   </div>
-                  <p className="mb-6 text-foreground/70 font-source-sans">
+                  <p className="mb-8 text-foreground font-mono text-sm leading-relaxed relative z-10">
                     {language === "en"
-                      ? "Your personalized cocktail is ready! View it now or explore more options."
-                      : "您的专属鸡尾酒已准备好！立即查看或探索更多选择。"}
+                      ? "> SYSTEM LOG: Personalized cocktail sequence initialized. View output or explore alternative logic paths."
+                      : "> 系统日志：专属鸡尾酒序列已生成，请查看输出或探索替代逻辑路径。"}
                   </p>
-                  <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-3">
+                  <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-4 relative z-10">
                     <Button
                       size="lg"
                       iconPosition="right"
                       icon={<ChevronRight className="h-4 w-4" />}
                       href={recommendationPath}
                       variant="primary"
-                      effect="shine"
                     >
                       <span className="flex items-center gap-2">
                         <Martini className="h-4 w-4" /> 
-                        <span>{language === "en" ? "View My Cocktail" : "查看我的鸡尾酒"}</span>
+                        <span>{language === "en" ? "View Cocktail" : "查看鸡尾酒"}</span>
                       </span>
                     </Button>
                     <Button
                       variant="outline"
                       size="lg"
                       href={galleryPath}
-                      effect="lift"
                       icon={<Library className="h-5 w-5" />}
                     >
                       {language === "en" ? "Browse More" : "浏览更多"}
                     </Button>
                   </div>
-                  <div className="mt-4 text-center">
+                  <div className="mt-6 text-center relative z-10">
                     <Link
                       href={newQuestionPath}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      className="text-sm text-primary font-mono tracking-widest hover:text-secondary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor]"
                     >
                       {language === "en"
                         ? "Start a new recommendation"
@@ -297,32 +298,33 @@ const Home = React.memo(function Home() {
                 </motion.div>
               ) : hasSavedSession ? (
                 <motion.div
-                  className="glass-effect card-spacing rounded-2xl border border-border/50 glow-effect max-w-lg"
+                  className="glass-panel p-6 rounded-none border-t-2 border-t-primary border-b-2 border-b-secondary shadow-[0_0_30px_rgba(255,0,255,0.15)] max-w-lg mb-8 relative overflow-hidden"
                   variants={slideUpVariants}
                 >
-                  <div className="flex items-center mb-4">
+                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay"></div>
+                  
+                  <div className="flex items-center mb-6 relative z-10">
                     <motion.div
-                      className="w-10 h-10 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center mr-3"
-                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="w-12 h-12 bg-black border-2 border-primary flex items-center justify-center mr-4 shadow-[0_0_15px_var(--color-primary)] rotate-45"
+                      whileHover={{ scale: 1.1, rotate: 90 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <History className="h-5 w-5 text-primary" />
+                      <History className="h-6 w-6 text-primary -rotate-45 group-hover:rotate-0 transition-transform" />
                     </motion.div>
-                    <h3 className="text-xl font-bold font-playfair">
+                    <h3 className="text-xl font-heading font-bold text-primary tracking-widest uppercase drop-shadow-[0_0_5px_rgba(255,0,255,0.8)]">
                       {t("home.savedSession")}
                     </h3>
                   </div>
-                  <p className="mb-6 text-foreground/70 font-source-sans">
+                  <p className="mb-8 text-foreground font-mono text-sm leading-relaxed relative z-10">
                     {t("home.savedSessionDesc")}
                   </p>
-                  <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-3">
+                  <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-4 relative z-10">
                     <Button
                       size="lg"
                       iconPosition="right"
                       icon={<ChevronRight className="h-4 w-4" />}
                       href={questionsPath}
-                      variant="primary"
-                      effect="pulse"
+                      variant="secondary"
                     >
                       <span className="flex items-center gap-2">
                         <History className="h-4 w-4" /> 
@@ -333,16 +335,15 @@ const Home = React.memo(function Home() {
                       variant="outline"
                       size="lg"
                       href={galleryPath}
-                      effect="lift"
                       icon={<Library className="h-5 w-5" />}
                     >
                       {language === "en" ? "Browse Gallery" : "浏览酒单库"}
                     </Button>
                   </div>
-                  <div className="mt-4 text-center">
+                  <div className="mt-6 text-center relative z-10">
                     <Link
                       href={newQuestionPath}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      className="text-sm text-secondary font-mono tracking-widest hover:text-primary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor]"
                     >
                       {language === "en"
                         ? "Start a new session instead"
@@ -361,11 +362,10 @@ const Home = React.memo(function Home() {
                     icon={<ArrowRight className="h-5 w-5" />}
                     href={questionsPath}
                     variant="primary"
-                    effect="shine"
-                    className="shadow-2xl"
+                    className="shadow-[0_0_20px_var(--color-secondary)] uppercase"
                   >
                     <span className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5" /> 
+                      <Sparkles className="h-5 w-5 animate-neon-pulse" /> 
                       <span>{t("home.start")}</span>
                     </span>
                   </Button>
@@ -373,9 +373,8 @@ const Home = React.memo(function Home() {
                     size="xl"
                     variant="outline"
                     href={galleryPath}
-                    effect="lift"
-                    className="shadow-lg border-primary/30 hover:bg-primary/10"
                     icon={<Library className="h-5 w-5" />}
+                    className="uppercase"
                   >
                     {language === "en" ? "View Gallery" : "浏览酒单"}
                   </Button>
@@ -414,7 +413,15 @@ const Home = React.memo(function Home() {
                               ease: "easeInOut",
                             }}
                           />
-                          <div className="relative h-full rounded-3xl overflow-hidden glass-effect border border-border/30 shadow-2xl shadow-primary/10 group-hover:shadow-primary/20 transition duration-500">
+                          <div className="relative h-full rounded-none overflow-hidden glass-panel border-2 border-secondary/50 shadow-[0_0_30px_rgba(0,255,255,0.2)] group-hover:shadow-[0_0_50px_rgba(0,255,255,0.4)] transition duration-500">
+                            {/* Neon Terminal Title Bar overlay */}
+                            <div className="absolute top-0 w-full bg-black/80 border-b-2 border-secondary px-4 py-2 flex items-center gap-2 z-20 backdrop-blur-md mix-blend-hard-light">
+                              <div className="h-3 w-3 rounded-full bg-primary" />
+                              <div className="h-3 w-3 rounded-full bg-secondary" />
+                              <div className="h-3 w-3 rounded-full bg-accent" />
+                              <span className="ml-2 font-mono text-[10px] text-secondary tracking-widest uppercase">IMAGE_DATA_RENDER.EXE</span>
+                            </div>
+                            
                             <SafeImage
                               src={cocktail.image}
                               fallbackSrc={`/placeholder.svg?height=600&width=500&query=${encodeURIComponent(cocktail.name)}`}
@@ -422,21 +429,24 @@ const Home = React.memo(function Home() {
                               fill
                               sizes="(max-width: 768px) 100vw, 50vw"
                               priority={index === currentCocktailIndex}
-                              className="object-cover transition duration-700 motion-safe:group-hover:scale-110 motion-safe:group-hover:brightness-110"
+                              className="object-cover transition duration-700 group-hover:scale-105 group-hover:brightness-125 group-hover:contrast-125 group-hover:sepia-[.2] mix-blend-screen"
                             />
+                            {/* Vaporwave duotone gradient overlay over images */}
+                            <div className="absolute inset-0 bg-linear-to-br from-primary/30 to-secondary/30 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-500" />
+                            
                             <motion.div
-                              className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-background/98 via-background/85 to-transparent backdrop-blur-sm"
+                              className="absolute bottom-0 left-0 right-0 p-8 pt-20 bg-gradient-to-t from-black via-black/80 to-transparent backdrop-blur-[2px]"
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.3, duration: 0.5 }}
                             >
-                              <h3 className="text-3xl font-bold font-playfair text-foreground mb-2 tracking-tight">
+                              <h3 className="text-3xl font-heading font-black text-white mb-1 tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
                                 {cocktail.name}
                               </h3>
-                              <p className="text-sm text-muted-foreground font-source-sans mb-3 tracking-wide uppercase">
+                              <p className="text-xs text-secondary font-mono mb-4 tracking-[0.2em] uppercase">
                                 {cocktail.englishName}
                               </p>
-                              <p className="text-foreground/90 font-source-sans text-lg mb-4 leading-relaxed">
+                              <p className="text-foreground font-mono text-sm mb-6 leading-relaxed bg-black/50 p-3 border-l-2 border-primary">
                                 {cocktail.description}
                               </p>
 
@@ -444,13 +454,7 @@ const Home = React.memo(function Home() {
                                 {cocktail.tags.map((tag, tagIndex) => (
                                   <div
                                     key={tagIndex}
-                                    className={`inline-flex items-center px-2.5 py-1 text-xs rounded-full font-medium backdrop-blur-sm ${
-                                      tagIndex % 3 === 0
-                                        ? "bg-primary/20 text-primary border border-primary/30"
-                                        : tagIndex % 3 === 1
-                                          ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                                          : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                    }`}
+                                    className="inline-flex items-center px-3 py-1 text-xs rounded-none font-bold uppercase tracking-wider backdrop-blur-md bg-black/60 text-secondary border border-secondary shadow-[0_0_8px_rgba(0,255,255,0.3)]"
                                   >
                                     {tag}
                                   </div>
@@ -471,16 +475,16 @@ const Home = React.memo(function Home() {
                     onClick={() => setCurrentCocktailIndex(index)}
                     className={`w-4 h-4 rounded-full transition duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       index === currentCocktailIndex
-                        ? "bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/40 ring-2 ring-primary/20"
-                        : "bg-muted/40 hover:bg-muted/70 hover:shadow-md"
+                        ? "bg-primary shadow-[0_0_15px_var(--color-primary)] ring-2 ring-secondary/50 rounded-none scale-125"
+                        : "bg-muted hover:bg-secondary hover:shadow-[0_0_10px_var(--color-secondary)] hover:rounded-none"
                     }`}
-                    whileHover={{ scale: 1.3, y: -2 }}
+                    whileHover={{ scale: 1.5, rotate: 45 }}
                     whileTap={{ scale: 0.9 }}
                     animate={{
-                      scale: index === currentCocktailIndex ? 1.4 : 1,
-                      y: index === currentCocktailIndex ? -2 : 0,
+                      scale: index === currentCocktailIndex ? 1.5 : 1,
+                      rotate: index === currentCocktailIndex ? 45 : 0,
                     }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    transition={{ duration: 0.4, ease: "linear" }}
                     aria-label={`View cocktail ${index + 1}`}
                   />
                 ))}
@@ -496,22 +500,23 @@ const Home = React.memo(function Home() {
 
       <section
         ref={ctaRef}
-        className="section-spacing bg-gradient-to-r from-background/90 to-card"
+        className="section-spacing relative bg-[#090014] overflow-hidden border-t-4 border-t-primary"
       >
-        <Container size="xl">
+        <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-size-[100%_4px] pointer-events-none z-10"></div>
+        <Container size="xl" className="relative z-20">
           <motion.div
-            className="text-center container-narrow"
-            initial={{ opacity: 0, y: 50 }}
-            animate={ctaInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ duration: 0.7 }}
+            className="text-center container-narrow glass-panel p-10 md:p-16 border-2 border-secondary shadow-[0_0_50px_rgba(0,255,255,0.15)] rounded-none"
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={ctaInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 50, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: "linear" }}
           >
             <GradientText
               as="h2"
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6"
+              className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight uppercase"
             >
               {t("home.cta.title")}
             </GradientText>
-            <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed mb-10">
+            <p className="text-xl text-foreground font-mono leading-relaxed mb-12 tracking-wide uppercase drop-shadow-md">
               {t("home.cta.subtitle")}
             </p>
             <Button

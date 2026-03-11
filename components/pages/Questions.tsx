@@ -363,24 +363,23 @@ const Questions = memo(function Questions() {
       <Container className="relative z-10 py-16 md:py-24">
         <div className="mb-12 md:mb-16 max-w-3xl mx-auto">
           <div className="flex justify-between items-center mb-4 px-1">
-            <span className="text-sm font-bold text-muted-foreground tracking-wider uppercase">
+            <span className="text-sm font-bold text-secondary font-mono tracking-widest uppercase drop-shadow-[0_0_5px_currentColor]">
               {t("questions.progress")}
             </span>
-            <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+            <span className="text-sm font-bold font-mono tracking-wider text-primary bg-black/50 px-3 py-1 border-2 border-primary shadow-[0_0_10px_rgba(255,0,255,0.3)]">
               {Math.round(calculatedProgress)}%
             </span>
           </div>
 
-          <div className="relative w-full bg-black/20 rounded-full h-3 overflow-hidden shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)] backdrop-blur-md border border-white/5">
+          <div className="relative w-full bg-black/40 h-4 border-2 border-primary/30 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] z-10">
             <motion.div
-              className="h-full bg-gradient-to-r from-primary via-orange-400 to-secondary rounded-full shadow-[0_0_20px_hsl(var(--primary)/0.6)] relative overflow-hidden"
+              className="h-full bg-linear-to-r from-primary via-secondary to-accent relative overflow-hidden shadow-[0_0_15px_rgba(255,0,255,0.5)]"
               initial={{ width: "0%" }}
               animate={{ width: `${calculatedProgress}%` }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
               <div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"
-                style={{ backgroundSize: "200% 100%" }}
+                className="absolute inset-0 bg-[linear-gradient(-45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-size-[20px_20px] animate-shimmer opacity-50"
               />
             </motion.div>
           </div>
@@ -402,7 +401,7 @@ const Questions = memo(function Questions() {
                   {canGoBack && (
                     <motion.button
                       onClick={handleGoBack}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full glass-effect border border-white/10 hover:border-primary/30 hover:bg-white/5 transition-all text-muted-foreground hover:text-foreground"
+                      className="flex items-center gap-2 px-4 py-2 border-2 border-primary/50 text-primary transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] font-mono uppercase font-bold"
                       whileHover={{ x: -3 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -412,27 +411,27 @@ const Questions = memo(function Questions() {
                       <span className="text-sm font-medium">{t("questions.back")}</span>
                     </motion.button>
                   )}
-                  <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
-                    <span className="text-primary font-bold text-sm tracking-wider">
+                  <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 border-2 border-secondary bg-black/40 shadow-[0_0_10px_rgba(0,255,255,0.2)]">
+                    <span className="text-secondary font-bold font-mono tracking-widest uppercase drop-shadow-[0_0_5px_currentColor]">
                       {t("questions.step")} {currentStep} / {totalSteps}
                     </span>
                   </div>
                 </div>
 
-                <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
+                <h2 className="text-3xl md:text-5xl font-black font-heading leading-tight tracking-widest uppercase text-center drop-shadow-[0_0_15px_rgba(255,0,255,0.5)]">
                   <GradientText>
                     {questions[currentQuestion - 1]?.title}
                   </GradientText>
                 </h2>
                 {answerError && answerError.questionId === currentQuestion && (
-                  <div className="max-w-2xl mx-auto mt-2 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-left">
-                    <p className="text-sm text-foreground">
+                  <div className="max-w-2xl mx-auto mt-2 border-2 border-destructive bg-black/60 p-4 text-left shadow-[0_0_15px_rgba(255,0,0,0.3)]">
+                    <p className="text-sm text-white font-mono font-bold">
                       {answerError.message}
                     </p>
-                    <div className="mt-2">
+                    <div className="mt-3">
                       <button
                         type="button"
-                        className="inline-flex items-center rounded-lg border border-destructive/40 bg-destructive/20 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-destructive/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/70"
+                        className="inline-flex items-center border-2 border-destructive bg-transparent px-4 py-2 text-xs font-mono font-bold text-destructive hover:bg-destructive hover:text-white transition-colors uppercase tracking-widest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
                         onClick={() => {
                           void handleAnswer(answerError.questionId, answerError.option);
                         }}
@@ -445,7 +444,7 @@ const Questions = memo(function Questions() {
               </div>
 
               <div
-                className={`grid gap-4 mx-auto min-h-[400px] content-start ${
+                className={`grid gap-4 mx-auto min-h-100 content-start ${
                   questions[currentQuestion - 1]?.options.length === 2
                     ? "grid-cols-1 sm:grid-cols-2 max-w-xl"
                     : questions[currentQuestion - 1]?.options.length === 3
@@ -466,10 +465,10 @@ const Questions = memo(function Questions() {
                     >
                       <button
                         type="button"
-                        className={`w-full text-left h-full min-h-[180px] group relative overflow-hidden glass-panel rounded-3xl p-1 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 active:scale-[0.98] ${
+                        className={`w-full text-left h-full min-h-[180px] group relative overflow-hidden glass-panel rounded-none p-1 transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,255,255,0.4)] hover:border-secondary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50 active:scale-[0.98] border-2 ${
                           selectedOption === option.value
-                            ? "border-primary shadow-[0_0_30px_hsl(var(--primary)/0.3)] scale-[1.02] ring-1 ring-primary/50"
-                            : "border-white/5"
+                            ? "border-secondary shadow-[0_0_40px_rgba(0,255,255,0.6)] scale-[1.02]"
+                            : "border-primary/50"
                         }`}
                         onClick={() =>
                           handleAnswer(currentQuestion, option.value)
@@ -492,10 +491,11 @@ const Questions = memo(function Questions() {
                           />
                         )}
 
-                        <div className="relative h-full rounded-xl overflow-hidden bg-black/20 flex flex-col p-4">
-                          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="relative h-full rounded-none overflow-hidden bg-black/60 flex flex-col p-4">
+                          <div className="absolute inset-0 bg-linear-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.3)_50%)] pointer-events-none mix-blend-overlay z-0" />
 
-                          <div className="aspect-square relative overflow-hidden rounded-lg mb-3 bg-black/20 shadow-inner group-hover:shadow-lg transition-shadow duration-500">
+                          <div className="aspect-square relative overflow-hidden rounded-none border-2 border-primary/30 mb-3 bg-black/80 group-hover:border-secondary transition-colors duration-500 z-10">
                             <Image
                               src={
                                 option.image ||
@@ -504,16 +504,16 @@ const Questions = memo(function Questions() {
                               alt={option.label}
                               fill
                               sizes="(max-width: 768px) 50vw, 33vw"
-                              className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-110"
+                              className="object-cover opacity-80 mix-blend-screen transition-transform duration-700 group-hover:scale-110 group-hover:opacity-100 group-hover:brightness-125 group-hover:contrast-125"
                             />
                           </div>
 
-                          <div className="relative z-10 mt-auto">
-                            <h3 className="font-bold text-foreground mb-1 font-playfair group-hover:text-primary transition-colors duration-300 text-lg">
+                          <div className="relative z-10 mt-auto bg-black/80 p-3 border-l-2 border-primary group-hover:border-secondary transition-colors">
+                            <h3 className="font-bold text-primary group-hover:text-secondary mb-1 font-heading uppercase tracking-widest drop-shadow-[0_0_5px_currentColor] transition-colors duration-300 text-lg sm:text-xl">
                               {option.label}
                             </h3>
                             {option.description && (
-                              <p className="text-muted-foreground leading-relaxed font-source-sans text-sm">
+                              <p className="text-foreground leading-relaxed font-mono text-xs sm:text-sm">
                                 {option.description}
                               </p>
                             )}
@@ -539,7 +539,7 @@ const Questions = memo(function Questions() {
                 <div className="flex items-center justify-center gap-4">
                   <motion.button
                     onClick={handleGoBack}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full glass-effect border border-white/10 hover:border-primary/30 hover:bg-white/5 transition-all text-muted-foreground hover:text-foreground"
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-primary/50 text-primary transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] font-mono uppercase font-bold"
                     whileHover={{ x: -3 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -548,20 +548,20 @@ const Questions = memo(function Questions() {
                     </svg>
                     <span className="text-sm font-medium">{t("questions.back")}</span>
                   </motion.button>
-                  <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
-                    <span className="text-primary font-bold text-sm tracking-wider">
+                  <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 border-2 border-secondary bg-black/40 shadow-[0_0_10px_rgba(0,255,255,0.2)]">
+                    <span className="text-secondary font-bold font-mono tracking-widest uppercase drop-shadow-[0_0_5px_currentColor]">
                       {t("questions.step")} {currentStep} / {totalSteps}
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
+                  <h2 className="text-3xl md:text-5xl font-black font-heading leading-tight tracking-widest uppercase text-center drop-shadow-[0_0_15px_rgba(255,0,255,0.5)]">
                     <GradientText>
                       {t("questions.base_spirits.title")}
                     </GradientText>
                   </h2>
-                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed font-source-sans">
+                  <p className="text-lg text-foreground max-w-2xl mx-auto leading-relaxed font-mono">
                     {t("questions.base_spirits.description")}
                   </p>
                 </div>
@@ -579,10 +579,10 @@ const Questions = memo(function Questions() {
                   >
                     <button
                       type="button"
-                      className={`w-full transition-all duration-500 relative overflow-hidden rounded-2xl p-3 text-center h-full group border focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 active:scale-[0.96] ${
+                      className={`w-full transition-all duration-500 relative overflow-hidden rounded-none p-2 text-center h-full group border-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50 active:scale-[0.96] ${
                         baseSpirits.includes(spirit.value)
-                          ? "glass-panel border-primary shadow-[0_0_25px_hsl(var(--primary)/0.25)] bg-primary/10 ring-1 ring-primary/50"
-                          : "glass-panel border-white/5 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] hover:bg-white/5"
+                          ? "border-secondary shadow-[0_0_25px_rgba(0,255,255,0.5)] bg-secondary/20"
+                          : "border-primary/30 hover:border-secondary hover:shadow-[0_0_20px_rgba(0,255,255,0.3)] hover:bg-black/60 bg-black/40"
                       }`}
                       onClick={() =>
                         toggleBaseSpirit(spirit.value)
@@ -595,11 +595,11 @@ const Questions = memo(function Questions() {
                       aria-pressed={baseSpirits.includes(spirit.value)}
                     >
                       {baseSpirits.includes(spirit.value) && (
-                        <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center shadow-md z-20">
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-secondary rounded-none flex items-center justify-center shadow-[0_0_10px_currentColor] z-20 border border-black">
                           <motion.svg
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="w-3 h-3 text-primary-foreground"
+                            className="w-3 h-3 text-black"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -613,20 +613,20 @@ const Questions = memo(function Questions() {
                       )}
 
                       <div
-                        className={`absolute inset-0 bg-primary/10 transition-opacity duration-300 ${baseSpirits.includes(spirit.value) ? "opacity-100" : "opacity-0"}`}
+                        className={`absolute inset-0 bg-secondary/10 transition-opacity duration-300 ${baseSpirits.includes(spirit.value) ? "opacity-100" : "opacity-0"}`}
                       />
 
-                      <div className="aspect-square relative overflow-hidden rounded-lg mb-3 bg-black/20 group-hover:shadow-inner transition-shadow">
+                      <div className="aspect-square relative overflow-hidden mb-2 bg-black/40 border border-white/5 transition-shadow">
                         <Image
                           src={spirit.image || "/placeholder.svg"}
                           alt={spirit.label}
                           fill
                           sizes="(max-width: 768px) 33vw, 16vw"
-                          className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+                          className="object-cover opacity-80 mix-blend-screen group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
                         />
                       </div>
                       <h3
-                        className={`text-sm font-medium transition-colors duration-300 ${baseSpirits.includes(spirit.value) ? "text-primary" : "text-foreground"}`}
+                        className={`text-xs md:text-sm font-bold font-mono uppercase tracking-wider transition-colors duration-300 ${baseSpirits.includes(spirit.value) ? "text-secondary drop-shadow-[0_0_5px_currentColor]" : "text-foreground group-hover:text-secondary"}`}
                       >
                         {spirit.label}
                       </h3>
@@ -659,7 +659,7 @@ const Questions = memo(function Questions() {
                 <div className="flex items-center justify-center gap-4">
                   <motion.button
                     onClick={handleGoBack}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full glass-effect border border-white/10 hover:border-primary/30 hover:bg-white/5 transition-all text-muted-foreground hover:text-foreground"
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-primary/50 text-primary transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] font-mono uppercase font-bold"
                     whileHover={{ x: -3 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -668,30 +668,30 @@ const Questions = memo(function Questions() {
                     </svg>
                     <span className="text-sm font-medium">{t("questions.back")}</span>
                   </motion.button>
-                  <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 rounded-full glass-effect border border-primary/20">
-                    <span className="text-primary font-bold text-sm tracking-wider">
+                  <div className="inline-flex items-center justify-center gap-3 px-4 py-1.5 border-2 border-accent bg-black/40 shadow-[0_0_10px_rgba(255,153,0,0.2)]">
+                    <span className="text-accent font-bold font-mono tracking-widest uppercase drop-shadow-[0_0_5px_currentColor]">
                       {t("questions.finalStep")}
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h2 className="text-4xl md:text-5xl font-bold font-playfair leading-tight tracking-tight">
+                  <h2 className="text-3xl md:text-5xl font-black font-heading leading-tight tracking-widest uppercase text-center drop-shadow-[0_0_15px_rgba(255,153,0,0.5)]">
                     <GradientText>{t("questions.feedback.title")}</GradientText>
                   </h2>
-                  <p className="text-lg text-muted-foreground leading-relaxed font-source-sans">
+                  <p className="text-lg text-foreground leading-relaxed font-mono">
                     {t("questions.feedback.description")}
                   </p>
                 </div>
               </div>
 
-              <div className="glass-effect rounded-3xl p-1">
-                <div className="bg-black/20 rounded-2xl p-6">
+              <div className="border-2 border-accent/50 shadow-[0_0_20px_rgba(255,153,0,0.2)] p-1 bg-black/40">
+                <div className="bg-black/60 p-6 border border-white/5">
                   <textarea
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                     placeholder={t("questions.feedback.placeholder")}
-                    className="w-full h-40 bg-transparent border border-white/10 rounded-xl p-4 text-lg text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 resize-none transition-all"
+                    className="w-full h-40 bg-transparent border-2 border-accent/30 p-4 text-lg text-foreground placeholder:-muted-foreground/50 focus:outline-none focus:border-accent focus:shadow-[0_0_15px_rgba(255,153,0,0.3)] resize-none transition-all font-mono"
                   />
                 </div>
               </div>
@@ -720,7 +720,7 @@ const Questions = memo(function Questions() {
                   disabled={isGenerating}
                   variant="primary"
                   size="xl"
-                  className="w-full sm:w-auto min-w-[200px]"
+                  className="w-full sm:w-auto min-w-50"
                 >
                   {isGenerating
                     ? t("questions.generating")
@@ -734,7 +734,7 @@ const Questions = memo(function Questions() {
                     handleFeedbackSubmit();
                   }}
                   size="md"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-foreground border-b-2 border-transparent hover:border-accent hover:text-accent font-mono uppercase tracking-widest rounded-none"
                   disabled={isGenerating}
                 >
                   {t("questions.skipFeedback")}
@@ -750,11 +750,11 @@ const Questions = memo(function Questions() {
             onClick={handleReset}
             whileHover={{ scale: 1.05, x: 5 }}
             whileTap={{ scale: 0.95 }}
-            className="group flex items-center gap-3 px-5 py-3 glass-effect rounded-full hover:border-destructive/50 transition-colors duration-300"
+            className="group flex items-center gap-3 px-5 py-3 border-2 border-white/10 bg-black/40 hover:border-destructive/80 hover:bg-destructive/10 transition-colors duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)]"
           >
-            <div className="p-2 rounded-full bg-destructive/10 group-hover:bg-destructive/20 transition-colors">
+            <div className="p-2 border-2 border-transparent group-hover:border-destructive transition-colors">
               <svg
-                className="w-4 h-4 text-destructive"
+                className="w-4 h-4 text-destructive drop-shadow-[0_0_5px_currentColor]"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -767,7 +767,7 @@ const Questions = memo(function Questions() {
                 />
               </svg>
             </div>
-            <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+            <span className="text-sm font-bold font-mono uppercase tracking-widest text-muted-foreground group-hover:text-destructive group-hover:drop-shadow-[0_0_5px_currentColor] transition-colors">
               {t("questions.reset")}
             </span>
           </motion.button>

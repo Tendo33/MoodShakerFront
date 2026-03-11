@@ -31,7 +31,7 @@ export default function HomeFeatures() {
   return (
     <section
       ref={featuresRef}
-      className="section-spacing pt-24 md:pt-32 lg:pt-40 bg-gradient-to-b from-background to-card/50"
+      className="section-spacing pt-24 md:pt-32 lg:pt-40 bg-linear-to-b from-background to-card/50"
     >
       <Container size="xl">
         <motion.div
@@ -44,16 +44,16 @@ export default function HomeFeatures() {
         >
           <GradientText
             as="h2"
-            className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6"
+            className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6 font-heading font-black tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,0,255,0.6)]"
           >
             {language === "en"
               ? "Why Choose MoodShaker?"
               : "为什么选择 MoodShaker?"}
           </GradientText>
-          <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed">
+          <p className="text-lg md:text-xl text-foreground font-mono leading-relaxed mt-4 drop-shadow-md">
             {language === "en"
-              ? "Our intelligent recommendation system finds the perfect cocktail based on your preferences and mood"
-              : "我们的智能推荐系统会根据您的喜好和心情，为您找到完美的鸡尾酒"}
+              ? "> INITIALIZING INTELLIGENT RECOMMENDATION PROTOCOL..."
+              : "> 正在初始化智能推荐协议..."}
           </p>
         </motion.div>
 
@@ -67,11 +67,11 @@ export default function HomeFeatures() {
               }
               transition={{ duration: 0.6, delay: index * 0.2 }}
             >
-              <div className="relative overflow-hidden rounded-2xl border border-white/5 glass-panel card-hover h-full text-center group p-8 transition-all duration-500 hover:border-primary/30 hover:shadow-[0_0_30px_hsl(var(--primary)/0.15)]">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 pointer-events-none" />
+              <div className="relative overflow-hidden rounded-none border-2 border-primary/50 glass-panel card-hover h-full text-center group p-8 transition-all duration-500 hover:border-secondary hover:shadow-[0_0_30px_rgba(0,255,255,0.3)]">
+                <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay" />
                 <div className="relative z-10 text-spacing">
                   <motion.div
-                    className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mx-auto shadow-lg mb-6 group-hover:shadow-xl transition-all duration-300"
+                    className="w-16 h-16 rounded-none border-2 border-primary bg-black flex items-center justify-center mx-auto shadow-[0_0_15px_var(--color-primary)] mb-6 group-hover:border-secondary group-hover:shadow-[0_0_20px_var(--color-secondary)] transition-all duration-300 transform"
                     whileHover={{
                       scale: 1.15,
                       rotate: index % 2 === 0 ? 8 : -8,
@@ -86,10 +86,10 @@ export default function HomeFeatures() {
                       {feature.icon}
                     </motion.div>
                   </motion.div>
-                  <h3 className="text-xl lg:text-2xl font-bold font-playfair mb-4 tracking-tight">
+                  <h3 className="text-xl lg:text-2xl font-bold font-heading mb-4 tracking-widest uppercase text-primary group-hover:text-secondary transition-colors drop-shadow-[0_0_5px_currentColor]">
                     {feature.title}
                   </h3>
-                  <p className="text-sm md:text-base leading-relaxed text-muted-foreground/90 font-source-sans">
+                  <p className="text-sm md:text-base leading-relaxed text-foreground font-mono bg-black/50 p-4 border-l-2 border-primary group-hover:border-secondary transition-colors">
                     {feature.description}
                   </p>
                 </div>

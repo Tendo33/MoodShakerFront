@@ -92,14 +92,14 @@ export default function HomePopular() {
         >
           <GradientText
             as="h2"
-            className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6"
+            className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6 font-heading font-black tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,0,255,0.6)]"
           >
             {language === "en" ? "Popular Cocktails" : "热门鸡尾酒"}
           </GradientText>
-          <p className="text-lg md:text-xl text-foreground/75 font-source-sans leading-relaxed">
+          <p className="text-lg md:text-xl text-foreground font-mono leading-relaxed mt-4 drop-shadow-md">
             {language === "en"
-              ? "Explore our users' favorite cocktails"
-              : "探索我们用户最喜爱的鸡尾酒"}
+              ? "> QUERYING MOST ACCESSED SELECTION ALGORITHMS..."
+              : "> 正在查询最常用的选择算法..."}
           </p>
         </motion.div>
 
@@ -114,11 +114,13 @@ export default function HomePopular() {
               transition={{ duration: 0.6, delay: index * 0.2 }}
             >
               <Link href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}>
-                <div className="relative overflow-hidden rounded-2xl border border-white/5 glass-panel card-hover h-full group hover:border-primary/30 hover:shadow-[0_0_30px_hsl(var(--primary)/0.15)] transition-all duration-500 p-8">
-                  <div className="relative h-40 md:h-48 overflow-hidden mb-4 rounded-xl">
+                <div className="relative overflow-hidden rounded-none border-2 border-primary/50 glass-panel card-hover h-full group hover:border-secondary hover:shadow-[0_0_30px_rgba(0,255,255,0.3)] transition-all duration-500 p-8">
+                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay z-0" />
+                  
+                  <div className="relative h-40 md:h-48 overflow-hidden mb-6 rounded-none border-2 border-primary group-hover:border-secondary transition-colors z-10">
                     <motion.div
                       className="w-full h-full relative"
-                      whileHover={{ scale: 1.08 }}
+                      whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
                     >
                       <SafeImage
@@ -127,17 +129,17 @@ export default function HomePopular() {
                         alt={cocktail.name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                        className="object-cover transition-all duration-600 group-hover:brightness-110 group-hover:contrast-110"
+                        className="object-cover transition-all duration-600 group-hover:brightness-125 group-hover:contrast-125 group-hover:sepia-[.2] mix-blend-screen"
                         loading="lazy"
                       />
                     </motion.div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-linear-to-br from-primary/30 to-secondary/30 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-300" />
                   </div>
-                  <div className="text-spacing">
-                    <h3 className="text-xl lg:text-2xl font-bold font-playfair mb-3 tracking-tight group-hover:text-primary transition-colors duration-300">
+                  <div className="text-spacing relative z-10">
+                    <h3 className="text-xl lg:text-2xl font-bold font-heading mb-3 tracking-widest uppercase text-primary group-hover:text-secondary drop-shadow-[0_0_5px_currentColor] transition-colors duration-300">
                       {cocktail.name}
                     </h3>
-                    <p className="text-sm md:text-base leading-relaxed text-muted-foreground/90 font-source-sans">
+                    <p className="text-sm md:text-base leading-relaxed text-foreground font-mono bg-black/50 p-3 border-l-2 border-primary group-hover:border-secondary transition-colors">
                       {cocktail.description}
                     </p>
                   </div>

@@ -5,9 +5,9 @@ import { Clock, Droplet, GlassWater } from "lucide-react";
 import type { Cocktail } from "@/lib/cocktail-types";
 
 interface CocktailSpecsProps {
+  cocktail: Cocktail;
   t: (key: string) => string;
   language: string;
-  textColorClass: string;
   getLocalizedContent: (
     field: keyof Cocktail,
     englishField: keyof Cocktail,
@@ -15,9 +15,9 @@ interface CocktailSpecsProps {
 }
 
 export function CocktailSpecs({
+  cocktail,
   t,
   language,
-  textColorClass,
   getLocalizedContent,
 }: CocktailSpecsProps) {
   return (
@@ -29,14 +29,14 @@ export function CocktailSpecs({
       }}
     >
       <motion.div
-        className="flex flex-col items-center md:items-start p-4 rounded-xl glass-effect border-none bg-white/5"
+        className="flex flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-pink-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(236,72,153,0.15)]"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
         }}
       >
         <div className="flex items-center mb-2">
-          <div className="mr-2 h-5 w-5 text-pink-500">
+          <div className="mr-2 h-5 w-5 text-pink-500 drop-shadow-[0_0_5px_currentColor]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -55,66 +55,66 @@ export function CocktailSpecs({
               <path d="M5.52 16h12.96"></path>
             </svg>
           </div>
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">
+          <p className="text-xs text-pink-500 uppercase tracking-widest font-mono">
             {t("detail.baseSpirit")}
           </p>
         </div>
-        <p className={`font-bold text-lg ${textColorClass}`}>
+        <p className={`font-mono font-bold text-lg text-white drop-shadow-md`}>
           {getLocalizedContent("base_spirit", "english_base_spirit")}
         </p>
       </motion.div>
 
       <motion.div
-        className="flex flex-col items-center md:items-start p-4 rounded-xl glass-effect border-none bg-white/5"
+        className="flex flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-blue-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(59,130,246,0.15)]"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
         }}
       >
         <div className="flex items-center mb-2">
-          <Droplet className="mr-2 h-5 w-5 text-blue-500" />
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">
+          <Droplet className="mr-2 h-5 w-5 text-blue-500 drop-shadow-[0_0_5px_currentColor]" />
+          <p className="text-xs text-blue-500 uppercase tracking-widest font-mono">
             {t("detail.alcohol")}
           </p>
         </div>
-        <p className={`font-bold text-lg ${textColorClass}`}>
+        <p className={`font-mono font-bold text-lg text-white drop-shadow-md`}>
           {getLocalizedContent("alcohol_level", "english_alcohol_level")}
         </p>
       </motion.div>
 
       <motion.div
-        className="flex flex-col items-center md:items-start p-4 rounded-xl glass-effect border-none bg-white/5"
+        className="flex flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-amber-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(245,158,11,0.15)]"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
         }}
       >
         <div className="flex items-center mb-2">
-          <Clock className="mr-2 h-5 w-5 text-amber-500" />
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">
+          <Clock className="mr-2 h-5 w-5 text-amber-500 drop-shadow-[0_0_5px_currentColor]" />
+          <p className="text-xs text-amber-500 uppercase tracking-widest font-mono">
             {t("detail.prepTime")}
           </p>
         </div>
-        <p className={`font-bold text-lg ${textColorClass}`}>
+        <p className={`font-mono font-bold text-lg text-white drop-shadow-md`}>
           {getLocalizedContent("time_required", "english_time_required") ||
             (language === "cn" ? "5分钟" : "5 mins")}
         </p>
       </motion.div>
 
       <motion.div
-        className="flex flex-col items-center md:items-start p-4 rounded-xl glass-effect border-none bg-white/5"
+        className="flex flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-emerald-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.15)]"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
         }}
       >
         <div className="flex items-center mb-2">
-          <GlassWater className="mr-2 h-5 w-5 text-emerald-500" />
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">
+          <GlassWater className="mr-2 h-5 w-5 text-emerald-500 drop-shadow-[0_0_5px_currentColor]" />
+          <p className="text-xs text-emerald-500 uppercase tracking-widest font-mono">
             {t("detail.glass")}
           </p>
         </div>
-        <p className={`font-bold text-lg ${textColorClass}`}>
+        <p className={`font-mono font-bold text-lg text-white drop-shadow-md`}>
           {getLocalizedContent("serving_glass", "english_serving_glass")}
         </p>
       </motion.div>
