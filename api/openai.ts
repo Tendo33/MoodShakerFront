@@ -22,7 +22,8 @@ export async function getChatCompletion(
 	options: {
 		temperature?: number;
 		max_tokens?: number;
-	} = {}
+		response_format?: { type: "text" | "json_object" };
+	} = {},
 ): Promise<string> {
 	const requestId = generateRequestId();
 	const startTime = Date.now();
@@ -73,7 +74,7 @@ export async function getChatCompletion(
 				cacheTTL: 10 * 60 * 1000, // 10 minutes cache
 				deduplicate: true,
 				retryCount: 2,
-			}
+			},
 		);
 
 		const endTime = Date.now();

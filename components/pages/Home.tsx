@@ -468,20 +468,20 @@ const Home = React.memo(function Home() {
                 )}
               </AnimatePresence>
 
-              <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex space-x-4">
+              <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-3">
                 {featuredCocktails.map((_, index) => (
                   <motion.button
                     key={index}
                     onClick={() => setCurrentCocktailIndex(index)}
-                    className={`w-4 h-4 rounded-full transition duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                    className={`w-2.5 h-2.5 rounded-full transition duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       index === currentCocktailIndex
-                        ? "bg-primary shadow-[0_0_15px_var(--color-primary)] ring-2 ring-secondary/50 rounded-none scale-125"
+                        ? "bg-primary shadow-[0_0_15px_var(--color-primary)] ring-2 ring-secondary/50 rounded-none scale-110"
                         : "bg-muted hover:bg-secondary hover:shadow-[0_0_10px_var(--color-secondary)] hover:rounded-none"
                     }`}
-                    whileHover={{ scale: 1.5, rotate: 45 }}
+                    whileHover={{ scale: 1.2, rotate: 45 }}
                     whileTap={{ scale: 0.9 }}
                     animate={{
-                      scale: index === currentCocktailIndex ? 1.5 : 1,
+                      scale: index === currentCocktailIndex ? 1.2 : 1,
                       rotate: index === currentCocktailIndex ? 45 : 0,
                     }}
                     transition={{ duration: 0.4, ease: "linear" }}

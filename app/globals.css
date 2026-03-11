@@ -1,6 +1,19 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* ===== Language Variants ===== */
+@custom-variant lang-en {
+  &:lang(en) {
+    @slot;
+  }
+}
+
+@custom-variant lang-zh {
+  &:lang(zh-CN), &:lang(zh) {
+    @slot;
+  }
+}
+
 /* ===== Container (removed from Tailwind v4 core) ===== */
 @utility container {
   width: 100%;
@@ -383,6 +396,7 @@
 
 /* ===== Fluid Typography ===== */
 @layer base {
+  /* Default (Chinese) */
   h1 {
     font-size: clamp(1.875rem, 5vw, 4.5rem);
     line-height: 1.1;
@@ -408,5 +422,26 @@
   p {
     font-size: clamp(0.9375rem, 1.5vw, 1.125rem);
     line-height: 1.65;
+  }
+
+  /* English-Specific Typography overrides to globally scale down text */
+  html:lang(en) body {
+    font-size: 0.875rem; /* equivalent to text-sm */
+    line-height: 1.5;
+  }
+  html:lang(en) h1 {
+    font-size: clamp(1.5rem, 4vw, 3.5rem);
+  }
+  html:lang(en) h2 {
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+  }
+  html:lang(en) h3 {
+    font-size: clamp(1.125rem, 2.5vw, 1.75rem);
+  }
+  html:lang(en) h4 {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+  }
+  html:lang(en) p {
+    font-size: clamp(0.8125rem, 1.2vw, 1rem);
   }
 }
