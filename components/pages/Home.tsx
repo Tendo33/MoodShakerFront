@@ -223,7 +223,7 @@ const Home = React.memo(function Home() {
               </motion.div>
 
               <motion.h1
-                className="font-heading font-black text-6xl md:text-8xl leading-none mb-6 text-shadow"
+                className="font-heading font-black text-6xl md:text-8xl lang-en:text-5xl lang-en:md:text-7xl leading-none mb-6 text-shadow"
                 variants={slideUpVariants}
               >
                 <GradientText as="span" className="block leading-tight drop-shadow-[0_0_20px_rgba(255,0,255,0.6)]">
@@ -232,7 +232,7 @@ const Home = React.memo(function Home() {
               </motion.h1>
 
               <motion.p
-                className="text-lg md:text-xl text-foreground font-mono leading-relaxed max-w-xl mb-8 tracking-wide drop-shadow-md"
+                className="text-lg md:text-xl lang-en:text-base lang-en:md:text-lg text-foreground font-mono leading-relaxed max-w-xl mb-8 tracking-wide drop-shadow-md"
                 variants={slideUpVariants}
               >
                 {t("home.subtitle")}

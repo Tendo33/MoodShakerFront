@@ -202,6 +202,11 @@
     --border: #2D1B4E;
     --radius: 0px; /* Zero radius for aggressive geometric edges */
   }
+
+  /* Root Font Scaling for English to compensate for wider Latin characters */
+  html:lang(en) {
+    font-size: 92%;
+  }
 }
 
 /* ===== Base Styles (raw CSS — no @apply inside @layer in v4) ===== */
@@ -425,23 +430,24 @@
   }
 
   /* English-Specific Typography overrides to globally scale down text */
+  /* These act as safety nets for elements not using rem or using hardcoded classes */
   html:lang(en) body {
-    font-size: 0.875rem; /* equivalent to text-sm */
+    font-size: 0.875rem !important; /* equivalent to text-sm */
     line-height: 1.5;
   }
   html:lang(en) h1 {
-    font-size: clamp(1.5rem, 4vw, 3.5rem);
+    font-size: clamp(1.5rem, 4vw, 3.5rem) !important;
   }
   html:lang(en) h2 {
-    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem) !important;
   }
   html:lang(en) h3 {
-    font-size: clamp(1.125rem, 2.5vw, 1.75rem);
+    font-size: clamp(1.125rem, 2.5vw, 1.75rem) !important;
   }
   html:lang(en) h4 {
-    font-size: clamp(1rem, 2vw, 1.25rem);
+    font-size: clamp(1rem, 2vw, 1.25rem) !important;
   }
   html:lang(en) p {
-    font-size: clamp(0.8125rem, 1.2vw, 1rem);
+    font-size: clamp(0.8125rem, 1.2vw, 1rem) !important;
   }
 }
