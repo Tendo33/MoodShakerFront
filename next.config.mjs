@@ -5,7 +5,7 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   images: {
-    unoptimized: true,
+    // Next.js默认图像优化已启用
   },
   // 添加CORS配置
   async headers() {

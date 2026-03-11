@@ -1,5 +1,7 @@
 "use client";
 
+import useSWR from "swr";
+
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -21,18 +23,12 @@ import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSection
 import { CocktailHero } from "@/components/pages/shared/CocktailHero";
 import { CocktailActions } from "@/components/pages/shared/CocktailActions";
 
-async function fetchCocktailById(id: string): Promise<Cocktail | null> {
-  const response = await fetch(`/api/cocktail/${encodeURIComponent(id)}`, {
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    return null;
-  }
-
-  const payload = (await response.json()) as { data?: Cocktail | null };
+const fetcher = async (url: string) => {
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) return null;
+  const payload = await response.json();
   return payload.data || null;
-}
+};
 
 const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const router = useRouter();
@@ -50,10 +46,21 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     submitRequest,
   } = useCocktailResult();
 
-  const [cocktail, setCocktail] = useState<Cocktail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: fetchedCocktail, isLoading: isSwrLoading } = useSWR<Cocktail | null>(
+    cocktailId ? `/api/cocktail/${encodeURIComponent(cocktailId)}` : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
+
+  const cocktail = cocktailId ? (fetchedCocktail || null) : (contextCocktail || null);
+
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isSmartLoading, setIsSmartLoading] = useState(true);
+
+  const isDataLoading = cocktailId ? isSwrLoading : isContextLoading;
+  const isLoading = isDataLoading || isRegenerating || isSmartLoading;
 
   // Updated design system classes
   const textColorClass = "text-foreground";
@@ -70,37 +77,20 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   } = useLocalizedCocktail(cocktail);
 
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-
-    const fetchCocktail = async () => {
-      setIsLoading(true);
-      try {
-        if (cocktailId) {
-          const data = await fetchCocktailById(cocktailId);
-          setCocktail(data);
-        } else if (contextCocktail) {
-          setCocktail(contextCocktail);
-        } else {
-          loadSavedData();
-        }
-
-        // Add a small delay before showing animations
-        timer = setTimeout(() => setIsPageLoaded(true), 100);
-      } catch (error) {
-        cocktailLogger.error("Error fetching cocktail", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void fetchCocktail();
-
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
+    if (!cocktailId && !contextCocktail) {
+      loadSavedData();
+    }
   }, [cocktailId, contextCocktail, loadSavedData]);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    if (cocktail && !isLoading) {
+      timer = setTimeout(() => setIsPageLoaded(true), 100);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [cocktail, isLoading]);
 
   const handleBack = () => {
     router.push(getPathWithLanguage("/"));
@@ -123,14 +113,15 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     if (!submitRequest || cocktailId) return; // Only valid for recommendation page, not db saved items
 
     try {
-      setIsLoading(true);
+      setIsRegenerating(true);
+      setIsSmartLoading(true);
       await submitRequest(true); // Pass regenerate = true
       // submitRequest updates recommendation context, page re-renders
       router.push(getPathWithLanguage("/cocktail/recommendation"));
     } catch (error) {
       cocktailLogger.error("Error regenerating recommendation", error);
     } finally {
-      setIsLoading(false);
+      setIsRegenerating(false);
     }
   };
 
@@ -141,14 +132,14 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     return tool.alternative;
   };
 
-  if (isLoading || isContextLoading) {
+  if (isLoading) {
     return (
       <SmartLoadingSystem
-        isShowing={true}
+        isShowing={isDataLoading || isRegenerating}
         type="recommendation"
         message={t("recommendation.loading")}
         estimatedDuration={4000}
-        onComplete={() => setIsLoading(false)}
+        onComplete={() => setIsSmartLoading(false)}
       />
     );
   }
@@ -454,7 +445,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               : handleRegenerateRecommendation
           }
           regenerateLabel={language === "en" ? "Try Another" : "换一个推荐"}
-          isRegenerating={isLoading}
+          isRegenerating={isRegenerating}
         />
       </div>
 
