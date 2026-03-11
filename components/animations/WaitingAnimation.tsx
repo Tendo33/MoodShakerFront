@@ -57,14 +57,6 @@ const WaitingAnimation = memo(function WaitingAnimation({
     };
   }, [externalProgress]);
 
-  useEffect(() => {
-    if (externalProgress && externalProgress >= 100 && onComplete) {
-      const timer = setTimeout(() => {
-        onComplete();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [externalProgress, onComplete]);
 
   if (!isShowing) return null;
 
@@ -84,29 +76,9 @@ const WaitingAnimation = memo(function WaitingAnimation({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <div className="relative mx-auto w-40 h-40">
-          <motion.div className="absolute inset-0 rounded-none border-4 border-primary/30 shadow-[0_0_15px_rgba(255,0,255,0.4)] rotate-45" />
-          <motion.div className="absolute inset-2 rounded-none border-2 border-secondary/50 shadow-[0_0_10px_rgba(0,255,255,0.4)] rotate-12" />
-          <div
-            className="absolute inset-0 rounded-none border-4 border-transparent animate-spin"
-            style={{
-              background:
-                "conic-gradient(from 0deg, transparent, var(--color-primary), var(--color-secondary), var(--color-accent), transparent)",
-              borderRadius: "0%",
-              mask: "radial-gradient(circle at center, transparent 60%, black 65%, black 100%)",
-              animationDuration: "2s",
-            }}
-          />
+        <div className="relative mx-auto w-40 h-40 flex items-center justify-center">
           <motion.div
-            className="absolute inset-4 rounded-none bg-linear-to-br from-primary/20 to-secondary/20 backdrop-blur-sm -rotate-12"
-            animate={{
-              scale: [1, 1.1, 1],
-              opacity: [0.5, 0.9, 0.5],
-            }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-          />
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center text-5xl"
+            className="text-5xl"
             animate={{
               scale: [1, 1.05, 1],
             }}

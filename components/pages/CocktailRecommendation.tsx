@@ -135,7 +135,8 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   if (isLoading) {
     return (
       <SmartLoadingSystem
-        isShowing={isDataLoading || isRegenerating}
+        isShowing={isSmartLoading}
+        actualProgress={isDataLoading || isRegenerating ? 0 : 100}
         type="recommendation"
         message={t("recommendation.loading")}
         estimatedDuration={4000}

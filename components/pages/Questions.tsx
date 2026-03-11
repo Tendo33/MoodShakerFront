@@ -47,6 +47,7 @@ const Questions = memo(function Questions() {
     message: string;
     context: string;
   } | null>(null);
+  const [generatedCocktailId, setGeneratedCocktailId] = useState<string | null>(null);
 
   // Loading message rotation
   const [loadingMessage, setLoadingMessage] = useState(() =>
@@ -271,12 +272,19 @@ const Questions = memo(function Questions() {
 
       updateProgress(20);
 
-      await withTimeout(submitRequest(), 60000, "Request timed out");
+      const cocktail = await withTimeout(submitRequest(), 120000, "Request timed out");
+
+      // Save the cocktail ID for navigation
+      if (cocktail?.id) {
+        setGeneratedCocktailId(String(cocktail.id));
+      }
 
       updateProgress(70);
 
+      // Use completeGeneration to properly clean up state
+      // This sets progress to 100 and schedules isLoading reset
       setTimeout(() => {
-        updateProgress(100);
+        completeGeneration();
       }, 800);
     } catch (error) {
       const errorMessage =
@@ -342,8 +350,11 @@ const Questions = memo(function Questions() {
   const canGoBack = true;
 
   const navigateToRecommendation = useCallback(() => {
-    router.push(getPathWithLanguage("/cocktail/recommendation"));
-  }, [router, getPathWithLanguage]);
+    const path = generatedCocktailId
+      ? getPathWithLanguage(`/cocktail/recommendation?id=${encodeURIComponent(generatedCocktailId)}`)
+      : getPathWithLanguage("/cocktail/recommendation");
+    router.push(path);
+  }, [router, getPathWithLanguage, generatedCocktailId]);
 
   if (isGenerating) {
     return (

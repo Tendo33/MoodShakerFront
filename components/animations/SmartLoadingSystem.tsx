@@ -162,7 +162,6 @@ const SmartLoadingSystem = memo(function SmartLoadingSystem({
   return (
     <WaitingAnimation
       isShowing={isShowing}
-      onComplete={onComplete}
       message={displayMessage}
       progress={simulatedProgress}
     />

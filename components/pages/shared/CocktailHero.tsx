@@ -119,9 +119,9 @@ export function CocktailHero({
                 {t("detail.flavorProfile")}
               </p>
               <div className="flex flex-wrap gap-3">
-                {(language === "en" && cocktail.english_flavor_profiles
+              {(language === "en" && cocktail.english_flavor_profiles
                   ? cocktail.english_flavor_profiles
-                  : cocktail.flavor_profiles
+                  : cocktail.flavor_profiles || []
                 ).map((flavor, index) => (
                   <motion.span
                     key={index}
