@@ -248,17 +248,17 @@ const Home = React.memo(function Home() {
                   
                   <div className="flex items-center mb-6 relative z-10">
                     <motion.div
-                      className="w-12 h-12 bg-black border-2 border-secondary flex items-center justify-center mr-4 shadow-[0_0_15px_var(--color-secondary)] rotate-45"
+                      className="w-12 h-12 bg-black border-2 border-secondary flex items-center justify-center mr-4 shadow-[0_0_15px_var(--color-secondary)] rotate-45 shrink-0"
                       whileHover={{ scale: 1.1, rotate: 90 }}
                       transition={{ duration: 0.3 }}
                     >
                       <Sparkles className="h-6 w-6 text-secondary -rotate-45 group-hover:rotate-0 transition-transform" />
                     </motion.div>
-                    <h3 className="text-xl font-heading font-bold text-secondary tracking-widest uppercase drop-shadow-[0_0_5px_rgba(0,255,255,0.8)]">
+                    <h3 className="text-xl lang-en:text-base font-heading font-bold text-secondary tracking-widest lang-en:tracking-wider uppercase drop-shadow-[0_0_5px_rgba(0,255,255,0.8)]">
                       {language === "en" ? "Your Recommendation" : "您的推荐"}
                     </h3>
                   </div>
-                  <p className="mb-8 text-foreground font-mono text-sm leading-relaxed relative z-10">
+                  <p className="mb-8 text-foreground font-mono text-sm lang-en:text-xs leading-relaxed lang-en:leading-normal relative z-10">
                     {language === "en"
                       ? "> SYSTEM LOG: Personalized cocktail sequence initialized. View output or explore alternative logic paths."
                       : "> 系统日志：专属鸡尾酒序列已生成，请查看输出或探索替代逻辑路径。"}
@@ -305,17 +305,17 @@ const Home = React.memo(function Home() {
                   
                   <div className="flex items-center mb-6 relative z-10">
                     <motion.div
-                      className="w-12 h-12 bg-black border-2 border-primary flex items-center justify-center mr-4 shadow-[0_0_15px_var(--color-primary)] rotate-45"
+                      className="w-12 h-12 bg-black border-2 border-primary flex items-center justify-center mr-4 shadow-[0_0_15px_var(--color-primary)] rotate-45 shrink-0"
                       whileHover={{ scale: 1.1, rotate: 90 }}
                       transition={{ duration: 0.3 }}
                     >
                       <History className="h-6 w-6 text-primary -rotate-45 group-hover:rotate-0 transition-transform" />
                     </motion.div>
-                    <h3 className="text-xl font-heading font-bold text-primary tracking-widest uppercase drop-shadow-[0_0_5px_rgba(255,0,255,0.8)]">
+                    <h3 className="text-xl lang-en:text-base font-heading font-bold text-primary tracking-widest lang-en:tracking-wider uppercase drop-shadow-[0_0_5px_rgba(255,0,255,0.8)]">
                       {t("home.savedSession")}
                     </h3>
                   </div>
-                  <p className="mb-8 text-foreground font-mono text-sm leading-relaxed relative z-10">
+                  <p className="mb-8 text-foreground font-mono text-sm lang-en:text-xs leading-relaxed lang-en:leading-normal relative z-10">
                     {t("home.savedSessionDesc")}
                   </p>
                   <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-4 relative z-10">
