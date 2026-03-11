@@ -33,6 +33,8 @@ export async function generateMetadata({
   };
 }
 
+import { Suspense } from "react";
+
 export default async function RecommendationPage({
   params,
 }: {
@@ -46,7 +48,9 @@ export default async function RecommendationPage({
 
   return (
     <ErrorBoundary>
-      <CocktailRecommendation />
+      <Suspense fallback={<div className="flex justify-center items-center h-screen"><LoadingSpinner variant="modern" /></div>}>
+        <CocktailRecommendation />
+      </Suspense>
     </ErrorBoundary>
   );
 }

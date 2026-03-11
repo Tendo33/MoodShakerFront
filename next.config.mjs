@@ -5,7 +5,12 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   images: {
-    // Next.js默认图像优化已启用
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'bizyair-prod.oss-cn-shanghai.aliyuncs.com',
+      },
+    ],
   },
   // 添加CORS配置
   async headers() {
