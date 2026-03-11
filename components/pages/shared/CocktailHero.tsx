@@ -10,7 +10,6 @@ interface CocktailHeroProps {
   language: string;
   isPageLoaded: boolean;
   t: (key: string) => string;
-  textColorClass: string;
   gradientTextClass: string;
   imageContent: ReactNode;
   getLocalizedContent: (
@@ -24,7 +23,6 @@ export function CocktailHero({
   language,
   isPageLoaded,
   t,
-  textColorClass,
   gradientTextClass,
   imageContent,
   getLocalizedContent,
@@ -101,7 +99,6 @@ export function CocktailHero({
           </motion.div>
 
           <CocktailSpecs
-            cocktail={cocktail}
             t={t}
             language={language}
             getLocalizedContent={getLocalizedContent}

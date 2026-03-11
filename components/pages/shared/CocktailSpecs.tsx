@@ -5,7 +5,6 @@ import { Clock, Droplet, GlassWater } from "lucide-react";
 import type { Cocktail } from "@/lib/cocktail-types";
 
 interface CocktailSpecsProps {
-  cocktail: Cocktail;
   t: (key: string) => string;
   language: string;
   getLocalizedContent: (
@@ -15,7 +14,6 @@ interface CocktailSpecsProps {
 }
 
 export function CocktailSpecs({
-  cocktail,
   t,
   language,
   getLocalizedContent,

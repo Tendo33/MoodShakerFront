@@ -7,7 +7,6 @@ import { useLanguage } from "@/context/LanguageContext";
 
 interface WaitingAnimationProps {
   isShowing?: boolean;
-  onComplete?: () => void;
   message?: string;
   messageKey?: string;
   subtitleKey?: string;
@@ -16,7 +15,6 @@ interface WaitingAnimationProps {
 
 const WaitingAnimation = memo(function WaitingAnimation({
   isShowing = true,
-  onComplete,
   message,
   messageKey = "loading.default",
   subtitleKey = "loading.subtitle",

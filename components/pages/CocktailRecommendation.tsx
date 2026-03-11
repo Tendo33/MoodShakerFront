@@ -326,7 +326,6 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           language={language}
           isPageLoaded={isPageLoaded}
           t={t}
-          textColorClass={textColorClass}
           gradientTextClass={gradientText}
           getLocalizedContent={getLocalizedContent}
           imageContent={
