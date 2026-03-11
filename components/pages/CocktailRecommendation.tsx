@@ -65,7 +65,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   // Updated design system classes
   const textColorClass = "text-foreground";
   const cardClasses =
-    "glass-effect text-foreground transition-all duration-300 hover:shadow-primary/10";
+    "glass-effect text-foreground transition-[box-shadow,border-color,background-color] duration-300 hover:shadow-primary/10";
   const gradientText = "gradient-text-bright";
   const {
     getLocalizedContent,
@@ -222,7 +222,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <motion.button
               onClick={() => router.push(getPathWithLanguage("/questions"))}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium shadow-[0_4px_14px_hsl(var(--primary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.6)] transition-all hover:scale-105"
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium shadow-[0_4px_14px_hsl(var(--primary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.6)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 hover:scale-105"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -231,7 +231,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             </motion.button>
             <button
               onClick={handleBack}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-full glass-effect border border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all"
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-full glass-effect border border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               {t("recommendation.back")}
             </button>
@@ -291,7 +291,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           <div className="flex items-center gap-4">
             <button
               onClick={handleBack}
-              className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
+              className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/10 transition-colors glass-effect border-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 "
             >
               <ArrowLeft className="h-4 w-4" />
               <span>{t("recommendation.back")}</span>
@@ -312,7 +312,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 <motion.button
                   onClick={generateCard}
                   disabled={isGeneratingCard}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all glass-effect border border-primary/30"
+                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition glass-effect border border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label={t("recommendation.saveImage")}
@@ -330,7 +330,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               <motion.button
                 onClick={generateCard}
                 disabled={isGeneratingCard}
-                className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-primary text-primary-foreground shadow-[0_4px_20px_hsl(var(--primary)/0.5)] transition-all"
+                className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-primary text-primary-foreground shadow-[0_4px_20px_hsl(var(--primary)/0.5)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={isPageLoaded ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
                 transition={{ delay: 0.6, type: "spring", stiffness: 300, damping: 25 }}
@@ -373,7 +373,8 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   <button
                     onClick={handleRefreshImage}
                     disabled={isRefreshingImage || isImageLoading}
-                    className="p-3 rounded-full bg-black/50 backdrop-blur-md hover:bg-black/70 transition-colors border border-white/10"
+                    className="p-3 rounded-full bg-black/50 backdrop-blur-md hover:bg-black/70 transition-colors border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    aria-label={language === "en" ? "Refresh image" : "刷新图片"}
                   >
                     <RefreshCcw
                       className={`h-5 w-5 text-white ${isRefreshingImage || isImageLoading ? "animate-spin" : ""}`}
@@ -408,7 +409,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                       <button
                         onClick={handleRefreshImage}
                         disabled={isRefreshingImage}
-                        className="flex-shrink-0 px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-medium transition-colors"
+                        className="flex-shrink-0 px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                       >
                         {language === "en" ? "Retry" : "重试"}
                       </button>

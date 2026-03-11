@@ -414,7 +414,7 @@ const Home = React.memo(function Home() {
                               ease: "easeInOut",
                             }}
                           />
-                          <div className="relative h-full rounded-3xl overflow-hidden glass-effect border border-border/30 shadow-2xl shadow-primary/10 group-hover:shadow-primary/20 transition-all duration-500">
+                          <div className="relative h-full rounded-3xl overflow-hidden glass-effect border border-border/30 shadow-2xl shadow-primary/10 group-hover:shadow-primary/20 transition duration-500">
                             <SafeImage
                               src={cocktail.image}
                               fallbackSrc={`/placeholder.svg?height=600&width=500&query=${encodeURIComponent(cocktail.name)}`}
@@ -422,7 +422,7 @@ const Home = React.memo(function Home() {
                               fill
                               sizes="(max-width: 768px) 100vw, 50vw"
                               priority={index === currentCocktailIndex}
-                              className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+                              className="object-cover transition duration-700 motion-safe:group-hover:scale-110 motion-safe:group-hover:brightness-110"
                             />
                             <motion.div
                               className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-background/98 via-background/85 to-transparent backdrop-blur-sm"
@@ -469,7 +469,7 @@ const Home = React.memo(function Home() {
                   <motion.button
                     key={index}
                     onClick={() => setCurrentCocktailIndex(index)}
-                    className={`w-4 h-4 rounded-full transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                    className={`w-4 h-4 rounded-full transition duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       index === currentCocktailIndex
                         ? "bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/40 ring-2 ring-primary/20"
                         : "bg-muted/40 hover:bg-muted/70 hover:shadow-md"
