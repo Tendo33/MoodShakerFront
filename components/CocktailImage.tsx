@@ -79,6 +79,7 @@ const CocktailImage = memo(function CocktailImage({
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             priority={false} // 移除priority，只对首屏图片使用
+            unoptimized={true} // Bypasses SSRF protection errors when the developer uses a fake-ip proxy (e.g., Clash resolving domain to 198.18.x.x)
             className="object-cover"
             onLoad={() => setIsLoading(false)}
             onError={() => {

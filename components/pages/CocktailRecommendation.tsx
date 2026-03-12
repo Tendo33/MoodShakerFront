@@ -63,10 +63,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const isLoading = isDataLoading || isRegenerating || isSmartLoading;
 
   // Updated design system classes
-  const textColorClass = "text-foreground";
+  const textColorClass = "text-foreground font-mono";
   const cardClasses =
-    "glass-effect text-foreground transition-all duration-300 hover:shadow-primary/10";
-  const gradientText = "gradient-text-bright";
+    "glass-panel text-foreground rounded-none border-2 transition-all duration-300 shadow-[0_0_20px_rgba(255,0,255,0.15)] hover:shadow-[0_0_30px_rgba(0,255,255,0.3)]";
+  const gradientText = "font-black font-heading tracking-widest uppercase drop-shadow-[0_0_15px_rgba(255,0,255,0.6)]";
   const {
     getLocalizedContent,
     getLocalizedIngredientName,
@@ -135,7 +135,8 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   if (isLoading) {
     return (
       <SmartLoadingSystem
-        isShowing={isDataLoading || isRegenerating}
+        isShowing={isSmartLoading}
+        actualProgress={isDataLoading || isRegenerating ? 0 : 100}
         type="recommendation"
         message={t("recommendation.loading")}
         estimatedDuration={4000}
@@ -152,8 +153,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-          className="text-center py-16 px-8 glass-panel rounded-3xl border border-white/10 max-w-md w-full"
+          className="text-center py-16 px-8 glass-panel rounded-none border-2 border-primary shadow-[0_0_30px_rgba(255,0,255,0.2)] max-w-md w-full relative overflow-hidden"
         >
+          <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] pointer-events-none mix-blend-overlay" />
           {/* Illustrated empty state icon */}
           <motion.div
             className="flex items-center justify-center mb-8"
@@ -212,17 +214,17 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             </div>
           </motion.div>
 
-          <h2 className="text-2xl font-bold font-playfair gradient-text mb-3">
+          <h2 className="text-2xl font-black font-heading uppercase tracking-widest text-primary drop-shadow-[0_0_10px_rgba(255,0,255,0.5)] mb-3 relative z-10">
             {t("recommendation.notFound")}
           </h2>
-          <p className="text-muted-foreground font-source-sans leading-relaxed mb-8">
+          <p className="text-foreground font-mono leading-relaxed mb-8 relative z-10 bg-black/40 p-4 border-l-2 border-primary">
             {t("recommendation.notFoundDesc")}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
             <motion.button
               onClick={() => router.push(getPathWithLanguage("/questions"))}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium shadow-[0_4px_14px_hsl(var(--primary)/0.4)] hover:shadow-[0_6px_20px_hsl(var(--primary)/0.6)] transition-all hover:scale-105"
+              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)]"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -231,7 +233,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             </motion.button>
             <button
               onClick={handleBack}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-full glass-effect border border-white/10 text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all"
+              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-secondary text-secondary transition-all duration-300 hover:bg-secondary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]"
             >
               {t("recommendation.back")}
             </button>
@@ -242,42 +244,9 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Animated background */}
-      <motion.div
-        className="fixed inset-0 overflow-hidden opacity-20 pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.2 }}
-        transition={{ duration: 1 }}
-      >
-        <motion.div
-          className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/30 rounded-full blur-3xl"
-          animate={{
-            y: [0, -20, 0],
-            scale: [1, 1.05, 1],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Number.POSITIVE_INFINITY,
-            repeatType: "reverse",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/30 rounded-full blur-3xl"
-          animate={{
-            y: [0, 20, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Number.POSITIVE_INFINITY,
-            repeatType: "reverse",
-            delay: 1,
-          }}
-        />
-      </motion.div>
-
-      <div className="container mx-auto py-12 md:py-20 px-4 relative">
+    <div className="min-h-screen relative overflow-x-hidden pt-20">
+      {/* Animated background - Removed blobs, relying on global grid/crt */}
+      <div className="container mx-auto pb-12 md:pb-20 px-4 relative z-10">
         {/* Navigation bar with animation */}
         <motion.div
           className="flex flex-wrap justify-between items-center mb-8 md:mb-12"
@@ -291,7 +260,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           <div className="flex items-center gap-4">
             <button
               onClick={handleBack}
-              className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-white/10 transition-colors glass-effect border-none"
+              className="flex items-center gap-2 px-4 py-2 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)]"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>{t("recommendation.back")}</span>
@@ -312,7 +281,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 <motion.button
                   onClick={generateCard}
                   disabled={isGeneratingCard}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/20 hover:bg-primary/30 text-primary transition-all glass-effect border border-primary/30"
+                  className="flex items-center gap-2 px-6 py-3 border-2 border-secondary text-secondary hover:bg-secondary hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(0,255,255,0.3)] hover:shadow-[0_0_40px_rgba(0,255,255,0.6)] font-mono font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label={t("recommendation.saveImage")}
@@ -330,7 +299,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               <motion.button
                 onClick={generateCard}
                 disabled={isGeneratingCard}
-                className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-primary text-primary-foreground shadow-[0_4px_20px_hsl(var(--primary)/0.5)] transition-all"
+                className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 bg-secondary text-black font-mono font-bold uppercase border-2 border-secondary shadow-[0_0_20px_rgba(0,255,255,0.5)]"
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={isPageLoaded ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
                 transition={{ delay: 0.6, type: "spring", stiffness: 300, damping: 25 }}
@@ -357,11 +326,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           language={language}
           isPageLoaded={isPageLoaded}
           t={t}
-          textColorClass={textColorClass}
           gradientTextClass={gradientText}
           getLocalizedContent={getLocalizedContent}
           imageContent={
-            <div className="rounded-2xl overflow-hidden w-full h-full relative">
+            <div className="rounded-none overflow-hidden w-full h-full relative border-[3px] border-primary/30">
               <CocktailImage
                 cocktailId={cocktailId ?? undefined}
                 imageData={imageData}
@@ -373,7 +341,8 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   <button
                     onClick={handleRefreshImage}
                     disabled={isRefreshingImage || isImageLoading}
-                    className="p-3 rounded-full bg-black/50 backdrop-blur-md hover:bg-black/70 transition-colors border border-white/10"
+                    className="p-3 rounded-full bg-black/50 backdrop-blur-md hover:bg-black/70 transition-colors border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    aria-label={language === "en" ? "Refresh image" : "刷新图片"}
                   >
                     <RefreshCcw
                       className={`h-5 w-5 text-white ${isRefreshingImage || isImageLoading ? "animate-spin" : ""}`}
@@ -408,7 +377,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                       <button
                         onClick={handleRefreshImage}
                         disabled={isRefreshingImage}
-                        className="flex-shrink-0 px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-medium transition-colors"
+                        className="shrink-0 px-3 py-1 border border-white text-white hover:bg-white hover:text-black font-mono uppercase text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                       >
                         {language === "en" ? "Retry" : "重试"}
                       </button>

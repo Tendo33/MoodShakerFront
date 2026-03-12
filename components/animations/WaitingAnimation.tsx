@@ -7,7 +7,6 @@ import { useLanguage } from "@/context/LanguageContext";
 
 interface WaitingAnimationProps {
   isShowing?: boolean;
-  onComplete?: () => void;
   message?: string;
   messageKey?: string;
   subtitleKey?: string;
@@ -16,7 +15,6 @@ interface WaitingAnimationProps {
 
 const WaitingAnimation = memo(function WaitingAnimation({
   isShowing = true,
-  onComplete,
   message,
   messageKey = "loading.default",
   subtitleKey = "loading.subtitle",
@@ -57,14 +55,6 @@ const WaitingAnimation = memo(function WaitingAnimation({
     };
   }, [externalProgress]);
 
-  useEffect(() => {
-    if (externalProgress && externalProgress >= 100 && onComplete) {
-      const timer = setTimeout(() => {
-        onComplete();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [externalProgress, onComplete]);
 
   if (!isShowing) return null;
 
@@ -73,35 +63,20 @@ const WaitingAnimation = memo(function WaitingAnimation({
     externalProgress !== undefined ? externalProgress : animationProgress;
 
   const content = (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6 fixed inset-0 z-[100] overflow-hidden">
+    <div className="min-h-screen w-screen bg-black flex items-center justify-center p-6 fixed inset-0 z-[100] overflow-hidden">
+      <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] pointer-events-none mix-blend-overlay z-10" />
+      <div
+        className="absolute inset-0 bg-[linear-gradient(-45deg,rgba(255,0,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,0,255,0.05)_50%,rgba(255,0,255,0.05)_75%,transparent_75%,transparent)] bg-size-[20px_20px] opacity-20"
+      />
       <motion.div
-        className="max-w-3xl w-full text-center space-y-20"
+        className="max-w-3xl w-full text-center space-y-20 relative z-20"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <div className="relative mx-auto w-40 h-40">
-          <motion.div className="absolute inset-0 rounded-full border-2 border-slate-700/30" />
-          <div
-            className="absolute inset-0 rounded-full border-4 border-transparent animate-spin"
-            style={{
-              background:
-                "conic-gradient(from 0deg, transparent, #fbbf24, #f43f5e, #fb923c, transparent)",
-              borderRadius: "50%",
-              mask: "radial-gradient(circle at center, transparent 68%, black 72%, black 100%)",
-              animationDuration: "2s",
-            }}
-          />
+        <div className="relative mx-auto w-40 h-40 flex items-center justify-center">
           <motion.div
-            className="absolute inset-4 rounded-full bg-gradient-to-br from-amber-400/25 to-pink-400/25 backdrop-blur-sm"
-            animate={{
-              scale: [1, 1.05, 1],
-              opacity: [0.5, 0.8, 0.5],
-            }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-          />
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center text-5xl"
+            className="text-5xl"
             animate={{
               scale: [1, 1.05, 1],
             }}
@@ -126,17 +101,17 @@ const WaitingAnimation = memo(function WaitingAnimation({
                 exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
                 transition={{ duration: 0.5 }}
               >
-                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400 bg-clip-text text-transparent tracking-tight pb-2 leading-relaxed px-4 drop-shadow-[0_0_15px_rgba(251,191,36,0.3)]">
+                <h2 className="text-4xl md:text-5xl font-black text-primary font-heading tracking-widest uppercase pb-2 leading-relaxed px-4 drop-shadow-[0_0_15px_rgba(255,0,255,0.6)]">
                   {displayMessage}
                 </h2>
                 <motion.p
-                  className="text-lg text-slate-300 font-light"
+                  className="text-lg text-secondary font-mono tracking-wider font-bold"
                   animate={{
                     opacity: [0.6, 1, 0.6],
-                    color: [
-                      "rgb(203 213 225)",
-                      "rgb(251 191 36)",
-                      "rgb(203 213 225)",
+                    textShadow: [
+                      "0 0 5px rgba(0,255,255,0.2)",
+                      "0 0 15px rgba(0,255,255,0.8)",
+                      "0 0 5px rgba(0,255,255,0.2)",
                     ],
                   }}
                   transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
@@ -147,9 +122,9 @@ const WaitingAnimation = memo(function WaitingAnimation({
             </AnimatePresence>
           </div>
 
-          <div className="w-full h-2 rounded-full overflow-hidden relative bg-slate-700/50 max-w-md mx-auto">
+          <div className="w-full h-3 rounded-none overflow-hidden relative bg-black/50 border-2 border-primary/40 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] max-w-md mx-auto">
             <motion.div
-              className="h-full bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 rounded-full shadow-lg shadow-amber-400/20"
+              className="h-full bg-linear-to-r from-primary via-secondary to-accent shadow-[0_0_20px_var(--color-secondary)]"
               style={{ width: `${currentProgress}%` }}
             ></motion.div>
           </div>

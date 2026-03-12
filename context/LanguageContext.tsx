@@ -135,9 +135,12 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     }
   }, [pathname, extractLanguageFromPathname, isClient]);
 
-  // Set custom header for middleware when language changes
+  // Set custom header for middleware when language changes and sync HTML lang attribute
   useEffect(() => {
     if (isClient && !isLoading) {
+      // Sync HTML lang attribute for CSS variants (e.g. lang-en, lang-zh)
+      document.documentElement.lang = language === "en" ? "en" : "zh-CN";
+
       // This is a client-side effect to help with back navigation
       // Create a custom event that can be listened to by navigation handlers
       const event = new CustomEvent("languageChanged", { detail: language });

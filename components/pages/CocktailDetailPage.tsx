@@ -160,7 +160,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           language={language}
           isPageLoaded={isPageLoaded}
           t={t}
-          textColorClass={textColorClass}
           gradientTextClass={gradientText}
           getLocalizedContent={getLocalizedContent}
           imageContent={

@@ -1,6 +1,19 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* ===== Language Variants ===== */
+@custom-variant lang-en {
+  &:lang(en) {
+    @slot;
+  }
+}
+
+@custom-variant lang-zh {
+  &:lang(zh-CN), &:lang(zh) {
+    @slot;
+  }
+}
+
 /* ===== Container (removed from Tailwind v4 core) ===== */
 @utility container {
   width: 100%;
@@ -13,51 +26,50 @@
 
 /* ===== Theme — replaces tailwind.config.ts ===== */
 @theme inline {
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-chart-1: hsl(var(--chart-1));
-  --color-chart-2: hsl(var(--chart-2));
-  --color-chart-3: hsl(var(--chart-3));
-  --color-chart-4: hsl(var(--chart-4));
-  --color-chart-5: hsl(var(--chart-5));
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --color-background: #090014;
+  --color-foreground: #E0E0E0;
+  
+  --color-primary: #FF00FF;
+  --color-primary-foreground: #090014;
+  
+  --color-secondary: #00FFFF;
+  --color-secondary-foreground: #090014;
+  
+  --color-accent: #FF9900;
+  --color-accent-foreground: #090014;
+  
+  --color-muted: rgba(224, 224, 224, 0.5);
+  --color-muted-foreground: rgba(224, 224, 224, 0.7);
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --color-border: #2D1B4E;
+  --color-input: #000000;
+  --color-ring: #00FFFF;
 
-  --animate-fadeIn: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  --animate-fadeOut: fadeOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  --animate-float: float 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  --animate-gentleFloat: gentleFloat 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  --animate-pulse: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-shimmer: shimmer 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  --animate-slideUp: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  --animate-scaleIn: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --color-popover: #1a103c;
+  --color-popover-foreground: #E0E0E0;
+  
+  --color-card: rgba(26, 16, 60, 0.8);
+  --color-card-foreground: #E0E0E0;
+
+  --color-destructive: #FF0000;
+  --color-destructive-foreground: #FFFFFF;
+
+  --radius-lg: 0px;
+  --radius-md: 0px;
+  --radius-sm: 0px;
+
+  --font-heading: var(--font-orbitron), sans-serif;
+  --font-mono: var(--font-share-tech-mono), monospace;
+
+  /* Vaporwave Animations */
+  --animate-grid-move: grid-move 5s linear infinite;
+  --animate-crt-flicker: crt-flicker 0.15s infinite;
+  --animate-neon-pulse: neon-pulse 2s infinite alternate;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-fadeIn: fadeIn 0.4s linear forwards;
+  --animate-fadeOut: fadeOut 0.3s linear forwards;
+  --animate-slideUp: slideUp 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
+  --animate-scaleIn: scaleIn 0.3s linear forwards;
 }
 
 @keyframes fadeIn {
@@ -72,28 +84,29 @@
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-12px); }
 }
-@keyframes gentleFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.05); opacity: 0.8; }
-}
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
 @keyframes slideUp {
-  0% { transform: translateY(40px); opacity: 0; filter: blur(8px); }
-  100% { transform: translateY(0); opacity: 1; filter: blur(0); }
+  0% { transform: translateY(40px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
 }
 @keyframes scaleIn {
   0% { transform: scale(0.85); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
+@keyframes grid-move {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 0, 0 40px; }
+}
+@keyframes crt-flicker {
+  0% { opacity: 0.95; }
+  50% { opacity: 0.85; }
+  100% { opacity: 1; }
+}
+@keyframes neon-pulse {
+  0% { filter: brightness(1); }
+  100% { filter: brightness(1.2) contrast(1.1); }
+}
 
-/* Font is handled by Playfair Display and Source Sans Pro in layout.tsx */
+/* Font handled by layout.tsx */
 
 /* ===== Custom Utilities (Tailwind v4: @utility replaces @layer utilities + @apply) ===== */
 
@@ -101,107 +114,117 @@
   text-wrap: balance;
 }
 
-@utility noise-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+/* Vaporwave Structural Utilities */
+@utility crt-overlay {
+  background: linear-gradient(rgba(18,16,20,0) 50%, rgba(0,0,0,0.25) 50%);
+  background-size: 100% 4px;
+  mix-blend-mode: overlay;
+  z-index: 100;
   pointer-events: none;
-  z-index: 50;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  animation: crt-flicker 0.15s infinite;
 }
 
-/* Level 1: 极淡 — 大背景装饰区域 */
+@utility crt-scanline {
+  background: linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+  pointer-events: none;
+}
+
+@utility vaporwave-grid {
+  background-image: 
+    linear-gradient(transparent 95%, #FF00FF 95%), 
+    linear-gradient(90deg, transparent 95%, #FF00FF 95%);
+  background-size: 40px 40px;
+  transform: perspective(600px) rotateX(60deg) translateY(-50px) scale(2.5);
+  mask-image: linear-gradient(to bottom, transparent, black);
+  animation: grid-move 5s linear infinite;
+  transform-origin: top center;
+}
+
+@utility vapor-sun {
+  width: 600px;
+  height: 600px;
+  background: linear-gradient(to bottom, #FF9900, #FF00FF);
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.2;
+}
+
+/* Glass Panels (adapted for dark synthwave borders) */
 @utility glass-subtle {
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  border: 1px solid rgb(255 255 255 / 0.05);
-  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  background: rgba(26, 16, 60, 0.4);
+  border: 1px solid rgba(255, 0, 255, 0.2);
   transform: translateZ(0);
 }
 
-/* Level 2: 标准卡片 — 内容卡片、面板 */
 @utility glass-panel {
   -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
-  border: 1px solid rgb(255 255 255 / 0.1);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  background: rgba(26, 16, 60, 0.8);
+  border: 1px solid rgba(255, 0, 255, 0.3);
+  border-top: 2px solid #00FFFF;
   transform: translateZ(0);
 }
 
-/* Level 3: 高对比 — Modal、Dropdown、Popup */
 @utility glass-popup {
   -webkit-backdrop-filter: blur(40px);
   backdrop-filter: blur(40px);
-  border: 1px solid rgb(255 255 255 / 0.2);
-  background: linear-gradient(135deg, rgba(40, 45, 60, 0.85) 0%, rgba(25, 30, 45, 0.95) 100%);
-  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  background: rgba(9, 0, 20, 0.95);
+  border: 2px solid #00FFFF;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
   transform: translateZ(0);
 }
 
-/* 兼容别名：保留 .glass-effect 映射到 glass-panel */
 @utility glass-effect {
   -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
-  border: 1px solid rgb(255 255 255 / 0.1);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  background: rgba(26, 16, 60, 0.8);
+  border: 1px solid rgba(255, 0, 255, 0.3);
+  border-top: 2px solid #00FFFF;
   transform: translateZ(0);
   will-change: transform, opacity;
 }
 
-/* ===== Design Tokens ===== */
+/* Base Design System overwriting defaults via standard variables. We are not using standard HSL palettes for Vaporwave since it uses pure saturation. */
 @layer base {
   :root {
-    --background: 220 26% 14%;
-    --foreground: 0 0% 98%;
-    --card: 220 23% 18%;
-    --card-foreground: 0 0% 98%;
-    --popover: 220 23% 18%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 35 81% 65%;
-    --primary-foreground: 220 26% 14%;
-    --secondary: 340 82% 62%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 220 9% 46%;
-    --muted-foreground: 220 9% 70%;
-    --accent: 340 82% 62%;
-    --accent-foreground: 220 26% 14%;
-    --destructive: 348 83% 47%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 13% 36%;
-    --input: 220 23% 18%;
-    --ring: 0 0% 98% / 0.1;
-    --chart-1: 35 81% 65%;
-    --chart-2: 340 82% 62%;
-    --chart-3: 220 9% 46%;
-    --chart-4: 220 13% 36%;
-    --chart-5: 220 23% 18%;
-    --radius: 0.75rem;
-    --sidebar: 220 23% 18%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 35 81% 65%;
-    --sidebar-primary-foreground: 220 26% 14%;
-    --sidebar-accent: 340 82% 62%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 13% 36%;
-    --sidebar-ring: 0 0% 98% / 0.1;
+    /* Pure hex values replaced for explicit tailwind generation */
+    --background: #090014;
+    --foreground: #E0E0E0;
+    --card: rgba(26, 16, 60, 0.8);
+    --card-foreground: #00FFFF;
+    --primary: #FF00FF;
+    --primary-foreground: #000000;
+    --secondary: #00FFFF;
+    --secondary-foreground: #000000;
+    --accent: #FF9900;
+    --border: #2D1B4E;
+    --radius: 0px; /* Zero radius for aggressive geometric edges */
+  }
+
+  /* Root Font Scaling for English to compensate for wider Latin characters */
+  html:lang(en) {
+    font-size: 92%;
   }
 }
 
 /* ===== Base Styles (raw CSS — no @apply inside @layer in v4) ===== */
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    border-color: var(--color-border);
   }
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+  body, html {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-mono);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
   }
 
   button,
@@ -242,47 +265,60 @@
 
 /* ===== Component Styles ===== */
 .card-hover {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s linear;
 }
 
 .card-hover:hover {
-  transform: translateY(-8px) scale(1.02);
+  transform: translateY(-8px);
   box-shadow:
-    0 30px 40px -10px hsl(var(--background) / 0.5),
-    0 15px 15px -10px hsl(var(--background) / 0.3),
-    0 0 0 1px hsl(var(--border) / 0.2);
+    0 0 20px var(--color-secondary),
+    0 0 40px rgba(0, 255, 255, 0.2);
+  border-color: var(--color-secondary);
 }
 
 .gradient-text {
   background: linear-gradient(
-    135deg,
-    hsl(var(--primary)),
-    hsl(var(--secondary))
+    to right,
+    var(--color-accent),
+    var(--color-primary),
+    var(--color-secondary)
   );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-size: 200% 200%;
-  animation: gradient-shift 3s ease infinite;
+  background-size: 200% auto;
+  animation: gradient-shift 5s linear infinite;
 }
 
 .gradient-text-bright {
-  background: linear-gradient(135deg, #fde047, #f87171, #ec4899);
+  background: linear-gradient(
+    to bottom,
+    var(--color-secondary),
+    var(--color-primary)
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-size: 200% 200%;
-  animation: gradient-shift 3s ease infinite;
 }
 
 @keyframes gradient-shift {
-  0%,
-  100% {
+  0% {
     background-position: 0% 50%;
   }
   50% {
     background-position: 100% 50%;
   }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.neon-glow-primary {
+  text-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-primary);
+}
+
+.neon-glow-secondary {
+  text-shadow: 0 0 5px var(--color-secondary), 0 0 10px rgba(0,255,255,0.8);
 }
 
 /* ===== Spacing Utilities (@apply outside @layer works in v4) ===== */
@@ -356,15 +392,16 @@
 }
 
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background;
+  @apply focus:outline-none focus:ring-1 focus:ring-secondary/90 focus:ring-offset-2 focus:ring-offset-background;
 }
 
 .page-transition {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s linear;
 }
 
 /* ===== Fluid Typography ===== */
 @layer base {
+  /* Default (Chinese) */
   h1 {
     font-size: clamp(1.875rem, 5vw, 4.5rem);
     line-height: 1.1;
@@ -390,5 +427,27 @@
   p {
     font-size: clamp(0.9375rem, 1.5vw, 1.125rem);
     line-height: 1.65;
+  }
+
+  /* English-Specific Typography overrides to globally scale down text */
+  /* These act as safety nets for elements not using rem or using hardcoded classes */
+  html:lang(en) body {
+    font-size: 0.875rem !important; /* equivalent to text-sm */
+    line-height: 1.5;
+  }
+  html:lang(en) h1 {
+    font-size: clamp(1.5rem, 4vw, 3.5rem) !important;
+  }
+  html:lang(en) h2 {
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem) !important;
+  }
+  html:lang(en) h3 {
+    font-size: clamp(1.125rem, 2.5vw, 1.75rem) !important;
+  }
+  html:lang(en) h4 {
+    font-size: clamp(1rem, 2vw, 1.25rem) !important;
+  }
+  html:lang(en) p {
+    font-size: clamp(0.8125rem, 1.2vw, 1rem) !important;
   }
 }

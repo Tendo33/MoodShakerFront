@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Playfair_Display, Source_Sans_3 } from "next/font/google";
+import { Orbitron, Share_Tech_Mono } from "next/font/google";
 import { ErrorProvider } from "@/context/ErrorContext";
 import { CocktailProvider } from "@/context/CocktailContext";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -12,27 +12,28 @@ import PerformanceMonitor from "@/components/PerformanceMonitor";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
-// 优化字体加载 - 减少权重变体，启用预加载
-const playfairDisplay = Playfair_Display({
+// Orbitron for headings
+const orbitron = Orbitron({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  variable: "--font-orbitron",
   display: "swap",
-  preload: true, // 启用预加载
-  weight: ["400", "700"], // 减少权重变体，只保留必要权重
-  style: ["normal"], // 只加载正常样式
-  adjustFontFallback: false, // 禁用字体回退调整以提升性能
-  fallback: ["serif"], // 明确指定回退字体
+  preload: true,
+  weight: ["400", "500", "700", "900"], 
+  style: ["normal"],
+  adjustFontFallback: false,
+  fallback: ["sans-serif"],
 });
 
-const sourceSans = Source_Sans_3({
+// Share Tech Mono for body and UI
+const shareTechMono = Share_Tech_Mono({
   subsets: ["latin"],
-  variable: "--font-source-sans",
+  variable: "--font-share-tech-mono",
   display: "swap",
-  preload: true, // 启用预加载
-  weight: ["400", "500", "600"], // 减少权重变体
-  style: ["normal"], // 只加载正常样式
-  adjustFontFallback: false, // 禁用字体回退调整
-  fallback: ["system-ui", "sans-serif"], // 明确指定回退字体
+  preload: true,
+  weight: ["400"],
+  style: ["normal"],
+  adjustFontFallback: false,
+  fallback: ["monospace", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -50,25 +51,27 @@ export const metadata: Metadata = {
   generator: "v0.app",
 };
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 应用启动日志
-  if (typeof window !== "undefined") {
-    import("@/utils/logger").then(({ safeLogger }) => {
-      safeLogger.appStart();
-    });
-  }
   return (
     <html
       lang="zh-CN"
       suppressHydrationWarning
-      className={`${playfairDisplay.variable} ${sourceSans.variable} antialiased`}
+      className={`${orbitron.variable} ${shareTechMono.variable} antialiased`}
     >
-      <body className="dark">
-        <div className="noise-bg" />
+      <body className="dark vaporwave-theme selection:bg-[#FF00FF] selection:text-white">
+        {/* Global Vaporwave Elements */}
+        <div className="fixed inset-0 crt-overlay pointer-events-none z-50"></div>
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 vapor-sun pointer-events-none z-0"></div>
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="vaporwave-grid absolute inset-x-0 bottom-0 h-full w-full opacity-30"></div>
+        </div>
         <ErrorProvider>
           <LanguageProvider>
             <CocktailProvider>

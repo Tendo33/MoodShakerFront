@@ -30,7 +30,7 @@ const STORAGE_KEYS = {
 
 const MAX_PERSISTED_IMAGE_BYTES = 320 * 1024;
 const IMAGE_PERSIST_DEBOUNCE_MS = 5000;
-const COCKTAIL_REQUEST_TIMEOUT_MS = 45000;
+const COCKTAIL_REQUEST_TIMEOUT_MS = 90000;
 const COCKTAIL_REQUEST_RETRY_LIMIT = 2;
 
 // ---------------------------------------------------------------------------

@@ -10,7 +10,6 @@ interface CocktailHeroProps {
   language: string;
   isPageLoaded: boolean;
   t: (key: string) => string;
-  textColorClass: string;
   gradientTextClass: string;
   imageContent: ReactNode;
   getLocalizedContent: (
@@ -24,7 +23,6 @@ export function CocktailHero({
   language,
   isPageLoaded,
   t,
-  textColorClass,
   gradientTextClass,
   imageContent,
   getLocalizedContent,
@@ -48,7 +46,7 @@ export function CocktailHero({
           }}
         >
           <motion.div
-            className="rounded-3xl overflow-hidden shadow-2xl glass-effect relative aspect-square p-2"
+            className="rounded-none overflow-hidden border-2 border-secondary shadow-[0_0_30px_rgba(0,255,255,0.2)] glass-panel relative aspect-square p-2"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
           >
@@ -73,10 +71,8 @@ export function CocktailHero({
             }}
           >
             <h1
-              className={`text-5xl md:text-6xl font-bold font-playfair ${gradientTextClass} inline-block`}
+              className={`text-5xl md:text-6xl font-black font-heading tracking-widest uppercase ${gradientTextClass} inline-block drop-shadow-[0_0_15px_rgba(255,0,255,0.5)]`}
               style={{
-                filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))",
-                textShadow: "0 2px 4px rgba(0, 0, 0, 0.5)",
                 lineHeight: "1.1",
                 paddingBottom: "0.25rem",
               }}
@@ -84,7 +80,7 @@ export function CocktailHero({
               {getLocalizedContent("name", "english_name")}
             </h1>
             {cocktail.english_name && language === "cn" && (
-              <p className="text-muted-foreground text-2xl font-playfair italic">
+              <p className="text-secondary text-2xl font-mono tracking-[0.2em] uppercase drop-shadow-[0_0_5px_currentColor]">
                 {cocktail.english_name}
               </p>
             )}
@@ -97,7 +93,7 @@ export function CocktailHero({
               visible: { opacity: 1, transition: { duration: 0.5 } },
             }}
           >
-            <p className="text-foreground/80 leading-relaxed text-xl font-source-sans max-w-2xl">
+            <p className="text-foreground leading-relaxed text-lg font-mono max-w-2xl bg-black/60 p-4 border-l-2 border-primary">
               {getLocalizedContent("description", "english_description")}
             </p>
           </motion.div>
@@ -105,7 +101,6 @@ export function CocktailHero({
           <CocktailSpecs
             t={t}
             language={language}
-            textColorClass={textColorClass}
             getLocalizedContent={getLocalizedContent}
           />
 
@@ -117,23 +112,24 @@ export function CocktailHero({
                 visible: { opacity: 1, transition: { duration: 0.5 } },
               }}
             >
-              <p className="text-sm text-muted-foreground mb-3 uppercase tracking-wider">
+              <p className="text-sm text-secondary mb-3 uppercase tracking-widest font-mono">
                 {t("detail.flavorProfile")}
               </p>
               <div className="flex flex-wrap gap-3">
-                {(language === "en" && cocktail.english_flavor_profiles
+              {(language === "en" && cocktail.english_flavor_profiles
                   ? cocktail.english_flavor_profiles
-                  : cocktail.flavor_profiles
+                  : cocktail.flavor_profiles || []
                 ).map((flavor, index) => (
                   <motion.span
                     key={index}
-                    className="px-4 py-1.5 glass-effect rounded-full text-sm font-medium text-foreground/90"
+                    className="px-4 py-1.5 glass-panel border border-primary text-primary rounded-none text-sm font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(255,0,255,0.2)]"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.1 }}
                     whileHover={{
                       scale: 1.05,
-                      backgroundColor: "rgba(255,255,255,0.1)",
+                      backgroundColor: "rgba(255,0,255,0.1)",
+                      boxShadow: "0 0 15px rgba(255,0,255,0.5)"
                     }}
                   >
                     {flavor}

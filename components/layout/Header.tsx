@@ -63,7 +63,7 @@ export default function Header() {
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${
-        isScrolled ? "glass-popup py-2 shadow-[0_8px_32px_rgba(0,0,0,0.6)] border-b border-white/10 before:absolute before:bottom-0 before:left-0 before:w-full before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-primary/30 before:to-transparent" : "bg-transparent py-4"
+        isScrolled ? "glass-popup py-2 shadow-[0_8px_32px_rgba(0,0,0,0.6)] border-b border-white/10 before:absolute before:bottom-0 before:left-0 before:w-full before:h-px before:bg-linear-to-r before:from-transparent before:via-primary/30 before:to-transparent" : "bg-transparent py-4"
       }`}
       suppressHydrationWarning
     >
@@ -97,8 +97,7 @@ export default function Header() {
               href={galleryLink}
               variant="outline"
               size="md"
-              effect="lift"
-              className="text-white border-white/20 hover:bg-white/10 hover:border-white/40 backdrop-blur-sm"
+              effect="glow"
               icon={<Library className="h-4 w-4" />}
             >
               {language === "cn" ? "酒单库" : "Gallery"}
