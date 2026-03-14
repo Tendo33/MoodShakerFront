@@ -20,7 +20,7 @@ export default function ErrorAlert() {
       aria-live="assertive"
     >
       <div
-        className={`max-w-sm w-full shadow-lg rounded-2xl pointer-events-auto overflow-hidden transform ease-out duration-300 transition ${
+        className={`max-w-sm w-full shadow-lg rounded-none pointer-events-auto overflow-hidden transform ease-out duration-300 transition ${
           isVisible
             ? "translate-y-0 opacity-100 sm:translate-x-0"
             : "translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"

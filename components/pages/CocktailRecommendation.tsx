@@ -352,7 +352,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               )}
 
               {(isRefreshingImage || isImageLoading) && (
-                <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center rounded-3xl">
+                <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center rounded-none">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mx-auto mb-2" />
                     <p className="text-sm text-white font-medium">

@@ -77,13 +77,13 @@ export default function Footer() {
                   >
                     <Cocktail className="h-6 w-6 text-white" />
                   </div>
-                  <span className="gradient-text-bright font-bold text-2xl font-playfair">
+                  <span className="gradient-text-bright font-bold text-2xl font-heading">
                     MoodShaker
                   </span>
                 </motion.div>
                 <motion.p
                   variants={itemAnimation}
-                  className="text-base text-muted-foreground mb-8 max-w-md mx-auto font-source-sans leading-relaxed"
+                  className="text-base text-muted-foreground mb-8 max-w-md mx-auto font-mono leading-relaxed"
                 >
                   {t("footer.description")}
                 </motion.p>
@@ -114,7 +114,7 @@ export default function Footer() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-center text-sm text-muted-foreground font-source-sans"
+              className="text-center text-sm text-muted-foreground font-mono"
             >
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <p className="flex items-center justify-center">

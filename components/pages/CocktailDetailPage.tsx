@@ -55,7 +55,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
     return (
       <div className="min-h-screen">
         <div className="container mx-auto py-16 md:py-24">
-          <div className="text-center py-12 glass-effect rounded-2xl">
+          <div className="text-center py-12 glass-effect rounded-none">
             <h2 className={`text-2xl font-medium mb-4 ${textColorClass}`}>
               {t("recommendation.notFound")}
             </h2>
@@ -163,7 +163,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           gradientTextClass={gradientText}
           getLocalizedContent={getLocalizedContent}
           imageContent={
-            <div className="rounded-2xl overflow-hidden w-full h-full relative">
+            <div className="rounded-none overflow-hidden w-full h-full relative">
               <CocktailImage
                 cocktailId={id}
                 imageData={cocktail?.image || null}

@@ -81,7 +81,7 @@ export default function Header() {
             <Martini className="h-5 w-5 md:h-6 md:w-6 text-white" />
           </motion.div>
           <motion.span
-            className="gradient-text-bright font-bold font-playfair tracking-tight"
+            className="gradient-text-bright font-bold font-heading tracking-tight"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -189,7 +189,7 @@ export default function Header() {
                   >
                     <Martini className="h-4 w-4 text-white" />
                   </div>
-                  <span id="mobile-menu-title" className="gradient-text-bright font-bold font-playfair text-lg">
+                  <span id="mobile-menu-title" className="gradient-text-bright font-bold font-heading text-lg">
                     MoodShaker
                   </span>
                 </div>

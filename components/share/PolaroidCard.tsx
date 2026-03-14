@@ -79,7 +79,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
           minHeight: "750px",
           backgroundColor: "#0F172A", // Slate-900
           padding: "40px 32px",
-          fontFamily: "var(--font-source-sans), sans-serif",
+          fontFamily: "var(--font-mono), monospace",
           color: "#ffffff",
         }}
       >
@@ -97,7 +97,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
 
         {/* Typographic Watermark */}
         {cocktail.english_name && (
-          <div className="absolute top-[20%] -right-10 rotate-90 origin-bottom-right text-[80px] font-black text-white/[0.02] whitespace-nowrap pointer-events-none font-playfair z-0">
+          <div className="absolute top-[20%] -right-10 rotate-90 origin-bottom-right text-[80px] font-black text-white/[0.02] whitespace-nowrap pointer-events-none font-heading z-0">
             {cocktail.english_name}
           </div>
         )}
@@ -105,7 +105,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
         {/* Main Content Z-Index Wrapper */}
         <div className="relative z-10 flex flex-col h-full">
           {/* 1. Hero Image */}
-          <div className="w-full aspect-[1/1] rounded-2xl overflow-hidden shadow-2xl mb-8 relative bg-white/5">
+          <div className="w-full aspect-[1/1] rounded-none overflow-hidden shadow-2xl mb-8 relative bg-white/5">
             {imageUrl ? (
               <img
                 src={imageUrl}
@@ -118,18 +118,18 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
                 <Martini className="w-16 h-16" />
               </div>
             )}
-            <div className="absolute inset-0 ring-1 ring-white/10 rounded-2xl pointer-events-none"></div>
+            <div className="absolute inset-0 ring-1 ring-white/10 rounded-none pointer-events-none"></div>
           </div>
 
           {/* 2. Typography Header */}
           <div className="mb-8 text-center">
-            <h2 className="text-4xl font-black font-playfair tracking-tight mb-2 leading-tight text-white">
+            <h2 className="text-4xl font-black font-heading tracking-tight mb-2 leading-tight text-white uppercase">
               {name}
             </h2>
 
             {/* English Subtitle */}
             {cocktail.english_name && language !== "en" && (
-              <p className="text-lg font-serif italic text-white/60 mb-4">
+              <p className="text-lg font-mono italic text-white/60 mb-4">
                 {cocktail.english_name}
               </p>
             )}
@@ -230,7 +230,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
           <div className="flex items-center justify-between pt-6 border-t border-white/5 opacity-50">
             <div className="flex items-center gap-2">
               <Wine className="w-4 h-4 text-white/80" />
-              <span className="font-playfair font-bold text-sm tracking-wide">
+              <span className="font-heading font-bold text-sm tracking-wide">
                 MoodShaker
               </span>
             </div>

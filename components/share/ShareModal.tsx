@@ -37,7 +37,7 @@ export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="relative w-full max-w-lg bg-black/80 border border-white/20 rounded-3xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/10"
+            className="relative w-full max-w-lg bg-black/80 border-2 border-primary/30 rounded-none overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/10"
             role="dialog"
             aria-modal="true"
             aria-labelledby="share-modal-title"
@@ -49,7 +49,7 @@ export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
           </h3>
           <button
             onClick={onClose}
-            className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-white/10 focus-ring"
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-none hover:bg-white/10 focus-ring"
             type="button"
             aria-label={language === "en" ? "Close dialog" : "关闭对话框"}
           >
@@ -59,7 +59,7 @@ export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
 
         {/* Body */}
         <div className="p-6 md:p-8 flex flex-col items-center">
-          <div className="relative w-full aspect-[3/4] max-h-[55vh] rounded-2xl overflow-hidden shadow-2xl mb-8 group">
+          <div className="relative w-full aspect-[3/4] max-h-[55vh] rounded-none overflow-hidden shadow-2xl mb-8 group">
             {/* Animated Glow Background directly behind image */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-tr from-primary/30 via-secondary/20 to-primary/30 blur-[40px] opacity-60"
@@ -71,7 +71,7 @@ export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
               transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
             />
             {/* Glass Container for Image */}
-            <div className="absolute inset-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden">
+            <div className="absolute inset-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-none overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageUrl}
@@ -87,7 +87,7 @@ export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
               fullWidth
               onClick={handleDownload}
               icon={<Download className="w-5 h-5" />}
-              className="py-6 text-lg shadow-[0_4px_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_8px_30px_hsl(var(--primary)/0.5)] transition-all duration-300 rounded-2xl"
+              className="py-6 text-lg shadow-[0_4px_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_8px_30px_hsl(var(--primary)/0.5)] transition-all duration-300 rounded-none"
             >
               {t("share.modal.download")}
             </Button>
