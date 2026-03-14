@@ -49,7 +49,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary hover:text-black hover:shadow-[0_0_20px_var(--color-secondary)]",
+        "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary hover:text-black hover:shadow-[0_0_12px_var(--color-secondary)]",
       secondary:
         "bg-primary border-2 border-primary text-black hover:scale-105 hover:opacity-90 neon-glow-primary",
       outline:
@@ -57,19 +57,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ghost:
         "bg-transparent text-foreground hover:bg-[rgba(0,255,255,0.1)] hover:text-secondary",
       link: "bg-transparent text-secondary hover:text-primary p-0 hover:underline font-medium hover:neon-glow-secondary",
-      neon: "bg-transparent border-2 border-primary text-primary shadow-[0_0_20px_rgba(255,0,255,0.3)] hover:shadow-[0_0_40px_rgba(255,0,255,0.8)] hover:bg-primary hover:text-black",
+      neon: "bg-transparent border-2 border-primary text-primary shadow-[0_0_12px_rgba(255,0,255,0.3)] hover:shadow-[0_0_24px_rgba(255,0,255,0.7)] hover:bg-primary hover:text-black",
       bubble:
-        "bg-gradient-to-r from-accent via-primary to-secondary text-black hover:scale-105 shadow-[0_0_15px_rgba(255,0,255,0.5)]",
+        "bg-gradient-to-r from-accent via-primary to-secondary text-black hover:scale-105 shadow-[0_0_10px_rgba(255,0,255,0.45)]",
       shine:
-        "bg-secondary border-2 border-secondary text-black hover:shadow-[0_0_30px_var(--color-secondary)]",
+        "bg-secondary border-2 border-secondary text-black hover:shadow-[0_0_18px_var(--color-secondary)]",
     };
 
     const effectStyles = {
       none: "",
       shine: "overflow-hidden hover:brightness-125",
       pulse: "animate-neon-pulse hover:animate-none",
-      glow: "hover:shadow-[0_0_30px_currentColor] z-10",
-      lift: "hover:-translate-y-2 hover:shadow-[0_15px_30px_-5px_var(--color-primary)]",
+      glow: "hover:shadow-[0_0_16px_currentColor] z-10",
+      lift: "hover:-translate-y-2 hover:shadow-[0_12px_24px_-6px_var(--color-primary)]",
       ring: "hover:ring-2 hover:ring-offset-2 hover:ring-secondary",
     };
 
@@ -256,3 +256,4 @@ export const GradientText = forwardRef<HTMLSpanElement, GradientTextProps>(
   },
 );
 GradientText.displayName = "GradientText";
+

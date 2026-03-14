@@ -25,12 +25,12 @@ export default function LoadingSpinner({
     lg: { spinner: "w-16 h-16", text: "text-xl" },
   };
 
-  // 如果是内联模式，使用专门的内联组件
+  // 濡傛灉鏄唴鑱旀ā寮忥紝浣跨敤涓撻棬鐨勫唴鑱旂粍浠?
   if (variant === "inline") {
     return <InlineLoading text={text} />;
   }
 
-  // 如果是点状加载器
+  // 濡傛灉鏄偣鐘跺姞杞藉櫒
   if (variant === "dots") {
     return (
       <div className="flex flex-col items-center justify-center space-y-4">
@@ -48,7 +48,7 @@ export default function LoadingSpinner({
     );
   }
 
-  // 如果是环形加载器
+  // 濡傛灉鏄幆褰㈠姞杞藉櫒
   if (variant === "ring") {
     const ringSize = size === "sm" ? 24 : size === "md" ? 32 : 40;
     return (
@@ -80,7 +80,7 @@ export default function LoadingSpinner({
           />
 
           <motion.div
-            className="absolute top-1/2 left-1/2 w-3 h-3 bg-gradient-to-br from-amber-400 to-pink-500 rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_20px_rgba(245,158,11,0.8)]"
+            className="absolute top-1/2 left-1/2 w-3 h-3 bg-gradient-to-br from-amber-400 to-pink-500 rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_16px_rgba(245,158,11,0.8)]"
             animate={{
               scale: [0.8, 1.5, 0.8],
               opacity: [0.6, 1, 0.6],
@@ -110,7 +110,7 @@ export default function LoadingSpinner({
     );
   }
 
-  // 经典版本（向后兼容）
+  // 缁忓吀鐗堟湰锛堝悜鍚庡吋瀹癸級
   return (
     <div className="flex items-center justify-center">
       <div className="relative">
@@ -125,3 +125,4 @@ export default function LoadingSpinner({
     </div>
   );
 }
+

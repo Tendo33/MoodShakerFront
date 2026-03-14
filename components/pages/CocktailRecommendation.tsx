@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import useSWR from "swr";
 
@@ -65,7 +65,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   // Updated design system classes
   const textColorClass = "text-foreground font-mono";
   const cardClasses =
-    "glass-panel text-foreground rounded-none border-2 transition-all duration-300 shadow-[0_0_20px_rgba(255,0,255,0.15)] hover:shadow-[0_0_30px_rgba(0,255,255,0.3)]";
+    "glass-panel text-foreground rounded-none border-2 transition-all duration-300 shadow-[0_0_16px_rgba(255,0,255,0.15)] hover:shadow-[0_0_22px_rgba(0,255,255,0.3)]";
   const gradientText = "font-black font-heading tracking-widest uppercase drop-shadow-[0_0_15px_rgba(255,0,255,0.6)]";
   const {
     getLocalizedContent,
@@ -145,7 +145,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     );
   }
 
-  // If no cocktail found — emotional empty state
+  // If no cocktail found - emotional empty state
   if (!cocktail) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
@@ -153,7 +153,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-          className="text-center py-16 px-8 glass-panel rounded-none border-2 border-primary shadow-[0_0_30px_rgba(255,0,255,0.2)] max-w-md w-full relative overflow-hidden"
+          className="text-center py-16 px-8 glass-panel rounded-none border-2 border-primary shadow-[0_0_22px_rgba(255,0,255,0.2)] max-w-md w-full relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] pointer-events-none mix-blend-overlay" />
           {/* Illustrated empty state icon */}
@@ -171,7 +171,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 xmlns="http://www.w3.org/2000/svg"
                 className="opacity-60"
               >
-                {/* Martini glass — inverted / empty */}
+                {/* Martini glass - inverted / empty */}
                 <path
                   d="M20 20 L50 60 L80 20 Z"
                   stroke="hsl(var(--primary))"
@@ -228,7 +228,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span>✨</span>
+              <span aria-hidden="true">↺</span>
               <span>{language === "en" ? "Shake One Up" : "重新调制一杯"}</span>
             </motion.button>
             <button
@@ -281,7 +281,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 <motion.button
                   onClick={generateCard}
                   disabled={isGeneratingCard}
-                  className="flex items-center gap-2 px-6 py-3 border-2 border-secondary text-secondary hover:bg-secondary hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(0,255,255,0.3)] hover:shadow-[0_0_40px_rgba(0,255,255,0.6)] font-mono font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
+                  className="flex items-center gap-2 px-6 py-3 border-2 border-secondary text-secondary hover:bg-secondary hover:text-black transition-all duration-300 shadow-[0_0_16px_rgba(0,255,255,0.3)] hover:shadow-[0_0_28px_rgba(0,255,255,0.6)] font-mono font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label={t("recommendation.saveImage")}
@@ -299,7 +299,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               <motion.button
                 onClick={generateCard}
                 disabled={isGeneratingCard}
-                className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 bg-secondary text-black font-mono font-bold uppercase border-2 border-secondary shadow-[0_0_20px_rgba(0,255,255,0.5)] focus-ring"
+                className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 bg-secondary text-black font-mono font-bold uppercase border-2 border-secondary shadow-[0_0_16px_rgba(0,255,255,0.5)] focus-ring"
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={isPageLoaded ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
                 transition={{ delay: 0.6, type: "spring", stiffness: 300, damping: 25 }}
@@ -445,3 +445,4 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 });
 
 export default CocktailRecommendation;
+

@@ -246,7 +246,7 @@ export function CocktailRecipeSections({
       <div className="hidden lg:grid lg:grid-cols-12 gap-10 items-start">
         <div className="lg:col-span-4 space-y-8 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin">
           <motion.div
-            className={`rounded-none overflow-hidden border-2 border-primary shadow-[0_0_20px_rgba(255,0,255,0.15)] ${cardClasses}`}
+            className={`rounded-none overflow-hidden border-2 border-primary shadow-[0_0_16px_rgba(255,0,255,0.15)] ${cardClasses}`}
             variants={{
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
@@ -284,7 +284,7 @@ export function CocktailRecipeSections({
           </motion.div>
 
           <motion.div
-            className={`rounded-none overflow-hidden border-2 border-secondary shadow-[0_0_20px_rgba(0,255,255,0.15)] ${cardClasses}`}
+            className={`rounded-none overflow-hidden border-2 border-secondary shadow-[0_0_16px_rgba(0,255,255,0.15)] ${cardClasses}`}
             variants={{
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.1 } },
@@ -325,7 +325,7 @@ export function CocktailRecipeSections({
 
         <div className="lg:col-span-8">
           <motion.div
-            className={`rounded-none overflow-hidden border-2 border-accent shadow-[0_0_30px_rgba(255,153,0,0.15)] ${cardClasses} h-full`}
+            className={`rounded-none overflow-hidden border-2 border-accent shadow-[0_0_22px_rgba(255,153,0,0.15)] ${cardClasses} h-full`}
             variants={{
               hidden: { opacity: 0, x: 20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
@@ -358,7 +358,7 @@ export function CocktailRecipeSections({
                           </p>
                           {localizedStep.tips && (
                             <motion.div
-                              className="mt-4 p-4 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden shadow-[0_0_20px_rgba(255,191,0,0.15)]"
+                              className="mt-4 p-4 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden shadow-[0_0_16px_rgba(255,191,0,0.15)]"
                               initial={{ opacity: 0, y: 5 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.3 }}
@@ -387,3 +387,4 @@ export function CocktailRecipeSections({
     </motion.div>
   );
 }
+

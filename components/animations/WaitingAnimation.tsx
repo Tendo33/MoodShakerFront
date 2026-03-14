@@ -124,7 +124,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
 
           <div className="w-full h-3 rounded-none overflow-hidden relative bg-black/50 border-2 border-primary/40 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] max-w-md mx-auto">
             <motion.div
-              className="h-full bg-linear-to-r from-primary via-secondary to-accent shadow-[0_0_20px_var(--color-secondary)]"
+              className="h-full bg-linear-to-r from-primary via-secondary to-accent shadow-[0_0_16px_var(--color-secondary)]"
               style={{ width: `${currentProgress}%` }}
             ></motion.div>
           </div>
@@ -143,3 +143,4 @@ const WaitingAnimation = memo(function WaitingAnimation({
 WaitingAnimation.displayName = "WaitingAnimation";
 
 export default WaitingAnimation;
+

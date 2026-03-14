@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -223,16 +223,16 @@ const Home = React.memo(function Home() {
               </motion.div>
 
               <motion.h1
-                className="font-heading font-black text-6xl md:text-8xl lang-en:text-5xl lang-en:md:text-7xl leading-none mb-6 text-shadow"
+                className="font-heading font-black text-6xl md:text-8xl lang-en:text-6xl lang-en:md:text-8xl leading-none mb-6 text-shadow"
                 variants={slideUpVariants}
               >
-                <GradientText as="span" className="block leading-tight drop-shadow-[0_0_20px_rgba(255,0,255,0.6)]">
+                <GradientText as="span" className="block leading-tight drop-shadow-[0_0_16px_rgba(255,0,255,0.6)]">
                   {t("home.title")}
                 </GradientText>
               </motion.h1>
 
               <motion.p
-                className="text-lg md:text-xl lang-en:text-base lang-en:md:text-lg text-foreground font-mono leading-relaxed max-w-xl mb-8 tracking-wide drop-shadow-md"
+                className="text-lg md:text-xl lang-en:text-lg lang-en:md:text-xl text-foreground font-mono leading-relaxed max-w-xl mb-8 tracking-wide drop-shadow-md"
                 variants={slideUpVariants}
               >
                 {t("home.subtitle")}
@@ -240,7 +240,7 @@ const Home = React.memo(function Home() {
 
               {hasRecommendation ? (
                 <motion.div
-                  className="glass-panel p-6 rounded-none border-t-2 border-t-secondary border-b-2 border-b-primary shadow-[0_0_30px_rgba(0,255,255,0.15)] max-w-lg mb-8 relative overflow-hidden"
+                  className="glass-panel p-6 rounded-none border-t-2 border-t-secondary border-b-2 border-b-primary shadow-[0_0_22px_rgba(0,255,255,0.15)] max-w-lg mb-8 relative overflow-hidden"
                   variants={slideUpVariants}
                 >
                   {/* Decorative Scanline inside card */}
@@ -254,11 +254,11 @@ const Home = React.memo(function Home() {
                     >
                       <Sparkles className="h-6 w-6 text-secondary -rotate-45 group-hover:rotate-0 transition-transform" />
                     </motion.div>
-                    <h3 className="text-xl lang-en:text-base font-heading font-bold text-secondary tracking-widest lang-en:tracking-wider uppercase drop-shadow-[0_0_5px_rgba(0,255,255,0.8)]">
+                    <h3 className="text-xl lang-en:text-lg font-heading font-bold text-secondary tracking-widest lang-en:tracking-wider uppercase drop-shadow-[0_0_5px_rgba(0,255,255,0.8)]">
                       {language === "en" ? "Your Recommendation" : "您的推荐"}
                     </h3>
                   </div>
-                  <p className="mb-8 text-foreground font-mono text-sm lang-en:text-xs leading-relaxed lang-en:leading-normal relative z-10">
+                  <p className="mb-8 text-foreground font-mono text-sm lang-en:text-sm leading-relaxed lang-en:leading-normal relative z-10">
                     {language === "en"
                       ? "> SYSTEM LOG: Personalized cocktail sequence initialized. View output or explore alternative logic paths."
                       : "> 系统日志：专属鸡尾酒序列已生成，请查看输出或探索替代逻辑路径。"}
@@ -298,7 +298,7 @@ const Home = React.memo(function Home() {
                 </motion.div>
               ) : hasSavedSession ? (
                 <motion.div
-                  className="glass-panel p-6 rounded-none border-t-2 border-t-primary border-b-2 border-b-secondary shadow-[0_0_30px_rgba(255,0,255,0.15)] max-w-lg mb-8 relative overflow-hidden"
+                  className="glass-panel p-6 rounded-none border-t-2 border-t-primary border-b-2 border-b-secondary shadow-[0_0_22px_rgba(255,0,255,0.15)] max-w-lg mb-8 relative overflow-hidden"
                   variants={slideUpVariants}
                 >
                   <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay"></div>
@@ -311,11 +311,11 @@ const Home = React.memo(function Home() {
                     >
                       <History className="h-6 w-6 text-primary -rotate-45 group-hover:rotate-0 transition-transform" />
                     </motion.div>
-                    <h3 className="text-xl lang-en:text-base font-heading font-bold text-primary tracking-widest lang-en:tracking-wider uppercase drop-shadow-[0_0_5px_rgba(255,0,255,0.8)]">
+                    <h3 className="text-xl lang-en:text-lg font-heading font-bold text-primary tracking-widest lang-en:tracking-wider uppercase drop-shadow-[0_0_5px_rgba(255,0,255,0.8)]">
                       {t("home.savedSession")}
                     </h3>
                   </div>
-                  <p className="mb-8 text-foreground font-mono text-sm lang-en:text-xs leading-relaxed lang-en:leading-normal relative z-10">
+                  <p className="mb-8 text-foreground font-mono text-sm lang-en:text-sm leading-relaxed lang-en:leading-normal relative z-10">
                     {t("home.savedSessionDesc")}
                   </p>
                   <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-4 relative z-10">
@@ -337,7 +337,7 @@ const Home = React.memo(function Home() {
                       href={galleryPath}
                       icon={<Library className="h-5 w-5" />}
                     >
-                      {language === "en" ? "Browse Gallery" : "浏览酒单库"}
+                      {language === "en" ? "Browse Gallery" : "浏览酒单"}
                     </Button>
                   </div>
                   <div className="mt-6 text-center relative z-10">
@@ -347,7 +347,7 @@ const Home = React.memo(function Home() {
                     >
                       {language === "en"
                         ? "Start a new session instead"
-                        : "开始新的对话"}
+                        : "开始新的会话"}
                     </Link>
                   </div>
                 </motion.div>
@@ -362,7 +362,7 @@ const Home = React.memo(function Home() {
                     icon={<ArrowRight className="h-5 w-5" />}
                     href={questionsPath}
                     variant="primary"
-                    className="shadow-[0_0_20px_var(--color-secondary)] uppercase"
+                    className="shadow-[0_0_16px_var(--color-secondary)] uppercase"
                   >
                     <span className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5 animate-neon-pulse" /> 
@@ -413,7 +413,7 @@ const Home = React.memo(function Home() {
                               ease: "easeInOut",
                             }}
                           />
-                          <div className="relative h-full rounded-none overflow-hidden glass-panel border-2 border-secondary/50 shadow-[0_0_30px_rgba(0,255,255,0.2)] group-hover:shadow-[0_0_50px_rgba(0,255,255,0.4)] transition duration-500">
+                          <div className="relative h-full rounded-none overflow-hidden glass-panel border-2 border-secondary/50 shadow-[0_0_22px_rgba(0,255,255,0.2)] group-hover:shadow-[0_0_36px_rgba(0,255,255,0.4)] transition duration-500">
                             {/* Neon Terminal Title Bar overlay */}
                             <div className="absolute top-0 w-full bg-black/80 border-b-2 border-secondary px-4 py-2 flex items-center gap-2 z-20 backdrop-blur-md mix-blend-hard-light">
                               <div className="h-3 w-3 rounded-full bg-primary" />
@@ -505,7 +505,7 @@ const Home = React.memo(function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-size-[100%_4px] pointer-events-none z-10"></div>
         <Container size="xl" className="relative z-20">
           <motion.div
-            className="text-center container-narrow glass-panel p-10 md:p-16 border-2 border-secondary shadow-[0_0_50px_rgba(0,255,255,0.15)] rounded-none"
+            className="text-center container-narrow glass-panel p-10 md:p-16 border-2 border-secondary shadow-[0_0_36px_rgba(0,255,255,0.15)] rounded-none"
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
             animate={ctaInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 50, scale: 0.95 }}
             transition={{ duration: 0.5, ease: "linear" }}
@@ -527,7 +527,7 @@ const Home = React.memo(function Home() {
               variant="primary"
               className="shadow-2xl"
             >
-              <span className="mr-2">✨</span> {t("home.start")}
+              <span className="mr-2">→</span> {t("home.start")}
             </Button>
           </motion.div>
         </Container>
@@ -539,3 +539,4 @@ const Home = React.memo(function Home() {
 Home.displayName = "Home";
 
 export default Home;
+

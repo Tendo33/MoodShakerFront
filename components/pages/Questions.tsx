@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, memo, useMemo, useCallback, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -293,7 +293,7 @@ const Questions = memo(function Questions() {
       const contextText =
         language === "en"
           ? `Context: final submit, spirits=${baseSpirits.length}, feedback=${trimmedFeedback ? `"${trimmedFeedback.slice(0, 60)}"` : "empty"}`
-          : `上下文：最终提交，基酒数=${baseSpirits.length}，反馈=${trimmedFeedback ? `“${trimmedFeedback.slice(0, 60)}”` : "空"}`;
+          : `上下文：最终提交，基酒数=${baseSpirits.length}，反馈=${trimmedFeedback ? `"${trimmedFeedback.slice(0, 60)}"` : "空"}`;
 
       appLogger.error("Questionnaire submission failed", errorMessage);
       completeGeneration();
@@ -341,7 +341,7 @@ const Questions = memo(function Questions() {
     } else if (currentQuestion > 1) {
       setCurrentQuestion((prev) => prev - 1);
     } else {
-      // 第1题时，返回首页
+      // 没有题目时，返回首页
       router.push(getPathWithLanguage("/"));
     }
   }, [showFeedbackForm, showBaseSpirits, currentQuestion, questions.length, router, getPathWithLanguage]);
@@ -407,7 +407,7 @@ const Questions = memo(function Questions() {
               className="space-y-12"
             >
               <div className="text-center space-y-6">
-                {/* 回退按钮 + 步骤指示器 */}
+                {/* 回退按钮 + 步骤指示 */}
                 <div className="flex items-center justify-center gap-4">
                   {canGoBack && (
                     <motion.button
@@ -476,9 +476,9 @@ const Questions = memo(function Questions() {
                     >
                       <button
                         type="button"
-                        className={`w-full text-left h-full min-h-[180px] group relative overflow-hidden glass-panel rounded-none p-1 transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,255,255,0.4)] hover:border-secondary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50 active:scale-[0.98] border-2 ${
+                        className={`w-full text-left h-full min-h-[180px] group relative overflow-hidden glass-panel rounded-none p-1 transition-all duration-500 hover:shadow-[0_0_22px_rgba(0,255,255,0.4)] hover:border-secondary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50 active:scale-[0.98] border-2 ${
                           selectedOption === option.value
-                            ? "border-secondary shadow-[0_0_40px_rgba(0,255,255,0.6)] scale-[1.02]"
+                            ? "border-secondary shadow-[0_0_28px_rgba(0,255,255,0.6)] scale-[1.02]"
                             : "border-primary/50"
                         }`}
                         onClick={() =>
@@ -546,7 +546,7 @@ const Questions = memo(function Questions() {
               className="space-y-12"
             >
               <div className="text-center space-y-6">
-                {/* 回退按钮 + 步骤指示器 */}
+                {/* 回退按钮 + 步骤指示 */}
                 <div className="flex items-center justify-center gap-4">
                   <motion.button
                     onClick={handleGoBack}
@@ -593,7 +593,7 @@ const Questions = memo(function Questions() {
                       className={`w-full transition-all duration-500 relative overflow-hidden rounded-none p-2 text-center h-full group border-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50 active:scale-[0.96] ${
                         baseSpirits.includes(spirit.value)
                           ? "border-secondary shadow-[0_0_25px_rgba(0,255,255,0.5)] bg-secondary/20"
-                          : "border-primary/30 hover:border-secondary hover:shadow-[0_0_20px_rgba(0,255,255,0.3)] hover:bg-black/60 bg-black/40"
+                          : "border-primary/30 hover:border-secondary hover:shadow-[0_0_16px_rgba(0,255,255,0.3)] hover:bg-black/60 bg-black/40"
                       }`}
                       onClick={() =>
                         toggleBaseSpirit(spirit.value)
@@ -666,7 +666,7 @@ const Questions = memo(function Questions() {
               className="space-y-10 max-w-3xl mx-auto"
             >
               <div className="text-center space-y-6">
-                {/* 回退按钮 + 步骤指示器 */}
+                {/* 回退按钮 + 步骤指示 */}
                 <div className="flex items-center justify-center gap-4">
                   <motion.button
                     onClick={handleGoBack}
@@ -696,7 +696,7 @@ const Questions = memo(function Questions() {
                 </div>
               </div>
 
-              <div className="border-2 border-accent/50 shadow-[0_0_20px_rgba(255,153,0,0.2)] p-1 bg-black/40">
+              <div className="border-2 border-accent/50 shadow-[0_0_16px_rgba(255,153,0,0.2)] p-1 bg-black/40">
                 <div className="bg-black/60 p-6 border border-white/5">
                   <label htmlFor="feedback-input" className="sr-only">
                     {t("questions.feedback.placeholder")}
@@ -730,7 +730,7 @@ const Questions = memo(function Questions() {
               )}
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-                {/* 主 CTA: 获取推荐 - 更大更突出 */}
+                {/* CTA: 获取推荐 - 更大更突出 */}
                 <Button
                   onClick={handleFeedbackSubmit}
                   disabled={isGenerating}
@@ -796,3 +796,4 @@ const Questions = memo(function Questions() {
 Questions.displayName = "Questions";
 
 export default Questions;
+

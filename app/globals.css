@@ -178,7 +178,7 @@
   backdrop-filter: blur(40px);
   background: rgba(9, 0, 20, 0.95);
   border: 2px solid #00FFFF;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 16px rgba(0, 255, 255, 0.18);
   transform: translateZ(0);
 }
 
@@ -275,10 +275,10 @@
 }
 
 .card-hover:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
   box-shadow:
-    0 0 20px var(--color-secondary),
-    0 0 40px rgba(0, 255, 255, 0.2);
+    0 0 14px var(--color-secondary),
+    0 0 24px rgba(0, 255, 255, 0.18);
   border-color: var(--color-secondary);
 }
 
@@ -320,11 +320,11 @@
 }
 
 .neon-glow-primary {
-  text-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-primary);
+  text-shadow: 0 0 6px var(--color-primary), 0 0 14px var(--color-primary);
 }
 
 .neon-glow-secondary {
-  text-shadow: 0 0 5px var(--color-secondary), 0 0 10px rgba(0,255,255,0.8);
+  text-shadow: 0 0 4px var(--color-secondary), 0 0 8px rgba(0,255,255,0.8);
 }
 
 /* ===== Spacing Utilities (@apply outside @layer works in v4) ===== */
@@ -427,23 +427,25 @@
     font-size: clamp(1.875rem, 5vw, 4.5rem);
     line-height: 1.1;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.03em;
   }
   h2 {
     font-size: clamp(1.5rem, 4vw, 3rem);
     line-height: 1.2;
     font-weight: 700;
-    letter-spacing: -0.015em;
+    letter-spacing: 0.025em;
   }
   h3 {
     font-size: clamp(1.25rem, 3vw, 2rem);
     line-height: 1.3;
     font-weight: 600;
+    letter-spacing: 0.02em;
   }
   h4 {
     font-size: clamp(1.125rem, 2.5vw, 1.5rem);
     line-height: 1.35;
     font-weight: 600;
+    letter-spacing: 0.015em;
   }
   p {
     font-size: clamp(0.9375rem, 1.5vw, 1.125rem);

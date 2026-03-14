@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
@@ -117,7 +117,7 @@ export default function HomePopular() {
                 href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}
                 className="focus-ring"
               >
-                <div className="relative overflow-hidden rounded-none border-2 border-primary/50 glass-panel card-hover h-full group hover:border-secondary hover:shadow-[0_0_30px_rgba(0,255,255,0.3)] transition-all duration-500 p-8">
+                <div className="relative overflow-hidden rounded-none border-2 border-primary/50 glass-panel card-hover h-full group hover:border-secondary hover:shadow-[0_0_22px_rgba(0,255,255,0.3)] transition-all duration-500 p-8">
                   <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay z-0" />
                   
                   <div className="relative h-40 md:h-48 overflow-hidden mb-6 rounded-none border-2 border-primary group-hover:border-secondary transition-colors z-10">
@@ -155,3 +155,4 @@ export default function HomePopular() {
     </section>
   );
 }
+

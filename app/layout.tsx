@@ -1,5 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
+import { cookies, headers } from "next/headers";
 import { Orbitron, Share_Tech_Mono } from "next/font/google";
 import { ErrorProvider } from "@/context/ErrorContext";
 import { CocktailProvider } from "@/context/CocktailContext";
@@ -54,14 +55,44 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
-export default function RootLayout({
+const resolveLanguageFromPath = (path?: string | null) => {
+  if (!path) return null;
+  const normalized = path.split("?")[0];
+  if (normalized === "/en" || normalized.startsWith("/en/")) return "en";
+  if (normalized === "/cn" || normalized.startsWith("/cn/")) return "cn";
+  return null;
+};
+
+const resolveLanguageFromAccept = (acceptLanguage?: string | null) => {
+  if (!acceptLanguage) return null;
+  const lower = acceptLanguage.toLowerCase();
+  return lower.startsWith("en") ? "en" : "cn";
+};
+
+const resolveHtmlLang = async () => {
+  const requestHeaders = await headers();
+  const pathLang =
+    resolveLanguageFromPath(requestHeaders.get("next-url")) ||
+    resolveLanguageFromPath(requestHeaders.get("x-nextjs-rewritten-path"));
+
+  if (pathLang) return pathLang;
+
+  const cookieStore = await cookies();
+  const cookieLang = cookieStore.get("moodshaker-language")?.value;
+  if (cookieLang === "en" || cookieLang === "cn") return cookieLang;
+
+  return resolveLanguageFromAccept(requestHeaders.get("accept-language")) || "cn";
+};
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const lang = await resolveHtmlLang();
   return (
     <html
-      lang="zh-CN"
+      lang={lang === "en" ? "en" : "zh-CN"}
       suppressHydrationWarning
       className={`${orbitron.variable} ${shareTechMono.variable} antialiased`}
     >

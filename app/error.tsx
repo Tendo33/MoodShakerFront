@@ -18,7 +18,7 @@ export default function Error({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="text-center p-8 max-w-md border-2 border-primary shadow-[0_0_20px_rgba(255,0,255,0.4)] bg-black/80">
+      <div className="text-center p-8 max-w-md border-2 border-primary shadow-[0_0_16px_rgba(255,0,255,0.4)] bg-black/80">
         <h2 className="text-3xl font-heading font-black mb-4 text-primary drop-shadow-[0_0_10px_currentColor]">
           {t("common.error") || "SYSTEM ERROR"}
         </h2>
@@ -35,3 +35,4 @@ export default function Error({
     </div>
   );
 }
+

@@ -46,7 +46,7 @@ export function CocktailHero({
           }}
         >
           <motion.div
-            className="rounded-none overflow-hidden border-2 border-secondary shadow-[0_0_30px_rgba(0,255,255,0.2)] glass-panel relative aspect-square p-2"
+            className="rounded-none overflow-hidden border-2 border-secondary shadow-[0_0_22px_rgba(0,255,255,0.2)] glass-panel relative aspect-square p-2"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
           >
@@ -143,3 +143,4 @@ export function CocktailHero({
     </motion.div>
   );
 }
+

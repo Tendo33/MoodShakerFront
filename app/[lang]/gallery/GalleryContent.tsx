@@ -357,7 +357,7 @@ export default function GalleryContent({
                 href={`/${lang}/cocktail/${String(cocktail.id)}`}
                 className="block group relative h-full focus-ring"
               >
-                <div className="relative h-full rounded-none overflow-hidden glass-panel border-2 border-primary/40 shadow-[0_0_20px_rgba(255,0,255,0.15)] transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(0,255,255,0.35)] group-hover:border-secondary group-hover:-translate-y-3 group-hover:scale-[1.02] will-change-transform">
+                <div className="relative h-full rounded-none overflow-hidden glass-panel border-2 border-primary/40 shadow-[0_0_16px_rgba(255,0,255,0.15)] transition-all duration-500 group-hover:shadow-[0_0_22px_rgba(0,255,255,0.35)] group-hover:border-secondary group-hover:-translate-y-3 group-hover:scale-[1.02] will-change-transform">
                   
                   {/* Image Container */}
                   <div className="relative aspect-[3/4] w-full overflow-hidden border-b-2 border-primary/40 bg-black/60">
@@ -440,3 +440,4 @@ export default function GalleryContent({
     </div>
   );
 }
+

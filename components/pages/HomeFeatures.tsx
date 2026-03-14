@@ -48,12 +48,12 @@ export default function HomeFeatures() {
           >
             {language === "en"
               ? "Why Choose MoodShaker?"
-              : "为什么选择 MoodShaker?"}
+              : "涓轰粈涔堥?夋嫨 MoodShaker?"}
           </GradientText>
           <p className="text-lg md:text-xl text-foreground font-mono leading-relaxed mt-4 drop-shadow-md">
             {language === "en"
               ? "> INITIALIZING INTELLIGENT RECOMMENDATION PROTOCOL..."
-              : "> 正在初始化智能推荐协议..."}
+              : "> 姝ｅ湪鍒濆鍖栨櫤鑳芥帹鑽愬崗璁?.."}
           </p>
         </motion.div>
 
@@ -67,11 +67,11 @@ export default function HomeFeatures() {
               }
               transition={{ duration: 0.6, delay: index * 0.2 }}
             >
-              <div className="relative overflow-hidden rounded-none border-2 border-primary/50 glass-panel card-hover h-full text-center group p-8 transition-all duration-500 hover:border-secondary hover:shadow-[0_0_30px_rgba(0,255,255,0.3)]">
+              <div className="relative overflow-hidden rounded-none border-2 border-primary/50 glass-panel card-hover h-full text-center group p-8 transition-all duration-500 hover:border-secondary hover:shadow-[0_0_22px_rgba(0,255,255,0.3)]">
                 <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay" />
                 <div className="relative z-10 text-spacing">
                   <motion.div
-                    className="w-16 h-16 rounded-none border-2 border-primary bg-black flex items-center justify-center mx-auto shadow-[0_0_15px_var(--color-primary)] mb-6 group-hover:border-secondary group-hover:shadow-[0_0_20px_var(--color-secondary)] transition-all duration-300 transform"
+                    className="w-16 h-16 rounded-none border-2 border-primary bg-black flex items-center justify-center mx-auto shadow-[0_0_15px_var(--color-primary)] mb-6 group-hover:border-secondary group-hover:shadow-[0_0_16px_var(--color-secondary)] transition-all duration-300 transform"
                     whileHover={{
                       scale: 1.15,
                       rotate: index % 2 === 0 ? 8 : -8,
@@ -101,3 +101,4 @@ export default function HomeFeatures() {
     </section>
   );
 }
+
