@@ -412,7 +412,7 @@ const Questions = memo(function Questions() {
                   {canGoBack && (
                     <motion.button
                       onClick={handleGoBack}
-                      className="flex items-center gap-2 px-4 py-2 border-2 border-primary/50 text-primary transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] font-mono uppercase font-bold"
+                      className="flex items-center gap-2 px-4 py-2 border-2 border-primary/50 text-primary transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] font-mono uppercase font-bold focus-ring"
                       whileHover={{ x: -3 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -550,7 +550,7 @@ const Questions = memo(function Questions() {
                 <div className="flex items-center justify-center gap-4">
                   <motion.button
                     onClick={handleGoBack}
-                    className="flex items-center gap-2 px-4 py-2 border-2 border-primary/50 text-primary transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] font-mono uppercase font-bold"
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-primary/50 text-primary transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] font-mono uppercase font-bold focus-ring"
                     whileHover={{ x: -3 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -670,7 +670,7 @@ const Questions = memo(function Questions() {
                 <div className="flex items-center justify-center gap-4">
                   <motion.button
                     onClick={handleGoBack}
-                    className="flex items-center gap-2 px-4 py-2 border-2 border-primary/50 text-primary transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] font-mono uppercase font-bold"
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-primary/50 text-primary transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,0,255,0.3)] font-mono uppercase font-bold focus-ring"
                     whileHover={{ x: -3 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -698,11 +698,16 @@ const Questions = memo(function Questions() {
 
               <div className="border-2 border-accent/50 shadow-[0_0_20px_rgba(255,153,0,0.2)] p-1 bg-black/40">
                 <div className="bg-black/60 p-6 border border-white/5">
+                  <label htmlFor="feedback-input" className="sr-only">
+                    {t("questions.feedback.placeholder")}
+                  </label>
                   <textarea
+                    id="feedback-input"
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                     placeholder={t("questions.feedback.placeholder")}
                     className="w-full h-40 bg-transparent border-2 border-accent/30 p-4 text-lg text-foreground placeholder:-muted-foreground/50 focus:outline-none focus:border-accent focus:shadow-[0_0_15px_rgba(255,153,0,0.3)] resize-none transition-all font-mono"
+                    aria-label={t("questions.feedback.placeholder")}
                   />
                 </div>
               </div>
@@ -761,7 +766,7 @@ const Questions = memo(function Questions() {
             onClick={handleReset}
             whileHover={{ scale: 1.05, x: 5 }}
             whileTap={{ scale: 0.95 }}
-            className="group flex items-center gap-3 px-5 py-3 border-2 border-white/10 bg-black/40 hover:border-destructive/80 hover:bg-destructive/10 transition-colors duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)]"
+            className="group flex items-center gap-3 px-5 py-3 border-2 border-white/10 bg-black/40 hover:border-destructive/80 hover:bg-destructive/10 transition-colors duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] focus-ring"
           >
             <div className="p-2 border-2 border-transparent group-hover:border-destructive transition-colors">
               <svg

@@ -5,7 +5,7 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export default function ErrorAlert() {
   const { errors, clearError } = useError();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Get the first error message (if any)
   const message = errors.length > 0 ? errors[0].message : null;
@@ -14,7 +14,11 @@ export default function ErrorAlert() {
   if (!message) return null;
 
   return (
-    <div className="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end z-50">
+    <div
+      className="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end z-50"
+      role="alert"
+      aria-live="assertive"
+    >
       <div
         className={`max-w-sm w-full shadow-lg rounded-2xl pointer-events-auto overflow-hidden transform ease-out duration-300 transition ${
           isVisible
@@ -49,7 +53,9 @@ export default function ErrorAlert() {
             <div className="ml-4 flex-shrink-0 flex">
               <button
                 onClick={() => clearError(errors[0].id)}
-                className="inline-flex text-muted-foreground focus:outline-none focus:text-foreground transition ease-in-out duration-150 hover:text-foreground"
+                className="inline-flex text-muted-foreground focus:outline-none focus:text-foreground transition ease-in-out duration-150 hover:text-foreground focus-ring"
+                type="button"
+                aria-label={language === "en" ? "Close" : "关闭"}
               >
                 <svg
                   className="h-5 w-5"

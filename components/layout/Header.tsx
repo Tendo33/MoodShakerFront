@@ -71,7 +71,7 @@ export default function Header() {
         {/* Logo */}
         <Link
           href={homeLink}
-          className="flex items-center gap-3 font-bold text-xl md:text-2xl"
+          className="flex items-center gap-3 font-bold text-xl md:text-2xl focus-ring"
         >
           <motion.div
             className={`w-10 h-10 md:w-12 md:h-12 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center shadow-lg`}
@@ -124,7 +124,7 @@ export default function Header() {
           <LanguageSelector />
           <motion.button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+            className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors focus-ring"
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
             whileTap={{ scale: 0.9 }}
@@ -177,6 +177,9 @@ export default function Header() {
               initial="hidden"
               animate="visible"
               exit="exit"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="mobile-menu-title"
             >
               {/* Drawer Header */}
               <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
@@ -186,13 +189,13 @@ export default function Header() {
                   >
                     <Martini className="h-4 w-4 text-white" />
                   </div>
-                  <span className="gradient-text-bright font-bold font-playfair text-lg">
+                  <span id="mobile-menu-title" className="gradient-text-bright font-bold font-playfair text-lg">
                     MoodShaker
                   </span>
                 </div>
                 <motion.button
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-full hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+                  className="p-2 rounded-full hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors focus-ring"
                   whileTap={{ scale: 0.9 }}
                   aria-label="Close menu"
                 >

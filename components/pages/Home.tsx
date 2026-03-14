@@ -288,7 +288,7 @@ const Home = React.memo(function Home() {
                   <div className="mt-6 text-center relative z-10">
                     <Link
                       href={newQuestionPath}
-                      className="text-sm text-primary font-mono tracking-widest hover:text-secondary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor]"
+                      className="text-sm text-primary font-mono tracking-widest hover:text-secondary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor] focus-ring"
                     >
                       {language === "en"
                         ? "Start a new recommendation"
@@ -343,7 +343,7 @@ const Home = React.memo(function Home() {
                   <div className="mt-6 text-center relative z-10">
                     <Link
                       href={newQuestionPath}
-                      className="text-sm text-secondary font-mono tracking-widest hover:text-primary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor]"
+                      className="text-sm text-secondary font-mono tracking-widest hover:text-primary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor] focus-ring"
                     >
                       {language === "en"
                         ? "Start a new session instead"
@@ -402,7 +402,7 @@ const Home = React.memo(function Home() {
                       >
                         <Link
                           href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}
-                          className="block relative h-full group"
+                          className="block relative h-full group focus-ring"
                         >
                           <motion.div
                             className="absolute -inset-8 bg-gradient-to-r from-primary/40 to-secondary/40 rounded-full blur-3xl opacity-60"

@@ -10,7 +10,7 @@ interface ShareModalProps {
 }
 
 export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   if (!isOpen || !imageUrl) return null;
 
@@ -38,15 +38,20 @@ export const ShareModal = ({ isOpen, onClose, imageUrl }: ShareModalProps) => {
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="relative w-full max-w-lg bg-black/80 border border-white/20 rounded-3xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/10"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="share-modal-title"
           >
             {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <h3 className="text-lg font-bold text-foreground">
+          <h3 id="share-modal-title" className="text-lg font-bold text-foreground">
             {t("share.modal.title")}
           </h3>
           <button
             onClick={onClose}
-            className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-white/10"
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-white/10 focus-ring"
+            type="button"
+            aria-label={language === "en" ? "Close dialog" : "关闭对话框"}
           >
             <X className="w-5 h-5" />
           </button>

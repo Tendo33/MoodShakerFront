@@ -90,7 +90,7 @@ export function CocktailRecipeSections({
           }}
         >
           <button
-            className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-primary/20 transition-colors group"
+            className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-primary/20 transition-colors group focus-ring"
             onClick={() => toggleSection("ingredients")}
           >
             <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-primary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
@@ -138,7 +138,7 @@ export function CocktailRecipeSections({
           }}
         >
           <button
-            className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-secondary/20 transition-colors group"
+            className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-secondary/20 transition-colors group focus-ring"
             onClick={() => toggleSection("tools")}
           >
             <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-secondary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
@@ -187,7 +187,7 @@ export function CocktailRecipeSections({
           }}
         >
           <button
-            className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-accent/20 transition-colors group"
+            className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-accent/20 transition-colors group focus-ring"
             onClick={() => toggleSection("steps")}
           >
             <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-accent transition-colors drop-shadow-[0_0_5px_currentColor]`}>

@@ -113,7 +113,10 @@ export default function HomePopular() {
               }
               transition={{ duration: 0.6, delay: index * 0.2 }}
             >
-              <Link href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}>
+              <Link
+                href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}
+                className="focus-ring"
+              >
                 <div className="relative overflow-hidden rounded-none border-2 border-primary/50 glass-panel card-hover h-full group hover:border-secondary hover:shadow-[0_0_30px_rgba(0,255,255,0.3)] transition-all duration-500 p-8">
                   <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay z-0" />
                   

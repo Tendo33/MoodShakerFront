@@ -114,6 +114,12 @@
   text-wrap: balance;
 }
 
+/* Rendering Optimization Utilities */
+@utility content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 320px 520px;
+}
+
 /* Vaporwave Structural Utilities */
 @utility crt-overlay {
   background: linear-gradient(rgba(18,16,20,0) 50%, rgba(0,0,0,0.25) 50%);
@@ -397,6 +403,21 @@
 
 .page-transition {
   transition: all 0.2s linear;
+}
+
+/* Reduced motion: minimize heavy animations and transitions */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .crt-overlay,
+  .vaporwave-grid {
+    animation: none !important;
+  }
 }
 
 /* ===== Fluid Typography ===== */

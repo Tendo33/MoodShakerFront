@@ -95,9 +95,10 @@ export default function Footer() {
                     <Link
                       key={index}
                       href={link.href}
-                      className="text-muted-foreground hover:text-primary transition-all duration-300 p-3 hover:bg-white/5 rounded-full hover:scale-110"
+                      className="text-muted-foreground hover:text-primary transition-all duration-300 p-3 hover:bg-white/5 rounded-full hover:scale-110 focus-ring"
                       aria-label={link.label}
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       {link.icon}
                     </Link>
@@ -129,7 +130,7 @@ export default function Footer() {
                     <Link
                       key={index}
                       href={link.href}
-                      className="hover:text-primary transition-colors hover:underline decoration-primary/30 underline-offset-4"
+                      className="hover:text-primary transition-colors hover:underline decoration-primary/30 underline-offset-4 focus-ring"
                     >
                       {link.text}
                     </Link>

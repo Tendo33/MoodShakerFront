@@ -54,7 +54,7 @@ export default function LanguageSelector() {
     <div className="relative" ref={dropdownRef}>
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-5 py-2 text-sm rounded-none font-mono tracking-widest uppercase transition-all duration-300 border-2 ${
+        className={`flex items-center gap-2 px-5 py-2 text-sm rounded-none font-mono tracking-widest uppercase transition-all duration-300 border-2 focus-ring ${
           isOpen
             ? "bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(255,0,255,0.4)]"
             : "bg-black/40 border-primary/30 text-primary/80 hover:bg-black/80 hover:border-primary hover:text-primary hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]"
@@ -64,6 +64,7 @@ export default function LanguageSelector() {
         aria-haspopup="listbox"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        type="button"
       >
         <span className="flex items-center gap-2">
           <Globe className={`h-4 w-4 ${isOpen ? "text-primary drop-shadow-[0_0_5px_currentColor]" : ""}`} />
@@ -97,7 +98,7 @@ export default function LanguageSelector() {
               {Object.entries(availableLanguages).map(([code, name]) => (
                 <button
                   key={code}
-                  className={`relative flex items-center justify-between w-full px-5 py-3 text-sm font-mono tracking-widest uppercase transition-all duration-300 group overflow-hidden ${
+                  className={`relative flex items-center justify-between w-full px-5 py-3 text-sm font-mono tracking-widest uppercase transition-all duration-300 group overflow-hidden focus-ring ${
                     language === code
                       ? "bg-primary/20 text-primary font-bold shadow-[inset_4px_0_0_rgba(255,0,255,1)]"
                       : "text-primary/70 hover:text-primary hover:bg-black/60 hover:pl-6"
@@ -108,6 +109,7 @@ export default function LanguageSelector() {
                     setLanguage(code as Language);
                     setIsOpen(false);
                   }}
+                  type="button"
                 >
                   <div className="flex items-center gap-3 z-10">
                     <span className="text-lg drop-shadow-[0_0_5px_rgba(255,0,255,0.5)]">

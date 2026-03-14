@@ -224,7 +224,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
             <motion.button
               onClick={() => router.push(getPathWithLanguage("/questions"))}
-              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)]"
+              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)] focus-ring"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -233,7 +233,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             </motion.button>
             <button
               onClick={handleBack}
-              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-secondary text-secondary transition-all duration-300 hover:bg-secondary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]"
+              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-secondary text-secondary transition-all duration-300 hover:bg-secondary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(0,255,255,0.4)] focus-ring"
             >
               {t("recommendation.back")}
             </button>
@@ -260,7 +260,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           <div className="flex items-center gap-4">
             <button
               onClick={handleBack}
-              className="flex items-center gap-2 px-4 py-2 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)]"
+              className="flex items-center gap-2 px-4 py-2 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)] focus-ring"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>{t("recommendation.back")}</span>
@@ -281,7 +281,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 <motion.button
                   onClick={generateCard}
                   disabled={isGeneratingCard}
-                  className="flex items-center gap-2 px-6 py-3 border-2 border-secondary text-secondary hover:bg-secondary hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(0,255,255,0.3)] hover:shadow-[0_0_40px_rgba(0,255,255,0.6)] font-mono font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-6 py-3 border-2 border-secondary text-secondary hover:bg-secondary hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(0,255,255,0.3)] hover:shadow-[0_0_40px_rgba(0,255,255,0.6)] font-mono font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label={t("recommendation.saveImage")}
@@ -299,7 +299,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               <motion.button
                 onClick={generateCard}
                 disabled={isGeneratingCard}
-                className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 bg-secondary text-black font-mono font-bold uppercase border-2 border-secondary shadow-[0_0_20px_rgba(0,255,255,0.5)]"
+                className="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 bg-secondary text-black font-mono font-bold uppercase border-2 border-secondary shadow-[0_0_20px_rgba(0,255,255,0.5)] focus-ring"
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={isPageLoaded ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 20 }}
                 transition={{ delay: 0.6, type: "spring", stiffness: 300, damping: 25 }}
