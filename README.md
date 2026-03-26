@@ -1,173 +1,265 @@
 # MoodShaker Frontend
 
-[简体中文](README.zh.md) · English
+<div align="center">
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
-![React](https://img.shields.io/badge/React-19-149eca?logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)
-![Prisma](https://img.shields.io/badge/Prisma-5-2d3748?logo=prisma)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38bdf8?logo=tailwind-css)
+An AI-powered bilingual cocktail experience that turns a quick mood check into a complete drink recommendation.
 
-MoodShaker is an AI-powered, bilingual cocktail recommendation web app.  
-It turns a short mood questionnaire into a personalized cocktail recipe with ingredients, tools, steps, and a shareable visual card.
+[![Chinese](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-0f172a?style=for-the-badge)](./README.zh.md)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-149eca?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-5-2d3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
+
+[![Overview](https://img.shields.io/badge/Overview-What%20it%20does-22c55e?style=flat-square)](#overview)
+[![Screenshots](https://img.shields.io/badge/Screenshots-Preview-f59e0b?style=flat-square)](#screenshots)
+[![Quick Start](https://img.shields.io/badge/Quick%20Start-Run%20locally-3b82f6?style=flat-square)](#quick-start)
+[![Architecture](https://img.shields.io/badge/Architecture-How%20it%20works-8b5cf6?style=flat-square)](#architecture)
+[![Deployment](https://img.shields.io/badge/Deployment-Docker-ef4444?style=flat-square)](#deployment)
+
+</div>
+
+## Table of Contents
+
+- [MoodShaker Frontend](#moodshaker-frontend)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Why MoodShaker](#why-moodshaker)
+  - [Highlights](#highlights)
+  - [Screenshots](#screenshots)
+    - [Current Screens](#current-screens)
+  - [Demo Flow](#demo-flow)
+  - [Tech Stack](#tech-stack)
+  - [Architecture](#architecture)
+    - [Main Runtime Pieces](#main-runtime-pieces)
+  - [Project Structure](#project-structure)
+  - [Quick Start](#quick-start)
+    - [1. Prerequisites](#1-prerequisites)
+    - [2. Install dependencies](#2-install-dependencies)
+    - [3. Configure environment variables](#3-configure-environment-variables)
+    - [4. Prepare the database](#4-prepare-the-database)
+    - [5. Start the development server](#5-start-the-development-server)
+  - [Environment Variables](#environment-variables)
+  - [Available Scripts](#available-scripts)
+  - [API Endpoints](#api-endpoints)
+  - [Localization](#localization)
+  - [Deployment](#deployment)
+  - [Troubleshooting](#troubleshooting)
+    - [Prisma `P2022`: missing `thumbnail` column](#prisma-p2022-missing-thumbnail-column)
+    - [Recommendation or image API errors](#recommendation-or-image-api-errors)
+  - [Validation](#validation)
+  - [Contributing](#contributing)
+  - [Notes](#notes)
+
+## Overview
+
+MoodShaker is a bilingual web app for cocktail discovery and recommendation. Instead of searching from a static list, users answer a short mood-based questionnaire and receive a personalized cocktail with ingredients, tools, steps, and a shareable visual card.
+
+The project is built with Next.js App Router, React 19, TypeScript, Prisma, and a pair of AI endpoints for recommendation and image generation. It also ships with a localized experience for Chinese and English users, a gallery for browsing drinks, and a detail page for exploring each recipe.
+
+## Why MoodShaker
+
+Most cocktail tools are either recipe databases or chat demos. MoodShaker sits somewhere in between: it keeps the interaction lightweight, but still feels like a guided experience.
+
+The result is a product flow that is easy to understand:
+
+- start from mood instead of ingredients
+- generate a drink recommendation with personality
+- enrich the result with image generation
+- keep everything browsable through gallery and detail pages
 
 ## Highlights
 
-- **AI recommendation pipeline** with two bartender modes (`classic_bartender` / `creative_bartender`).
-- **Localized UX** in Chinese and English (`/cn`, `/en`) with path-based routing and auto language redirect.
-- **Full cocktail journey**: home → questions → recommendation → gallery → detail page.
-- **Image generation + optimization** via external image API, optional `sharp` processing, and DB thumbnail backfill support.
-- **Performance-focused client state** using split contexts, async storage batching, request dedup/cache, and dev performance overlay.
+- Two recommendation styles are supported through different bartender personas: `classic_bartender` and `creative_bartender`.
+- Language-aware routing is built in, with `/cn` and `/en` paths plus automatic redirect logic in [`proxy.ts`](./proxy.ts).
+- The full product journey is already connected: landing page, questionnaire, recommendation page, gallery, cocktail details, and share card output.
+- The image flow supports external generation APIs and thumbnail backfill for stored assets.
+- The frontend is organized around reusable components, split contexts, and performance-focused client data handling.
 
 ## Screenshots
 
+### Current Screens
+
 | Home | Questionnaire |
 | --- | --- |
-| ![Home](docs/screenshots/home_full.png) | ![Questions](docs/screenshots/questions_start.png) |
+| ![Home](docs/screenshots/home_full.png) | ![Questionnaire](docs/screenshots/questions_start.png) |
 
-| Gallery | Detail |
+| Gallery | Cocktail Detail |
 | --- | --- |
 | ![Gallery](docs/screenshots/gallery.png) | ![Cocktail Detail](docs/screenshots/cocktail_detail.png) |
 
+
+## Demo Flow
+
+```text
+Landing page
+  -> mood questionnaire
+  -> AI cocktail recommendation
+  -> generated image + recipe details
+  -> shareable card
+  -> gallery browsing
+  -> cocktail detail revisit
+```
+
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router), React 19
-- **Language**: TypeScript
-- **Styling/UI**: Tailwind CSS, Framer Motion, Radix UI, Lucide
-- **Data layer**: Prisma + PostgreSQL
-- **AI integration**: OpenAI-compatible chat endpoint + image generation endpoint
-- **Tooling**: pnpm, ESLint (`next/core-web-vitals` + TypeScript rules)
+- Framework: Next.js 16 with App Router
+- UI: React 19, Tailwind CSS 4, Framer Motion, Radix UI, Lucide
+- Language: TypeScript
+- Data layer: Prisma with PostgreSQL
+- Data fetching: SWR
+- AI integration: OpenAI-compatible chat endpoint and image generation endpoint
+- Tooling: pnpm, ESLint, tsx, Docker Compose
 
-## Architecture Overview
+## Architecture
 
 ```mermaid
 flowchart LR
-  A["User (Web)"] --> B["App Router Pages (/cn, /en)"]
-  B --> C["Client Contexts (Language / Form / Result)"]
-  C --> D["API Routes (/api/cocktail, /api/image)"]
-  D --> E["LLM + Image Providers"]
-  D --> F["Prisma"]
-  F --> G["PostgreSQL"]
-  B --> H["Gallery / Detail (DB + fallback catalog)"]
+  A["User"] --> B["Localized App Routes (/cn, /en)"]
+  B --> C["Questionnaire / Gallery / Detail Pages"]
+  C --> D["App API Routes"]
+  D --> E["Chat Recommendation Provider"]
+  D --> F["Image Generation Provider"]
+  D --> G["Prisma Client"]
+  G --> H["PostgreSQL"]
+  C --> I["Share Card / Client State / UI Animations"]
 ```
+
+### Main Runtime Pieces
+
+- App routes live under [`app/[lang]`](./app/%5Blang%5D) and provide the user-facing pages.
+- API handlers live under [`app/api`](./app/api) and coordinate recommendation, detail lookup, and image generation.
+- Shared UI lives in [`components`](./components), while app-wide state is managed in [`context`](./context).
+- Database schema, migrations, seed data, and maintenance scripts are in [`prisma`](./prisma).
 
 ## Project Structure
 
 ```text
 app/
+  api/
+    cocktail/
+    image/
   [lang]/
     page.tsx
     questions/page.tsx
     gallery/page.tsx
     cocktail/[id]/page.tsx
     cocktail/recommendation/page.tsx
-  api/
-    cocktail/route.ts
-    cocktail/[id]/route.ts
-    image/route.ts
 components/
+  animations/
+  layout/
+  pages/
+  share/
+  ui/
 context/
-locales/
+docs/
+  screenshots/
 lib/
+locales/
 prisma/
+public/
 proxy.ts
 ```
 
-## Getting Started
+## Quick Start
 
-### 1) Prerequisites
+### 1. Prerequisites
 
-- Node.js **20+**
-- pnpm **9+**
-- PostgreSQL **15+** (or Docker)
+- Node.js `>= 22`
+- pnpm `>= 10`
+- PostgreSQL `15+` or Docker
 
-### 2) Install dependencies
+### 2. Install dependencies
 
 ```bash
 pnpm install
 ```
 
-### 3) Configure environment
+### 3. Configure environment variables
 
 ```bash
 cp .env.example .env
 ```
 
-Fill in required API/database values in `.env` (see [Environment Variables](#environment-variables)).
+Then fill in the required values in `.env`.
 
-### 4) Prepare database
+### 4. Prepare the database
 
-Make sure PostgreSQL is running and `DATABASE_URL` is reachable, then:
+Make sure PostgreSQL is running and `DATABASE_URL` is reachable:
 
 ```bash
 pnpm db:init
 ```
 
-This runs Prisma client generation, migration deploy, and seed data.
+This command will:
 
-### 5) Run development server
+- generate the Prisma client
+- apply migrations
+- seed initial cocktail data
+
+### 5. Start the development server
 
 ```bash
 pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).  
-Root path redirects to language routes (default `/cn`).
+Requests to `/` will be redirected to the proper language path, defaulting to `/cn`.
 
 ## Environment Variables
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | Yes | API key for chat completion endpoint |
-| `OPENAI_BASE_URL` | Yes | OpenAI-compatible base URL (keep trailing `/`, e.g. `.../v1/`) |
+| `OPENAI_API_KEY` | Yes | API key for the chat recommendation endpoint |
+| `OPENAI_BASE_URL` | Yes | OpenAI-compatible base URL, such as `https://api.siliconflow.cn/v1/` |
 | `OPENAI_MODEL` | Yes | Chat model name |
-| `IMAGE_API_URL` | Yes (for image generation) | Image generation endpoint |
-| `IMAGE_API_KEY` | Yes (for image generation) | Image API key |
+| `IMAGE_API_URL` | Yes for image generation | Image generation endpoint |
+| `IMAGE_API_KEY` | Yes for image generation | Image generation API key |
 | `IMAGE_MODEL` | No | Image model name |
-| `DATABASE_URL` | Yes for persistent DB mode | PostgreSQL connection string |
-| `HOST_PORT` | Optional (Docker Compose) | Exposed web port |
-| `POSTGRES_USER` | Optional (Docker Compose) | Database username |
-| `POSTGRES_PASSWORD` | Optional (Docker Compose) | Database password |
-| `POSTGRES_DB` | Optional (Docker Compose) | Database name |
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `HOST_PORT` | Optional | Exposed web port for Docker Compose |
+| `POSTGRES_USER` | Optional | Database username for Docker Compose |
+| `POSTGRES_PASSWORD` | Optional | Database password for Docker Compose |
+| `POSTGRES_DB` | Optional | Database name for Docker Compose |
 
 ## Available Scripts
 
 | Command | Description |
 | --- | --- |
-| `pnpm dev` | Start local development server |
-| `pnpm build` | Build production bundle |
-| `pnpm start` | Run built app |
+| `pnpm dev` | Start the local development server |
+| `pnpm build` | Build the production bundle |
+| `pnpm start` | Run the production build |
 | `pnpm lint` | Run ESLint |
-| `pnpm db:init` | Prisma generate + migrate deploy + seed |
-| `pnpm prisma:generate` | Generate Prisma client |
+| `pnpm db:init` | Generate Prisma client, apply migrations, and seed data |
+| `pnpm prisma:generate` | Generate Prisma client only |
 | `pnpm prisma:migrate` | Apply Prisma migrations |
-| `pnpm prisma:seed` | Seed popular cocktails |
-| `pnpm prisma:backfill-thumbnails` | Backfill `thumbnail` column from existing images |
+| `pnpm prisma:seed` | Seed cocktail data |
+| `pnpm prisma:backfill-thumbnails` | Backfill the `thumbnail` field from stored images |
 
 ## API Endpoints
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
-| `POST` | `/api/cocktail` | Generate cocktail recommendation from questionnaire payload |
-| `GET` | `/api/cocktail/:id` | Fetch cocktail detail by id |
-| `POST` | `/api/image` | Generate cocktail image and optionally persist optimized image/thumbnail |
+| `POST` | `/api/cocktail` | Generate a cocktail recommendation from questionnaire input |
+| `GET` | `/api/cocktail/:id` | Fetch a cocktail detail record by id |
+| `POST` | `/api/image` | Generate a cocktail image and optionally persist optimized assets |
 
-## Localization & Routing
+## Localization
 
-- Supported languages: `cn`, `en`
-- `proxy.ts` handles language detection from URL, cookie, and `Accept-Language`
-- Missing language prefix paths are redirected to localized routes
-- Translation dictionaries live in `locales/cn.ts` and `locales/en.ts`
+- Supported languages are `cn` and `en`.
+- [`proxy.ts`](./proxy.ts) detects language from the URL, cookie, and `Accept-Language` header.
+- Requests without a language prefix are redirected to a localized route.
+- Translation dictionaries live in [`locales/cn.ts`](./locales/cn.ts) and [`locales/en.ts`](./locales/en.ts).
 
-## Docker Deployment
+## Deployment
 
-This repo includes:
+This repository already includes the essentials for containerized deployment:
 
-- `Dockerfile` for multi-stage app image build
-- `docker-compose.yml` with `moodshaker-web` + `postgres` services
-- `scripts/docker-entrypoint.sh` to init DB schema and seed on container startup
+- [`Dockerfile`](./Dockerfile) for multi-stage image builds
+- [`docker-compose.yml`](./docker-compose.yml) for the web app and PostgreSQL
+- [`scripts/docker-entrypoint.sh`](./scripts/docker-entrypoint.sh) for startup-time schema initialization and seed handling
 
-Run:
+Run locally with Docker:
 
 ```bash
 docker compose up -d
@@ -175,7 +267,7 @@ docker compose up -d
 
 ## Troubleshooting
 
-### Prisma `P2022` missing `thumbnail` column
+### Prisma `P2022`: missing `thumbnail` column
 
 If you see:
 
@@ -187,43 +279,47 @@ Run:
 
 ```bash
 pnpm db:init
-# or
+```
+
+If the database already exists and only migrations are missing, you can also try:
+
+```bash
 pnpm prisma:migrate
 ```
 
 ### Recommendation or image API errors
 
-- Verify `.env` keys and endpoint URLs
-- Ensure `OPENAI_BASE_URL` is OpenAI-compatible and includes `/v1/`
-- Check server logs from `api/openai.ts` and `app/api/*` handlers
+- Check that the keys and URLs in `.env` are correct.
+- Make sure `OPENAI_BASE_URL` points to an OpenAI-compatible endpoint.
+- Inspect the server logs for the handlers under [`app/api`](./app/api).
 
-## Quality & Validation
+## Validation
 
-There is no automated test runner configured yet. Recommended checks:
+There is no dedicated automated test runner configured yet, so the safest baseline checks are:
 
 ```bash
 pnpm lint
 pnpm build
 ```
 
-Manual smoke checks:
+Recommended manual smoke checks:
 
-1. Questionnaire flow and recommendation generation
-2. Gallery search + filters
-3. Detail page rendering and language switch
-4. Share card generation/download
+1. Complete the questionnaire and verify recommendation generation.
+2. Browse the gallery and confirm search or filters still behave correctly.
+3. Open a cocktail detail page and switch languages.
+4. Verify share card generation and download flow if you touch that area.
 
 ## Contributing
 
-PRs are welcome. Suggested PR content:
+If you open a PR, it helps to include:
 
-- short summary
-- related issue (if any)
+- a short summary of the change
+- linked issue or context, if any
 - verification steps
 - screenshots for UI changes
-- env/database notes when applicable
+- notes for environment or database updates
 
 ## Notes
 
-- AI outputs can be inaccurate; always review recipes and safety constraints.
-- Do not commit `.env` or any secret values.
+- AI-generated content should be reviewed before real-world use.
+- Do not commit `.env` or any production secret values.

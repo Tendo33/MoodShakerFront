@@ -48,12 +48,12 @@ export default function HomeFeatures() {
           >
             {language === "en"
               ? "Why Choose MoodShaker?"
-              : "涓轰粈涔堥?夋嫨 MoodShaker?"}
+              : "为什么选择 MoodShaker？"}
           </GradientText>
           <p className="text-lg md:text-xl text-foreground font-mono leading-relaxed mt-4 drop-shadow-md">
             {language === "en"
               ? "> INITIALIZING INTELLIGENT RECOMMENDATION PROTOCOL..."
-              : "> 姝ｅ湪鍒濆鍖栨櫤鑳芥帹鑽愬崗璁?.."}
+              : "> 正在初始化智能推荐协议..."}
           </p>
         </motion.div>
 
