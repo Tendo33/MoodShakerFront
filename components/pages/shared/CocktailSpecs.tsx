@@ -27,7 +27,7 @@ export function CocktailSpecs({
       }}
     >
       <motion.div
-        className="flex flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-pink-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(236,72,153,0.15)]"
+        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-pink-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(236,72,153,0.15)]"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -57,13 +57,13 @@ export function CocktailSpecs({
             {t("detail.baseSpirit")}
           </p>
         </div>
-        <p className={`font-mono font-bold text-lg text-white drop-shadow-md`}>
+        <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
           {getLocalizedContent("base_spirit", "english_base_spirit")}
         </p>
       </motion.div>
 
       <motion.div
-        className="flex flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-blue-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-blue-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(59,130,246,0.15)]"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -75,13 +75,13 @@ export function CocktailSpecs({
             {t("detail.alcohol")}
           </p>
         </div>
-        <p className={`font-mono font-bold text-lg text-white drop-shadow-md`}>
+        <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
           {getLocalizedContent("alcohol_level", "english_alcohol_level")}
         </p>
       </motion.div>
 
       <motion.div
-        className="flex flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-amber-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-amber-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(245,158,11,0.15)]"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -93,14 +93,14 @@ export function CocktailSpecs({
             {t("detail.prepTime")}
           </p>
         </div>
-        <p className={`font-mono font-bold text-lg text-white drop-shadow-md`}>
+        <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
           {getLocalizedContent("time_required", "english_time_required") ||
             (language === "cn" ? "5分钟" : "5 mins")}
         </p>
       </motion.div>
 
       <motion.div
-        className="flex flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-emerald-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-emerald-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.15)]"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -112,7 +112,7 @@ export function CocktailSpecs({
             {t("detail.glass")}
           </p>
         </div>
-        <p className={`font-mono font-bold text-lg text-white drop-shadow-md`}>
+        <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
           {getLocalizedContent("serving_glass", "english_serving_glass")}
         </p>
       </motion.div>

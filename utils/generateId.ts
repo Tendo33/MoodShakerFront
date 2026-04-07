@@ -3,6 +3,8 @@
  * 提供一致的ID生成逻辑
  */
 
+import { randomBytes } from "node:crypto";
+
 /**
  * 生成随机字符串ID
  * @param prefix ID前缀
@@ -49,3 +51,10 @@ export function generateImageId(): string {
   return generateId("cocktail_img", 13);
 }
 
+/**
+ * 生成编辑令牌
+ * @returns 用于私有推荐结果编辑/读取的安全令牌
+ */
+export function generateEditToken(): string {
+  return randomBytes(24).toString("hex");
+}

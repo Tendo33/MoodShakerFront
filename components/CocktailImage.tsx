@@ -4,18 +4,21 @@ import { useState, useEffect, memo } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { cocktailImages } from "@/utils/cocktail-images";
+import { shouldBypassNextImageOptimization } from "@/utils/image-optimization";
 import { imageLogger } from "@/utils/logger";
 
 interface CocktailImageProps {
   cocktailId?: string;
   imageData: string | null;
   cocktailName?: string;
+  priority?: boolean;
 }
 
 const CocktailImage = memo(function CocktailImage({
   cocktailId,
   imageData,
   cocktailName = "Cocktail",
+  priority = false,
 }: CocktailImageProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,8 +81,8 @@ const CocktailImage = memo(function CocktailImage({
             alt={cocktailName || "Cocktail"}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            priority={false} // 移除priority，只对首屏图片使用
-            unoptimized={true} // Bypasses SSRF protection errors when the developer uses a fake-ip proxy (e.g., Clash resolving domain to 198.18.x.x)
+            priority={priority}
+            unoptimized={shouldBypassNextImageOptimization(imageSrc)}
             className="object-cover"
             onLoad={() => setIsLoading(false)}
             onError={() => {

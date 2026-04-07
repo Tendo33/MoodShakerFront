@@ -1,6 +1,4 @@
 import { getChatCompletion } from "@/api/openai";
-import { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
 import type { AgentType, BartenderRequest, Cocktail } from "@/lib/cocktail-types";
 import { createSystemPrompt } from "@/utils/prompts";
 import { cocktailLogger } from "@/utils/logger";
@@ -106,59 +104,6 @@ function parseCocktailFromCompletion(completion: string): Cocktail {
 	}
 }
 
-async function persistCocktail(cocktail: Cocktail): Promise<Cocktail> {
-	try {
-		const existingCocktail = await prisma.cocktail.findFirst({
-			where: { name: cocktail.name },
-			select: {
-				id: true,
-				image: true,
-			},
-		});
-
-		if (existingCocktail) {
-			return {
-				...cocktail,
-				id: existingCocktail.id,
-				image: existingCocktail.image || cocktail.image,
-				thumbnail: cocktail.thumbnail,
-			};
-		}
-
-		const newCocktail = await prisma.cocktail.create({
-			data: {
-				name: cocktail.name,
-				englishName: cocktail.english_name,
-				description: cocktail.description,
-				englishDescription: cocktail.english_description,
-				matchReason: cocktail.match_reason,
-				englishMatchReason: cocktail.english_match_reason,
-				baseSpirit: cocktail.base_spirit,
-				englishBaseSpirit: cocktail.english_base_spirit,
-				alcoholLevel: cocktail.alcohol_level,
-				englishAlcoholLevel: cocktail.english_alcohol_level,
-				servingGlass: cocktail.serving_glass,
-				englishServingGlass: cocktail.english_serving_glass,
-				timeRequired: cocktail.time_required || "5 mins",
-				englishTimeRequired: cocktail.english_time_required,
-				flavorProfiles: cocktail.flavor_profiles,
-				englishFlavorProfiles: cocktail.english_flavor_profiles || [],
-				ingredients: cocktail.ingredients as unknown as Prisma.InputJsonValue,
-				tools: cocktail.tools as unknown as Prisma.InputJsonValue,
-				steps: cocktail.steps as unknown as Prisma.InputJsonValue,
-			},
-			select: {
-				id: true,
-			},
-		});
-
-		return { ...cocktail, id: newCocktail.id };
-	} catch (error) {
-		cocktailLogger.error("Failed to save cocktail to DB", error);
-		return cocktail;
-	}
-}
-
 export async function generateCocktailRecommendation(options: {
 	request: BartenderRequest;
 	language: string;
@@ -181,6 +126,5 @@ export async function generateCocktailRecommendation(options: {
 	);
 
 	const cocktail = parseCocktailFromCompletion(completion);
-	const persisted = await persistCocktail(cocktail);
-	return persisted;
+	return cocktail;
 }

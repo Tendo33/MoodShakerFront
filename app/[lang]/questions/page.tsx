@@ -14,9 +14,9 @@ const Questions = dynamic(() => import("@/components/pages/Questions"), {
 });
 
 interface PageProps {
-  params: {
+  params: Promise<{
     lang: string;
-  };
+  }>;
 }
 
 export const metadata: Metadata = {
@@ -28,11 +28,8 @@ export const metadata: Metadata = {
 };
 
 export default async function QuestionsPage({ params }: PageProps) {
-  // Validate language parameter
   const validLangs = ["en", "cn"];
-
   const { lang } = await params;
-
   if (!validLangs.includes(lang)) {
     redirect("/cn/questions");
   }

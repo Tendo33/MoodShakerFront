@@ -77,15 +77,15 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
   return (
     <div className="min-h-screen">
       {/* Shared Background with Recommendation Page */}
-      <motion.div
-        className="fixed inset-0 overflow-hidden opacity-30 pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.3 }}
-        transition={{ duration: 1 }}
-      >
         <motion.div
-          className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/40 rounded-full blur-[120px] mix-blend-screen"
-          animate={{ y: [0, -20, 0], scale: [1, 1.05, 1], rotate: [0, 5, 0] }}
+          className="fixed inset-0 overflow-hidden opacity-30 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
+          transition={{ duration: 1 }}
+        >
+          <motion.div
+          className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/18 blur-[84px]"
+          animate={{ y: [0, -14, 0], scale: [1, 1.03, 1] }}
           transition={{
             duration: 8,
             repeat: Number.POSITIVE_INFINITY,
@@ -93,8 +93,8 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           }}
         />
         <motion.div
-          className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/40 rounded-full blur-[120px] mix-blend-screen"
-          animate={{ y: [0, 20, 0], scale: [1, 1.1, 1], rotate: [0, -5, 0] }}
+          className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/18 blur-[84px]"
+          animate={{ y: [0, 14, 0], scale: [1, 1.04, 1] }}
           transition={{
             duration: 10,
             repeat: Number.POSITIVE_INFINITY,
@@ -168,6 +168,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
                 cocktailId={id}
                 imageData={cocktail?.image || null}
                 cocktailName={cocktail?.name}
+                priority
               />
             </div>
           }
@@ -193,4 +194,3 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
 CocktailDetailPage.displayName = "CocktailDetailPage";
 
 export default CocktailDetailPage;
-

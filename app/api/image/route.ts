@@ -1,8 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { generateImage } from "@/api/openai";
-import { imageLogger } from "@/utils/logger";
-import { prisma } from "@/lib/prisma";
+import { NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
+import { generateImage } from "@/api/openai";
+import { apiError, apiSuccess } from "@/lib/api-response";
+import { consumeRateLimit } from "@/lib/rate-limit";
+import { getRecommendationSessionById, updateRecommendationSessionImage } from "@/lib/recommendation-sessions";
+import { validateImageRequest } from "@/lib/request-validation";
+import { imageLogger } from "@/utils/logger";
 
 interface SharpTransformer {
   rotate(): SharpTransformer;
@@ -19,24 +22,37 @@ type SharpFactory = (input: Buffer) => SharpTransformer;
 
 let sharpFactory: SharpFactory | null | undefined;
 let sharpFactoryPromise: Promise<SharpFactory | null> | null = null;
-const THUMBNAIL_COLUMN_NAME = "thumbnail";
 
-function isMissingThumbnailColumnError(error: unknown): boolean {
-  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
-    return false;
+function getAllowedImageHosts(): Set<string> {
+  const hosts = new Set<string>();
+  const configured = process.env.IMAGE_FETCH_HOST_ALLOWLIST;
+
+  if (configured) {
+    configured
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .forEach((host) => hosts.add(host));
   }
 
-  if (error.code !== "P2022") {
-    return false;
+  if (process.env.IMAGE_API_URL) {
+    try {
+      hosts.add(new URL(process.env.IMAGE_API_URL).hostname);
+    } catch {
+      imageLogger.warn("Failed to parse IMAGE_API_URL for host allowlist");
+    }
   }
 
-  const meta = error.meta as { column?: unknown } | undefined;
-  const column = typeof meta?.column === "string" ? meta.column : "";
+  return hosts;
+}
 
-  return (
-    error.message.toLowerCase().includes(THUMBNAIL_COLUMN_NAME) ||
-    column.toLowerCase().includes(THUMBNAIL_COLUMN_NAME)
-  );
+function isAllowedRemoteImageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return getAllowedImageHosts().has(parsed.hostname);
+  } catch {
+    return false;
+  }
 }
 
 async function getSharpFactory(): Promise<SharpFactory | null> {
@@ -65,18 +81,16 @@ async function getSharpFactory(): Promise<SharpFactory | null> {
   return sharpFactoryPromise;
 }
 
-/**
- * Convert remote image URL to Buffer
- */
-async function imageUrlToBuffer(
-  url: string,
-): Promise<Buffer> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+async function imageUrlToBuffer(url: string): Promise<Buffer> {
+  if (!isAllowedRemoteImageUrl(url)) {
+    throw new Error("Image host is not allowed for server-side fetch.");
+  }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+  try {
     const response = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(
@@ -86,9 +100,8 @@ async function imageUrlToBuffer(
 
     const arrayBuffer = await response.arrayBuffer();
     return Buffer.from(arrayBuffer);
-  } catch (error) {
-    imageLogger.error("Failed to fetch image buffer", error);
-    throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -115,100 +128,103 @@ async function createOptimizedImageData(
   return bufferToDataUrl(optimized, "image/webp");
 }
 
-/**
- * POST /api/image
- * Generates a cocktail image based on prompts.
- */
+function isMissingJsonColumnError(error: unknown): boolean {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2022"
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { prompt, cocktailName } = body;
+    const validated = validateImageRequest(body);
 
-    if (!prompt) {
-      return NextResponse.json(
-        { success: false, error: "Missing required parameter: prompt" },
-        { status: 400 },
+    if (!validated.success) {
+      return apiError("INVALID_PAYLOAD", validated.message, 400);
+    }
+
+    const { recommendationId, editToken, prompt } = validated.data;
+    const recommendation = await getRecommendationSessionById(
+      recommendationId,
+      editToken,
+    );
+
+    if (!recommendation) {
+      return apiError(
+        "FORBIDDEN",
+        "You do not have permission to update this recommendation.",
+        403,
       );
     }
 
-    imageLogger.info(`Processing image generation request`);
+    const rateLimit = consumeRateLimit(
+      `image:${recommendationId}`,
+      3,
+      60 * 1000,
+    );
+    if (!rateLimit.allowed) {
+      return apiError(
+        "RATE_LIMITED",
+        "Image refresh is happening too frequently. Please wait a moment.",
+        429,
+      );
+    }
 
-    // Call image generation API
     const imageUrl = await generateImage(prompt, {
       negative_prompt: "low quality, blurry, distorted",
       image_size: "1024x1024",
     });
 
-    imageLogger.info(`Image generation completed`);
+    let optimizedImage = imageUrl;
+    let thumbnailImage = imageUrl;
 
-    // Convert to optimized Base64 images and save to DB if cocktailName is provided
-    let finalImage = imageUrl;
-    if (cocktailName) {
-      try {
-        imageLogger.info(
-          `Attempting to optimize and save image for: ${cocktailName}`,
-        );
-        const sharp = await getSharpFactory();
-        let optimizedImage = imageUrl;
-        let thumbnailImage = imageUrl;
-
-        if (sharp) {
-          const buffer = await imageUrlToBuffer(imageUrl);
-          optimizedImage = await createOptimizedImageData(
-            sharp,
-            buffer,
-            1024,
-            80,
-          );
-          thumbnailImage = await createOptimizedImageData(
-            sharp,
-            buffer,
-            320,
-            60,
-          );
-        }
-
-        finalImage = optimizedImage;
-
-        try {
-          await prisma.cocktail.updateMany({
-            where: { name: cocktailName },
-            data: { image: optimizedImage, thumbnail: thumbnailImage },
-          });
-        } catch (dbError) {
-          if (!isMissingThumbnailColumnError(dbError)) {
-            throw dbError;
-          }
-
-          imageLogger.warn(
-            `[DB Compatibility][api/image] Missing "${THUMBNAIL_COLUMN_NAME}". Retrying with image only. Please run "pnpm prisma:migrate" or "pnpm db:init".`,
-          );
-
-          await prisma.cocktail.updateMany({
-            where: { name: cocktailName },
-            data: { image: optimizedImage },
-          });
-        }
-        imageLogger.info(`Saved image for cocktail: ${cocktailName}`);
-      } catch (dbError) {
-        imageLogger.error("Failed to save image to DB", dbError);
-        // Fallback: return original URL if optimization/save fails
+    try {
+      const sharp = await getSharpFactory();
+      if (sharp && isAllowedRemoteImageUrl(imageUrl)) {
+        const buffer = await imageUrlToBuffer(imageUrl);
+        optimizedImage = await createOptimizedImageData(sharp, buffer, 1024, 80);
+        thumbnailImage = await createOptimizedImageData(sharp, buffer, 320, 60);
+      } else if (!isAllowedRemoteImageUrl(imageUrl)) {
+        imageLogger.warn("Skipping server-side image fetch due to host allowlist");
+      }
+    } catch (error) {
+      if (!isMissingJsonColumnError(error)) {
+        imageLogger.warn("Failed to optimize generated image", error);
       }
     }
 
-    return NextResponse.json({ success: true, data: finalImage });
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const updatedRecommendation = await updateRecommendationSessionImage({
+      id: recommendationId,
+      editToken,
+      image: optimizedImage,
+      thumbnail: thumbnailImage,
+    });
 
-    imageLogger.error("Image generation failed", errorMessage);
+    if (!updatedRecommendation) {
+      return apiError(
+        "NOT_FOUND",
+        "Recommendation not found.",
+        404,
+      );
+    }
 
-    return NextResponse.json(
+    return apiSuccess(
       {
-        success: false,
-        error: errorMessage,
+        image: updatedRecommendation.image || optimizedImage,
+        thumbnail: updatedRecommendation.thumbnail || thumbnailImage,
       },
-      { status: 500 },
+      200,
+    );
+  } catch (error) {
+    imageLogger.error(
+      "Image generation failed",
+      error instanceof Error ? error.message : "Unknown error",
+    );
+    return apiError(
+      "IMAGE_GENERATION_FAILED",
+      "Unable to generate a cocktail image right now.",
+      500,
     );
   }
 }

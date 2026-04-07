@@ -107,15 +107,18 @@ export default function PerformanceMonitor() {
     <div className="fixed bottom-4 right-4 z-50">
       <button
         onClick={() => setIsVisible(!isVisible)}
-        className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg shadow-lg transition-colors"
+        className="glass-panel border border-secondary/50 text-secondary text-xs px-3 py-2 rounded-none shadow-[0_0_16px_rgba(0,255,255,0.18)] transition-colors hover:text-foreground focus-ring"
         title="性能监控"
+        type="button"
       >
-        📊 性能
+        性能
       </button>
 
       {isVisible && (
-        <div className="absolute bottom-12 right-0 bg-black/90 text-white text-xs p-4 rounded-lg shadow-xl backdrop-blur-sm min-w-80 max-h-96 overflow-y-auto">
-          <h3 className="font-bold mb-3 text-yellow-400">🚀 性能指标</h3>
+        <div className="absolute bottom-12 right-0 glass-popup text-white text-xs p-4 rounded-none shadow-xl min-w-80 max-h-96 overflow-y-auto">
+          <h3 className="font-bold mb-3 text-secondary font-heading tracking-wider uppercase">
+            Performance
+          </h3>
 
           <div className="space-y-2">
             {/* 核心指标 */}

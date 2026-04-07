@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { apiError, apiSuccess } from "@/lib/api-response";
 import { getCocktailById } from "@/lib/cocktail-data";
 
 export async function GET(
@@ -8,25 +9,21 @@ export async function GET(
   const { id } = await params;
 
   if (!id) {
-    return NextResponse.json(
-      { success: false, error: "Missing cocktail id" },
-      { status: 400 },
-    );
+    return apiError("INVALID_ID", "Missing cocktail id.", 400);
   }
 
   try {
     const cocktail = await getCocktailById(id);
     if (!cocktail) {
-      return NextResponse.json(
-        { success: false, error: "Cocktail not found" },
-        { status: 404 },
-      );
+      return apiError("NOT_FOUND", "Cocktail not found.", 404);
     }
 
-    return NextResponse.json({ success: true, data: cocktail });
+    return apiSuccess(cocktail, 200);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Failed to load cocktail";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return apiError(
+      "LOAD_FAILED",
+      error instanceof Error ? error.message : "Failed to load cocktail.",
+      500,
+    );
   }
 }

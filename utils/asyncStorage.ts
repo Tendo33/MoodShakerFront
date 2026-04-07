@@ -409,3 +409,7 @@ export const saveToStorageAsync = <T>(key: string, value: T): Promise<void> => {
 export const clearStorageWithPrefixAsync = (prefix: string): Promise<void> => {
   return asyncStorage.clearWithPrefix(prefix);
 };
+
+export const removeStorageKeysAsync = async (keys: string[]): Promise<void> => {
+  await Promise.all(keys.map((key) => asyncStorage.removeItem(key)));
+};

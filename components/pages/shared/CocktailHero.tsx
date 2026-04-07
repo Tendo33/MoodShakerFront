@@ -47,8 +47,8 @@ export function CocktailHero({
         >
           <motion.div
             className="rounded-none overflow-hidden border-2 border-secondary shadow-[0_0_22px_rgba(0,255,255,0.2)] glass-panel relative aspect-square p-2"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.35 }}
           >
             {imageContent}
           </motion.div>
@@ -71,7 +71,7 @@ export function CocktailHero({
             }}
           >
             <h1
-              className={`text-5xl md:text-6xl font-black font-heading tracking-widest uppercase ${gradientTextClass} inline-block drop-shadow-[0_0_15px_rgba(255,0,255,0.5)]`}
+              className={`text-4xl sm:text-5xl md:text-6xl font-black font-heading tracking-widest uppercase ${gradientTextClass} inline-block drop-shadow-[0_0_15px_rgba(255,0,255,0.5)] text-safe-wrap`}
               style={{
                 lineHeight: "1.1",
                 paddingBottom: "0.25rem",
@@ -80,7 +80,7 @@ export function CocktailHero({
               {getLocalizedContent("name", "english_name")}
             </h1>
             {cocktail.english_name && language === "cn" && (
-              <p className="text-secondary text-2xl font-mono tracking-[0.2em] uppercase drop-shadow-[0_0_5px_currentColor]">
+              <p className="text-secondary text-xl md:text-2xl font-mono tracking-[0.2em] uppercase drop-shadow-[0_0_5px_currentColor] text-safe-wrap">
                 {cocktail.english_name}
               </p>
             )}
@@ -93,7 +93,7 @@ export function CocktailHero({
               visible: { opacity: 1, transition: { duration: 0.5 } },
             }}
           >
-            <p className="text-foreground leading-relaxed text-lg font-mono max-w-2xl bg-black/60 p-4 border-l-2 border-primary">
+            <p className="text-foreground leading-relaxed text-lg font-mono max-w-2xl bg-black/60 p-4 border-l-2 border-primary text-safe-wrap">
               {getLocalizedContent("description", "english_description")}
             </p>
           </motion.div>
@@ -122,7 +122,7 @@ export function CocktailHero({
                 ).map((flavor, index) => (
                   <motion.span
                     key={index}
-                    className="px-4 py-1.5 glass-panel border border-primary text-primary rounded-none text-sm font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(255,0,255,0.2)]"
+                    className="px-4 py-1.5 glass-panel border border-primary text-primary rounded-none text-sm font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(255,0,255,0.2)] text-safe-wrap"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.1 }}
@@ -143,4 +143,3 @@ export function CocktailHero({
     </motion.div>
   );
 }
-

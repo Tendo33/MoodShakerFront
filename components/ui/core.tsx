@@ -45,7 +45,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const { t } = useLanguage();
     const baseStyles =
-      "relative rounded-none font-medium transition-all duration-200 flex items-center justify-center font-mono uppercase tracking-wider focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary/90 focus-visible:ring-offset-2 focus-visible:ring-offset-background transform-gpu active:scale-95 disabled:active:scale-100 whitespace-nowrap";
+      "relative rounded-none font-medium text-center leading-tight transition-all duration-200 flex items-center justify-center font-mono uppercase tracking-wider focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary/90 focus-visible:ring-offset-2 focus-visible:ring-offset-background transform-gpu active:scale-95 disabled:active:scale-100 whitespace-normal sm:whitespace-nowrap";
 
     const variantStyles = {
       primary:
@@ -78,11 +78,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const activeEffect = variant === 'shine' && effect === 'none' ? 'shine' : effect;
 
     const sizeStyles = {
-      xs: "px-3 py-1 text-xs",
-      sm: "px-4 py-2 text-sm",
-      md: "px-6 py-3 text-sm",
-      lg: "px-8 py-4 text-base",
-      xl: "px-10 py-4 text-lg",
+      xs: "min-h-10 px-3 py-2 text-xs",
+      sm: "min-h-10 px-4 py-2.5 text-sm",
+      md: "min-h-11 px-6 py-3 text-sm",
+      lg: "min-h-12 px-8 py-3.5 text-base",
+      xl: "min-h-14 px-10 py-4 text-lg",
     };
 
     const widthStyles = fullWidth ? "w-full" : "w-auto";
@@ -256,4 +256,3 @@ export const GradientText = forwardRef<HTMLSpanElement, GradientTextProps>(
   },
 );
 GradientText.displayName = "GradientText";
-

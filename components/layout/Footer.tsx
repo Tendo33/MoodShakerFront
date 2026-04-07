@@ -37,6 +37,7 @@ export default function Footer() {
     { text: t("footer.privacy"), href: "#" },
     { text: t("footer.terms"), href: "#" },
   ];
+  const activeSocialLinks = socialLinks.filter((link) => link.href !== "#");
 
   const staggerAnimation = {
     hidden: { opacity: 0 },
@@ -91,7 +92,7 @@ export default function Footer() {
                   variants={itemAnimation}
                   className="flex justify-center space-x-4"
                 >
-                  {socialLinks.map((link, index) => (
+                  {activeSocialLinks.map((link, index) => (
                     <Link
                       key={index}
                       href={link.href}
@@ -127,13 +128,13 @@ export default function Footer() {
                 </p>
                 <div className="flex flex-wrap justify-center gap-x-8 gap-y-2">
                   {footerLinks.map((link, index) => (
-                    <Link
+                    <span
                       key={index}
-                      href={link.href}
-                      className="hover:text-primary transition-colors hover:underline decoration-primary/30 underline-offset-4 focus-ring"
+                      className="text-muted-foreground/70"
+                      aria-disabled="true"
                     >
                       {link.text}
-                    </Link>
+                    </span>
                   ))}
                 </div>
               </div>

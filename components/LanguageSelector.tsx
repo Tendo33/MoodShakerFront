@@ -1,14 +1,29 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, type KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Globe, Check, ChevronDown } from "lucide-react";
 import { useLanguage, type Language } from "@/context/LanguageContext";
 
-export default function LanguageSelector() {
+interface LanguageSelectorProps {
+  idBase?: string;
+}
+
+export default function LanguageSelector({
+  idBase = "language-selector",
+}: LanguageSelectorProps) {
   const { language, setLanguage, t, availableLanguages } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const listboxId = `${idBase}-listbox`;
+  const pendingFocusIndexRef = useRef<number | null>(null);
+  const languageOptions = useMemo(
+    () => Object.entries(availableLanguages),
+    [availableLanguages],
+  );
+  const selectedIndex = languageOptions.findIndex(([code]) => code === language);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -26,6 +41,111 @@ export default function LanguageSelector() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      pendingFocusIndexRef.current = null;
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      const nextIndex =
+        pendingFocusIndexRef.current ?? (selectedIndex >= 0 ? selectedIndex : 0);
+      optionRefs.current[nextIndex]?.focus();
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [isOpen, selectedIndex]);
+
+  const closeListbox = () => {
+    setIsOpen(false);
+    triggerRef.current?.focus();
+  };
+
+  const openListbox = (targetIndex = selectedIndex >= 0 ? selectedIndex : 0) => {
+    pendingFocusIndexRef.current = targetIndex;
+    setIsOpen(true);
+  };
+
+  const selectLanguage = (code: string) => {
+    void setLanguage(code as Language);
+    closeListbox();
+  };
+
+  const focusOption = (index: number) => {
+    const total = languageOptions.length;
+    const normalized = (index + total) % total;
+    optionRefs.current[normalized]?.focus();
+  };
+
+  const handleTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      openListbox(selectedIndex >= 0 ? selectedIndex : 0);
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      openListbox(selectedIndex >= 0 ? selectedIndex : languageOptions.length - 1);
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      if (isOpen) {
+        closeListbox();
+      } else {
+        openListbox();
+      }
+    }
+  };
+
+  const handleOptionKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+    code: string,
+  ) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      focusOption(index + 1);
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      focusOption(index - 1);
+      return;
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      focusOption(0);
+      return;
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      focusOption(languageOptions.length - 1);
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeListbox();
+      return;
+    }
+
+    if (event.key === "Tab") {
+      setIsOpen(false);
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectLanguage(code);
+    }
+  };
 
   // Animation variants
   const dropdownVariants = {
@@ -53,8 +173,15 @@ export default function LanguageSelector() {
   return (
     <div className="relative" ref={dropdownRef}>
       <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-5 py-2 text-sm rounded-none font-mono tracking-widest uppercase transition-all duration-300 border-2 focus-ring ${
+        ref={triggerRef}
+        onClick={() => {
+          if (isOpen) {
+            closeListbox();
+            return;
+          }
+          openListbox();
+        }}
+        className={`flex min-h-11 items-center gap-2 px-5 py-2.5 text-sm rounded-none font-mono tracking-widest uppercase transition-all duration-300 border-2 focus-ring ${
           isOpen
             ? "bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(255,0,255,0.4)]"
             : "bg-black/40 border-primary/30 text-primary/80 hover:bg-black/80 hover:border-primary hover:text-primary hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]"
@@ -62,8 +189,10 @@ export default function LanguageSelector() {
         aria-label={t("language.select")}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
+        aria-controls={listboxId}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        onKeyDown={handleTriggerKeyDown}
         type="button"
       >
         <span className="flex items-center gap-2">
@@ -82,6 +211,7 @@ export default function LanguageSelector() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            id={listboxId}
             className="absolute right-0 mt-3 w-48 rounded-none overflow-hidden bg-black/90 backdrop-blur-3xl border-2 border-primary shadow-[0_10px_40px_rgba(255,0,255,0.3)] z-50"
             initial="hidden"
             animate="visible"
@@ -95,9 +225,12 @@ export default function LanguageSelector() {
                 {t("language.select")}
               </div>
 
-              {Object.entries(availableLanguages).map(([code, name]) => (
+              {languageOptions.map(([code, name], index) => (
                 <button
                   key={code}
+                  ref={(element) => {
+                    optionRefs.current[index] = element;
+                  }}
                   className={`relative flex items-center justify-between w-full px-5 py-3 text-sm font-mono tracking-widest uppercase transition-all duration-300 group overflow-hidden focus-ring ${
                     language === code
                       ? "bg-primary/20 text-primary font-bold shadow-[inset_4px_0_0_rgba(255,0,255,1)]"
@@ -105,10 +238,8 @@ export default function LanguageSelector() {
                   }`}
                   role="option"
                   aria-selected={language === code}
-                  onClick={() => {
-                    setLanguage(code as Language);
-                    setIsOpen(false);
-                  }}
+                  onKeyDown={(event) => handleOptionKeyDown(event, index, code)}
+                  onClick={() => selectLanguage(code)}
                   type="button"
                 >
                   <div className="flex items-center gap-3 z-10">

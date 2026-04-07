@@ -52,9 +52,6 @@ export const metadata: Metadata = {
   generator: "v0.app",
 };
 
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
-
 const resolveLanguageFromPath = (path?: string | null) => {
   if (!path) return null;
   const normalized = path.split("?")[0];

@@ -73,9 +73,9 @@ export default function HomeFeatures() {
                   <motion.div
                     className="w-16 h-16 rounded-none border-2 border-primary bg-black flex items-center justify-center mx-auto shadow-[0_0_15px_var(--color-primary)] mb-6 group-hover:border-secondary group-hover:shadow-[0_0_16px_var(--color-secondary)] transition-all duration-300 transform"
                     whileHover={{
-                      scale: 1.15,
-                      rotate: index % 2 === 0 ? 8 : -8,
-                      y: -4,
+                      scale: 1.08,
+                      rotate: index % 2 === 0 ? 4 : -4,
+                      y: -2,
                     }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
                   >
@@ -101,4 +101,3 @@ export default function HomeFeatures() {
     </section>
   );
 }
-

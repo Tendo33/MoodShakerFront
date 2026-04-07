@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma, type Cocktail as DBCocktail } from "@prisma/client";
-import type { Cocktail, GalleryCocktail } from "@/lib/cocktail-types";
+import type {
+  Cocktail,
+  GalleryCocktail,
+  PaginatedGalleryResult,
+  PublicCocktailSummary,
+} from "@/lib/cocktail-types";
 import { popularCocktails } from "@/lib/cocktail-catalog";
 
 export interface GalleryQueryFilters {
@@ -96,10 +101,6 @@ function filterGalleryCocktailsInMemory(
         cocktail.english_base_spirit,
         ...(cocktail.flavor_profiles || []),
         ...(cocktail.english_flavor_profiles || []),
-        ...(cocktail.ingredients || []).flatMap((ingredient) => [
-          ingredient.name,
-          ingredient.english_name,
-        ]),
       ]
         .filter(Boolean)
         .join(" ")
@@ -189,6 +190,14 @@ function asTypedArray<T>(value: Prisma.JsonValue): T[] {
 
 const THUMBNAIL_COLUMN_NAME = "cocktails.thumbnail";
 
+function shouldUseBuildFallback(): boolean {
+  return (
+    !process.env.DATABASE_URL ||
+    process.env.DATABASE_URL.includes("placeholder") ||
+    process.env.npm_lifecycle_event === "build"
+  );
+}
+
 const cocktailSelectWithoutThumbnail = {
   id: true,
   name: true,
@@ -228,10 +237,6 @@ const gallerySelectWithoutThumbnail = {
   englishBaseSpirit: true,
   alcoholLevel: true,
   englishAlcoholLevel: true,
-  flavorProfiles: true,
-  englishFlavorProfiles: true,
-  ingredients: true,
-  image: true,
 } satisfies Prisma.CocktailSelect;
 
 const gallerySelectWithThumbnail = {
@@ -309,6 +314,47 @@ function getPopularGalleryCocktails(filters?: GalleryQueryFilters): GalleryCockt
   );
 }
 
+function mapCocktailToPublicCocktailSummary(
+  cocktail: Cocktail,
+): PublicCocktailSummary {
+  return {
+    id: String(cocktail.id || ""),
+    name: cocktail.name,
+    english_name: cocktail.english_name,
+    description: cocktail.description,
+    english_description: cocktail.english_description,
+    base_spirit: cocktail.base_spirit,
+    english_base_spirit: cocktail.english_base_spirit,
+    alcohol_level: cocktail.alcohol_level,
+    english_alcohol_level: cocktail.english_alcohol_level,
+    thumbnail: cocktail.thumbnail,
+  };
+}
+
+function getPopularGalleryPage(
+  filters?: GalleryQueryFilters,
+  cursor?: string | null,
+  limit: number = 24,
+): PaginatedGalleryResult {
+  const filtered = getPopularGalleryCocktails(filters).map((cocktail) =>
+    mapCocktailToPublicCocktailSummary(cocktail as unknown as Cocktail),
+  );
+  const startIndex = cursor
+    ? Math.max(
+        filtered.findIndex((item) => item.id === cursor) + 1,
+        0,
+      )
+    : 0;
+  const page = filtered.slice(startIndex, startIndex + limit + 1);
+  const hasMore = page.length > limit;
+  const items = hasMore ? page.slice(0, limit) : page;
+
+  return {
+    items,
+    nextCursor: hasMore ? items[items.length - 1]?.id || null : null,
+  };
+}
+
 type DBGalleryCocktail = Pick<
   DBCocktail,
   | "id"
@@ -320,10 +366,6 @@ type DBGalleryCocktail = Pick<
   | "englishBaseSpirit"
   | "alcoholLevel"
   | "englishAlcoholLevel"
-  | "flavorProfiles"
-  | "englishFlavorProfiles"
-  | "ingredients"
-  | "image"
   | "thumbnail"
 >;
 
@@ -388,12 +430,12 @@ function mapCocktailToGalleryCocktail(cocktail: Cocktail): GalleryCocktail {
 
 function mapDBGalleryCocktail(
   dbCocktail: DBGalleryCocktailWithOptionalThumbnail,
-): GalleryCocktail {
+): PublicCocktailSummary {
   const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
   const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
 
   return {
-    id: dbCocktail.id,
+    id: String(dbCocktail.id),
     name: dbCocktail.name,
     english_name: dbCocktail.englishName || dbCocktail.name,
     description: dbCocktail.description,
@@ -408,22 +450,12 @@ function mapDBGalleryCocktail(
       dbCocktail.alcoholLevel,
       dbCocktail.englishAlcoholLevel,
     ),
-    flavor_profiles: dbCocktail.flavorProfiles,
-    english_flavor_profiles: dbCocktail.englishFlavorProfiles || [],
-    ingredients: asTypedArray<NonNullable<GalleryCocktail["ingredients"]>[number]>(
-      dbCocktail.ingredients,
-    ),
-    image: dbCocktail.image ?? undefined,
     thumbnail: dbCocktail.thumbnail || undefined,
   };
 }
 
 export async function getAllCocktails(): Promise<Cocktail[]> {
-  // Check if we're in build time (no DATABASE_URL means we're building)
-  const isBuildTime = !process.env.DATABASE_URL || 
-    process.env.DATABASE_URL.includes('placeholder');
-
-  // During build time, return empty array or popular cocktails
+  const isBuildTime = shouldUseBuildFallback();
   if (isBuildTime) {
     return getPopularCocktailList();
   }
@@ -450,20 +482,27 @@ export async function getAllCocktails(): Promise<Cocktail[]> {
 
 export async function getGalleryCocktails(
   filters?: GalleryQueryFilters,
-): Promise<GalleryCocktail[]> {
+  options: {
+    cursor?: string | null;
+    limit?: number;
+  } = {},
+): Promise<PaginatedGalleryResult> {
   const { searchValue, spiritKeywords, flavorKeywords, alcoholKeywords } =
     getQueryValues(filters);
-  const isBuildTime =
-    !process.env.DATABASE_URL || process.env.DATABASE_URL.includes("placeholder");
+  const isBuildTime = shouldUseBuildFallback();
+  const limit = Math.min(Math.max(options.limit || 24, 1), 48);
 
   if (isBuildTime) {
-    return getPopularGalleryCocktails(filters);
+    return getPopularGalleryPage(filters, options.cursor, limit);
   }
 
   try {
     const andFilters: Prisma.CocktailWhereInput[] = [];
 
     if (searchValue) {
+      const searchCandidates = Array.from(
+        new Set([searchValue, searchValue.toLowerCase(), capitalizeKeyword(searchValue)]),
+      );
       andFilters.push({
         OR: [
           { name: { contains: searchValue, mode: Prisma.QueryMode.insensitive } },
@@ -497,6 +536,8 @@ export async function getGalleryCocktails(
               mode: Prisma.QueryMode.insensitive,
             },
           },
+          { flavorProfiles: { hasSome: searchCandidates } },
+          { englishFlavorProfiles: { hasSome: searchCandidates } },
         ],
       });
     }
@@ -580,27 +621,31 @@ export async function getGalleryCocktails(
       (includeThumbnail) =>
         prisma.cocktail.findMany({
           where: andFilters.length > 0 ? { AND: andFilters } : undefined,
-          orderBy: { createdAt: "desc" },
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          cursor: options.cursor ? { id: options.cursor } : undefined,
+          skip: options.cursor ? 1 : 0,
+          take: limit + 1,
           select: includeThumbnail
             ? gallerySelectWithThumbnail
             : gallerySelectWithoutThumbnail,
         }),
     );
-    return cocktails.map((cocktail) =>
+    const hasMore = cocktails.length > limit;
+    const items = (hasMore ? cocktails.slice(0, limit) : cocktails).map((cocktail) =>
       mapDBGalleryCocktail(cocktail as DBGalleryCocktailWithOptionalThumbnail),
     );
+    return {
+      items,
+      nextCursor: hasMore ? items[items.length - 1]?.id || null : null,
+    };
   } catch (error) {
     console.error("Error fetching gallery cocktails from DB:", error);
-    return getPopularGalleryCocktails(filters);
+    return getPopularGalleryPage(filters, options.cursor, limit);
   }
 }
 
 export async function getCocktailById(id: string): Promise<Cocktail | null> {
-  // Check if we're in build time (no DATABASE_URL means we're building)
-  const isBuildTime = !process.env.DATABASE_URL || 
-    process.env.DATABASE_URL.includes('placeholder');
-
-  // During build time, only use popular cocktails
+  const isBuildTime = shouldUseBuildFallback();
   if (isBuildTime) {
     return getPopularCocktailById(id);
   }

@@ -63,7 +63,7 @@
 
   /* Vaporwave Animations */
   --animate-grid-move: grid-move 5s linear infinite;
-  --animate-crt-flicker: crt-flicker 0.15s infinite;
+  --animate-crt-flicker: crt-flicker 8s ease-in-out infinite;
   --animate-neon-pulse: neon-pulse 2s infinite alternate;
   --animate-float: float 7s ease-in-out infinite;
   --animate-fadeIn: fadeIn 0.4s linear forwards;
@@ -114,6 +114,11 @@
   text-wrap: balance;
 }
 
+@utility text-safe-wrap {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 /* Rendering Optimization Utilities */
 @utility content-auto {
   content-visibility: auto;
@@ -127,7 +132,7 @@
   mix-blend-mode: overlay;
   z-index: 100;
   pointer-events: none;
-  animation: crt-flicker 0.15s infinite;
+  opacity: 0.35;
 }
 
 @utility crt-scanline {

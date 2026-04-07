@@ -7,10 +7,10 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { getCocktailById, getPopularCocktailIds } from "@/lib/cocktail-data";
 
 interface CocktailPageProps {
-  params: {
+  params: Promise<{
     lang: string;
     id: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({

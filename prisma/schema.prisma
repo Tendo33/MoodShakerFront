@@ -8,6 +8,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RecommendationStatus {
+  PRIVATE
+  PUBLISHED
+}
+
 model Cocktail {
   id                    String   @id @default(uuid())
   name                  String   @unique // Added unique constraint for cocktail names
@@ -33,6 +38,7 @@ model Cocktail {
   thumbnail             String?  @db.Text
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
+  recommendations       RecommendationSession[]
 
   // Indexes for common query patterns
   @@index([baseSpirit], name: "idx_cocktail_base_spirit")
@@ -40,4 +46,27 @@ model Cocktail {
   @@index([createdAt], name: "idx_cocktail_created_at")
   @@index([englishName], name: "idx_cocktail_english_name")
   @@map("cocktails")
+}
+
+model RecommendationSession {
+  id                String               @id @default(cuid())
+  sessionId         String               @map("session_id")
+  editToken         String               @unique @map("edit_token")
+  language          String
+  agentType         String               @map("agent_type")
+  answers           Json
+  baseSpirits       String[]             @map("base_spirits")
+  specialRequests   String?              @map("special_requests")
+  cocktailPayload   Json                 @map("cocktail_payload")
+  image             String?              @db.Text
+  thumbnail         String?              @db.Text
+  status            RecommendationStatus @default(PRIVATE)
+  publishedCocktailId String?            @map("published_cocktail_id")
+  publishedCocktail Cocktail?            @relation(fields: [publishedCocktailId], references: [id], onDelete: SetNull)
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+
+  @@index([sessionId], name: "idx_recommendation_session_session_id")
+  @@index([status, createdAt], name: "idx_recommendation_session_status_created_at")
+  @@map("recommendation_sessions")
 }

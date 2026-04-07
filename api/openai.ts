@@ -67,13 +67,16 @@ export async function getChatCompletion(
 					messages,
 					temperature: options.temperature || 0.7,
 					max_tokens: options.max_tokens || 1000,
+					...(options.response_format
+						? { response_format: options.response_format }
+						: {}),
 				}),
 			},
 			{
 				cacheKey,
 				cacheTTL: 10 * 60 * 1000, // 10 minutes cache
 				deduplicate: true,
-				retryCount: 2,
+				retryCount: 1,
 			},
 		);
 

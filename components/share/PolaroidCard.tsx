@@ -21,6 +21,15 @@ interface PolaroidCardProps {
 export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
   ({ cocktail, imageUrl }, ref) => {
     const { language, t } = useLanguage();
+    const generatedDate = new Intl.DateTimeFormat(
+      language === "en" ? "en-US" : "zh-CN",
+      {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        timeZone: "UTC",
+      },
+    ).format(new Date());
 
     // Helper to get content based on language
     const getLocalizedContent = (field: string, englishField: string) => {
@@ -91,7 +100,9 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.07] z-0 mix-blend-overlay"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            backgroundImage:
+              "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.45) 0 0.6px, transparent 0.9px), radial-gradient(circle at 80% 35%, rgba(255,255,255,0.35) 0 0.7px, transparent 1px), radial-gradient(circle at 45% 75%, rgba(255,255,255,0.28) 0 0.6px, transparent 0.9px)",
+            backgroundSize: "18px 18px, 24px 24px, 22px 22px",
           }}
         ></div>
 
@@ -235,7 +246,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
               </span>
             </div>
             <span className="text-[9px] font-mono text-white/40 tracking-widest">
-              {new Date().toLocaleDateString()}
+              {generatedDate}
             </span>
           </div>
         </div>

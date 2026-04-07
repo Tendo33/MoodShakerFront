@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Martini, Library, Sparkles } from "lucide-react";
@@ -8,11 +8,23 @@ import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/core";
 import { gradientStyles } from "@/utils/style-constants";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 export default function Header() {
   const { t, language, getPathWithLanguage } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const drawerId = "mobile-navigation-drawer";
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useFocusTrap({
+    isOpen: isMobileMenuOpen,
+    containerRef: drawerRef,
+    initialFocusRef: closeButtonRef,
+    onClose: () => setIsMobileMenuOpen(false),
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,9 +67,9 @@ export default function Header() {
   };
 
   const backdropVariants = {
-    hidden: { opacity: 0, backdropFilter: "blur(0px)" },
-    visible: { opacity: 1, backdropFilter: "blur(4px)", transition: { duration: 0.3 } },
-    exit: { opacity: 0, backdropFilter: "blur(0px)", transition: { duration: 0.2 } },
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.25 } },
+    exit: { opacity: 0, transition: { duration: 0.18 } },
   };
 
   return (
@@ -116,18 +128,21 @@ export default function Header() {
 
           <div className="h-6 w-px bg-white/20 mx-1" />
 
-          <LanguageSelector />
+          <LanguageSelector idBase="header-desktop-language-selector" />
         </div>
 
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center gap-2">
-          <LanguageSelector />
+          <LanguageSelector idBase="header-mobile-language-selector" />
           <motion.button
+            ref={menuButtonRef}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-gray-300 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors focus-ring"
+            className="text-gray-300 hover:text-white inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 transition-colors focus-ring"
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
+            aria-controls={drawerId}
             whileTap={{ scale: 0.9 }}
+            type="button"
           >
             <AnimatePresence mode="wait" initial={false}>
               {isMobileMenuOpen ? (
@@ -173,6 +188,8 @@ export default function Header() {
             {/* Drawer Panel */}
             <motion.div
               className="md:hidden fixed top-0 right-0 bottom-0 z-50 w-72 glass-popup flex flex-col"
+              id={drawerId}
+              ref={drawerRef}
               variants={drawerVariants}
               initial="hidden"
               animate="visible"
@@ -180,6 +197,7 @@ export default function Header() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="mobile-menu-title"
+              tabIndex={-1}
             >
               {/* Drawer Header */}
               <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
@@ -194,10 +212,12 @@ export default function Header() {
                   </span>
                 </div>
                 <motion.button
+                  ref={closeButtonRef}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-full hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors focus-ring"
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors focus-ring"
                   whileTap={{ scale: 0.9 }}
                   aria-label="Close menu"
+                  type="button"
                 >
                   <X size={20} />
                 </motion.button>
@@ -236,7 +256,7 @@ export default function Header() {
                 <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">
                   {language === "cn" ? "语言" : "Language"}
                 </p>
-                <LanguageSelector />
+                <LanguageSelector idBase="drawer-language-selector" />
               </div>
             </motion.div>
           </>

@@ -11,10 +11,10 @@ function ErrorFallback() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] p-6 text-center">
-      <div className="w-16 h-16 mb-4 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+      <div className={`w-16 h-16 mb-4 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center`}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-8 w-8 text-red-500"
+          className="h-8 w-8 text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -27,8 +27,10 @@ function ErrorFallback() {
           />
         </svg>
       </div>
-      <h2 className="text-xl font-bold mb-2">{t("error.boundary.title")}</h2>
-      <p className="text-gray-500 dark:text-gray-400 mb-4">
+      <h2 className="text-xl font-bold mb-2 font-heading tracking-wide text-primary">
+        {t("error.boundary.title")}
+      </h2>
+      <p className="text-muted-foreground mb-4 max-w-md font-mono">
         {t("error.boundary.description")}
       </p>
       <button
@@ -37,7 +39,8 @@ function ErrorFallback() {
             window.location.reload();
           }
         }}
-        className={`px-4 py-2 ${gradientStyles.primaryButton} text-white rounded-full transition-all`}
+        className={`px-4 py-2 ${gradientStyles.primaryButton} transition-all focus-ring`}
+        type="button"
       >
         {t("error.boundary.refresh")}
       </button>

@@ -41,6 +41,12 @@ export function CocktailRecipeSections({
   const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
   const [isToolsExpanded, setIsToolsExpanded] = useState(false);
   const [isStepsExpanded, setIsStepsExpanded] = useState(false);
+  const ingredientsSectionId = "recipe-ingredients-panel";
+  const toolsSectionId = "recipe-tools-panel";
+  const stepsSectionId = "recipe-steps-panel";
+  const ingredientsButtonId = "recipe-ingredients-toggle";
+  const toolsButtonId = "recipe-tools-toggle";
+  const stepsButtonId = "recipe-steps-toggle";
 
   const toggleSection = useCallback((section: "ingredients" | "tools" | "steps") => {
     switch (section) {
@@ -90,8 +96,12 @@ export function CocktailRecipeSections({
           }}
         >
           <button
+            id={ingredientsButtonId}
             className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-primary/20 transition-colors group focus-ring"
             onClick={() => toggleSection("ingredients")}
+            aria-expanded={isIngredientsExpanded}
+            aria-controls={ingredientsSectionId}
+            type="button"
           >
             <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-primary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
               {t("recommendation.ingredients")}
@@ -103,7 +113,12 @@ export function CocktailRecipeSections({
             )}
           </button>
           {isIngredientsExpanded && (
-            <div className="p-5 md:p-6 bg-black/20">
+            <div
+              id={ingredientsSectionId}
+              className="p-5 md:p-6 bg-black/20"
+              role="region"
+              aria-labelledby={ingredientsButtonId}
+            >
               <ul className="divide-y divide-white/5">
                 {cocktail.ingredients?.map((ingredient, index) => (
                   <motion.li
@@ -138,8 +153,12 @@ export function CocktailRecipeSections({
           }}
         >
           <button
+            id={toolsButtonId}
             className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-secondary/20 transition-colors group focus-ring"
             onClick={() => toggleSection("tools")}
+            aria-expanded={isToolsExpanded}
+            aria-controls={toolsSectionId}
+            type="button"
           >
             <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-secondary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
               {t("recommendation.tools")}
@@ -151,7 +170,12 @@ export function CocktailRecipeSections({
             )}
           </button>
           {isToolsExpanded && (
-            <div className="p-5 md:p-6 bg-black/20">
+            <div
+              id={toolsSectionId}
+              className="p-5 md:p-6 bg-black/20"
+              role="region"
+              aria-labelledby={toolsButtonId}
+            >
               <ul className="space-y-4">
                 {cocktail.tools?.map((tool, index) => {
                   const alternative = resolveToolAlternative(tool);
@@ -187,8 +211,12 @@ export function CocktailRecipeSections({
           }}
         >
           <button
+            id={stepsButtonId}
             className="w-full p-5 md:p-6 flex justify-between items-center bg-black/40 hover:bg-accent/20 transition-colors group focus-ring"
             onClick={() => toggleSection("steps")}
+            aria-expanded={isStepsExpanded}
+            aria-controls={stepsSectionId}
+            type="button"
           >
             <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-accent transition-colors drop-shadow-[0_0_5px_currentColor]`}>
               {t("recommendation.steps")}
@@ -200,7 +228,12 @@ export function CocktailRecipeSections({
             )}
           </button>
           {isStepsExpanded && (
-            <div className="p-5 md:p-6 bg-black/20">
+            <div
+              id={stepsSectionId}
+              className="p-5 md:p-6 bg-black/20"
+              role="region"
+              aria-labelledby={stepsButtonId}
+            >
               <ol className="space-y-10">
                 {cocktail.steps?.map((step) => {
                   const localizedStep = getLocalizedStepContent(step);
@@ -387,4 +420,3 @@ export function CocktailRecipeSections({
     </motion.div>
   );
 }
-

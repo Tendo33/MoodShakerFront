@@ -22,12 +22,11 @@ import {
   pulseAnimation,
   useInViewAnimation,
 } from "@/utils/animation-utils";
-import dynamic from "next/dynamic";
-
-const HomeFeatures = dynamic(() => import("./HomeFeatures"), { ssr: false });
-const HomePopular = dynamic(() => import("./HomePopular"), { ssr: false });
+import HomeFeatures from "./HomeFeatures";
+import HomePopular from "./HomePopular";
 import { useImagePreload } from "@/utils/performance-utils";
 import { useAsyncState } from "@/hooks/useAsyncState";
+import type { RecommendationMeta } from "@/lib/cocktail-types";
 
 import { cocktailImages } from "@/utils/cocktail-images";
 
@@ -64,7 +63,7 @@ const SafeImage = React.memo(function SafeImage({
 SafeImage.displayName = "SafeImage";
 
 const Home = React.memo(function Home() {
-  const { t, language } = useLanguage();
+  const { t, language, getPathWithLanguage } = useLanguage();
   const [currentCocktailIndex, setCurrentCocktailIndex] = useState(0);
 
   const shouldAnimate = useDelayedAnimation(100);
@@ -80,15 +79,25 @@ const Home = React.memo(function Home() {
   });
 
   // 检查是否有推荐结果
-  const { data: savedRecommendation } = useAsyncState({
+  const { data: savedRecommendation } = useAsyncState<Record<string, unknown> | null>({
     storageKey: "moodshaker-recommendation",
     defaultValue: null,
     immediate: true,
   });
 
+  const { data: savedRecommendationMeta } = useAsyncState<RecommendationMeta | null>({
+    storageKey: "moodshaker-recommendation-meta",
+    defaultValue: null,
+    immediate: true,
+  });
+
   // 计算会话状态
-  const hasSavedSession = savedAnswers && Object.keys(savedAnswers).length > 0;
-  const hasRecommendation = savedRecommendation !== null;
+  const hasRecommendation =
+    savedRecommendation !== null && savedRecommendationMeta !== null;
+  const hasSavedSession =
+    !hasRecommendation &&
+    savedAnswers !== null &&
+    Object.keys(savedAnswers as Record<string, unknown>).length > 0;
 
   // Featured cocktails for the hero section with translations - 使用 useMemo 优化性能
   interface FeaturedCocktail {
@@ -164,16 +173,17 @@ const Home = React.memo(function Home() {
     return () => clearInterval(interval);
   }, [featuredCocktails.length]);
 
-  // Get paths with language prefix
-  const getPathWithLanguage = (path: string) => {
-    const langPrefix = language === "en" ? "en" : "cn";
-    return `/${langPrefix}${path}`;
-  };
-
   const questionsPath = getPathWithLanguage("/questions");
   const newQuestionPath = getPathWithLanguage("/questions?new=true");
   const galleryPath = getPathWithLanguage("/gallery");
-  const recommendationPath = getPathWithLanguage("/cocktail/recommendation");
+  const recommendationPath =
+    savedRecommendationMeta?.recommendationId
+      ? getPathWithLanguage(
+          `/cocktail/recommendation?id=${encodeURIComponent(
+            savedRecommendationMeta.recommendationId,
+          )}`,
+        )
+      : getPathWithLanguage("/cocktail/recommendation");
   const floatAnimationTarget = floatAnimation as TargetAndTransition;
   const delayedFloatAnimation = (delay: number): TargetAndTransition => ({
     ...floatAnimation,
@@ -192,15 +202,15 @@ const Home = React.memo(function Home() {
       <section className="relative hero-height flex items-center section-spacing pt-16 md:pt-20 lg:pt-24 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
-            className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/30 rounded-full blur-[100px] mix-blend-plus-lighter"
+            className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/18 blur-[72px]"
             animate={floatAnimationTarget}
           />
           <motion.div
-            className="absolute bottom-1/3 left-1/3 w-96 h-96 bg-secondary/30 rounded-full blur-[100px] mix-blend-plus-lighter"
+            className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/18 blur-[72px]"
             animate={delayedFloatAnimation(1)}
           />
           <motion.div
-            className="absolute top-2/3 right-1/3 w-64 h-64 bg-accent/20 rounded-full blur-[80px] mix-blend-plus-lighter"
+            className="absolute top-2/3 right-1/3 h-56 w-56 rounded-full bg-accent/12 blur-[60px]"
             animate={delayedFloatAnimation(2)}
           />
         </div>
@@ -406,9 +416,9 @@ const Home = React.memo(function Home() {
                         >
                           <motion.div
                             className="absolute -inset-8 bg-gradient-to-r from-primary/40 to-secondary/40 rounded-full blur-3xl opacity-60"
-                            animate={pulseGlowAnimation}
-                            transition={{
-                              duration: 3,
+                              animate={pulseGlowAnimation}
+                              transition={{
+                              duration: 4,
                               repeat: Number.POSITIVE_INFINITY,
                               ease: "easeInOut",
                             }}
@@ -429,7 +439,7 @@ const Home = React.memo(function Home() {
                               fill
                               sizes="(max-width: 768px) 100vw, 50vw"
                               priority={index === currentCocktailIndex}
-                              className="object-cover transition duration-700 group-hover:scale-105 group-hover:brightness-125 group-hover:contrast-125 group-hover:sepia-[.2] mix-blend-screen"
+                              className="object-cover opacity-95 transition duration-500 group-hover:scale-[1.03]"
                             />
                             {/* Vaporwave duotone gradient overlay over images */}
                             <div className="absolute inset-0 bg-linear-to-br from-primary/30 to-secondary/30 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-500" />
@@ -539,4 +549,3 @@ const Home = React.memo(function Home() {
 Home.displayName = "Home";
 
 export default Home;
-

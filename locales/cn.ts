@@ -123,6 +123,7 @@ export const cn = {
   "common.loading": "加载中...",
   "common.error": "错误",
   "common.tryAgain": "重试",
+  "common.close": "关闭",
 
   // Error boundary
   "error.boundary.title": "出现了一些问题",
@@ -168,7 +169,7 @@ export const cn = {
   // Gallery
   "gallery.title": "酒单库",
   "gallery.subtitle": "探索由社区创造的独特鸡尾酒配方，每一杯都是一个故事。",
-  "gallery.search.placeholder": "搜索鸡尾酒、成分、口味...",
+  "gallery.search.placeholder": "搜索名称、描述、基酒、风味...",
   "gallery.search.button": "搜索",
   "gallery.filter.button": "筛选",
   "gallery.filter.base": "基酒",

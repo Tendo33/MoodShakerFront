@@ -63,6 +63,7 @@ function useCombinedCocktailContext() {
     userFeedback: form.userFeedback,
     baseSpirits: form.baseSpirits,
     saveAnswer: form.saveAnswer,
+    removeAnswer: form.removeAnswer,
     saveFeedback: form.saveFeedback,
     saveBaseSpirits: form.saveBaseSpirits,
     toggleBaseSpirit: form.toggleBaseSpirit,
@@ -70,6 +71,7 @@ function useCombinedCocktailContext() {
 
     // Result state
     recommendation: result.recommendation,
+    recommendationMeta: result.recommendationMeta,
     imageData: result.imageData,
     isLoading: result.isLoading,
     isImageLoading: result.isImageLoading,

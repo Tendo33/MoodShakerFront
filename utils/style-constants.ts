@@ -7,14 +7,15 @@
 export const gradientStyles = {
   // 主按钮渐变
   primaryButton:
-    "bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-600 hover:to-pink-600",
+    "border-2 border-secondary bg-secondary text-black hover:bg-secondary/90 hover:shadow-[0_0_18px_var(--color-secondary)]",
 
   // 文字渐变
   primaryText:
-    "text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-red-400 to-pink-500",
+    "text-transparent bg-clip-text bg-[linear-gradient(135deg,var(--color-secondary),var(--color-primary),var(--color-accent))]",
 
   // 圆形图标背景
-  iconBackground: "bg-gradient-to-r from-amber-500 to-pink-500",
+  iconBackground:
+    "bg-[linear-gradient(135deg,var(--color-secondary)_0%,var(--color-primary)_58%,var(--color-accent)_100%)] border border-white/10 shadow-[0_0_18px_rgba(0,255,255,0.18)]",
 
   // 工具提示背景
   tooltip: "bg-black/80 text-white",
@@ -23,7 +24,7 @@ export const gradientStyles = {
 // 通用样式组合
 export const commonStyles = {
   // 主按钮完整样式
-  primaryButtonFull: `${gradientStyles.primaryButton} text-white px-6 py-2.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105`,
+  primaryButtonFull: `${gradientStyles.primaryButton} px-6 py-2.5 shadow-lg transition-all duration-300 hover:scale-[1.02]`,
 
   // 圆形图标完整样式
   circleIcon: `flex h-10 w-10 items-center justify-center rounded-full ${gradientStyles.iconBackground} text-white shadow-lg flex-shrink-0`,

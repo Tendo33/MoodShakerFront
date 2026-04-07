@@ -9,9 +9,13 @@ import {
   useRef,
 } from "react";
 import type { ReactNode } from "react";
-import type { Cocktail, BartenderRequest } from "@/lib/cocktail-types";
+import type {
+  BartenderRequest,
+  Cocktail,
+  RecommendationMeta,
+} from "@/lib/cocktail-types";
 import { AgentType } from "@/lib/cocktail-types";
-import { asyncStorage } from "@/utils/asyncStorage";
+import { asyncStorage, removeStorageKeysAsync } from "@/utils/asyncStorage";
 import { useBatchAsyncState } from "@/hooks/useAsyncState";
 import { generateImagePrompt } from "@/api/image";
 import { generateSessionId } from "@/utils/generateId";
@@ -20,9 +24,9 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useCocktailForm } from "@/context/CocktailFormContext";
 import { withTimeout } from "@/utils/withTimeout";
 
-// Storage key constants
 const STORAGE_KEYS = {
   RECOMMENDATION: "moodshaker-recommendation",
+  RECOMMENDATION_META: "moodshaker-recommendation-meta",
   SESSION_ID: "moodshaker-session-id",
   REQUEST: "moodshaker-request",
   IMAGE_DATA: "moodshaker-image-data",
@@ -33,12 +37,9 @@ const IMAGE_PERSIST_DEBOUNCE_MS = 5000;
 const COCKTAIL_REQUEST_TIMEOUT_MS = 90000;
 const COCKTAIL_REQUEST_RETRY_LIMIT = 2;
 
-// ---------------------------------------------------------------------------
-// Context type
-// ---------------------------------------------------------------------------
-
 interface CocktailResultContextType {
   recommendation: Cocktail | null;
+  recommendationMeta: RecommendationMeta | null;
   imageData: string | null;
   isLoading: boolean;
   isImageLoading: boolean;
@@ -56,10 +57,6 @@ const CocktailResultContext = createContext<
   CocktailResultContextType | undefined
 >(undefined);
 
-// ---------------------------------------------------------------------------
-// Provider
-// ---------------------------------------------------------------------------
-
 interface CocktailResultProviderProps {
   children: ReactNode;
 }
@@ -70,7 +67,6 @@ export const CocktailResultProvider = ({
   const { t, language } = useLanguage();
   const { answers, baseSpirits, userFeedback } = useCocktailForm();
 
-  // Persisted result state via batch async storage
   const {
     data: savedData,
     isLoading: isDataLoading,
@@ -78,11 +74,23 @@ export const CocktailResultProvider = ({
     reload: reloadData,
   } = useBatchAsyncState<{
     recommendation: Cocktail | null;
+    recommendationMeta: RecommendationMeta | null;
+    request: BartenderRequest | null;
     imageData: string | null;
   }>([
     {
       key: "recommendation",
       storageKey: STORAGE_KEYS.RECOMMENDATION,
+      defaultValue: null,
+    },
+    {
+      key: "recommendationMeta",
+      storageKey: STORAGE_KEYS.RECOMMENDATION_META,
+      defaultValue: null,
+    },
+    {
+      key: "request",
+      storageKey: STORAGE_KEYS.REQUEST,
       defaultValue: null,
     },
     {
@@ -93,9 +101,9 @@ export const CocktailResultProvider = ({
   ]);
 
   const recommendation = savedData.recommendation || null;
+  const recommendationMeta = savedData.recommendationMeta || null;
   const persistedImageData = savedData.imageData || null;
 
-  // Volatile (non-persisted) state
   const [isLoading, setIsLoading] = useState(false);
   const [isImageLoading, setIsImageLoadingState] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,9 +118,15 @@ export const CocktailResultProvider = ({
     timestamp: 0,
   });
 
-  const imageData = volatileImageData || persistedImageData;
+  const scopedPersistedImageData =
+    recommendation &&
+    recommendationMeta &&
+    String(recommendation.id || "") === recommendationMeta.recommendationId
+      ? persistedImageData
+      : null;
 
-  // ------ helpers ------
+  const imageData =
+    volatileImageData || scopedPersistedImageData || recommendation?.image || null;
 
   const loadSavedData = useCallback(() => {
     reloadData().catch(() => {
@@ -162,20 +176,43 @@ export const CocktailResultProvider = ({
     [estimateDataUrlBytes, updateItem],
   );
 
-  // ------ actions ------
+  const updateRecommendationImage = useCallback(
+    async (
+      baseRecommendation: Cocktail | null,
+      image: string | null,
+      thumbnail?: string | null,
+    ) => {
+      if (!baseRecommendation) {
+        return;
+      }
+
+      await updateItem("recommendation", {
+        ...baseRecommendation,
+        image: image || undefined,
+        thumbnail: thumbnail || baseRecommendation.thumbnail,
+      });
+    },
+    [updateItem],
+  );
 
   const submitRequest = useCallback(
     async (regenerate: boolean = false): Promise<Cocktail> => {
       setIsLoading(true);
       setError(null);
+      setImageError(null);
       setProgressPercentage(0);
       setVolatileImageData(null);
 
       let nextRecommendation: Cocktail | null = null;
+      let nextRecommendationMeta: RecommendationMeta | null = null;
 
       try {
-        const sessionId = generateSessionId();
-        await asyncStorage.setItem(STORAGE_KEYS.SESSION_ID, sessionId);
+        let sessionId =
+          (await asyncStorage.getItem(STORAGE_KEYS.SESSION_ID, "")) || "";
+        if (!sessionId) {
+          sessionId = generateSessionId();
+          await asyncStorage.setItem(STORAGE_KEYS.SESSION_ID, sessionId);
+        }
 
         const request: BartenderRequest = {
           answers,
@@ -186,11 +223,14 @@ export const CocktailResultProvider = ({
             : userFeedback,
         };
 
-        const agentType = answers["1"] === "creative" 
-          ? AgentType.CREATIVE_BARTENDER 
-          : AgentType.CLASSIC_BARTENDER;
+        const agentType =
+          answers["1"] === "creative"
+            ? AgentType.CREATIVE_BARTENDER
+            : AgentType.CLASSIC_BARTENDER;
 
         await asyncStorage.setItem(STORAGE_KEYS.REQUEST, request);
+        await updateItem("request", request);
+        await updateItem("imageData", null);
 
         let cocktailResponse: Response | null = null;
         let lastRequestError: Error | null = null;
@@ -223,14 +263,11 @@ export const CocktailResultProvider = ({
               let errorMessage = t("error.generationFailed");
               try {
                 const errorData = await response.json();
-                if (
-                  typeof errorData?.error === "string" &&
-                  errorData.error.trim()
-                ) {
-                  errorMessage = errorData.error;
+                if (typeof errorData?.error?.message === "string") {
+                  errorMessage = errorData.error.message;
                 }
               } catch {
-                // Ignore non-JSON error payloads
+                // ignore invalid error payloads
               }
 
               const responseError = new Error(errorMessage);
@@ -241,15 +278,16 @@ export const CocktailResultProvider = ({
                 lastRequestError = responseError;
                 continue;
               }
+
               throw responseError;
             }
 
             cocktailResponse = response;
             break;
-          } catch (error) {
+          } catch (requestError) {
             const resolvedError =
-              error instanceof Error
-                ? error
+              requestError instanceof Error
+                ? requestError
                 : new Error(t("error.generationFailed"));
             lastRequestError = resolvedError;
 
@@ -258,7 +296,6 @@ export const CocktailResultProvider = ({
                 attempt,
                 message: resolvedError.message,
               });
-              continue;
             }
           }
         }
@@ -270,31 +307,33 @@ export const CocktailResultProvider = ({
                 ? "Network unstable, showing your last successful recommendation."
                 : "网络不稳定，已为你展示最近一次成功推荐。";
             setError(fallbackMessage);
-            cocktailLogger.warn(
-              "Cocktail request downgraded to cached recommendation",
-            );
             setProgressPercentage(100);
             return recommendation;
           }
           throw lastRequestError || new Error(t("error.generationFailed"));
         }
 
-        const cocktailData = await cocktailResponse.json();
-        nextRecommendation = cocktailData.data;
+        const payload = await cocktailResponse.json();
+        nextRecommendation = payload?.data?.cocktail || null;
+        nextRecommendationMeta = payload?.data?.meta || null;
 
-        if (!nextRecommendation) {
+        if (!nextRecommendation || !nextRecommendationMeta) {
           throw new Error(t("error.invalidData"));
         }
 
-        await updateItem("recommendation", nextRecommendation);
+        nextRecommendation = {
+          ...nextRecommendation,
+          id: nextRecommendationMeta.recommendationId,
+        };
 
-        // Start background image generation (non-blocking)
+        await updateItem("recommendation", nextRecommendation);
+        await updateItem("recommendationMeta", nextRecommendationMeta);
+        await persistImageData(nextRecommendation.image || null, true);
+
         setIsImageLoadingState(true);
-        setImageError(null);
 
         const prompt = generateImagePrompt(nextRecommendation);
-
-        const generateImageTask = async () => {
+        void (async () => {
           try {
             const imageResponse = await withTimeout(
               fetch("/api/image", {
@@ -303,9 +342,9 @@ export const CocktailResultProvider = ({
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                  recommendationId: nextRecommendationMeta?.recommendationId,
+                  editToken: nextRecommendationMeta?.editToken,
                   prompt,
-                  sessionId,
-                  cocktailName: nextRecommendation?.name,
                 }),
               }),
               30000,
@@ -313,57 +352,59 @@ export const CocktailResultProvider = ({
             );
 
             if (!imageResponse.ok) {
-              const errorData = await imageResponse.json();
-              const errorMsg =
+              const errorPayload = await imageResponse.json().catch(() => null);
+              cocktailLogger.warn(
+                "Image generation failed",
+                errorPayload?.error?.message,
+              );
+              setImageError(
                 language === "en"
                   ? "Image generation failed. Using default image."
-                  : "图片生成失败，使用默认图片。";
-              setImageError(errorMsg);
-              cocktailLogger.warn(
-                "图片生成失败，使用默认图片",
-                errorData.error,
+                  : "图片生成失败，使用默认图片。",
               );
               await persistImageData(null, true);
-            } else {
-              const imgData = await imageResponse.json();
-              await persistImageData(imgData.data);
-              setImageError(null);
+              return;
             }
-          } catch (error) {
-            const errorMsg =
+
+            const imagePayload = await imageResponse.json();
+            const nextImage = imagePayload?.data?.image || null;
+            const nextThumbnail = imagePayload?.data?.thumbnail || null;
+            await persistImageData(nextImage, true);
+            await updateRecommendationImage(
+              nextRecommendation,
+              nextImage,
+              nextThumbnail,
+            );
+            setImageError(null);
+          } catch (imageGenerationError) {
+            setImageError(
               language === "en"
-                ? error instanceof Error &&
-                  error.message === "Image generation timeout"
-                  ? "Image generation timed out. Using default image."
-                  : "Image generation failed. Using default image."
-                : error instanceof Error &&
-                    error.message === "Image generation timeout"
-                  ? "图片生成超时，使用默认图片。"
-                  : "图片生成失败，使用默认图片。";
-            setImageError(errorMsg);
-            cocktailLogger.error("后台图片生成出错", error);
+                ? "Image generation failed. Using default image."
+                : "图片生成失败，使用默认图片。",
+            );
+            cocktailLogger.error(
+              "Background image generation failed",
+              imageGenerationError,
+            );
             await persistImageData(null, true);
           } finally {
             setIsImageLoadingState(false);
           }
-        };
-
-        // Fire and forget
-        generateImageTask();
+        })();
 
         setProgressPercentage(100);
         return nextRecommendation;
-      } catch (err) {
+      } catch (submitError) {
         const errorMessage =
-          err instanceof Error
-            ? err.message
+          submitError instanceof Error
+            ? submitError.message
             : "Failed to generate cocktail recommendation.";
         setError(errorMessage);
         cocktailLogger.error(
           "Error generating cocktail recommendation",
-          err,
+          submitError,
         );
-        throw err;
+        throw submitError;
       } finally {
         setIsLoading(false);
       }
@@ -372,11 +413,12 @@ export const CocktailResultProvider = ({
       answers,
       baseSpirits,
       language,
-      userFeedback,
-      updateItem,
       recommendation,
-      persistImageData,
       t,
+      updateItem,
+      userFeedback,
+      persistImageData,
+      updateRecommendationImage,
     ],
   );
 
@@ -389,14 +431,11 @@ export const CocktailResultProvider = ({
     setImageError(null);
 
     try {
-      if (!recommendation) {
+      if (!recommendation || !recommendationMeta) {
         throw new Error("No cocktail recommendation available.");
       }
 
-      const sessionId =
-        (await asyncStorage.getItem(STORAGE_KEYS.SESSION_ID, "")) || "";
       const prompt = generateImagePrompt(recommendation);
-
       const imageResponse = await withTimeout(
         fetch("/api/image", {
           method: "POST",
@@ -404,10 +443,10 @@ export const CocktailResultProvider = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            recommendationId: recommendationMeta.recommendationId,
+            editToken: recommendationMeta.editToken,
             prompt,
-            sessionId,
             forceRefresh: true,
-            cocktailName: recommendation.name,
           }),
         }),
         30000,
@@ -415,58 +454,63 @@ export const CocktailResultProvider = ({
       );
 
       if (!imageResponse.ok) {
-        const errorData = await imageResponse.json();
-        const errorMsg =
-          language === "en"
-            ? "Failed to refresh image. Please try again."
-            : "刷新图片失败，请重试。";
-        setImageError(errorMsg);
-        throw new Error(errorData.error || "Failed to refresh image");
+        const errorPayload = await imageResponse.json().catch(() => null);
+        throw new Error(
+          errorPayload?.error?.message || "Failed to refresh image",
+        );
       }
 
-      const imgData = await imageResponse.json();
-      await persistImageData(imgData.data, true);
-      setImageError(null);
-
-      return imgData.data;
-    } catch (err) {
-      const errorMsg =
+      const payload = await imageResponse.json();
+      const nextImage = payload?.data?.image || null;
+      const nextThumbnail = payload?.data?.thumbnail || null;
+      await persistImageData(nextImage, true);
+      await updateRecommendationImage(recommendation, nextImage, nextThumbnail);
+      return nextImage;
+    } catch (refreshError) {
+      setImageError(
         language === "en"
-          ? err instanceof Error &&
-            err.message === "Image generation timeout"
-            ? "Image refresh timed out. Please try again."
-            : "Failed to refresh image. Please try again."
-          : err instanceof Error &&
-              err.message === "Image generation timeout"
-            ? "图片刷新超时，请重试。"
-            : "刷新图片失败，请重试。";
-      setImageError(errorMsg);
-      cocktailLogger.error("Error refreshing cocktail image", err);
+          ? "Failed to refresh image. Please try again."
+          : "刷新图片失败，请重试。",
+      );
+      cocktailLogger.error("Error refreshing cocktail image", refreshError);
       return null;
     } finally {
       setIsImageLoading(false);
     }
-  }, [recommendation, language, persistImageData, setIsImageLoading]);
+  }, [
+    recommendation,
+    recommendationMeta,
+    language,
+    persistImageData,
+    setIsImageLoading,
+    updateRecommendationImage,
+  ]);
 
   const resetResult = useCallback(async () => {
     try {
+      await removeStorageKeysAsync([
+        STORAGE_KEYS.RECOMMENDATION,
+        STORAGE_KEYS.RECOMMENDATION_META,
+        STORAGE_KEYS.SESSION_ID,
+        STORAGE_KEYS.REQUEST,
+        STORAGE_KEYS.IMAGE_DATA,
+      ]);
       await reloadData();
       setError(null);
+      setImageError(null);
       setProgressPercentage(0);
       setVolatileImageData(null);
       imagePersistenceRef.current = { signature: "", timestamp: 0 };
-      cocktailLogger.debug("Result data reset successfully");
     } catch {
       cocktailLogger.error("Failed to reset result data");
       setError(t("error.resetData"));
     }
   }, [reloadData, t]);
 
-  // ------ memo value ------
-
   const contextValue = useMemo(
     () => ({
       recommendation,
+      recommendationMeta,
       imageData,
       isLoading: isLoading || isDataLoading,
       isImageLoading,
@@ -481,6 +525,7 @@ export const CocktailResultProvider = ({
     }),
     [
       recommendation,
+      recommendationMeta,
       imageData,
       isLoading,
       isDataLoading,
@@ -502,10 +547,6 @@ export const CocktailResultProvider = ({
     </CocktailResultContext.Provider>
   );
 };
-
-// ---------------------------------------------------------------------------
-// Hook
-// ---------------------------------------------------------------------------
 
 export const useCocktailResult = () => {
   const context = useContext(CocktailResultContext);

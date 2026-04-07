@@ -8,23 +8,16 @@ import {
   useMemo,
 } from "react";
 import type { ReactNode } from "react";
-import {
-  clearStorageWithPrefixAsync,
-} from "@/utils/asyncStorage";
+import { removeStorageKeysAsync } from "@/utils/asyncStorage";
 import { useBatchAsyncState } from "@/hooks/useAsyncState";
 import { cocktailLogger } from "@/utils/logger";
 import { useLanguage } from "@/context/LanguageContext";
 
-// Storage key constants
 const STORAGE_KEYS = {
   ANSWERS: "moodshaker-answers",
   FEEDBACK: "moodshaker-feedback",
   BASE_SPIRITS: "moodshaker-base-spirits",
 };
-
-// ---------------------------------------------------------------------------
-// Context type
-// ---------------------------------------------------------------------------
 
 interface CocktailFormContextType {
   answers: Record<string, string>;
@@ -33,9 +26,10 @@ interface CocktailFormContextType {
   isDataLoading: boolean;
   loadSavedData: () => void;
   saveAnswer: (questionId: string, optionId: string) => Promise<void>;
+  removeAnswer: (questionId: string) => Promise<void>;
   saveFeedback: (feedback: string) => Promise<void>;
-  saveBaseSpirits: (spirits: string[]) => void;
-  toggleBaseSpirit: (spiritId: string) => void;
+  saveBaseSpirits: (spirits: string[]) => Promise<void>;
+  toggleBaseSpirit: (spiritId: string) => Promise<void>;
   isQuestionAnswered: (questionId: string) => boolean;
   resetForm: () => Promise<void>;
 }
@@ -43,10 +37,6 @@ interface CocktailFormContextType {
 const CocktailFormContext = createContext<CocktailFormContextType | undefined>(
   undefined,
 );
-
-// ---------------------------------------------------------------------------
-// Provider
-// ---------------------------------------------------------------------------
 
 interface CocktailFormProviderProps {
   children: ReactNode;
@@ -77,26 +67,18 @@ export const CocktailFormProvider = ({
     },
   ]);
 
-  // Derived values
-  const answers = useMemo(
-    () => savedData.answers ?? {},
-    [savedData.answers],
-  );
+  const answers = useMemo(() => savedData.answers ?? {}, [savedData.answers]);
   const userFeedback = savedData.feedback || "";
   const baseSpirits = useMemo(
     () => savedData.baseSpirits ?? [],
     [savedData.baseSpirits],
   );
 
-  // Log data-loading errors once
   useEffect(() => {
-    const errorKeys = Object.keys(dataErrors);
-    if (errorKeys.length > 0) {
+    if (Object.keys(dataErrors).length > 0) {
       cocktailLogger.error("Form data loading error");
     }
   }, [dataErrors]);
-
-  // ------ actions ------
 
   const loadSavedData = useCallback(() => {
     reloadData().catch(() => {
@@ -106,42 +88,50 @@ export const CocktailFormProvider = ({
 
   const saveAnswer = useCallback(
     async (questionId: string, optionId: string) => {
-      const newAnswers = {
-        ...answers,
-        [questionId]: optionId,
-      };
-
       try {
-        await updateItem("answers", newAnswers);
-        cocktailLogger.debug("User answer saved successfully");
+        await updateItem("answers", {
+          ...answers,
+          [questionId]: optionId,
+        });
       } catch {
         cocktailLogger.error("Failed to save answer");
-        const errorMessage = t("error.saveAnswers");
-        throw new Error(errorMessage);
+        throw new Error(t("error.saveAnswers"));
       }
     },
-    [answers, updateItem, t],
+    [answers, t, updateItem],
+  );
+
+  const removeAnswer = useCallback(
+    async (questionId: string) => {
+      const nextAnswers = { ...answers };
+      delete nextAnswers[questionId];
+
+      try {
+        await updateItem("answers", nextAnswers);
+      } catch {
+        cocktailLogger.error("Failed to remove answer");
+        throw new Error(t("error.saveAnswers"));
+      }
+    },
+    [answers, t, updateItem],
   );
 
   const saveFeedback = useCallback(
     async (feedback: string) => {
       try {
         await updateItem("feedback", feedback);
-        cocktailLogger.debug("User feedback saved successfully");
       } catch {
         cocktailLogger.error("Failed to save feedback");
-        const errorMessage = t("error.saveFeedback");
-        throw new Error(errorMessage);
+        throw new Error(t("error.saveFeedback"));
       }
     },
-    [updateItem, t],
+    [t, updateItem],
   );
 
   const saveBaseSpirits = useCallback(
     async (spirits: string[]) => {
       try {
         await updateItem("baseSpirits", spirits);
-        cocktailLogger.debug("Base spirits saved successfully");
       } catch {
         cocktailLogger.error("Failed to save base spirits");
       }
@@ -151,13 +141,12 @@ export const CocktailFormProvider = ({
 
   const toggleBaseSpirit = useCallback(
     async (spiritId: string) => {
-      const updatedSpirits = baseSpirits.includes(spiritId)
+      const nextSpirits = baseSpirits.includes(spiritId)
         ? baseSpirits.filter((id) => id !== spiritId)
         : [...baseSpirits, spiritId];
 
       try {
-        await updateItem("baseSpirits", updatedSpirits);
-        cocktailLogger.debug("Base spirit toggled successfully");
+        await updateItem("baseSpirits", nextSpirits);
       } catch {
         cocktailLogger.error("Failed to toggle base spirit");
       }
@@ -166,21 +155,22 @@ export const CocktailFormProvider = ({
   );
 
   const isQuestionAnswered = useCallback(
-    (questionId: string) => !!answers[questionId],
+    (questionId: string) => Boolean(answers[questionId]),
     [answers],
   );
 
   const resetForm = useCallback(async () => {
     try {
-      await clearStorageWithPrefixAsync("moodshaker-");
+      await removeStorageKeysAsync([
+        STORAGE_KEYS.ANSWERS,
+        STORAGE_KEYS.FEEDBACK,
+        STORAGE_KEYS.BASE_SPIRITS,
+      ]);
       await reloadData();
-      cocktailLogger.debug("Form data reset successfully");
     } catch {
       cocktailLogger.error("Failed to reset form data");
     }
   }, [reloadData]);
-
-  // ------ memo value ------
 
   const contextValue = useMemo(
     () => ({
@@ -190,6 +180,7 @@ export const CocktailFormProvider = ({
       isDataLoading,
       loadSavedData,
       saveAnswer,
+      removeAnswer,
       saveFeedback,
       saveBaseSpirits,
       toggleBaseSpirit,
@@ -203,6 +194,7 @@ export const CocktailFormProvider = ({
       isDataLoading,
       loadSavedData,
       saveAnswer,
+      removeAnswer,
       saveFeedback,
       saveBaseSpirits,
       toggleBaseSpirit,
@@ -217,10 +209,6 @@ export const CocktailFormProvider = ({
     </CocktailFormContext.Provider>
   );
 };
-
-// ---------------------------------------------------------------------------
-// Hook
-// ---------------------------------------------------------------------------
 
 export const useCocktailForm = () => {
   const context = useContext(CocktailFormContext);

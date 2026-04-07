@@ -20,7 +20,7 @@ const CocktailRecommendation = dynamic(
 export async function generateMetadata({
   params,
 }: {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang } = await params;
   const isEnglish = lang === "en";
@@ -38,9 +38,8 @@ import { Suspense } from "react";
 export default async function RecommendationPage({
   params,
 }: {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }) {
-  // Validate language parameter
   const { lang } = await params;
   if (lang !== "en" && lang !== "cn") {
     redirect("/cn/cocktail/recommendation");

@@ -24,9 +24,8 @@ export const metadata: Metadata = {
 export default async function LangHomePage({
   params,
 }: {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }) {
-  // Validate language parameter
   const { lang } = await params;
   if (lang !== "en" && lang !== "cn") {
     redirect("/cn");

@@ -6,13 +6,14 @@ export default async function GalleryPage({
   params,
   searchParams,
 }: {
-  params: { lang: string };
-  searchParams?: {
+  params: Promise<{ lang: string }>;
+  searchParams?: Promise<{
     q?: string | string[];
+    cursor?: string | string[];
     spirit?: string | string[];
     flavor?: string | string[];
     alcohol?: string | string[];
-  };
+  }>;
 }) {
   const { lang } = await params;
 
@@ -25,6 +26,10 @@ export default async function GalleryPage({
     search:
       typeof resolvedSearchParams?.q === "string"
         ? resolvedSearchParams.q
+        : undefined,
+    cursor:
+      typeof resolvedSearchParams?.cursor === "string"
+        ? resolvedSearchParams.cursor
         : undefined,
     spirit:
       typeof resolvedSearchParams?.spirit === "string"
@@ -40,7 +45,25 @@ export default async function GalleryPage({
         : undefined,
   };
 
-  const cocktails = await getGalleryCocktails(filters);
+  const cocktails = await getGalleryCocktails(
+    {
+      search: filters.search,
+      spirit: filters.spirit,
+      flavor: filters.flavor,
+      alcohol: filters.alcohol,
+    },
+    {
+      cursor: filters.cursor,
+      limit: 24,
+    },
+  );
 
-  return <GalleryContent cocktails={cocktails} lang={lang} initialFilters={filters} />;
+  return (
+    <GalleryContent
+      cocktails={cocktails.items}
+      nextCursor={cocktails.nextCursor}
+      lang={lang}
+      initialFilters={filters}
+    />
+  );
 }

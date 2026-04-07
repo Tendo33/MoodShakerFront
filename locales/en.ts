@@ -122,6 +122,7 @@ export const en = {
   "common.loading": "Loading...",
   "common.error": "Error",
   "common.tryAgain": "Try Again",
+  "common.close": "Close",
 
   // Error boundary
   "error.boundary.title": "Something went wrong",
@@ -167,7 +168,7 @@ export const en = {
   // Gallery
   "gallery.title": "The Cellar",
   "gallery.subtitle": "Discover unique cocktail recipes created by the community. Every drink tells a story.",
-  "gallery.search.placeholder": "Search cocktails, ingredients, flavors...",
+  "gallery.search.placeholder": "Search names, descriptions, spirits, flavors...",
   "gallery.search.button": "Search",
   "gallery.filter.button": "Filter",
   "gallery.filter.base": "Base",

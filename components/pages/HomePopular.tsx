@@ -132,7 +132,7 @@ export default function HomePopular() {
                         alt={cocktail.name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                        className="object-cover transition-all duration-600 group-hover:brightness-125 group-hover:contrast-125 group-hover:sepia-[.2] mix-blend-screen"
+                        className="object-cover opacity-95 transition-transform duration-500 group-hover:scale-[1.03]"
                         loading="lazy"
                       />
                     </motion.div>
@@ -155,4 +155,3 @@ export default function HomePopular() {
     </section>
   );
 }
-

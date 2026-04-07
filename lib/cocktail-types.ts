@@ -18,6 +18,11 @@ export enum AgentType {
   CREATIVE_BARTENDER = "creative_bartender",
 }
 
+export enum RecommendationStatus {
+  PRIVATE = "PRIVATE",
+  PUBLISHED = "PUBLISHED",
+}
+
 export interface Ingredient {
   name: string;
   english_name?: string;
@@ -84,6 +89,57 @@ export interface GalleryCocktail {
   ingredients?: Ingredient[];
   image?: string;
   thumbnail?: string;
+}
+
+export interface PublicCocktailSummary {
+  id: string;
+  name: string;
+  english_name?: string;
+  description: string;
+  english_description?: string;
+  base_spirit: string;
+  english_base_spirit?: string;
+  alcohol_level: string;
+  english_alcohol_level?: string;
+  thumbnail?: string;
+}
+
+export interface PublicCocktailDetail extends Cocktail {
+  id: string;
+}
+
+export interface RecommendationMeta {
+  recommendationId: string;
+  editToken: string;
+  sessionId: string;
+}
+
+export interface RecommendationSession {
+  id: string;
+  sessionId: string;
+  editToken: string;
+  language: string;
+  agentType: AgentType;
+  answers: Record<string, string>;
+  baseSpirits: string[];
+  specialRequests?: string;
+  cocktail: Cocktail;
+  image?: string;
+  thumbnail?: string;
+  status: RecommendationStatus;
+  publishedCocktailId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecommendationResponse {
+  cocktail: Cocktail;
+  meta: RecommendationMeta;
+}
+
+export interface PaginatedGalleryResult {
+  items: PublicCocktailSummary[];
+  nextCursor: string | null;
 }
 
 export interface BartenderRequest {
