@@ -7,7 +7,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Image as ImageIcon, Loader2, RefreshCcw } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCocktailResult } from "@/context/CocktailResultContext";
-import type { Cocktail, RecommendationResponse, Tool } from "@/lib/cocktail-types";
+import type { Cocktail, Tool } from "@/lib/cocktail-types";
+import type { RecommendationAccessPayload } from "@/lib/recommendation-access";
 import { CocktailImage } from "@/components/CocktailImage";
 import { cocktailLogger, imageLogger } from "@/utils/logger";
 import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem";
@@ -17,16 +18,42 @@ import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSection
 import { CocktailHero } from "@/components/pages/shared/CocktailHero";
 import { CocktailActions } from "@/components/pages/shared/CocktailActions";
 
-const fetcher = async (url: string) => {
-  const response = await fetch(url, { cache: "no-store" });
+interface RecommendationAccessResponse {
+  data: RecommendationAccessPayload | null;
+  errorCode: string | null;
+}
+
+const recommendationFetcher = async (
+  [recommendationId, editToken]: [string, string],
+): Promise<RecommendationAccessResponse> => {
+  const response = await fetch(
+    `/api/recommendation/${encodeURIComponent(recommendationId)}`,
+    {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ editToken }),
+    },
+  );
+
+  const payload = (await response.json().catch(() => null)) as {
+    data?: RecommendationAccessPayload;
+    error?: { code?: string };
+  } | null;
+
   if (!response.ok) {
-    return null;
+    return {
+      data: null,
+      errorCode: payload?.error?.code || "REQUEST_FAILED",
+    };
   }
 
-  const payload = (await response.json()) as {
-    data?: RecommendationResponse;
+  return {
+    data: payload?.data || null,
+    errorCode: null,
   };
-  return payload.data || null;
 };
 
 const CocktailRecommendation = React.memo(function CocktailRecommendation() {
@@ -64,14 +91,18 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     (!contextCocktail ||
       String(contextCocktail.id || "") !== activeRecommendationId);
 
+  const missingPrivateAccess =
+    Boolean(privateRecommendationId) &&
+    !activeEditToken &&
+    (!contextCocktail ||
+      String(contextCocktail.id || "") !== privateRecommendationId);
+
   const { data: fetchedRecommendation, isLoading: isSWRLoading } =
-    useSWR<RecommendationResponse | null>(
-      shouldFetchPrivateRecommendation
-        ? `/api/recommendation/${encodeURIComponent(
-            activeRecommendationId || "",
-          )}?editToken=${encodeURIComponent(activeEditToken || "")}`
+    useSWR<RecommendationAccessResponse>(
+      shouldFetchPrivateRecommendation && activeRecommendationId && activeEditToken
+        ? [activeRecommendationId, activeEditToken]
         : null,
-      fetcher,
+      recommendationFetcher,
       { revalidateOnFocus: false },
     );
 
@@ -88,8 +119,13 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
       return contextCocktail;
     }
 
-    return fetchedRecommendation?.cocktail || null;
-  }, [activeRecommendationId, contextCocktail, fetchedRecommendation?.cocktail]);
+    return fetchedRecommendation?.data?.cocktail || null;
+  }, [activeRecommendationId, contextCocktail, fetchedRecommendation?.data?.cocktail]);
+
+  const recommendationAccessError =
+    missingPrivateAccess
+      ? "ACCESS_TOKEN_UNAVAILABLE"
+      : fetchedRecommendation?.errorCode || null;
 
   const canEditCurrentRecommendation =
     Boolean(recommendationMeta) &&
@@ -105,7 +141,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const [isRefreshingImage, setIsRefreshingImage] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
 
-  const isBlockingLoading = !cocktail && (isContextLoading || isSWRLoading);
+  const isBlockingLoading =
+    !cocktail &&
+    !recommendationAccessError &&
+    (isContextLoading || isSWRLoading);
 
   const textColorClass = "text-foreground font-mono";
   const cardClasses =
@@ -189,6 +228,20 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   }
 
   if (!cocktail) {
+    const isAccessIssue =
+      recommendationAccessError === "ACCESS_TOKEN_UNAVAILABLE" ||
+      recommendationAccessError === "FORBIDDEN";
+    const title = isAccessIssue
+      ? language === "en"
+        ? "Private recommendation unavailable"
+        : "私有推荐当前不可访问"
+      : t("recommendation.notFound");
+    const description = isAccessIssue
+      ? language === "en"
+        ? "This recommendation can only be reopened from the browser session that created it. Start a new recommendation to continue."
+        : "这个推荐只能在最初生成它的浏览器会话中重新打开。请重新生成一个推荐继续体验。"
+      : t("recommendation.notFoundDesc");
+
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <motion.div
@@ -199,10 +252,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
         >
           <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] pointer-events-none mix-blend-overlay" />
           <h2 className="text-2xl font-black font-heading uppercase tracking-widest text-primary drop-shadow-[0_0_10px_rgba(255,0,255,0.5)] mb-3 relative z-10">
-            {t("recommendation.notFound")}
+            {title}
           </h2>
           <p className="text-foreground font-mono leading-relaxed mb-8 relative z-10 bg-black/40 p-4 border-l-2 border-primary">
-            {t("recommendation.notFoundDesc")}
+            {description}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
             <motion.button

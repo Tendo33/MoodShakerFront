@@ -27,6 +27,7 @@ import HomePopular from "./HomePopular";
 import { useImagePreload } from "@/utils/performance-utils";
 import { useAsyncState } from "@/hooks/useAsyncState";
 import type { RecommendationMeta } from "@/lib/cocktail-types";
+import { hasRecoverableRecommendation } from "@/lib/recommendation-state";
 
 import { cocktailImages } from "@/utils/cocktail-images";
 
@@ -78,13 +79,13 @@ const Home = React.memo(function Home() {
     immediate: true, // 立即加载但不阻塞渲染
   });
 
-  // 检查是否有推荐结果
   const { data: savedRecommendation } = useAsyncState<Record<string, unknown> | null>({
     storageKey: "moodshaker-recommendation",
     defaultValue: null,
     immediate: true,
   });
 
+  // 检查是否有推荐结果
   const { data: savedRecommendationMeta } = useAsyncState<RecommendationMeta | null>({
     storageKey: "moodshaker-recommendation-meta",
     defaultValue: null,
@@ -92,8 +93,11 @@ const Home = React.memo(function Home() {
   });
 
   // 计算会话状态
+  const hasStoredRecommendation = savedRecommendation !== null;
+  const hasRecoverableRemoteRecommendation =
+    hasRecoverableRecommendation(savedRecommendationMeta);
   const hasRecommendation =
-    savedRecommendation !== null && savedRecommendationMeta !== null;
+    hasStoredRecommendation || hasRecoverableRemoteRecommendation;
   const hasSavedSession =
     !hasRecommendation &&
     savedAnswers !== null &&
@@ -177,7 +181,7 @@ const Home = React.memo(function Home() {
   const newQuestionPath = getPathWithLanguage("/questions?new=true");
   const galleryPath = getPathWithLanguage("/gallery");
   const recommendationPath =
-    savedRecommendationMeta?.recommendationId
+    hasRecoverableRemoteRecommendation
       ? getPathWithLanguage(
           `/cocktail/recommendation?id=${encodeURIComponent(
             savedRecommendationMeta.recommendationId,

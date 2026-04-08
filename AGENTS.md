@@ -21,8 +21,9 @@
 - Components use `PascalCase.tsx` (e.g., `CocktailDetailPage.tsx`), hooks use `useX.ts`, contexts use `XContext.tsx`, and route files follow Next.js conventions (`page.tsx`, `layout.tsx`).
 
 ## Testing Guidelines
-- There is no automated test runner configured yet. Validate changes by running `pnpm dev` and checking key flows (questions, gallery, recommendations).
-- If you add tests, document the runner and commands in `README.md` and co-locate tests or use a `tests/` directory.
+- A lightweight automated test runner is configured through `pnpm test`. Use it together with `pnpm lint` and `pnpm build` for baseline verification.
+- There is still no end-to-end runner configured yet. Validate key flows manually in `pnpm dev` or a preview deploy: questions, recommendations, recommendation recovery, gallery, and cocktail detail.
+- If you add broader tests, document the runner and commands in `README.md` and co-locate tests or use a `tests/` directory.
 
 ## Commit & Pull Request Guidelines
 - Commit messages generally use a short type prefix: `feat:`, `refactor:`, `chore:`, `docs:`, and occasional `tinyfix`. Keep them concise and descriptive.

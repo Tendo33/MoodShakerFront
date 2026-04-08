@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { generateImage } from "@/api/openai";
 import { apiError, apiSuccess } from "@/lib/api-response";
-import { consumeRateLimit } from "@/lib/rate-limit";
+import { buildRateLimitHeaders, consumeRateLimit } from "@/lib/rate-limit";
 import { getRecommendationSessionById, updateRecommendationSessionImage } from "@/lib/recommendation-sessions";
 import { validateImageRequest } from "@/lib/request-validation";
 import { imageLogger } from "@/utils/logger";
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const rateLimit = consumeRateLimit(
+    const rateLimit = await consumeRateLimit(
       `image:${recommendationId}`,
       3,
       60 * 1000,
@@ -168,6 +168,7 @@ export async function POST(request: NextRequest) {
         "RATE_LIMITED",
         "Image refresh is happening too frequently. Please wait a moment.",
         429,
+        { headers: buildRateLimitHeaders(rateLimit) },
       );
     }
 
@@ -215,6 +216,7 @@ export async function POST(request: NextRequest) {
         thumbnail: updatedRecommendation.thumbnail || thumbnailImage,
       },
       200,
+      { headers: buildRateLimitHeaders(rateLimit) },
     );
   } catch (error) {
     imageLogger.error(

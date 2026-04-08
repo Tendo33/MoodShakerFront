@@ -12,73 +12,43 @@ An AI-powered bilingual cocktail experience that turns a quick mood check into a
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 
 [![Overview](https://img.shields.io/badge/Overview-What%20it%20does-22c55e?style=flat-square)](#overview)
-[![Screenshots](https://img.shields.io/badge/Screenshots-Preview-f59e0b?style=flat-square)](#screenshots)
+[![Status](https://img.shields.io/badge/Status-Current%20state-f59e0b?style=flat-square)](#current-status)
 [![Quick Start](https://img.shields.io/badge/Quick%20Start-Run%20locally-3b82f6?style=flat-square)](#quick-start)
-[![Architecture](https://img.shields.io/badge/Architecture-How%20it%20works-8b5cf6?style=flat-square)](#architecture)
-[![Deployment](https://img.shields.io/badge/Deployment-Docker-ef4444?style=flat-square)](#deployment)
+[![Deployment](https://img.shields.io/badge/Deployment-Checklist-ef4444?style=flat-square)](#deployment-and-release)
 
 </div>
 
-## Table of Contents
-
-- [MoodShaker Frontend](#moodshaker-frontend)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Why MoodShaker](#why-moodshaker)
-  - [Highlights](#highlights)
-  - [Screenshots](#screenshots)
-    - [Current Screens](#current-screens)
-  - [Demo Flow](#demo-flow)
-  - [Tech Stack](#tech-stack)
-  - [Architecture](#architecture)
-    - [Main Runtime Pieces](#main-runtime-pieces)
-  - [Project Structure](#project-structure)
-  - [Quick Start](#quick-start)
-    - [1. Prerequisites](#1-prerequisites)
-    - [2. Install dependencies](#2-install-dependencies)
-    - [3. Configure environment variables](#3-configure-environment-variables)
-    - [4. Prepare the database](#4-prepare-the-database)
-    - [5. Start the development server](#5-start-the-development-server)
-  - [Environment Variables](#environment-variables)
-  - [Available Scripts](#available-scripts)
-  - [API Endpoints](#api-endpoints)
-  - [Localization](#localization)
-  - [Deployment](#deployment)
-  - [Troubleshooting](#troubleshooting)
-    - [Prisma `P2022`: missing `thumbnail` column](#prisma-p2022-missing-thumbnail-column)
-    - [Recommendation or image API errors](#recommendation-or-image-api-errors)
-  - [Validation](#validation)
-  - [Contributing](#contributing)
-  - [Notes](#notes)
-
 ## Overview
 
-MoodShaker is a bilingual web app for cocktail discovery and recommendation. Instead of searching from a static list, users answer a short mood-based questionnaire and receive a personalized cocktail with ingredients, tools, steps, and a shareable visual card.
+MoodShaker is a bilingual web app for cocktail discovery and recommendation. Instead of browsing a static recipe database first, users answer a short mood-based questionnaire and receive a personalized cocktail with ingredients, tools, steps, and a shareable visual card.
 
-The project is built with Next.js App Router, React 19, TypeScript, Prisma, and a pair of AI endpoints for recommendation and image generation. It also ships with a localized experience for Chinese and English users, a gallery for browsing drinks, and a detail page for exploring each recipe.
+The project is built with Next.js App Router, React 19, TypeScript, Prisma, PostgreSQL, and a pair of AI-backed endpoints for recommendation and image generation. It also ships with a localized experience for Chinese and English users, a gallery for browsing drinks, and a detail page for revisiting recipes.
 
-## Why MoodShaker
+## Current Status
 
-Most cocktail tools are either recipe databases or chat demos. MoodShaker sits somewhere in between: it keeps the interaction lightweight, but still feels like a guided experience.
+### Implementation status
 
-The result is a product flow that is easy to understand:
+- Batch 1 hardening is complete: local verification is restored, private recommendation access no longer puts `editToken` in the URL, unsafe wildcard CORS headers were removed, API 500s were standardized, and shared rate-limit storage was added.
+- Lightweight automated verification is now part of the repo through `pnpm test`.
+- Recommendation recovery is intentionally same-browser-session access. When local edit access is unavailable, the product now shows an explicit unavailable state instead of a silent failure.
 
-- start from mood instead of ingredients
-- generate a drink recommendation with personality
-- enrich the result with image generation
-- keep everything browsable through gallery and detail pages
+### Release status
+
+- Suitable for local development, staging, and controlled beta testing.
+- Not yet recommended for a full production launch.
+
+Formal release blockers are tracked in [docs/release-readiness.md](./docs/release-readiness.md).
 
 ## Highlights
 
 - Two recommendation styles are supported through different bartender personas: `classic_bartender` and `creative_bartender`.
-- Language-aware routing is built in, with `/cn` and `/en` paths plus automatic redirect logic in [`proxy.ts`](./proxy.ts).
-- The full product journey is already connected: landing page, questionnaire, recommendation page, gallery, cocktail details, and share card output.
-- The image flow supports external generation APIs and thumbnail backfill for stored assets.
-- The frontend is organized around reusable components, split contexts, and performance-focused client data handling.
+- Language-aware routing is built in, with `/cn` and `/en` paths plus automatic redirect logic in [proxy.ts](./proxy.ts).
+- The main product flow is connected: landing page, questionnaire, recommendation page, gallery, cocktail details, and share card output.
+- Recommendation access is private by default and requires both the recommendation id and a local edit token.
+- Server responses use stable error codes and generic client-safe 500 messages.
+- Recommendation and image endpoints emit rate-limit headers and can use shared Postgres-backed buckets.
 
 ## Screenshots
-
-### Current Screens
 
 | Home | Questionnaire |
 | --- | --- |
@@ -87,7 +57,6 @@ The result is a product flow that is easy to understand:
 | Gallery | Cocktail Detail |
 | --- | --- |
 | ![Gallery](docs/screenshots/gallery.png) | ![Cocktail Detail](docs/screenshots/cocktail_detail.png) |
-
 
 ## Demo Flow
 
@@ -115,22 +84,23 @@ Landing page
 
 ```mermaid
 flowchart LR
-  A["User"] --> B["Localized App Routes (/cn, /en)"]
-  B --> C["Questionnaire / Gallery / Detail Pages"]
-  C --> D["App API Routes"]
-  D --> E["Chat Recommendation Provider"]
-  D --> F["Image Generation Provider"]
+  A["User"] --> B["Localized app routes (/cn, /en)"]
+  B --> C["Questionnaire / Gallery / Detail pages"]
+  C --> D["App API routes"]
+  D --> E["Cocktail recommendation provider"]
+  D --> F["Image generation provider"]
   D --> G["Prisma Client"]
   G --> H["PostgreSQL"]
-  C --> I["Share Card / Client State / UI Animations"]
+  C --> I["Client persistence / share card / motion UI"]
 ```
 
-### Main Runtime Pieces
+### Main runtime pieces
 
-- App routes live under [`app/[lang]`](./app/%5Blang%5D) and provide the user-facing pages.
-- API handlers live under [`app/api`](./app/api) and coordinate recommendation, detail lookup, and image generation.
-- Shared UI lives in [`components`](./components), while app-wide state is managed in [`context`](./context).
-- Database schema, migrations, seed data, and maintenance scripts are in [`prisma`](./prisma).
+- App routes live under [app/[lang]](./app/%5Blang%5D) and provide the user-facing pages.
+- API handlers live under [app/api](./app/api) and coordinate recommendation generation, detail lookup, image generation, and private recommendation retrieval.
+- Shared UI lives in [components](./components), while app-wide state is managed in [context](./context).
+- Database schema, migrations, seed data, and maintenance scripts are in [prisma](./prisma).
+- Current remediation notes and performance tracking live under [docs](./docs).
 
 ## Project Structure
 
@@ -139,6 +109,7 @@ app/
   api/
     cocktail/
     image/
+    recommendation/
   [lang]/
     page.tsx
     questions/page.tsx
@@ -153,11 +124,13 @@ components/
   ui/
 context/
 docs/
+  plans/
   screenshots/
 lib/
 locales/
 prisma/
 public/
+tests/
 proxy.ts
 ```
 
@@ -174,6 +147,8 @@ proxy.ts
 ```bash
 pnpm install
 ```
+
+`postinstall` runs `prisma generate`, so a clean install should produce a usable Prisma client automatically.
 
 ### 3. Configure environment variables
 
@@ -203,19 +178,19 @@ This command will:
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).  
-Requests to `/` will be redirected to the proper language path, defaulting to `/cn`.
+Open [http://localhost:3000](http://localhost:3000). Requests to `/` are redirected to the proper language path, defaulting to `/cn`.
 
 ## Environment Variables
 
 | Variable | Required | Description |
 | --- | --- | --- |
 | `OPENAI_API_KEY` | Yes | API key for the chat recommendation endpoint |
-| `OPENAI_BASE_URL` | Yes | OpenAI-compatible base URL, such as `https://api.siliconflow.cn/v1/` |
+| `OPENAI_BASE_URL` | Yes | OpenAI-compatible base URL |
 | `OPENAI_MODEL` | Yes | Chat model name |
 | `IMAGE_API_URL` | Yes for image generation | Image generation endpoint |
 | `IMAGE_API_KEY` | Yes for image generation | Image generation API key |
 | `IMAGE_MODEL` | No | Image model name |
+| `IMAGE_FETCH_HOST_ALLOWLIST` | Recommended | Comma-separated host allowlist for server-side image fetch and optimization |
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
 | `HOST_PORT` | Optional | Exposed web port for Docker Compose |
 | `POSTGRES_USER` | Optional | Database username for Docker Compose |
@@ -230,6 +205,7 @@ Requests to `/` will be redirected to the proper language path, defaulting to `/
 | `pnpm build` | Build the production bundle |
 | `pnpm start` | Run the production build |
 | `pnpm lint` | Run ESLint |
+| `pnpm test` | Run the lightweight Node-based regression suite |
 | `pnpm db:init` | Generate Prisma client, apply migrations, and seed data |
 | `pnpm prisma:generate` | Generate Prisma client only |
 | `pnpm prisma:migrate` | Apply Prisma migrations |
@@ -241,29 +217,56 @@ Requests to `/` will be redirected to the proper language path, defaulting to `/
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | `POST` | `/api/cocktail` | Generate a cocktail recommendation from questionnaire input |
-| `GET` | `/api/cocktail/:id` | Fetch a cocktail detail record by id |
-| `POST` | `/api/image` | Generate a cocktail image and optionally persist optimized assets |
+| `GET` | `/api/cocktail/:id` | Fetch a public cocktail detail record by id |
+| `POST` | `/api/image` | Generate or refresh a recommendation image when the caller has edit access |
+| `POST` | `/api/recommendation/:id` | Retrieve a private recommendation by id using an `editToken` in the JSON body |
+
+### Security and behavior notes
+
+- `editToken` is no longer accepted in the URL for private recommendation access.
+- `POST /api/recommendation/:id` returns recommendation metadata without echoing the `editToken`.
+- `POST /api/cocktail` is currently rate-limited by client IP.
+- `POST /api/image` is rate-limited per recommendation id.
+- In production, missing shared rate-limit storage is treated as a deployment error instead of silently falling back forever.
 
 ## Localization
 
 - Supported languages are `cn` and `en`.
-- [`proxy.ts`](./proxy.ts) detects language from the URL, cookie, and `Accept-Language` header.
+- [proxy.ts](./proxy.ts) detects language from the URL, cookie, and `Accept-Language` header.
 - Requests without a language prefix are redirected to a localized route.
-- Translation dictionaries live in [`locales/cn.ts`](./locales/cn.ts) and [`locales/en.ts`](./locales/en.ts).
+- Translation dictionaries live in [locales/cn.ts](./locales/cn.ts) and [locales/en.ts](./locales/en.ts).
 
-## Deployment
+## Deployment And Release
 
 This repository already includes the essentials for containerized deployment:
 
-- [`Dockerfile`](./Dockerfile) for multi-stage image builds
-- [`docker-compose.yml`](./docker-compose.yml) for the web app and PostgreSQL
-- [`scripts/docker-entrypoint.sh`](./scripts/docker-entrypoint.sh) for startup-time schema initialization and seed handling
+- [Dockerfile](./Dockerfile) for multi-stage image builds
+- [docker-compose.yml](./docker-compose.yml) for the web app and PostgreSQL
+- [scripts/docker-entrypoint.sh](./scripts/docker-entrypoint.sh) for startup-time schema initialization and seed handling
 
-Run locally with Docker:
+### Minimum deployment checklist
+
+1. Set all required environment variables.
+2. Run Prisma migrations against the target database.
+3. Verify the `rate_limit_buckets` table exists after deploy.
+4. Run the verification commands:
 
 ```bash
-docker compose up -d
+pnpm test
+pnpm lint
+pnpm build
 ```
+
+5. Run a manual smoke pass:
+   - home -> questions -> recommendation
+   - image generation / refresh
+   - recommendation restore from the same browser session
+   - gallery search and filter
+   - cocktail detail page in both languages
+
+### Current release warning
+
+The project is not yet ready for a full GA release. See [docs/release-readiness.md](./docs/release-readiness.md) before promoting beyond staging or a controlled beta.
 
 ## Troubleshooting
 
@@ -287,31 +290,56 @@ If the database already exists and only migrations are missing, you can also try
 pnpm prisma:migrate
 ```
 
+### Rate limiting fails immediately after deploy
+
+If recommendation or image requests start failing in production after the hardening batch, verify that the latest Prisma migration was applied and that the `rate_limit_buckets` table exists.
+
 ### Recommendation or image API errors
 
 - Check that the keys and URLs in `.env` are correct.
 - Make sure `OPENAI_BASE_URL` points to an OpenAI-compatible endpoint.
-- Inspect the server logs for the handlers under [`app/api`](./app/api).
+- Confirm `IMAGE_FETCH_HOST_ALLOWLIST` includes any remote host you expect the server to fetch for image optimization.
+- Inspect the server logs for the handlers under [app/api](./app/api).
+
+### Private recommendation cannot be reopened
+
+Private recommendation recovery is currently same-browser-session access. If local edit access was cleared, the app will show an explicit unavailable state and ask the user to generate a new recommendation.
 
 ## Validation
 
-There is no dedicated automated test runner configured yet, so the safest baseline checks are:
+The baseline checks for this repository are:
 
 ```bash
+pnpm test
 pnpm lint
 pnpm build
+```
+
+If you install dependencies in an environment where Prisma client generation was skipped, run this once before `pnpm build`:
+
+```bash
+pnpm prisma:generate
 ```
 
 Recommended manual smoke checks:
 
 1. Complete the questionnaire and verify recommendation generation.
-2. Browse the gallery and confirm search or filters still behave correctly.
-3. Open a cocktail detail page and switch languages.
-4. Verify share card generation and download flow if you touch that area.
+2. Refresh the recommendation image and confirm rate-limit feedback behaves correctly.
+3. Reopen a private recommendation from the same browser session.
+4. Confirm a private recommendation without local access shows the unavailable state.
+5. Browse the gallery and confirm search or filters still behave correctly.
+6. Open a cocktail detail page and switch languages.
+7. Verify share card generation and download flow if you touch that area.
+
+## Project Docs
+
+- [docs/release-readiness.md](./docs/release-readiness.md): current staging vs production readiness
+- [docs/performance-baseline.md](./docs/performance-baseline.md): local verification baseline and known bottlenecks
+- [docs/plans/2026-04-07-moodshaker-remediation-implementation-plan.md](./docs/plans/2026-04-07-moodshaker-remediation-implementation-plan.md): remediation plan and current phase status
 
 ## Contributing
 
-If you open a PR, it helps to include:
+If you open a PR, include:
 
 - a short summary of the change
 - linked issue or context, if any
@@ -323,3 +351,4 @@ If you open a PR, it helps to include:
 
 - AI-generated content should be reviewed before real-world use.
 - Do not commit `.env` or any production secret values.
+- Current automated coverage is still lightweight. Treat `pnpm test` as regression support, not a substitute for end-to-end verification.

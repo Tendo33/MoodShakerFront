@@ -24,6 +24,10 @@ export interface ValidatedImageRequest {
   forceRefresh: boolean;
 }
 
+export interface ValidatedRecommendationAccessRequest {
+  editToken: string;
+}
+
 export function validateCocktailRequest(
   input: unknown,
 ): { success: true; data: ValidatedCocktailRequest } | { success: false; message: string } {
@@ -110,6 +114,27 @@ export function validateImageRequest(
       editToken: editToken.trim(),
       prompt: prompt.trim(),
       forceRefresh: Boolean(forceRefresh),
+    },
+  };
+}
+
+export function validateRecommendationAccessRequest(
+  input: unknown,
+): { success: true; data: ValidatedRecommendationAccessRequest } | { success: false; message: string } {
+  if (!isRecord(input)) {
+    return { success: false, message: "Request body must be an object." };
+  }
+
+  const { editToken } = input;
+
+  if (typeof editToken !== "string" || editToken.trim().length === 0) {
+    return { success: false, message: "Edit token is required." };
+  }
+
+  return {
+    success: true,
+    data: {
+      editToken: editToken.trim(),
     },
   };
 }

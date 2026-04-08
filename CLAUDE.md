@@ -10,6 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build` - Build production version
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint code quality checks
+- `pnpm test` - Run the lightweight Node regression suite
 - `pnpm db:init` - Initialize database (generate, migrate, seed)
 
 ### Package Manager
@@ -45,7 +46,8 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
   - `animations/` - Framer Motion animation components
   - `share/` - Social sharing and card generation components
 - `context/` - React Context providers for state management
-  - `CocktailContext.tsx` - Main cocktail recommendation state and logic
+  - `CocktailResultContext.tsx` - Main cocktail recommendation result state and persistence
+  - `CocktailFormContext.tsx` - Questionnaire input state
   - `LanguageContext.tsx` - Internationalization with English/Chinese support
   - `ErrorContext.tsx` - Global error handling
 - `api/` - External API integration modules
@@ -71,6 +73,7 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 - **Context-first**: Uses React Context for global state
 - **LocalStorage persistence**: User progress saved locally
 - **Session management**: Unique session IDs for tracking
+- **Private recommendation access**: Retrieval depends on local edit access, not URL query tokens
 - **Error boundaries**: Global error handling with context
 
 #### AI Integration
@@ -91,11 +94,12 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 
 #### Cocktail Recommendation Process
 
-1. User answers questions → stored in CocktailContext
+1. User answers questions → stored in CocktailFormContext
 2. Form request with preferences → sent to AI service
 3. AI generates cocktail recipe → parsed and validated
-4. Image generated asynchronously → cached locally
-5. Results displayed → saved to localStorage
+4. Recommendation session metadata is persisted locally for same-session recovery
+5. Image generated asynchronously → cached locally
+6. Results displayed → saved to localStorage
 
 #### Language Handling
 
@@ -129,7 +133,7 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 
 #### Build Configuration
 
-- **Next.js config**: CORS headers, image optimization disabled, rewrites for static assets
+- **Next.js config**: image remote patterns and rewrites for static assets
 - **TypeScript**: Strict type checking enabled
 - **ESLint**: Custom rules with React hooks and refresh plugins
 
@@ -137,7 +141,8 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 
 #### Working with the Context System
 
-- CocktailContext manages the entire user journey from questions to results
+- CocktailFormContext manages questionnaire answers and user preference input
+- CocktailResultContext manages recommendation results, recovery, and image refresh state
 - LanguageContext provides translations and path utilities
 - ErrorContext handles global error states and user notifications
 
@@ -153,6 +158,7 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 - Images are generated asynchronously after cocktail recommendations
 - Caching system prevents unnecessary API calls
 - Fallback handling for image generation failures
+- Server-side optimization only runs for allowed remote hosts
 - Version control for image refreshing
 
 #### Performance Considerations
@@ -161,3 +167,4 @@ This project uses `pnpm` as the package manager. All commands should use `pnpm` 
 - Client-side navigation with Next.js App Router
 - Optimized bundle with dynamic imports where needed
 - Image caching and lazy loading patterns
+- Current automated coverage is lightweight. Use `pnpm test`, `pnpm lint`, and `pnpm build` together before claiming a change is ready.

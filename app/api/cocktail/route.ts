@@ -4,7 +4,7 @@ import { cocktailLogger } from "@/utils/logger";
 import { AgentType } from "@/lib/cocktail-types";
 import { generateCocktailRecommendation } from "@/lib/cocktail-generation";
 import { apiError, apiSuccess } from "@/lib/api-response";
-import { consumeRateLimit } from "@/lib/rate-limit";
+import { buildRateLimitHeaders, consumeRateLimit } from "@/lib/rate-limit";
 import { validateCocktailRequest } from "@/lib/request-validation";
 import { createRecommendationSession } from "@/lib/recommendation-sessions";
 
@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
     const { sessionId, language, agentType, answers, baseSpirits, specialRequests } =
       validated.data;
     const ip = getRequestIp(request);
-    const rateLimit = consumeRateLimit(
-      `cocktail:${ip}:${sessionId}`,
+    const rateLimit = await consumeRateLimit(
+      `cocktail:${ip}`,
       4,
       5 * 60 * 1000,
     );
@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
         "RATE_LIMITED",
         "Too many cocktail generation requests. Please try again shortly.",
         429,
+        { headers: buildRateLimitHeaders(rateLimit) },
       );
     }
 
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
         meta,
       },
       200,
+      { headers: buildRateLimitHeaders(rateLimit) },
     );
   } catch (error) {
     const duration = Date.now() - startTime;

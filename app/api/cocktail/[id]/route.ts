@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { getCocktailById } from "@/lib/cocktail-data";
+import { cocktailLogger } from "@/utils/logger";
 
 export async function GET(
   _request: NextRequest,
@@ -20,10 +21,7 @@ export async function GET(
 
     return apiSuccess(cocktail, 200);
   } catch (error) {
-    return apiError(
-      "LOAD_FAILED",
-      error instanceof Error ? error.message : "Failed to load cocktail.",
-      500,
-    );
+    cocktailLogger.error("Failed to load cocktail detail", error);
+    return apiError("LOAD_FAILED", "Failed to load cocktail.", 500);
   }
 }

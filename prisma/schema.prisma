@@ -70,3 +70,14 @@ model RecommendationSession {
   @@index([status, createdAt], name: "idx_recommendation_session_status_created_at")
   @@map("recommendation_sessions")
 }
+
+model RateLimitBucket {
+  key       String   @id
+  count     Int
+  resetAt   DateTime @map("reset_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([resetAt], name: "idx_rate_limit_bucket_reset_at")
+  @@map("rate_limit_buckets")
+}

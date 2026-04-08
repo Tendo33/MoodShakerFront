@@ -5,14 +5,19 @@ export interface ApiErrorShape {
   message: string;
 }
 
-export function apiSuccess<T>(data: T, status: number = 200) {
-  return NextResponse.json({ success: true, data }, { status });
+export function apiSuccess<T>(
+  data: T,
+  status: number = 200,
+  init?: ResponseInit,
+) {
+  return NextResponse.json({ success: true, data }, { status, ...init });
 }
 
 export function apiError(
   code: string,
   message: string,
   status: number,
+  init?: ResponseInit,
 ) {
   return NextResponse.json(
     {
@@ -22,6 +27,6 @@ export function apiError(
         message,
       } satisfies ApiErrorShape,
     },
-    { status },
+    { status, ...init },
   );
 }
