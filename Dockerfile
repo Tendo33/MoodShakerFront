@@ -13,6 +13,9 @@ RUN npm install -g pnpm@10.9.0
 # 复制 package.json 和 pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
+# postinstall 会执行 prisma generate，所以安装依赖前必须先提供 schema
+COPY prisma ./prisma
+
 # 安装依赖
 RUN pnpm install --frozen-lockfile --shamefully-hoist
 
