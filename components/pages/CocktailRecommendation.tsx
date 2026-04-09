@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Image as ImageIcon, Loader2, RefreshCcw } from "lucide-react";
+import { ArrowLeft, RefreshCcw } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCocktailResult } from "@/context/CocktailResultContext";
 import type { Cocktail, Tool } from "@/lib/cocktail-types";
@@ -13,10 +13,11 @@ import { CocktailImage } from "@/components/CocktailImage";
 import { cocktailLogger, imageLogger } from "@/utils/logger";
 import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem";
 import { useLocalizedCocktail } from "@/hooks/useLocalizedCocktail";
-import { CocktailSharePortal } from "@/components/share/CocktailSharePortal";
 import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSections";
 import { CocktailHero } from "@/components/pages/shared/CocktailHero";
 import { CocktailActions } from "@/components/pages/shared/CocktailActions";
+import { RecommendationShareAction } from "@/components/pages/shared/RecommendationShareAction";
+import { RecommendationUnavailableState } from "@/components/pages/shared/RecommendationUnavailableState";
 
 interface RecommendationAccessResponse {
   data: RecommendationAccessPayload | null;
@@ -232,50 +233,21 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
       recommendationAccessError === "ACCESS_TOKEN_UNAVAILABLE" ||
       recommendationAccessError === "FORBIDDEN";
     const title = isAccessIssue
-      ? language === "en"
-        ? "Private recommendation unavailable"
-        : "私有推荐当前不可访问"
+      ? t("recommendation.privateUnavailableTitle")
       : t("recommendation.notFound");
     const description = isAccessIssue
-      ? language === "en"
-        ? "This recommendation can only be reopened from the browser session that created it. Start a new recommendation to continue."
-        : "这个推荐只能在最初生成它的浏览器会话中重新打开。请重新生成一个推荐继续体验。"
+      ? t("recommendation.privateUnavailableDesc")
       : t("recommendation.notFoundDesc");
 
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-          className="text-center py-16 px-8 glass-panel rounded-none border-2 border-primary shadow-[0_0_22px_rgba(255,0,255,0.2)] max-w-md w-full relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] pointer-events-none mix-blend-overlay" />
-          <h2 className="text-2xl font-black font-heading uppercase tracking-widest text-primary drop-shadow-[0_0_10px_rgba(255,0,255,0.5)] mb-3 relative z-10">
-            {title}
-          </h2>
-          <p className="text-foreground font-mono leading-relaxed mb-8 relative z-10 bg-black/40 p-4 border-l-2 border-primary">
-            {description}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-            <motion.button
-              onClick={() => router.push(getPathWithLanguage("/questions?new=true"))}
-              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)] focus-ring"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span aria-hidden="true">↺</span>
-              <span>{language === "en" ? "Start Again" : "重新开始"}</span>
-            </motion.button>
-            <button
-              onClick={handleBack}
-              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-secondary text-secondary transition-all duration-300 hover:bg-secondary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(0,255,255,0.4)] focus-ring"
-            >
-              {t("recommendation.back")}
-            </button>
-          </div>
-        </motion.div>
-      </div>
+      <RecommendationUnavailableState
+        title={title}
+        description={description}
+        backLabel={t("recommendation.back")}
+        restartLabel={t("recommendation.startQuestions")}
+        onBack={handleBack}
+        onRestart={() => router.push(getPathWithLanguage("/questions?new=true"))}
+      />
     );
   }
 
@@ -301,34 +273,16 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             </button>
           </div>
 
-          <CocktailSharePortal
+          <RecommendationShareAction
             cocktail={cocktail}
             imageUrl={
               scopedImageData ||
               cocktail.image ||
               `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`
             }
-          >
-            {({ isGeneratingCard, generateCard }) => (
-              <div className="flex items-center gap-3">
-                <motion.button
-                  onClick={generateCard}
-                  disabled={isGeneratingCard}
-                  className="flex items-center gap-2 px-6 py-3 border-2 border-secondary text-secondary hover:bg-secondary hover:text-black transition-all duration-300 shadow-[0_0_16px_rgba(0,255,255,0.3)] hover:shadow-[0_0_28px_rgba(0,255,255,0.6)] font-mono font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed focus-ring"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label={t("recommendation.saveImage")}
-                >
-                  {isGeneratingCard ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <ImageIcon className="h-5 w-5" />
-                  )}
-                  <span className="font-medium">{t("recommendation.saveImage")}</span>
-                </motion.button>
-              </div>
-            )}
-          </CocktailSharePortal>
+            saveLabel={t("recommendation.saveImage")}
+            shareErrorLabel={t("share.error.generate")}
+          />
         </motion.div>
 
         <CocktailHero

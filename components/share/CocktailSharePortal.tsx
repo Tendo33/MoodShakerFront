@@ -9,6 +9,7 @@ import { ShareModal } from "@/components/share/ShareModal";
 
 interface ShareRenderProps {
   isGeneratingCard: boolean;
+  generationError: string | null;
   generateCard: () => Promise<void>;
 }
 
@@ -26,19 +27,23 @@ export function CocktailSharePortal({
   const cardRef = useRef<HTMLDivElement>(null);
   const [generatedCardUrl, setGeneratedCardUrl] = useState<string | null>(null);
   const [isGeneratingCard, setIsGeneratingCard] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const closeModal = useCallback(() => {
     setIsOpen(false);
     setGeneratedCardUrl(null);
+    setGenerationError(null);
   }, []);
 
   const generateCard = useCallback(async () => {
     if (!cardRef.current) {
+      setGenerationError("Failed to generate share card.");
       return;
     }
 
     setIsGeneratingCard(true);
+    setGenerationError(null);
     try {
       await new Promise((resolve) => setTimeout(resolve, 300));
       const dataUrl = await toPng(cardRef.current, {
@@ -50,6 +55,7 @@ export function CocktailSharePortal({
       setIsOpen(true);
     } catch (error) {
       console.error("Failed to generate card", error);
+      setGenerationError("Failed to generate share card.");
     } finally {
       setIsGeneratingCard(false);
     }
@@ -57,7 +63,7 @@ export function CocktailSharePortal({
 
   return (
     <>
-      {children({ isGeneratingCard, generateCard })}
+      {children({ isGeneratingCard, generationError, generateCard })}
 
       <div style={{ position: "fixed", top: "-9999px", left: "-9999px" }}>
         {cocktail && (

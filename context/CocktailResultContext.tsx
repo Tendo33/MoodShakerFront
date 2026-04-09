@@ -260,10 +260,16 @@ export const CocktailResultProvider = ({
             );
 
             if (!response.ok) {
-              let errorMessage = t("error.generationFailed");
+              let errorMessage =
+                response.status === 503
+                  ? t("error.serviceUnavailable")
+                  : t("error.generationFailed");
               try {
                 const errorData = await response.json();
-                if (typeof errorData?.error?.message === "string") {
+                if (
+                  response.status !== 503 &&
+                  typeof errorData?.error?.message === "string"
+                ) {
                   errorMessage = errorData.error.message;
                 }
               } catch {
@@ -358,9 +364,7 @@ export const CocktailResultProvider = ({
                 errorPayload?.error?.message,
               );
               setImageError(
-                language === "en"
-                  ? "Image generation failed. Using default image."
-                  : "图片生成失败，使用默认图片。",
+                t("share.error.generate"),
               );
               await persistImageData(null, true);
               return;
@@ -377,11 +381,7 @@ export const CocktailResultProvider = ({
             );
             setImageError(null);
           } catch (imageGenerationError) {
-            setImageError(
-              language === "en"
-                ? "Image generation failed. Using default image."
-                : "图片生成失败，使用默认图片。",
-            );
+            setImageError(t("share.error.generate"));
             cocktailLogger.error(
               "Background image generation failed",
               imageGenerationError,

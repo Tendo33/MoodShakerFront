@@ -132,8 +132,8 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
               `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`
             }
           >
-            {({ isGeneratingCard, generateCard }) => (
-              <div className="flex items-center gap-3">
+            {({ isGeneratingCard, generationError, generateCard }) => (
+              <div className="flex flex-col items-end gap-3">
                 <Button
                   onClick={generateCard}
                   disabled={isGeneratingCard}
@@ -150,6 +150,11 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
                 >
                   {t("recommendation.saveImage")}
                 </Button>
+                {generationError && (
+                  <p className="text-sm text-destructive font-mono">
+                    {t("share.error.generate")}
+                  </p>
+                )}
               </div>
             )}
           </CocktailSharePortal>

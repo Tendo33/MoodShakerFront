@@ -1,5 +1,26 @@
 import { AgentType } from "@/lib/cocktail-types";
 
+const MAX_SESSION_ID_LENGTH = 64;
+const MAX_EDIT_TOKEN_LENGTH = 256;
+const MAX_SPECIAL_REQUESTS_LENGTH = 300;
+const MAX_PROMPT_LENGTH = 1600;
+const MAX_BASE_SPIRITS = 5;
+
+const ALLOWED_ANSWER_VALUES: Record<string, readonly string[]> = {
+  "1": ["classic", "creative"],
+  "2": ["light", "medium", "strong", "surprise"],
+  "3": ["beginner", "intermediate", "advanced"],
+};
+
+const ALLOWED_BASE_SPIRITS = new Set([
+  "gin",
+  "rum",
+  "vodka",
+  "whiskey",
+  "tequila",
+  "brandy",
+]);
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -41,12 +62,45 @@ export function validateCocktailRequest(
     return { success: false, message: "Invalid answers payload." };
   }
 
+  if (Object.keys(answers).some((key) => !(key in ALLOWED_ANSWER_VALUES))) {
+    return { success: false, message: "Unexpected answer key." };
+  }
+
+  if (
+    Object.entries(answers).some(([key, value]) => {
+      const normalizedValue = String(value).trim();
+      return !ALLOWED_ANSWER_VALUES[key]?.includes(normalizedValue);
+    })
+  ) {
+    return { success: false, message: "Invalid answer value." };
+  }
+
   if (!isStringArray(baseSpirits)) {
     return { success: false, message: "Base spirits must be a string array." };
   }
 
+  if (baseSpirits.length > MAX_BASE_SPIRITS) {
+    return { success: false, message: "Too many base spirits." };
+  }
+
+  if (
+    baseSpirits.some(
+      (spirit) =>
+        spirit.trim().length === 0 || !ALLOWED_BASE_SPIRITS.has(spirit.trim().toLowerCase()),
+    )
+  ) {
+    return { success: false, message: "Invalid base spirit." };
+  }
+
   if (typeof sessionId !== "string" || sessionId.trim().length === 0) {
     return { success: false, message: "Session id is required." };
+  }
+
+  if (sessionId.trim().length > MAX_SESSION_ID_LENGTH) {
+    return {
+      success: false,
+      message: `Session id must be ${MAX_SESSION_ID_LENGTH} characters or fewer.`,
+    };
   }
 
   if (
@@ -54,6 +108,16 @@ export function validateCocktailRequest(
     typeof specialRequests !== "string"
   ) {
     return { success: false, message: "Special requests must be a string." };
+  }
+
+  if (
+    typeof specialRequests === "string" &&
+    specialRequests.trim().length > MAX_SPECIAL_REQUESTS_LENGTH
+  ) {
+    return {
+      success: false,
+      message: `Special requests must be ${MAX_SPECIAL_REQUESTS_LENGTH} characters or fewer.`,
+    };
   }
 
   if (
@@ -71,9 +135,9 @@ export function validateCocktailRequest(
     success: true,
     data: {
       answers: Object.fromEntries(
-        Object.entries(answers).map(([key, value]) => [key, String(value)]),
+        Object.entries(answers).map(([key, value]) => [key, String(value).trim()]),
       ),
-      baseSpirits,
+      baseSpirits: baseSpirits.map((spirit) => spirit.trim().toLowerCase()),
       sessionId: sessionId.trim(),
       specialRequests: specialRequests?.trim() || undefined,
       agentType,
@@ -99,8 +163,22 @@ export function validateImageRequest(
     return { success: false, message: "Edit token is required." };
   }
 
+  if (editToken.trim().length > MAX_EDIT_TOKEN_LENGTH) {
+    return {
+      success: false,
+      message: `Edit token must be ${MAX_EDIT_TOKEN_LENGTH} characters or fewer.`,
+    };
+  }
+
   if (typeof prompt !== "string" || prompt.trim().length === 0) {
     return { success: false, message: "Prompt is required." };
+  }
+
+  if (prompt.trim().length > MAX_PROMPT_LENGTH) {
+    return {
+      success: false,
+      message: `Prompt must be ${MAX_PROMPT_LENGTH} characters or fewer.`,
+    };
   }
 
   if (forceRefresh !== undefined && typeof forceRefresh !== "boolean") {
@@ -129,6 +207,13 @@ export function validateRecommendationAccessRequest(
 
   if (typeof editToken !== "string" || editToken.trim().length === 0) {
     return { success: false, message: "Edit token is required." };
+  }
+
+  if (editToken.trim().length > MAX_EDIT_TOKEN_LENGTH) {
+    return {
+      success: false,
+      message: `Edit token must be ${MAX_EDIT_TOKEN_LENGTH} characters or fewer.`,
+    };
   }
 
   return {

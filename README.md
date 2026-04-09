@@ -206,6 +206,7 @@ Open [http://localhost:3000](http://localhost:3000). Requests to `/` are redirec
 | `pnpm start` | Run the production build |
 | `pnpm lint` | Run ESLint |
 | `pnpm test` | Run the lightweight Node-based regression suite |
+| `pnpm test:e2e` | Run the Playwright smoke test for the localized home -> questions flow |
 | `pnpm db:init` | Generate Prisma client, apply migrations, and seed data |
 | `pnpm prisma:generate` | Generate Prisma client only |
 | `pnpm prisma:migrate` | Apply Prisma migrations |
@@ -249,15 +250,17 @@ This repository already includes the essentials for containerized deployment:
 1. Set all required environment variables.
 2. Run Prisma migrations against the target database.
 3. Verify the `rate_limit_buckets` table exists after deploy.
-4. Run the verification commands:
+4. Verify the recommendation endpoint returns `503` instead of a generic `500` when shared limiter storage or the primary database is unavailable.
+5. Run the verification commands:
 
 ```bash
 pnpm test
+pnpm test:e2e
 pnpm lint
 pnpm build
 ```
 
-5. Run a manual smoke pass:
+6. Run a manual smoke pass:
    - home -> questions -> recommendation
    - image generation / refresh
    - recommendation restore from the same browser session

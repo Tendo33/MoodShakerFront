@@ -123,6 +123,7 @@ export const en = {
   "common.error": "Error",
   "common.tryAgain": "Try Again",
   "common.close": "Close",
+  "common.unavailable": "Temporarily unavailable",
 
   // Error boundary
   "error.boundary.title": "Something went wrong",
@@ -153,6 +154,8 @@ export const en = {
   "recommendation.browseMore": "Browse More Cocktails",
   "recommendation.notFound": "Cocktail Not Found",
   "recommendation.notFoundDesc": "Sorry, we couldn't find the cocktail you requested",
+  "recommendation.privateUnavailableTitle": "Private recommendation unavailable",
+  "recommendation.privateUnavailableDesc": "This recommendation can only be reopened from the browser session that created it. Start a new recommendation to continue.",
   "recommendation.loading": "Loading cocktail information...",
   "recommendation.imageLoading": "Generating cocktail image...",
   "recommendation.analyzing": "Analyzing your preferences...",
@@ -236,8 +239,16 @@ export const en = {
   "error.saveAnswersProgress": "Error saving answers",
   "error.submitFailed": "Submission failed",
   "error.generationFailed": "Failed to generate cocktail recommendation, please try again later",
+  "error.serviceUnavailable": "Cocktail generation is temporarily unavailable. Please try again shortly.",
   "error.invalidData": "Server returned invalid cocktail data",
   "error.parseFailed": "Failed to parse cocktail data",
+  "error.page.title": "System Error",
+  "error.page.description": "The simulation encountered an unexpected glitch.",
+  "error.page.action": "Reboot",
+  "notFound.title": "404 Not Found",
+  "notFound.description": "The requested data could not be located in the simulation matrix.",
+  "notFound.action": "Return Home",
+  "share.error.generate": "Failed to generate share card. Please try again.",
 } as const;
 
 export type TranslationKey = keyof typeof en;

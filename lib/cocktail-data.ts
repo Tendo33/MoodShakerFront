@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma, type Cocktail as DBCocktail } from "@prisma/client";
+import { DataSourceUnavailableError } from "@/lib/runtime-errors";
 import type {
   Cocktail,
   GalleryCocktail,
@@ -195,6 +196,14 @@ function shouldUseBuildFallback(): boolean {
     !process.env.DATABASE_URL ||
     process.env.DATABASE_URL.includes("placeholder") ||
     process.env.npm_lifecycle_event === "build"
+  );
+}
+
+function createDataSourceUnavailableError(context: string, error: unknown) {
+  const detail = error instanceof Error ? error.message : "Unknown data source error";
+  return new DataSourceUnavailableError(
+    "COCKTAIL_DATA_UNAVAILABLE",
+    `${context} unavailable: ${detail}`,
   );
 }
 
@@ -476,7 +485,7 @@ export async function getAllCocktails(): Promise<Cocktail[]> {
     );
   } catch (error) {
     console.error("Error fetching cocktails from DB:", error);
-    return getPopularCocktailList();
+    throw createDataSourceUnavailableError("Cocktail list", error);
   }
 }
 
@@ -640,7 +649,7 @@ export async function getGalleryCocktails(
     };
   } catch (error) {
     console.error("Error fetching gallery cocktails from DB:", error);
-    return getPopularGalleryPage(filters, options.cursor, limit);
+    throw createDataSourceUnavailableError("Gallery data", error);
   }
 }
 
@@ -673,8 +682,7 @@ export async function getCocktailById(id: string): Promise<Cocktail | null> {
     return getPopularCocktailById(id);
   } catch (error) {
     console.error("Error fetching cocktail from DB:", error);
-    // Fallback to popular cocktails on error
-    return getPopularCocktailById(id);
+    throw createDataSourceUnavailableError("Cocktail detail", error);
   }
 }
 

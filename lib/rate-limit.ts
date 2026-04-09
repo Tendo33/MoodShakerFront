@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { DeploymentDependencyError } from "@/lib/runtime-errors";
 import { createLogger } from "@/utils/logger";
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
@@ -105,6 +106,48 @@ function isRateLimitTableMissingError(error: unknown): boolean {
   );
 }
 
+function isDatabaseUnavailableError(error: unknown): boolean {
+  if (error instanceof Prisma.PrismaClientInitializationError) {
+    return true;
+  }
+
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+
+  const candidate = error as {
+    code?: unknown;
+    message?: unknown;
+  };
+  const message =
+    typeof candidate.message === "string"
+      ? candidate.message.toLowerCase()
+      : "";
+
+  return Boolean(
+    candidate.code === "P1001" ||
+      message.includes("can't reach database server") ||
+      message.includes("connect econnrefused") ||
+      message.includes("connection terminated unexpectedly") ||
+      (message.includes("database server") && message.includes("timed out")),
+  );
+}
+
+export function classifyRateLimitError(error: unknown): {
+  kind: "missing_store" | "database_unavailable" | "unknown";
+  isDeploymentIssue: boolean;
+} {
+  if (isRateLimitTableMissingError(error)) {
+    return { kind: "missing_store", isDeploymentIssue: true };
+  }
+
+  if (isDatabaseUnavailableError(error)) {
+    return { kind: "database_unavailable", isDeploymentIssue: true };
+  }
+
+  return { kind: "unknown", isDeploymentIssue: false };
+}
+
 function summarizeRateLimitError(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
@@ -122,7 +165,7 @@ export function shouldFailClosedOnRateLimitError(
   error: unknown,
   runtimeEnv: string = process.env.NODE_ENV || "development",
 ): boolean {
-  return runtimeEnv === "production" && isRateLimitTableMissingError(error);
+  return runtimeEnv === "production" && classifyRateLimitError(error).isDeploymentIssue;
 }
 
 export function buildRateLimitHeaders(result: RateLimitResult): HeadersInit {
@@ -177,9 +220,11 @@ export async function consumeRateLimit(
       retryAfterMs: current.count <= limit ? 0 : retryAfterMs,
     };
   } catch (error) {
+    const classification = classifyRateLimitError(error);
     const logData = {
       bucketScope: key.split(":")[0] || "unknown",
       error: summarizeRateLimitError(error),
+      kind: classification.kind,
     };
 
     if (shouldFailClosedOnRateLimitError(error)) {
@@ -187,7 +232,14 @@ export async function consumeRateLimit(
         "Shared rate limit storage is unavailable; refusing insecure fallback",
         logData,
       );
-      throw error;
+      throw new DeploymentDependencyError(
+        classification.kind === "missing_store"
+          ? "RATE_LIMIT_STORAGE_UNAVAILABLE"
+          : "DATABASE_UNAVAILABLE",
+        classification.kind === "missing_store"
+          ? "Shared rate limit storage is unavailable."
+          : "Database connection unavailable for shared rate limiting.",
+      );
     }
 
     rateLimitLogger.warn(

@@ -63,11 +63,12 @@ async function getSharpFactory(): Promise<SharpFactory | null> {
   if (!sharpFactoryPromise) {
     sharpFactoryPromise = (async () => {
       try {
-        const dynamicImport = new Function(
-          "moduleName",
-          "return import(moduleName)",
-        ) as (moduleName: string) => Promise<{ default?: SharpFactory }>;
-        const loaded = await dynamicImport("sharp");
+        const sharpModuleName = "sharp";
+        const { createRequire } = await import("node:module");
+        const require = createRequire(import.meta.url);
+        const loaded = require(sharpModuleName) as {
+          default?: SharpFactory;
+        };
         sharpFactory = (loaded.default || loaded) as SharpFactory;
         return sharpFactory;
       } catch {

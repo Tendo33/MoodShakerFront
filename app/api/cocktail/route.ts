@@ -7,6 +7,7 @@ import { apiError, apiSuccess } from "@/lib/api-response";
 import { buildRateLimitHeaders, consumeRateLimit } from "@/lib/rate-limit";
 import { validateCocktailRequest } from "@/lib/request-validation";
 import { createRecommendationSession } from "@/lib/recommendation-sessions";
+import { DeploymentDependencyError } from "@/lib/runtime-errors";
 
 function getRequestIp(request: NextRequest): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -88,6 +89,14 @@ export async function POST(request: NextRequest) {
       `Cocktail request failed [${requestId}] (${duration}ms)`,
       error instanceof Error ? error.message : "Unknown error",
     );
+
+    if (error instanceof DeploymentDependencyError) {
+      return apiError(
+        "SERVICE_UNAVAILABLE",
+        "Cocktail generation is temporarily unavailable while the service is starting up. Please try again shortly.",
+        503,
+      );
+    }
 
     return apiError(
       "COCKTAIL_GENERATION_FAILED",

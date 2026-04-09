@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   buildRateLimitHeaders,
+  classifyRateLimitError,
   shouldFailClosedOnRateLimitError,
 } from "../../lib/rate-limit";
 
@@ -55,4 +56,28 @@ test("shouldFailClosedOnRateLimitError keeps non-production environments on fall
   );
 
   assert.equal(shouldFailClosed, false);
+});
+
+test("classifyRateLimitError marks missing schema as deployment dependency", () => {
+  const classification = classifyRateLimitError({
+    code: "P2010",
+    meta: {
+      code: "42P01",
+      message: 'relation "rate_limit_buckets" does not exist',
+    },
+  });
+
+  assert.equal(classification.kind, "missing_store");
+  assert.equal(classification.isDeploymentIssue, true);
+});
+
+test("classifyRateLimitError marks unreachable database as deployment dependency", () => {
+  const classification = classifyRateLimitError(
+    new Error(
+      "Can't reach database server at ep-aged-water-a4s815nk-pooler.us-east-1.aws.neon.tech:5432",
+    ),
+  );
+
+  assert.equal(classification.kind, "database_unavailable");
+  assert.equal(classification.isDeploymentIssue, true);
 });

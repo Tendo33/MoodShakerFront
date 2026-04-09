@@ -138,38 +138,9 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   // Set custom header for middleware when language changes and sync HTML lang attribute
   useEffect(() => {
     if (isClient && !isLoading) {
-      // Sync HTML lang attribute for CSS variants (e.g. lang-en, lang-zh)
       document.documentElement.lang = language === "en" ? "en" : "zh-CN";
-
-      // This is a client-side effect to help with back navigation
-      // Create a custom event that can be listened to by navigation handlers
-      const event = new CustomEvent("languageChanged", { detail: language });
-      window.dispatchEvent(event);
-
-      // Add event listener for popstate (back/forward navigation)
-      const handlePopState = () => {
-        // When navigating back, we need to check if we should redirect
-        const currentPath = window.location.pathname;
-        const pathLang = extractLanguageFromPathname(currentPath);
-
-        // If there's no language in the path or it's different from current language,
-        // redirect to the correct language path
-        if (
-          !pathLang ||
-          (pathLang !== language &&
-            pathLang !== (language === "en" ? "en" : "cn"))
-        ) {
-          const newPath = getPathWithLanguage(currentPath);
-          window.history.replaceState(null, "", newPath);
-        }
-      };
-
-      window.addEventListener("popstate", handlePopState);
-      return () => {
-        window.removeEventListener("popstate", handlePopState);
-      };
     }
-  }, [language, isLoading, extractLanguageFromPathname, getPathWithLanguage, isClient]);
+  }, [language, isLoading, isClient]);
 
   // Update URL when language changes
   const setLanguage = useCallback(

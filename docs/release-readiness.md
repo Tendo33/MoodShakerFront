@@ -60,7 +60,8 @@ The next hardening layer is still pending:
 
 1. Apply the latest Prisma migrations in the target environment.
 2. Verify the `rate_limit_buckets` table exists.
-3. Run:
+3. Verify the recommendation endpoint degrades to `503 Service Unavailable` if shared limiter storage or the primary database is unavailable.
+4. Run:
 
 ```bash
 pnpm test
@@ -68,10 +69,10 @@ pnpm lint
 pnpm build
 ```
 
-4. Execute a manual smoke pass with real environment variables.
-5. Add at least one end-to-end smoke test for the primary recommendation flow.
-6. Add minimum runtime metrics and alerting.
-7. Re-evaluate release readiness after Batch 2 stabilization.
+5. Execute a manual smoke pass with real environment variables.
+6. Add at least one end-to-end smoke test for the primary recommendation flow.
+7. Add minimum runtime metrics and alerting.
+8. Re-evaluate release readiness after Batch 2 stabilization.
 
 ## Notes
 

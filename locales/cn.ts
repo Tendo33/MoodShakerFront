@@ -124,6 +124,7 @@ export const cn = {
   "common.error": "错误",
   "common.tryAgain": "重试",
   "common.close": "关闭",
+  "common.unavailable": "暂时不可用",
 
   // Error boundary
   "error.boundary.title": "出现了一些问题",
@@ -154,6 +155,8 @@ export const cn = {
   "recommendation.browseMore": "浏览更多酒单",
   "recommendation.notFound": "未找到鸡尾酒",
   "recommendation.notFoundDesc": "抱歉，我们找不到您请求的鸡尾酒",
+  "recommendation.privateUnavailableTitle": "私有推荐当前不可访问",
+  "recommendation.privateUnavailableDesc": "这个推荐只能在最初生成它的浏览器会话中重新打开。请重新生成一个推荐继续体验。",
   "recommendation.loading": "正在加载鸡尾酒信息...",
   "recommendation.imageLoading": "正在生成鸡尾酒图片...",
   "recommendation.analyzing": "正在分析您的偏好...",
@@ -237,8 +240,16 @@ export const cn = {
   "error.saveAnswersProgress": "保存答案时出错",
   "error.submitFailed": "提交失败",
   "error.generationFailed": "生成鸡尾酒推荐失败，请稍后重试",
+  "error.serviceUnavailable": "当前暂时无法生成鸡尾酒推荐，请稍后再试。",
   "error.invalidData": "服务器返回了无效的鸡尾酒数据",
   "error.parseFailed": "无法解析鸡尾酒数据",
+  "error.page.title": "系统错误",
+  "error.page.description": "模拟系统出现了意外故障。",
+  "error.page.action": "重新启动",
+  "notFound.title": "404 未找到",
+  "notFound.description": "请求的数据未能在模拟矩阵中定位到。",
+  "notFound.action": "返回首页",
+  "share.error.generate": "生成分享卡失败，请重试。",
 } as const;
 
 export type TranslationKey = keyof typeof cn;

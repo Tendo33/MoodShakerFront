@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, memo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface WaitingAnimationProps {
@@ -22,6 +22,8 @@ const WaitingAnimation = memo(function WaitingAnimation({
 }: WaitingAnimationProps) {
   const { t } = useLanguage();
   const [animationProgress, setAnimationProgress] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   // Get display text: custom message > translated message > fallback
   const displayMessage = message || t(messageKey) || t("loading.default");
@@ -44,7 +46,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
     };
 
     // Only run internal animation loop if no external progress is provided
-    if (externalProgress === undefined) {
+    if (externalProgress === undefined && !prefersReducedMotion) {
       animationFrame = requestAnimationFrame(updateAnimation);
     }
 
@@ -53,17 +55,37 @@ const WaitingAnimation = memo(function WaitingAnimation({
         cancelAnimationFrame(animationFrame);
       }
     };
-  }, [externalProgress]);
+  }, [externalProgress, prefersReducedMotion]);
+
+  useEffect(() => {
+    if (!isShowing) {
+      return;
+    }
+
+    containerRef.current?.focus();
+  }, [isShowing]);
 
 
   if (!isShowing) return null;
 
   // Use external progress if available, otherwise fallback to internal looping animation
   const currentProgress =
-    externalProgress !== undefined ? externalProgress : animationProgress;
+    externalProgress !== undefined
+      ? externalProgress
+      : prefersReducedMotion
+        ? 50
+        : animationProgress;
 
   const content = (
-    <div className="min-h-screen w-screen bg-black flex items-center justify-center p-6 fixed inset-0 z-[100] overflow-hidden">
+    <div
+      ref={containerRef}
+      className="min-h-screen w-screen bg-black flex items-center justify-center p-6 fixed inset-0 z-[100] overflow-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-live="polite"
+      aria-busy="true"
+      tabIndex={-1}
+    >
       <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] pointer-events-none mix-blend-overlay z-10" />
       <div
         className="absolute inset-0 bg-[linear-gradient(-45deg,rgba(255,0,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,0,255,0.05)_50%,rgba(255,0,255,0.05)_75%,transparent_75%,transparent)] bg-size-[20px_20px] opacity-20"
@@ -77,14 +99,22 @@ const WaitingAnimation = memo(function WaitingAnimation({
         <div className="relative mx-auto w-40 h-40 flex items-center justify-center">
           <motion.div
             className="text-5xl"
-            animate={{
-              scale: [1, 1.05, 1],
-            }}
-            transition={{
-              duration: 2.5,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
-            }}
+            animate={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    scale: [1, 1.05, 1],
+                  }
+            }
+            transition={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    duration: 2.5,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "easeInOut",
+                  }
+            }
           >
             🍸
           </motion.div>
@@ -106,15 +136,23 @@ const WaitingAnimation = memo(function WaitingAnimation({
                 </h2>
                 <motion.p
                   className="text-lg text-secondary font-mono tracking-wider font-bold"
-                  animate={{
-                    opacity: [0.6, 1, 0.6],
-                    textShadow: [
-                      "0 0 5px rgba(0,255,255,0.2)",
-                      "0 0 15px rgba(0,255,255,0.8)",
-                      "0 0 5px rgba(0,255,255,0.2)",
-                    ],
-                  }}
-                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                  animate={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          opacity: [0.6, 1, 0.6],
+                          textShadow: [
+                            "0 0 5px rgba(0,255,255,0.2)",
+                            "0 0 15px rgba(0,255,255,0.8)",
+                            "0 0 5px rgba(0,255,255,0.2)",
+                          ],
+                        }
+                  }
+                  transition={
+                    prefersReducedMotion
+                      ? undefined
+                      : { duration: 2, repeat: Number.POSITIVE_INFINITY }
+                  }
                 >
                   {displaySubtitle}
                 </motion.p>
@@ -143,4 +181,3 @@ const WaitingAnimation = memo(function WaitingAnimation({
 WaitingAnimation.displayName = "WaitingAnimation";
 
 export default WaitingAnimation;
-

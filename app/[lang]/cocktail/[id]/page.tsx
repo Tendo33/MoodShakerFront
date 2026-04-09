@@ -5,6 +5,7 @@ import CocktailDetailPage from "@/components/pages/CocktailDetailPage";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { getCocktailById, getPopularCocktailIds } from "@/lib/cocktail-data";
+import { DataSourceUnavailableError } from "@/lib/runtime-errors";
 
 interface CocktailPageProps {
   params: Promise<{
@@ -63,7 +64,29 @@ export default async function CocktailPage({ params }: CocktailPageProps) {
   }
 
   // Fetch cocktail from DB (or fallback to popular)
-  const cocktail = await getCocktailById(id);
+  let cocktail = null;
+  try {
+    cocktail = await getCocktailById(id);
+  } catch (error) {
+    if (!(error instanceof DataSourceUnavailableError)) {
+      throw error;
+    }
+
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-xl w-full border-2 border-primary/40 bg-black/70 p-8 text-center glass-panel">
+          <h1 className="text-2xl font-heading font-black tracking-widest uppercase text-primary mb-4">
+            {lang === "en" ? "Cocktail detail unavailable" : "鸡尾酒详情暂时不可用"}
+          </h1>
+          <p className="font-mono text-foreground/80 leading-relaxed">
+            {lang === "en"
+              ? "We cannot load this cocktail right now. Please try again shortly."
+              : "当前无法加载这杯酒的详情，请稍后再试。"}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!cocktail) {
     notFound();
