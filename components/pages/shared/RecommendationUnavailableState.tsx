@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/core";
 
 interface RecommendationUnavailableStateProps {
   title: string;
@@ -25,31 +26,24 @@ export function RecommendationUnavailableState({
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-        className="text-center py-16 px-8 glass-panel rounded-none border-2 border-primary shadow-[0_0_22px_rgba(255,0,255,0.2)] max-w-md w-full relative overflow-hidden"
+        className="glass-panel relative w-full max-w-xl overflow-hidden border border-primary/35 px-8 py-14 text-center shadow-[0_20px_48px_rgba(3,0,9,0.32)]"
       >
         <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] pointer-events-none mix-blend-overlay" />
-        <h2 className="text-2xl font-black font-heading uppercase tracking-widest text-primary drop-shadow-[0_0_10px_rgba(255,0,255,0.5)] mb-3 relative z-10">
+        <h2 className="relative z-10 mb-3 text-2xl font-black font-heading uppercase tracking-widest text-primary drop-shadow-[0_0_10px_rgba(255,79,216,0.35)]">
           {title}
         </h2>
-        <p className="text-foreground font-mono leading-relaxed mb-8 relative z-10 bg-black/40 p-4 border-l-2 border-primary">
+        <p className="relative z-10 mx-auto mb-8 max-w-lg border-l-2 border-primary/60 bg-black/35 p-4 font-mono leading-relaxed text-foreground">
           {description}
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-          <motion.button
-            onClick={onRestart}
-            className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)] focus-ring"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span aria-hidden="true">↺</span>
-            <span>{restartLabel}</span>
-          </motion.button>
-          <button
-            onClick={onBack}
-            className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-secondary text-secondary transition-all duration-300 hover:bg-secondary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(0,255,255,0.4)] focus-ring"
-          >
+        <div className="relative z-10 flex flex-col justify-center gap-4 sm:flex-row">
+          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+            <Button onClick={onRestart} variant="secondary" size="lg" effect="glow">
+              {restartLabel}
+            </Button>
+          </motion.div>
+          <Button onClick={onBack} variant="primary" size="lg" effect="lift">
             {backLabel}
-          </button>
+          </Button>
         </div>
       </motion.div>
     </div>

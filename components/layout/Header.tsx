@@ -75,18 +75,20 @@ export default function Header() {
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${
-        isScrolled ? "glass-popup py-2 shadow-[0_8px_32px_rgba(0,0,0,0.6)] border-b border-white/10 before:absolute before:bottom-0 before:left-0 before:w-full before:h-px before:bg-linear-to-r before:from-transparent before:via-primary/30 before:to-transparent" : "bg-transparent py-4"
+        isScrolled
+          ? "glass-popup py-2 shadow-[0_18px_40px_rgba(3,0,9,0.42)] border-b border-white/10 before:absolute before:bottom-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-secondary/30 before:to-transparent"
+          : "bg-transparent py-4"
       }`}
       suppressHydrationWarning
     >
-      <div className="container mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:h-20 md:px-6">
         {/* Logo */}
         <Link
           href={homeLink}
           className="flex items-center gap-3 font-bold text-xl md:text-2xl focus-ring"
         >
           <motion.div
-            className={`w-10 h-10 md:w-12 md:h-12 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center shadow-lg`}
+            className={`flex h-10 w-10 items-center justify-center border border-white/10 shadow-[0_16px_30px_rgba(3,0,9,0.28)] md:h-12 md:w-12 ${gradientStyles.iconBackground}`}
             whileHover={{ scale: 1.1, rotate: 5 }}
             transition={{ duration: 0.2 }}
           >
@@ -103,13 +105,13 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-3">
-          <div className="flex items-center space-x-3">
+        <div className="hidden md:flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <Button
               href={galleryLink}
               variant="outline"
               size="md"
-              effect="glow"
+              effect="lift"
               icon={<Library className="h-4 w-4" />}
             >
               {language === "cn" ? "酒单库" : "Gallery"}
@@ -119,14 +121,14 @@ export default function Header() {
               size="md"
               variant="primary"
               effect="shine"
-              className="shadow-xl hover:shadow-primary/25"
+              className="shadow-xl"
               icon={<Sparkles className="h-4 w-4" />}
             >
               {t("home.start")}
             </Button>
           </div>
 
-          <div className="h-6 w-px bg-white/20 mx-1" />
+          <div className="mx-1 h-7 w-px bg-white/12" />
 
           <LanguageSelector idBase="header-desktop-language-selector" />
         </div>
@@ -137,7 +139,7 @@ export default function Header() {
           <motion.button
             ref={menuButtonRef}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-gray-300 hover:text-white inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 transition-colors focus-ring"
+            className="focus-ring inline-flex min-h-11 min-w-11 items-center justify-center border border-white/10 bg-black/30 text-muted-foreground transition-colors hover:border-secondary/40 hover:bg-white/10 hover:text-foreground"
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
             aria-controls={drawerId}
@@ -187,7 +189,7 @@ export default function Header() {
 
             {/* Drawer Panel */}
             <motion.div
-              className="md:hidden fixed top-0 right-0 bottom-0 z-50 w-72 glass-popup flex flex-col"
+              className="glass-popup fixed top-0 right-0 bottom-0 z-50 flex w-72 flex-col md:hidden"
               id={drawerId}
               ref={drawerRef}
               variants={drawerVariants}
@@ -198,12 +200,12 @@ export default function Header() {
               aria-modal="true"
               aria-labelledby="mobile-menu-title"
               tabIndex={-1}
-            >
+              >
               {/* Drawer Header */}
-              <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+              <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
                 <div className="flex items-center gap-2">
                   <div
-                    className={`w-8 h-8 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center`}
+                    className={`flex h-8 w-8 items-center justify-center border border-white/10 ${gradientStyles.iconBackground}`}
                   >
                     <Martini className="h-4 w-4 text-white" />
                   </div>
@@ -214,7 +216,7 @@ export default function Header() {
                 <motion.button
                   ref={closeButtonRef}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors focus-ring"
+                  className="focus-ring inline-flex min-h-11 min-w-11 items-center justify-center border border-white/10 bg-black/30 text-muted-foreground transition-colors hover:border-secondary/40 hover:bg-white/10 hover:text-foreground"
                   whileTap={{ scale: 0.9 }}
                   aria-label="Close menu"
                   type="button"
@@ -231,7 +233,7 @@ export default function Header() {
                   fullWidth
                   effect="lift"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="justify-start text-base text-white border-white/20 hover:bg-white/10 hover:border-white/40"
+                  className="justify-start text-base"
                   icon={<Library className="h-5 w-5" />}
                 >
                   {language === "cn" ? "酒单库" : "Gallery"}
@@ -244,7 +246,7 @@ export default function Header() {
                   effect="shine"
                   fullWidth
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="shadow-lg text-base mt-2"
+                  className="mt-2 text-base shadow-lg"
                   icon={<Sparkles className="h-5 w-5" />}
                 >
                   {t("home.start")}
@@ -252,8 +254,8 @@ export default function Header() {
               </nav>
 
               {/* Drawer Footer: Language Selector */}
-              <div className="px-6 py-6 border-t border-white/10">
-                <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">
+              <div className="border-t border-white/10 px-6 py-6">
+                <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">
                   {language === "cn" ? "语言" : "Language"}
                 </p>
                 <LanguageSelector idBase="drawer-language-selector" />

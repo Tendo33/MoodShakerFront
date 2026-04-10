@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, RefreshCcw } from "lucide-react";
+import { Button } from "@/components/ui/core";
 
 interface CocktailActionsProps {
   t: (key: string) => string;
@@ -29,37 +30,44 @@ export function CocktailActions({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5, duration: 0.5 }}
     >
-      <button
+      <Button
         onClick={onBack}
-        className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)] focus-ring"
+        variant="outline"
+        size="lg"
+        effect="lift"
+        icon={<ArrowLeft className="h-4 w-4" />}
       >
-        <ArrowLeft className="h-4 w-4" />
-        <span>{t("recommendation.back")}</span>
-      </button>
+        {t("recommendation.back")}
+      </Button>
 
       {onRegenerate && regenerateLabel && (
-        <motion.button
-          onClick={onRegenerate}
-          disabled={isRegenerating}
-          className="flex items-center justify-center gap-2 px-8 py-4 bg-transparent border-2 border-secondary text-secondary hover:bg-secondary hover:text-black transition-all duration-300 shadow-[0_0_16px_rgba(0,255,255,0.3)] hover:shadow-[0_0_28px_rgba(0,255,255,0.6)] font-mono font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale focus-ring"
+        <motion.div
           whileHover={{ scale: isRegenerating ? 1 : 1.05 }}
           whileTap={{ scale: isRegenerating ? 1 : 0.95 }}
         >
-          <span className="text-lg">🎲</span>
-          <span>{regenerateLabel}</span>
-        </motion.button>
+          <Button
+            onClick={onRegenerate}
+            disabled={isRegenerating}
+            variant="primary"
+            size="lg"
+            effect="glow"
+            icon={<RefreshCcw className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`} />}
+          >
+            {regenerateLabel}
+          </Button>
+        </motion.div>
       )}
 
       {onBrowseMore && browseMoreLabel && (
-        <button
+        <Button
           onClick={onBrowseMore}
-          className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)] focus-ring"
+          variant="outline"
+          size="lg"
+          effect="lift"
         >
-          <span className="text-lg">🍹</span>
-          <span>{browseMoreLabel}</span>
-        </button>
+          {browseMoreLabel}
+        </Button>
       )}
     </motion.div>
   );
 }
-

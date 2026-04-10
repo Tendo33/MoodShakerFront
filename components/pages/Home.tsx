@@ -203,7 +203,7 @@ const Home = React.memo(function Home() {
 
   return (
     <div className="bg-background text-foreground">
-      <section className="relative hero-height flex items-center section-spacing pt-16 md:pt-20 lg:pt-24 overflow-hidden">
+      <section className="relative hero-height flex items-center overflow-hidden section-spacing pt-16 md:pt-20 lg:pt-24">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
             className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/18 blur-[72px]"
@@ -220,16 +220,16 @@ const Home = React.memo(function Home() {
         </div>
 
         <Container size="xl">
-          <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
             <motion.div
               initial="hidden"
               animate={shouldAnimate ? "visible" : "hidden"}
               variants={staggerContainerVariants}
               className="content-spacing"
             >
-              <motion.div variants={slideUpVariants} className="mb-6">
-                <div className="inline-flex items-center bg-transparent text-primary border-2 border-primary px-4 py-2 text-sm rounded-none font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(255,0,255,0.4)]">
-                  <Sparkles className="h-4 w-4 mr-2 text-secondary animate-neon-pulse" />
+              <motion.div variants={slideUpVariants} className="mb-4">
+                <div className="glass-subtle inline-flex items-center gap-2 border border-primary/35 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.22em] text-primary shadow-[0_14px_26px_rgba(3,0,9,0.18)]">
+                  <Sparkles className="h-4 w-4 text-secondary animate-neon-pulse" />
                   {language === "en"
                     ? "AI-Powered Cocktail Recommendations"
                     : "AI 驱动的鸡尾酒推荐"}
@@ -237,16 +237,16 @@ const Home = React.memo(function Home() {
               </motion.div>
 
               <motion.h1
-                className="font-heading font-black text-6xl md:text-8xl lang-en:text-6xl lang-en:md:text-8xl leading-none mb-6 text-shadow"
+                className="mb-6 max-w-3xl font-heading text-5xl font-black leading-[0.96] tracking-[0.08em] text-shadow md:text-7xl lg:text-8xl lang-en:text-5xl lang-en:md:text-7xl"
                 variants={slideUpVariants}
               >
-                <GradientText as="span" className="block leading-tight drop-shadow-[0_0_16px_rgba(255,0,255,0.6)]">
+                <GradientText as="span" className="block leading-tight drop-shadow-[0_0_16px_rgba(255,79,216,0.28)]">
                   {t("home.title")}
                 </GradientText>
               </motion.h1>
 
               <motion.p
-                className="text-lg md:text-xl lang-en:text-lg lang-en:md:text-xl text-foreground font-mono leading-relaxed max-w-xl mb-8 tracking-wide drop-shadow-md"
+                className="mb-8 max-w-2xl text-base font-mono leading-relaxed tracking-[0.04em] text-foreground/90 drop-shadow-md md:text-lg lg:text-xl lang-en:text-base lang-en:md:text-lg"
                 variants={slideUpVariants}
               >
                 {t("home.subtitle")}
@@ -254,25 +254,25 @@ const Home = React.memo(function Home() {
 
               {hasRecommendation ? (
                 <motion.div
-                  className="glass-panel p-6 rounded-none border-t-2 border-t-secondary border-b-2 border-b-primary shadow-[0_0_22px_rgba(0,255,255,0.15)] max-w-lg mb-8 relative overflow-hidden"
+                  className="glass-panel relative mb-8 max-w-xl overflow-hidden border border-secondary/30 p-6 shadow-[0_22px_46px_rgba(3,0,9,0.26)]"
                   variants={slideUpVariants}
                 >
                   {/* Decorative Scanline inside card */}
                   <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay"></div>
                   
-                  <div className="flex items-center mb-6 relative z-10">
+                  <div className="relative z-10 mb-6 flex items-center">
                     <motion.div
-                      className="w-12 h-12 bg-black border-2 border-secondary flex items-center justify-center mr-4 shadow-[0_0_15px_var(--color-secondary)] rotate-45 shrink-0"
+                      className="mr-4 flex h-12 w-12 shrink-0 items-center justify-center border border-secondary/45 bg-black/55 shadow-[0_14px_24px_rgba(3,0,9,0.18)] rotate-45"
                       whileHover={{ scale: 1.1, rotate: 90 }}
                       transition={{ duration: 0.3 }}
                     >
                       <Sparkles className="h-6 w-6 text-secondary -rotate-45 group-hover:rotate-0 transition-transform" />
                     </motion.div>
-                    <h3 className="text-xl lang-en:text-lg font-heading font-bold text-secondary tracking-widest lang-en:tracking-wider uppercase drop-shadow-[0_0_5px_rgba(0,255,255,0.8)]">
+                    <h3 className="text-xl font-heading font-bold uppercase tracking-[0.2em] text-secondary lang-en:text-lg">
                       {language === "en" ? "Your Recommendation" : "您的推荐"}
                     </h3>
                   </div>
-                  <p className="mb-8 text-foreground font-mono text-sm lang-en:text-sm leading-relaxed lang-en:leading-normal relative z-10">
+                  <p className="relative z-10 mb-8 text-sm font-mono leading-relaxed text-foreground/84 lang-en:text-sm lang-en:leading-normal">
                     {language === "en"
                       ? "> SYSTEM LOG: Personalized cocktail sequence initialized. View output or explore alternative logic paths."
                       : "> 系统日志：专属鸡尾酒序列已生成，请查看输出或探索替代逻辑路径。"}
@@ -312,24 +312,24 @@ const Home = React.memo(function Home() {
                 </motion.div>
               ) : hasSavedSession ? (
                 <motion.div
-                  className="glass-panel p-6 rounded-none border-t-2 border-t-primary border-b-2 border-b-secondary shadow-[0_0_22px_rgba(255,0,255,0.15)] max-w-lg mb-8 relative overflow-hidden"
+                  className="glass-panel relative mb-8 max-w-xl overflow-hidden border border-primary/30 p-6 shadow-[0_22px_46px_rgba(3,0,9,0.26)]"
                   variants={slideUpVariants}
                 >
                   <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay"></div>
                   
-                  <div className="flex items-center mb-6 relative z-10">
+                  <div className="relative z-10 mb-6 flex items-center">
                     <motion.div
-                      className="w-12 h-12 bg-black border-2 border-primary flex items-center justify-center mr-4 shadow-[0_0_15px_var(--color-primary)] rotate-45 shrink-0"
+                      className="mr-4 flex h-12 w-12 shrink-0 items-center justify-center border border-primary/45 bg-black/55 shadow-[0_14px_24px_rgba(3,0,9,0.18)] rotate-45"
                       whileHover={{ scale: 1.1, rotate: 90 }}
                       transition={{ duration: 0.3 }}
                     >
                       <History className="h-6 w-6 text-primary -rotate-45 group-hover:rotate-0 transition-transform" />
                     </motion.div>
-                    <h3 className="text-xl lang-en:text-lg font-heading font-bold text-primary tracking-widest lang-en:tracking-wider uppercase drop-shadow-[0_0_5px_rgba(255,0,255,0.8)]">
+                    <h3 className="text-xl font-heading font-bold uppercase tracking-[0.2em] text-primary lang-en:text-lg">
                       {t("home.savedSession")}
                     </h3>
                   </div>
-                  <p className="mb-8 text-foreground font-mono text-sm lang-en:text-sm leading-relaxed lang-en:leading-normal relative z-10">
+                  <p className="relative z-10 mb-8 text-sm font-mono leading-relaxed text-foreground/84 lang-en:text-sm lang-en:leading-normal">
                     {t("home.savedSessionDesc")}
                   </p>
                   <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-4 relative z-10">
@@ -397,7 +397,7 @@ const Home = React.memo(function Home() {
             </motion.div>
 
             <motion.div
-              className="relative h-[400px] md:h-[500px] lg:h-[550px]"
+              className="relative h-[400px] md:h-[500px] lg:h-[560px]"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -419,7 +419,7 @@ const Home = React.memo(function Home() {
                           className="block relative h-full group focus-ring"
                         >
                           <motion.div
-                            className="absolute -inset-8 bg-gradient-to-r from-primary/40 to-secondary/40 rounded-full blur-3xl opacity-60"
+                            className="absolute -inset-8 rounded-full bg-gradient-to-r from-primary/30 to-secondary/35 blur-3xl opacity-55"
                               animate={pulseGlowAnimation}
                               transition={{
                               duration: 4,
@@ -427,13 +427,13 @@ const Home = React.memo(function Home() {
                               ease: "easeInOut",
                             }}
                           />
-                          <div className="relative h-full rounded-none overflow-hidden glass-panel border-2 border-secondary/50 shadow-[0_0_22px_rgba(0,255,255,0.2)] group-hover:shadow-[0_0_36px_rgba(0,255,255,0.4)] transition duration-500">
+                          <div className="glass-panel relative h-full overflow-hidden border border-secondary/45 shadow-[0_24px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.1)] transition duration-500 group-hover:border-secondary group-hover:shadow-[0_30px_62px_rgba(3,0,9,0.36),0_0_24px_rgba(93,246,255,0.16)]">
                             {/* Neon Terminal Title Bar overlay */}
-                            <div className="absolute top-0 w-full bg-black/80 border-b-2 border-secondary px-4 py-2 flex items-center gap-2 z-20 backdrop-blur-md mix-blend-hard-light">
+                            <div className="absolute top-0 z-20 flex w-full items-center gap-2 border-b border-secondary/45 bg-black/72 px-4 py-2 backdrop-blur-md">
                               <div className="h-3 w-3 rounded-full bg-primary" />
                               <div className="h-3 w-3 rounded-full bg-secondary" />
                               <div className="h-3 w-3 rounded-full bg-accent" />
-                              <span className="ml-2 font-mono text-[10px] text-secondary tracking-widest uppercase">IMAGE_DATA_RENDER.EXE</span>
+                              <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.24em] text-secondary/90">IMAGE_DATA_RENDER.EXE</span>
                             </div>
                             
                             <SafeImage
@@ -449,18 +449,18 @@ const Home = React.memo(function Home() {
                             <div className="absolute inset-0 bg-linear-to-br from-primary/30 to-secondary/30 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-500" />
                             
                             <motion.div
-                              className="absolute bottom-0 left-0 right-0 p-8 pt-20 bg-gradient-to-t from-black via-black/80 to-transparent backdrop-blur-[2px]"
+                              className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/82 to-transparent p-8 pt-20 backdrop-blur-[2px]"
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.3, duration: 0.5 }}
                             >
-                              <h3 className="text-3xl font-heading font-black text-white mb-1 tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
+                              <h3 className="mb-1 text-3xl font-heading font-black uppercase tracking-[0.16em] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]">
                                 {cocktail.name}
                               </h3>
-                              <p className="text-xs text-secondary font-mono mb-4 tracking-[0.2em] uppercase">
+                              <p className="mb-4 text-xs font-mono uppercase tracking-[0.2em] text-secondary/90">
                                 {cocktail.englishName}
                               </p>
-                              <p className="text-foreground font-mono text-sm mb-6 leading-relaxed bg-black/50 p-3 border-l-2 border-primary">
+                              <p className="mb-6 border-l-2 border-primary/65 bg-black/45 p-3 text-sm font-mono leading-relaxed text-foreground">
                                 {cocktail.description}
                               </p>
 
@@ -468,7 +468,7 @@ const Home = React.memo(function Home() {
                                 {cocktail.tags.map((tag, tagIndex) => (
                                   <div
                                     key={tagIndex}
-                                    className="inline-flex items-center px-3 py-1 text-xs rounded-none font-bold uppercase tracking-wider backdrop-blur-md bg-black/60 text-secondary border border-secondary shadow-[0_0_8px_rgba(0,255,255,0.3)]"
+                                    className="glass-subtle inline-flex items-center border border-secondary/35 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-secondary"
                                   >
                                     {tag}
                                   </div>
@@ -482,15 +482,15 @@ const Home = React.memo(function Home() {
                 )}
               </AnimatePresence>
 
-              <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-3">
+              <div className="absolute -bottom-10 left-1/2 flex -translate-x-1/2 space-x-3">
                 {featuredCocktails.map((_, index) => (
                   <motion.button
                     key={index}
                     onClick={() => setCurrentCocktailIndex(index)}
-                    className={`w-2.5 h-2.5 rounded-full transition duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                    className={`h-2.5 w-2.5 transition duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       index === currentCocktailIndex
-                        ? "bg-primary shadow-[0_0_15px_var(--color-primary)] ring-2 ring-secondary/50 rounded-none scale-110"
-                        : "bg-muted hover:bg-secondary hover:shadow-[0_0_10px_var(--color-secondary)] hover:rounded-none"
+                        ? "scale-110 bg-primary shadow-[0_0_15px_var(--color-primary)] ring-2 ring-secondary/50"
+                        : "bg-muted hover:bg-secondary hover:shadow-[0_0_10px_var(--color-secondary)]"
                     }`}
                     whileHover={{ scale: 1.2, rotate: 45 }}
                     whileTap={{ scale: 0.9 }}
@@ -514,23 +514,23 @@ const Home = React.memo(function Home() {
 
       <section
         ref={ctaRef}
-        className="section-spacing relative bg-[#090014] overflow-hidden border-t-4 border-t-primary"
+        className="section-spacing relative overflow-hidden border-t border-primary/35 bg-[#090014]"
       >
         <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-size-[100%_4px] pointer-events-none z-10"></div>
         <Container size="xl" className="relative z-20">
           <motion.div
-            className="text-center container-narrow glass-panel p-10 md:p-16 border-2 border-secondary shadow-[0_0_36px_rgba(0,255,255,0.15)] rounded-none"
+            className="glass-panel container-narrow border border-secondary/35 p-8 text-center shadow-[0_26px_54px_rgba(3,0,9,0.32),0_0_20px_rgba(93,246,255,0.12)] md:p-14"
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
             animate={ctaInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 50, scale: 0.95 }}
             transition={{ duration: 0.5, ease: "linear" }}
           >
             <GradientText
               as="h2"
-              className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight uppercase"
+              className="mb-6 text-4xl font-black uppercase tracking-[0.08em] md:text-5xl lg:text-6xl"
             >
               {t("home.cta.title")}
             </GradientText>
-            <p className="text-xl text-foreground font-mono leading-relaxed mb-12 tracking-wide uppercase drop-shadow-md">
+            <p className="mb-12 text-lg font-mono leading-relaxed tracking-[0.06em] text-foreground/90 drop-shadow-md md:text-xl">
               {t("home.cta.subtitle")}
             </p>
             <Button

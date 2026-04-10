@@ -181,10 +181,10 @@ export default function LanguageSelector({
           }
           openListbox();
         }}
-        className={`flex min-h-11 items-center gap-2 px-5 py-2.5 text-sm rounded-none font-mono tracking-widest uppercase transition-all duration-300 border-2 focus-ring ${
+        className={`focus-ring flex min-h-11 items-center gap-2 border px-5 py-2.5 text-sm font-mono uppercase tracking-[0.18em] transition-all duration-300 ${
           isOpen
-            ? "bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(255,0,255,0.4)]"
-            : "bg-black/40 border-primary/30 text-primary/80 hover:bg-black/80 hover:border-primary hover:text-primary hover:shadow-[0_0_15px_rgba(255,0,255,0.3)]"
+            ? "border-primary/55 bg-primary/16 text-primary shadow-[0_16px_28px_rgba(3,0,9,0.22)]"
+            : "border-primary/28 bg-black/40 text-primary/80 hover:border-primary/45 hover:bg-black/65 hover:text-primary hover:shadow-[0_16px_28px_rgba(3,0,9,0.18)]"
         }`}
         aria-label={t("language.select")}
         aria-expanded={isOpen}
@@ -197,7 +197,7 @@ export default function LanguageSelector({
       >
         <span className="flex items-center gap-2">
           <Globe className={`h-4 w-4 ${isOpen ? "text-primary drop-shadow-[0_0_5px_currentColor]" : ""}`} />
-          <span className="hidden md:inline text-sm font-bold font-mono tracking-widest drop-shadow-[0_0_5px_currentColor]">
+          <span className="hidden text-sm font-bold font-mono tracking-[0.18em] md:inline">
             {t(language === "en" ? "language.en" : "language.cn")}
           </span>
         </span>
@@ -212,7 +212,7 @@ export default function LanguageSelector({
         {isOpen && (
           <motion.div
             id={listboxId}
-            className="absolute right-0 mt-3 w-48 rounded-none overflow-hidden bg-black/90 backdrop-blur-3xl border-2 border-primary shadow-[0_10px_40px_rgba(255,0,255,0.3)] z-50"
+            className="absolute right-0 z-50 mt-3 w-48 overflow-hidden border border-primary/45 bg-black/90 shadow-[0_24px_48px_rgba(3,0,9,0.34),0_0_18px_rgba(255,79,216,0.16)] backdrop-blur-3xl"
             initial="hidden"
             animate="visible"
             exit="exit"
@@ -221,7 +221,7 @@ export default function LanguageSelector({
             <div className="absolute inset-0 bg-linear-to-b from-white/10 to-transparent pointer-events-none" />
 
             <div className="relative py-2" role="listbox">
-              <div className="px-5 py-2 text-xs font-bold text-primary/70 font-mono uppercase tracking-widest border-b-2 border-primary/30 mb-1">
+              <div className="mb-1 border-b border-primary/30 px-5 py-2 text-xs font-bold font-mono uppercase tracking-[0.18em] text-primary/70">
                 {t("language.select")}
               </div>
 
@@ -231,10 +231,10 @@ export default function LanguageSelector({
                   ref={(element) => {
                     optionRefs.current[index] = element;
                   }}
-                  className={`relative flex items-center justify-between w-full px-5 py-3 text-sm font-mono tracking-widest uppercase transition-all duration-300 group overflow-hidden focus-ring ${
+                  className={`focus-ring group relative flex w-full items-center justify-between overflow-hidden px-5 py-3 text-sm font-mono uppercase tracking-[0.18em] transition-all duration-300 ${
                     language === code
-                      ? "bg-primary/20 text-primary font-bold shadow-[inset_4px_0_0_rgba(255,0,255,1)]"
-                      : "text-primary/70 hover:text-primary hover:bg-black/60 hover:pl-6"
+                      ? "bg-primary/18 font-bold text-primary shadow-[inset_3px_0_0_rgba(255,79,216,1)]"
+                      : "text-primary/70 hover:bg-black/60 hover:pl-6 hover:text-primary"
                   }`}
                   role="option"
                   aria-selected={language === code}

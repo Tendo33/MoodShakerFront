@@ -26,33 +26,40 @@
 
 /* ===== Theme — replaces tailwind.config.ts ===== */
 @theme inline {
-  --color-background: #090014;
-  --color-foreground: #E0E0E0;
-  
-  --color-primary: #FF00FF;
-  --color-primary-foreground: #090014;
-  
-  --color-secondary: #00FFFF;
-  --color-secondary-foreground: #090014;
-  
-  --color-accent: #FF9900;
-  --color-accent-foreground: #090014;
-  
-  --color-muted: rgba(224, 224, 224, 0.5);
-  --color-muted-foreground: rgba(224, 224, 224, 0.7);
+  --color-background: #0b0415;
+  --color-foreground: #f3ebff;
 
-  --color-border: #2D1B4E;
-  --color-input: #000000;
-  --color-ring: #00FFFF;
+  --color-primary: #ff4fd8;
+  --color-primary-foreground: #14031f;
 
-  --color-popover: #1a103c;
-  --color-popover-foreground: #E0E0E0;
-  
-  --color-card: rgba(26, 16, 60, 0.8);
-  --color-card-foreground: #E0E0E0;
+  --color-secondary: #5df6ff;
+  --color-secondary-foreground: #08131b;
 
-  --color-destructive: #FF0000;
-  --color-destructive-foreground: #FFFFFF;
+  --color-accent: #ffb15b;
+  --color-accent-foreground: #201004;
+
+  --color-muted: rgba(219, 209, 239, 0.4);
+  --color-muted-foreground: rgba(219, 209, 239, 0.78);
+
+  --color-border: rgba(145, 112, 214, 0.34);
+  --color-input: rgba(11, 4, 21, 0.78);
+  --color-ring: rgba(93, 246, 255, 0.92);
+
+  --color-popover: rgba(18, 9, 33, 0.96);
+  --color-popover-foreground: #f3ebff;
+
+  --color-card: rgba(20, 10, 38, 0.78);
+  --color-card-foreground: #f3ebff;
+
+  --color-destructive: #ff5b76;
+  --color-destructive-foreground: #fff3f6;
+
+  --surface-strong: rgba(19, 10, 37, 0.9);
+  --surface-soft: rgba(19, 10, 37, 0.72);
+  --surface-glow: rgba(255, 79, 216, 0.18);
+  --surface-glow-cool: rgba(93, 246, 255, 0.16);
+  --surface-stroke: rgba(255, 255, 255, 0.06);
+  --surface-shadow: 0 22px 60px rgba(3, 0, 9, 0.5);
 
   --radius-lg: 0px;
   --radius-md: 0px;
@@ -160,57 +167,20 @@
   opacity: 0.2;
 }
 
-/* Glass Panels (adapted for dark synthwave borders) */
-@utility glass-subtle {
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  background: rgba(26, 16, 60, 0.4);
-  border: 1px solid rgba(255, 0, 255, 0.2);
-  transform: translateZ(0);
-}
-
-@utility glass-panel {
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
-  background: rgba(26, 16, 60, 0.8);
-  border: 1px solid rgba(255, 0, 255, 0.3);
-  border-top: 2px solid #00FFFF;
-  transform: translateZ(0);
-}
-
-@utility glass-popup {
-  -webkit-backdrop-filter: blur(40px);
-  backdrop-filter: blur(40px);
-  background: rgba(9, 0, 20, 0.95);
-  border: 2px solid #00FFFF;
-  box-shadow: 0 0 16px rgba(0, 255, 255, 0.18);
-  transform: translateZ(0);
-}
-
-@utility glass-effect {
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
-  background: rgba(26, 16, 60, 0.8);
-  border: 1px solid rgba(255, 0, 255, 0.3);
-  border-top: 2px solid #00FFFF;
-  transform: translateZ(0);
-  will-change: transform, opacity;
-}
-
 /* Base Design System overwriting defaults via standard variables. We are not using standard HSL palettes for Vaporwave since it uses pure saturation. */
 @layer base {
   :root {
     /* Pure hex values replaced for explicit tailwind generation */
-    --background: #090014;
-    --foreground: #E0E0E0;
-    --card: rgba(26, 16, 60, 0.8);
-    --card-foreground: #00FFFF;
-    --primary: #FF00FF;
-    --primary-foreground: #000000;
-    --secondary: #00FFFF;
-    --secondary-foreground: #000000;
-    --accent: #FF9900;
-    --border: #2D1B4E;
+    --background: #0b0415;
+    --foreground: #f3ebff;
+    --card: rgba(20, 10, 38, 0.78);
+    --card-foreground: #f3ebff;
+    --primary: #ff4fd8;
+    --primary-foreground: #14031f;
+    --secondary: #5df6ff;
+    --secondary-foreground: #08131b;
+    --accent: #ffb15b;
+    --border: rgba(145, 112, 214, 0.34);
     --radius: 0px; /* Zero radius for aggressive geometric edges */
   }
 
@@ -226,11 +196,15 @@
     border-color: var(--color-border);
   }
   body, html {
-    background-color: var(--color-background);
+    background:
+      radial-gradient(circle at top left, rgba(255, 79, 216, 0.13), transparent 30%),
+      radial-gradient(circle at top right, rgba(93, 246, 255, 0.1), transparent 28%),
+      linear-gradient(180deg, #120322 0%, var(--color-background) 22%, #080212 100%);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-family: var(--font-mono);
+    min-height: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -252,6 +226,11 @@
       font-size: 16px !important;
     }
   }
+
+  ::selection {
+    background: rgba(255, 79, 216, 0.22);
+    color: var(--color-foreground);
+  }
 }
 
 /* ===== Scrollbar ===== */
@@ -265,25 +244,29 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted) / 0.2);
+  background: rgba(219, 209, 239, 0.24);
   border-radius: 10px;
   transition: background-color 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted) / 0.4);
+  background: rgba(219, 209, 239, 0.42);
 }
 
 /* ===== Component Styles ===== */
 .card-hover {
-  transition: all 0.2s linear;
+  transition:
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.32s ease,
+    background-color 0.32s ease;
 }
 
 .card-hover:hover {
-  transform: translateY(-6px);
+  transform: translateY(-8px);
   box-shadow:
-    0 0 14px var(--color-secondary),
-    0 0 24px rgba(0, 255, 255, 0.18);
+    0 16px 38px rgba(3, 0, 9, 0.32),
+    0 0 18px rgba(93, 246, 255, 0.18);
   border-color: var(--color-secondary);
 }
 
@@ -303,9 +286,10 @@
 
 .gradient-text-bright {
   background: linear-gradient(
-    to bottom,
-    var(--color-secondary),
-    var(--color-primary)
+    180deg,
+    #f8fbff 0%,
+    var(--color-secondary) 22%,
+    var(--color-primary) 100%
   );
   background-clip: text;
   -webkit-background-clip: text;
@@ -334,11 +318,11 @@
 
 /* ===== Spacing Utilities (@apply outside @layer works in v4) ===== */
 .section-spacing {
-  @apply py-16 md:py-24 lg:py-32;
+  @apply py-14 md:py-20 lg:py-28;
 }
 
 .content-spacing {
-  @apply space-y-8 md:space-y-12 lg:space-y-16;
+  @apply space-y-6 md:space-y-10 lg:space-y-12;
 }
 
 .card-spacing {
@@ -360,10 +344,10 @@
   }
 
   .section-spacing {
-    @apply py-12;
+    @apply py-10;
   }
   .content-spacing {
-    @apply space-y-6;
+    @apply space-y-5;
   }
   .card-spacing {
     @apply p-5;
@@ -403,11 +387,65 @@
 }
 
 .focus-ring {
-  @apply focus:outline-none focus:ring-1 focus:ring-secondary/90 focus:ring-offset-2 focus:ring-offset-background;
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/90 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  box-shadow: 0 0 0 0 rgba(93, 246, 255, 0);
 }
 
 .page-transition {
   transition: all 0.2s linear;
+}
+
+.glass-subtle {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
+    var(--surface-soft);
+  border: 1px solid var(--surface-stroke);
+  box-shadow: var(--surface-shadow);
+  transform: translateZ(0);
+}
+
+.glass-panel {
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 24%),
+    linear-gradient(135deg, rgba(255, 79, 216, 0.08), transparent 44%),
+    var(--surface-soft);
+  border: 1px solid var(--surface-stroke);
+  border-top: 1px solid rgba(93, 246, 255, 0.52);
+  box-shadow:
+    var(--surface-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transform: translateZ(0);
+}
+
+.glass-popup {
+  -webkit-backdrop-filter: blur(28px);
+  backdrop-filter: blur(28px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 28%),
+    rgba(14, 7, 26, 0.95);
+  border: 1px solid rgba(93, 246, 255, 0.4);
+  box-shadow:
+    0 24px 60px rgba(3, 0, 9, 0.6),
+    0 0 24px rgba(93, 246, 255, 0.12);
+  transform: translateZ(0);
+}
+
+.glass-effect {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 26%),
+    linear-gradient(135deg, rgba(255, 79, 216, 0.06), transparent 48%),
+    var(--surface-strong);
+  border: 1px solid var(--surface-stroke);
+  border-top: 1px solid rgba(93, 246, 255, 0.35);
+  box-shadow: var(--surface-shadow);
+  transform: translateZ(0);
+  will-change: transform, opacity;
 }
 
 /* Reduced motion: minimize heavy animations and transitions */

@@ -51,6 +51,9 @@ export default function GalleryContent({
   );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterPanelId = useId();
+  const activeFilterCount =
+    [selectedSpirit, selectedFlavor, selectedAlcohol].filter(Boolean).length +
+    (searchQuery.trim() ? 1 : 0);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -155,12 +158,12 @@ export default function GalleryContent({
         <div className="absolute bottom-[-8%] right-[-8%] h-[28%] w-[28%] rounded-full bg-secondary/8 blur-[110px] animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-16">
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <div className="mb-14 text-center md:mb-16">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <GradientText
               as="h1"
-              className="text-4xl md:text-6xl lg:text-7xl mb-6 tracking-widest uppercase drop-shadow-[0_0_15px_rgba(255,0,255,0.6)]"
+              className="mb-6 text-4xl uppercase tracking-[0.16em] drop-shadow-[0_0_14px_rgba(255,79,216,0.28)] md:text-6xl lg:text-7xl"
             >
               {t("gallery.title")}
             </GradientText>
@@ -169,9 +172,19 @@ export default function GalleryContent({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-mono tracking-wide leading-relaxed"
+            className="mx-auto max-w-2xl text-base font-mono leading-relaxed tracking-[0.04em] text-muted-foreground md:text-lg"
           >
             {t("gallery.subtitle")}
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="mt-4 text-xs font-mono uppercase tracking-[0.22em] text-foreground/55 md:text-sm"
+          >
+            {lang === "en"
+              ? `${renderableCocktails.length} cocktails in view`
+              : `当前展示 ${renderableCocktails.length} 款鸡尾酒`}
           </motion.p>
         </div>
 
@@ -181,9 +194,9 @@ export default function GalleryContent({
           transition={{ delay: 0.3 }}
           className="sticky top-24 z-30 mb-10"
         >
-          <div className="glass-panel border-2 border-primary/40 rounded-none p-3 shadow-[0_0_25px_rgba(255,0,255,0.2)] backdrop-blur-3xl max-w-3xl mx-auto transition-all duration-300 hover:border-primary hover:shadow-[0_0_35px_rgba(255,0,255,0.35)]">
-            <div className="flex flex-col md:flex-row gap-3 items-center">
-              <div className="flex-1 w-full relative group">
+          <div className="glass-panel mx-auto max-w-4xl border border-primary/30 p-3 shadow-[0_24px_48px_rgba(3,0,9,0.3),0_0_18px_rgba(255,79,216,0.12)] backdrop-blur-3xl transition-all duration-300 hover:border-primary/50">
+            <div className="flex flex-col items-center gap-3 md:flex-row">
+              <div className="group relative w-full flex-1">
                 <label htmlFor="gallery-search" className="sr-only">
                   {t("gallery.search.placeholder")}
                 </label>
@@ -193,7 +206,7 @@ export default function GalleryContent({
                 <input
                   type="text"
                   id="gallery-search"
-                  className="block w-full pl-11 pr-8 py-3 bg-black/40 border-2 border-primary/30 rounded-none text-foreground placeholder-muted-foreground focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/40 transition-all text-sm shadow-inner"
+                  className="block w-full border border-primary/30 bg-black/40 py-3 pl-11 pr-10 text-sm text-foreground shadow-inner transition-all placeholder:text-muted-foreground focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
                   placeholder={t("gallery.search.placeholder")}
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
@@ -212,14 +225,14 @@ export default function GalleryContent({
                 )}
               </div>
 
-              <div className="flex gap-2 w-full md:w-auto">
+              <div className="flex w-full gap-2 md:w-auto">
                 <button
                   type="button"
                   onClick={() => setIsFilterOpen((value) => !value)}
-                  className={`flex-1 md:flex-none flex min-h-11 items-center justify-center gap-2 px-4 py-2.5 rounded-none transition-all duration-300 border-2 text-sm font-mono uppercase tracking-widest focus-ring ${
+                  className={`focus-ring flex min-h-11 flex-1 items-center justify-center gap-2 border px-4 py-2.5 text-sm font-mono uppercase tracking-[0.18em] transition-all duration-300 md:flex-none ${
                     isFilterOpen || selectedSpirit || selectedFlavor || selectedAlcohol
-                      ? "bg-primary/20 text-primary border-primary/50 hover:bg-primary/30 shadow-[0_0_15px_rgba(255,0,255,0.25)]"
-                      : "bg-black/40 text-muted-foreground border-primary/20 hover:border-primary hover:text-primary"
+                      ? "border-primary/50 bg-primary/16 text-primary shadow-[0_16px_28px_rgba(3,0,9,0.22)] hover:bg-primary/22"
+                      : "border-primary/20 bg-black/40 text-muted-foreground hover:border-primary/45 hover:text-primary"
                   }`}
                   aria-expanded={isFilterOpen}
                   aria-controls={filterPanelId}
@@ -229,6 +242,46 @@ export default function GalleryContent({
                 </button>
               </div>
             </div>
+
+            {activeFilterCount > 0 && (
+              <div className="mt-3 flex flex-wrap items-center gap-2 px-1">
+                <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-foreground/55">
+                  {lang === "en" ? "Active filters" : "已启用筛选"}
+                </span>
+                {searchQuery.trim() && (
+                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-primary">
+                    {lang === "en" ? "Search" : "搜索"}: {searchQuery.trim()}
+                  </span>
+                )}
+                {selectedSpirit && (
+                  <span className="glass-subtle border border-secondary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-secondary">
+                    {t(`gallery.spirit.${selectedSpirit.toLowerCase()}`)}
+                  </span>
+                )}
+                {selectedAlcohol && (
+                  <span className="glass-subtle border border-accent/40 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-accent">
+                    {t(`gallery.level.${selectedAlcohol.toLowerCase()}`)}
+                  </span>
+                )}
+                {selectedFlavor && (
+                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-primary">
+                    {t(`gallery.flavor.${selectedFlavor.toLowerCase()}`)}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSelectedSpirit(null);
+                    setSelectedFlavor(null);
+                    setSelectedAlcohol(null);
+                  }}
+                  className="focus-ring ml-auto inline-flex min-h-10 items-center justify-center border border-white/10 px-3 py-2 text-[11px] font-mono uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
+                >
+                  {lang === "en" ? "Clear all" : "清空全部"}
+                </button>
+              </div>
+            )}
 
             <div
               id={filterPanelId}
@@ -248,7 +301,7 @@ export default function GalleryContent({
                         key={spirit}
                         type="button"
                         onClick={() => setSelectedSpirit(selectedSpirit === spirit ? null : spirit)}
-                        className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-400 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
+                        className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
                           selectedSpirit === spirit
                             ? "bg-secondary text-black border-secondary shadow-[0_0_15px_rgba(0,255,255,0.4)] font-semibold"
                             : "bg-black/40 text-muted-foreground border-primary/20 hover:border-secondary hover:text-secondary hover:bg-secondary/10"
@@ -272,7 +325,7 @@ export default function GalleryContent({
                         key={level}
                         type="button"
                         onClick={() => setSelectedAlcohol(selectedAlcohol === level ? null : level)}
-                        className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-400 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
+                        className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
                           selectedAlcohol === level
                             ? "bg-accent text-black border-accent shadow-[0_0_15px_rgba(255,153,0,0.4)] font-semibold"
                             : "bg-black/40 text-muted-foreground border-primary/20 hover:border-accent hover:text-accent hover:bg-accent/10"
@@ -296,7 +349,7 @@ export default function GalleryContent({
                         key={flavor}
                         type="button"
                         onClick={() => setSelectedFlavor(selectedFlavor === flavor ? null : flavor)}
-                        className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-400 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
+                        className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
                           selectedFlavor === flavor
                             ? "bg-primary text-black border-primary shadow-[0_0_15px_rgba(255,0,255,0.4)] font-semibold"
                             : "bg-black/40 text-muted-foreground border-primary/20 hover:border-primary hover:text-primary hover:bg-primary/10"
@@ -320,8 +373,8 @@ export default function GalleryContent({
         </motion.div>
 
         {renderableCocktails.length === 0 ? (
-          <div className="glass-panel border-2 border-primary/30 p-10 text-center max-w-2xl mx-auto">
-            <h2 className="text-2xl font-heading font-bold uppercase tracking-widest text-primary mb-4">
+          <div className="glass-panel mx-auto max-w-2xl border border-primary/30 p-10 text-center shadow-[0_24px_46px_rgba(3,0,9,0.28)]">
+            <h2 className="mb-4 text-2xl font-heading font-bold uppercase tracking-[0.16em] text-primary">
               {t("gallery.noResults.title")}
             </h2>
             <p className="font-mono text-foreground/80">{t("gallery.noResults.desc")}</p>
@@ -340,7 +393,7 @@ export default function GalleryContent({
                     href={`/${lang}/cocktail/${cocktail.id}`}
                     className="block group relative h-full focus-ring"
                   >
-                    <div className="relative h-full rounded-none overflow-hidden glass-panel border-2 border-primary/40 shadow-[0_0_16px_rgba(255,0,255,0.15)] transition-all duration-500 group-hover:shadow-[0_0_22px_rgba(0,255,255,0.35)] group-hover:border-secondary group-hover:-translate-y-3 group-hover:scale-[1.02] will-change-transform">
+                    <div className="glass-panel relative h-full overflow-hidden border border-primary/35 shadow-[0_20px_42px_rgba(3,0,9,0.28),0_0_14px_rgba(255,79,216,0.1)] transition-all duration-500 group-hover:-translate-y-2.5 group-hover:scale-[1.02] group-hover:border-secondary group-hover:shadow-[0_26px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.14)] will-change-transform">
                       <div className="relative aspect-[4/5] overflow-hidden bg-black/60">
                         <Image
                           src={
@@ -355,29 +408,29 @@ export default function GalleryContent({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                       </div>
-                      <div className="p-5 space-y-4">
-                        <div>
-                          <h2 className="text-xl font-heading font-bold uppercase tracking-widest text-primary group-hover:text-secondary transition-colors">
+                        <div className="space-y-4 p-5">
+                          <div>
+                          <h2 className="text-xl font-heading font-bold uppercase tracking-[0.16em] text-primary transition-colors group-hover:text-secondary">
                             {lang === "en" ? cocktail.english_name || cocktail.name : cocktail.name}
                           </h2>
                           {lang === "cn" && cocktail.english_name && (
-                            <p className="text-xs font-mono tracking-[0.2em] uppercase text-secondary">
+                            <p className="text-xs font-mono uppercase tracking-[0.2em] text-secondary/88">
                               {cocktail.english_name}
                             </p>
                           )}
                         </div>
-                        <p className="font-mono text-sm text-foreground/80 line-clamp-3">
+                        <p className="line-clamp-3 font-mono text-sm leading-relaxed text-foreground/82">
                           {lang === "en"
                             ? cocktail.english_description || cocktail.description
                             : cocktail.description}
                         </p>
-                        <div className="flex flex-wrap gap-2 text-xs font-mono uppercase tracking-widest">
-                          <span className="px-3 py-1 border border-primary/40 text-primary">
+                        <div className="flex flex-wrap gap-2 text-xs font-mono uppercase tracking-[0.16em]">
+                          <span className="glass-subtle border border-primary/35 px-3 py-1 text-primary">
                             {lang === "en"
                               ? cocktail.english_base_spirit || cocktail.base_spirit
                               : cocktail.base_spirit}
                           </span>
-                          <span className="px-3 py-1 border border-secondary/40 text-secondary">
+                          <span className="glass-subtle border border-secondary/35 px-3 py-1 text-secondary">
                             {lang === "en"
                               ? cocktail.english_alcohol_level || cocktail.alcohol_level
                               : cocktail.alcohol_level}
@@ -394,7 +447,7 @@ export default function GalleryContent({
               <div className="mt-12 flex justify-center">
                 <Link
                   href={`${pathname}?${createQueryString({ cursor: nextCursor })}`}
-                  className="px-6 py-3 border-2 border-primary text-primary hover:bg-primary hover:text-black transition-all duration-300 font-mono uppercase tracking-widest focus-ring"
+                  className="focus-ring inline-flex min-h-11 items-center justify-center border border-primary/35 px-6 py-3 font-mono uppercase tracking-[0.16em] text-primary transition-all duration-300 hover:border-primary/70 hover:bg-primary hover:text-black"
                 >
                   {lang === "en" ? "Next Page" : "下一页"}
                 </Link>

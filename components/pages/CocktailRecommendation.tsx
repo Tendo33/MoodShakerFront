@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, RefreshCcw } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCocktailResult } from "@/context/CocktailResultContext";
+import { Button } from "@/components/ui/core";
 import type { Cocktail, Tool } from "@/lib/cocktail-types";
 import type { RecommendationAccessPayload } from "@/lib/recommendation-access";
 import { CocktailImage } from "@/components/CocktailImage";
@@ -151,7 +152,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   const cardClasses =
     "glass-panel text-foreground rounded-none border-2 transition-all duration-300 shadow-[0_0_16px_rgba(255,0,255,0.15)] hover:shadow-[0_0_22px_rgba(0,255,255,0.3)]";
   const gradientText =
-    "font-black font-heading tracking-widest uppercase drop-shadow-[0_0_15px_rgba(255,0,255,0.6)]";
+    "font-black font-heading uppercase tracking-[0.14em] drop-shadow-[0_0_12px_rgba(255,79,216,0.24)]";
 
   const {
     getLocalizedContent,
@@ -264,13 +265,15 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           }}
         >
           <div className="flex items-center gap-4">
-            <button
+            <Button
               onClick={handleBack}
-              className="flex items-center gap-2 px-4 py-2 border-2 border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black font-mono uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,0,255,0.4)] focus-ring"
+              variant="outline"
+              size="md"
+              effect="lift"
+              icon={<ArrowLeft className="h-4 w-4" />}
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span>{t("recommendation.back")}</span>
-            </button>
+              {t("recommendation.back")}
+            </Button>
           </div>
 
           <RecommendationShareAction
@@ -306,7 +309,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                   <button
                     onClick={handleRefreshImage}
                     disabled={isRefreshingImage || isImageLoading}
-                    className="p-3 rounded-full bg-black/50 backdrop-blur-md hover:bg-black/70 transition-colors border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    className="focus-ring inline-flex min-h-11 min-w-11 items-center justify-center border border-white/10 bg-black/55 backdrop-blur-md transition-colors hover:border-secondary/45 hover:bg-black/75"
                     aria-label={language === "en" ? "Refresh image" : "刷新图片"}
                   >
                     <RefreshCcw
@@ -330,18 +333,20 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               )}
 
               {imageError && canEditCurrentRecommendation && !isImageLoading && (
-                <div className="absolute bottom-4 left-4 right-4 bg-destructive/90 backdrop-blur-md text-white px-4 py-3 rounded-xl border border-destructive/50 shadow-lg">
+                <div className="absolute bottom-4 left-4 right-4 border border-destructive/50 bg-destructive/88 px-4 py-3 text-white shadow-lg backdrop-blur-md">
                   <div className="flex items-start gap-3">
                     <div className="flex-1">
                       <p className="text-sm font-medium">{imageError}</p>
                     </div>
-                    <button
+                    <Button
                       onClick={handleRefreshImage}
                       disabled={isRefreshingImage}
-                      className="shrink-0 px-3 py-1 border border-white text-white hover:bg-white hover:text-black font-mono uppercase text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      variant="ghost"
+                      size="xs"
+                      className="shrink-0 border-white/60 text-white hover:border-white hover:bg-white hover:text-black"
                     >
                       {language === "en" ? "Retry" : "重试"}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}

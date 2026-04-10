@@ -83,7 +83,7 @@ export default function HomePopular() {
     <section ref={popularRef} className="section-spacing bg-card/50">
       <Container size="xl">
         <motion.div
-          className="text-center mb-8 lg:mb-12 container-narrow"
+          className="container-narrow mb-8 text-center lg:mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={
             popularInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
@@ -92,11 +92,11 @@ export default function HomePopular() {
         >
           <GradientText
             as="h2"
-            className="text-3xl md:text-4xl lg:text-5xl mb-4 lg:mb-6 font-heading font-black tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,0,255,0.6)]"
+            className="mb-4 text-3xl font-heading font-black uppercase tracking-[0.16em] drop-shadow-[0_0_10px_rgba(255,79,216,0.28)] md:text-4xl lg:mb-6 lg:text-5xl"
           >
             {language === "en" ? "Popular Cocktails" : "热门鸡尾酒"}
           </GradientText>
-          <p className="text-lg md:text-xl text-foreground font-mono leading-relaxed mt-4 drop-shadow-md">
+          <p className="mt-4 text-base font-mono leading-relaxed text-foreground/84 drop-shadow-md md:text-lg">
             {language === "en"
               ? "> QUERYING MOST ACCESSED SELECTION ALGORITHMS..."
               : "> 正在查询最常用的选择算法..."}
@@ -117,10 +117,10 @@ export default function HomePopular() {
                 href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}
                 className="focus-ring"
               >
-                <div className="relative overflow-hidden rounded-none border-2 border-primary/50 glass-panel card-hover h-full group hover:border-secondary hover:shadow-[0_0_22px_rgba(0,255,255,0.3)] transition-all duration-500 p-8">
+                <div className="glass-panel card-hover group relative h-full overflow-hidden border border-primary/35 p-8 transition-all duration-500 hover:border-secondary hover:shadow-[0_24px_48px_rgba(3,0,9,0.28),0_0_18px_rgba(93,246,255,0.16)]">
                   <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay z-0" />
                   
-                  <div className="relative h-40 md:h-48 overflow-hidden mb-6 rounded-none border-2 border-primary group-hover:border-secondary transition-colors z-10">
+                  <div className="relative z-10 mb-6 h-40 overflow-hidden border border-primary/45 transition-colors group-hover:border-secondary md:h-48">
                     <motion.div
                       className="w-full h-full relative"
                       whileHover={{ scale: 1.05 }}
@@ -139,10 +139,10 @@ export default function HomePopular() {
                     <div className="absolute inset-0 bg-linear-to-br from-primary/30 to-secondary/30 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-300" />
                   </div>
                   <div className="text-spacing relative z-10">
-                    <h3 className="text-xl lg:text-2xl font-bold font-heading mb-3 tracking-widest uppercase text-primary group-hover:text-secondary drop-shadow-[0_0_5px_currentColor] transition-colors duration-300">
+                    <h3 className="mb-3 text-xl font-bold font-heading uppercase tracking-[0.16em] text-primary transition-colors duration-300 group-hover:text-secondary lg:text-2xl">
                       {cocktail.name}
                     </h3>
-                    <p className="text-sm md:text-base leading-relaxed text-foreground font-mono bg-black/50 p-3 border-l-2 border-primary group-hover:border-secondary transition-colors">
+                    <p className="border-l-2 border-primary/60 bg-black/40 p-3 text-sm font-mono leading-relaxed text-foreground/88 transition-colors group-hover:border-secondary md:text-base">
                       {cocktail.description}
                     </p>
                   </div>

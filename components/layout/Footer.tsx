@@ -60,10 +60,10 @@ export default function Footer() {
       <div className="glass-effect border-t border-white/10">
         <div className="py-12 md:py-16 lg:py-20">
           <Container>
-            <div className="grid grid-cols-1 gap-8 mb-12">
+            <div className="mb-12 grid grid-cols-1 gap-8">
               {/* MoodShaker Column */}
               <motion.div
-                className="md:col-span-1 max-w-2xl mx-auto text-center"
+                className="mx-auto max-w-2xl text-center md:col-span-1"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
@@ -71,10 +71,10 @@ export default function Footer() {
               >
                 <motion.div
                   variants={itemAnimation}
-                  className="flex items-center justify-center gap-3 mb-6"
+                  className="mb-6 flex items-center justify-center gap-3"
                 >
                   <div
-                    className={`w-12 h-12 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center shadow-lg`}
+                    className={`flex h-12 w-12 items-center justify-center border border-white/10 shadow-[0_18px_32px_rgba(3,0,9,0.24)] ${gradientStyles.iconBackground}`}
                   >
                     <Cocktail className="h-6 w-6 text-white" />
                   </div>
@@ -84,19 +84,19 @@ export default function Footer() {
                 </motion.div>
                 <motion.p
                   variants={itemAnimation}
-                  className="text-base text-muted-foreground mb-8 max-w-md mx-auto font-mono leading-relaxed"
+                  className="mx-auto mb-8 max-w-xl text-base font-mono leading-relaxed text-muted-foreground"
                 >
                   {t("footer.description")}
                 </motion.p>
                 <motion.div
                   variants={itemAnimation}
-                  className="flex justify-center space-x-4"
+                  className="flex justify-center gap-3"
                 >
                   {activeSocialLinks.map((link, index) => (
                     <Link
                       key={index}
                       href={link.href}
-                      className="text-muted-foreground hover:text-primary transition-all duration-300 p-3 hover:bg-white/5 rounded-full hover:scale-110 focus-ring"
+                      className="focus-ring border border-white/10 bg-black/20 p-3 text-muted-foreground transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-white/5 hover:text-primary"
                       aria-label={link.label}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -108,16 +108,16 @@ export default function Footer() {
               </motion.div>
             </div>
 
-            <Divider className="border-white/10 my-8" />
+            <Divider className="my-8 border-white/10" />
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-center text-sm text-muted-foreground font-mono"
+              className="text-center text-sm font-mono text-muted-foreground"
             >
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
                 <p className="flex items-center justify-center">
                   © {new Date().getFullYear()} MoodShaker.{" "}
                   {t("footer.madeWith")}

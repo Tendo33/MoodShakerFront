@@ -45,44 +45,46 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const { t } = useLanguage();
     const baseStyles =
-      "relative rounded-none font-medium text-center leading-tight transition-all duration-200 flex items-center justify-center font-mono uppercase tracking-wider focus:outline-none focus-visible:ring-1 focus-visible:ring-secondary/90 focus-visible:ring-offset-2 focus-visible:ring-offset-background transform-gpu active:scale-95 disabled:active:scale-100 whitespace-normal sm:whitespace-nowrap";
+      "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-none border text-center leading-tight font-mono uppercase tracking-[0.18em] whitespace-normal sm:whitespace-nowrap transition-[transform,box-shadow,border-color,background-color,color,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/90 focus-visible:ring-offset-2 focus-visible:ring-offset-background transform-gpu active:scale-[0.985] disabled:active:scale-100";
 
     const variantStyles = {
       primary:
-        "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary hover:text-black hover:shadow-[0_0_12px_var(--color-secondary)]",
+        "border-secondary/70 bg-secondary/8 text-secondary shadow-[0_0_0_1px_rgba(93,246,255,0.12),0_14px_32px_rgba(3,0,9,0.22)] hover:border-secondary hover:bg-secondary hover:text-[#091219] hover:shadow-[0_18px_38px_rgba(3,0,9,0.28),0_0_22px_rgba(93,246,255,0.28)]",
       secondary:
-        "bg-primary border-2 border-primary text-black hover:scale-105 hover:opacity-90 neon-glow-primary",
+        "border-primary/70 bg-primary/16 text-primary shadow-[0_14px_32px_rgba(3,0,9,0.22)] hover:border-primary hover:bg-primary hover:text-[#180320] hover:shadow-[0_18px_38px_rgba(3,0,9,0.28),0_0_22px_rgba(255,79,216,0.26)]",
       outline:
-        "bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-black",
+        "border-primary/40 bg-transparent text-primary shadow-[0_12px_24px_rgba(3,0,9,0.14)] hover:border-primary/70 hover:bg-primary/10 hover:text-primary hover:shadow-[0_16px_34px_rgba(3,0,9,0.22),0_0_18px_rgba(255,79,216,0.16)]",
       ghost:
-        "bg-transparent text-foreground hover:bg-[rgba(0,255,255,0.1)] hover:text-secondary",
-      link: "bg-transparent text-secondary hover:text-primary p-0 hover:underline font-medium hover:neon-glow-secondary",
-      neon: "bg-transparent border-2 border-primary text-primary shadow-[0_0_12px_rgba(255,0,255,0.3)] hover:shadow-[0_0_24px_rgba(255,0,255,0.7)] hover:bg-primary hover:text-black",
+        "border-transparent bg-transparent text-foreground/88 hover:border-white/10 hover:bg-white/5 hover:text-secondary",
+      link:
+        "border-transparent bg-transparent p-0 text-secondary hover:text-primary hover:underline font-medium shadow-none",
+      neon:
+        "border-primary/75 bg-[linear-gradient(135deg,rgba(255,79,216,0.18),rgba(19,10,37,0.68))] text-primary shadow-[0_18px_36px_rgba(3,0,9,0.24),0_0_16px_rgba(255,79,216,0.18)] hover:bg-primary hover:text-[#180320] hover:shadow-[0_22px_40px_rgba(3,0,9,0.28),0_0_28px_rgba(255,79,216,0.3)]",
       bubble:
-        "bg-gradient-to-r from-accent via-primary to-secondary text-black hover:scale-105 shadow-[0_0_10px_rgba(255,0,255,0.45)]",
+        "border-transparent bg-linear-to-r from-accent via-primary to-secondary text-[#12071d] shadow-[0_18px_36px_rgba(3,0,9,0.28)] hover:brightness-105 hover:shadow-[0_24px_46px_rgba(3,0,9,0.32)]",
       shine:
-        "bg-secondary border-2 border-secondary text-black hover:shadow-[0_0_18px_var(--color-secondary)]",
+        "border-secondary bg-secondary text-[#091219] shadow-[0_18px_36px_rgba(3,0,9,0.24),0_0_16px_rgba(93,246,255,0.16)] hover:shadow-[0_22px_42px_rgba(3,0,9,0.28),0_0_24px_rgba(93,246,255,0.26)]",
     };
 
     const effectStyles = {
       none: "",
-      shine: "overflow-hidden hover:brightness-125",
+      shine: "overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:bg-linear-to-r before:from-transparent before:via-white/20 before:to-transparent before:transition-transform before:duration-500 hover:before:translate-x-full",
       pulse: "animate-neon-pulse hover:animate-none",
-      glow: "hover:shadow-[0_0_16px_currentColor] z-10",
-      lift: "hover:-translate-y-2 hover:shadow-[0_12px_24px_-6px_var(--color-primary)]",
-      ring: "hover:ring-2 hover:ring-offset-2 hover:ring-secondary",
+      glow: "hover:shadow-[0_18px_38px_rgba(3,0,9,0.28),0_0_18px_currentColor] z-10",
+      lift: "hover:-translate-y-1.5 hover:shadow-[0_18px_38px_rgba(3,0,9,0.28)]",
+      ring: "hover:ring-2 hover:ring-offset-2 hover:ring-secondary/65",
     };
 
     const defaultTransform = "";
 
-    const activeEffect = variant === 'shine' && effect === 'none' ? 'shine' : effect;
+    const activeEffect = variant === "shine" && effect === "none" ? "shine" : effect;
 
     const sizeStyles = {
-      xs: "min-h-10 px-3 py-2 text-xs",
-      sm: "min-h-10 px-4 py-2.5 text-sm",
-      md: "min-h-11 px-6 py-3 text-sm",
-      lg: "min-h-12 px-8 py-3.5 text-base",
-      xl: "min-h-14 px-10 py-4 text-lg",
+      xs: "min-h-10 px-3 py-2 text-[11px]",
+      sm: "min-h-10 px-4 py-2.5 text-xs",
+      md: "min-h-11 px-5 py-3 text-sm",
+      lg: "min-h-12 px-7 py-3.5 text-sm",
+      xl: "min-h-14 px-9 py-4 text-base",
     };
 
     const widthStyles = fullWidth ? "w-full" : "w-auto";
@@ -104,7 +106,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Button content
     const buttonContent = (
-      <span className="inline-flex items-center">
+      <span className="relative z-10 inline-flex items-center">
         {isLoading ? (
           <span className="flex items-center justify-center">
             <Loader2 className="mr-2 h-4 w-4 animate-spin text-current" />
@@ -113,13 +115,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           <>
             {icon && iconPosition === "left" && (
-              <span className="mr-2 flex items-center drop-shadow-[0_0_8px_currentColor]">{icon}</span>
+              <span className="flex items-center opacity-90">{icon}</span>
             )}
-            <span className="drop-shadow-[0_0_8px_currentColor]">{children}</span>
+            <span>{children}</span>
             {icon && iconPosition === "right" && (
-              <span className="ml-2 flex items-center drop-shadow-[0_0_8px_currentColor]">{icon}</span>
+              <span className="flex items-center opacity-90">{icon}</span>
             )}
-            {external && <ExternalLink className="ml-1.5 h-3.5 w-3.5 drop-shadow-[0_0_8px_currentColor]" />}
+            {external && <ExternalLink className="h-3.5 w-3.5 opacity-80" />}
           </>
         )}
       </span>
