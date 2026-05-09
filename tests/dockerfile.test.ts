@@ -25,6 +25,17 @@ test("docker builder stage copies prisma before pnpm install when postinstall ge
 
   assert.ok(builderStage, "Dockerfile should include a builder stage.");
 
+  assert.doesNotMatch(
+    dockerfile,
+    /(^|\s)(npm|npx)\s/m,
+    "Dockerfile should use corepack/pnpm commands, not npm or npx entrypoints.",
+  );
+  assert.match(
+    dockerfile,
+    /corepack enable && corepack prepare pnpm@10\.9\.0 --activate/,
+    "Dockerfile should activate the pinned pnpm version through corepack.",
+  );
+
   const copyPrismaIndex = builderStage.indexOf("COPY prisma ./prisma");
   const installIndex = builderStage.indexOf(
     "RUN pnpm install --frozen-lockfile --shamefully-hoist",

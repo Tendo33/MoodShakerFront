@@ -7,8 +7,8 @@ WORKDIR /app
 # 安装系统依赖 (OpenSSL 3.0 compatibility)
 RUN apk add --no-cache openssl libc6-compat
 
-# 安装 pnpm (锁定版本)
-RUN npm install -g pnpm@10.9.0
+# 启用 pnpm (锁定版本)
+RUN corepack enable && corepack prepare pnpm@10.9.0 --activate
 
 # 复制 package.json 和 pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
@@ -27,7 +27,7 @@ COPY . .
 ENV DATABASE_URL="postgresql://placeholder:placeholder@placeholder:5432/placeholder?schema=public"
 
 # 生成 Prisma 客户端
-RUN npx prisma generate
+RUN pnpm exec prisma generate
 
 # 验证 Prisma 客户端是否生成成功
 RUN ls -la node_modules/.prisma/ || echo "Warning: .prisma directory not found"
@@ -43,8 +43,8 @@ WORKDIR /app
 # 安装系统依赖 (OpenSSL 3.0 compatibility)
 RUN apk add --no-cache openssl libc6-compat
 
-# 安装 pnpm (锁定版本)
-RUN npm install -g pnpm@10.9.0
+# 启用 pnpm (锁定版本)
+RUN corepack enable && corepack prepare pnpm@10.9.0 --activate
 
 # 复制必要的文件
 COPY --from=builder --chown=node:node /app/package.json /app/pnpm-lock.yaml ./
@@ -71,7 +71,7 @@ RUN pnpm install --frozen-lockfile --shamefully-hoist
 ENV DATABASE_URL="postgresql://placeholder:placeholder@placeholder:5432/placeholder?schema=public"
 
 # 生成 Prisma 客户端
-RUN npx prisma generate
+RUN pnpm exec prisma generate
 
 # 验证 Prisma 客户端是否生成成功
 RUN ls -la node_modules/.prisma/ || echo "Warning: .prisma directory not found in runner stage"
