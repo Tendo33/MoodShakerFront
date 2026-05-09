@@ -24,6 +24,8 @@ MoodShaker is a bilingual web app for cocktail discovery and recommendation. Ins
 
 The project is built with Next.js App Router, React 19, TypeScript, Prisma, PostgreSQL, and a pair of AI-backed endpoints for recommendation and image generation. It also ships with a localized experience for Chinese and English users, a gallery for browsing drinks, and a detail page for revisiting recipes.
 
+AI assistant collaboration rules live in `.trellis/spec/README.md`, with shared entrypoints in `AGENTS.md` and `CLAUDE.md`.
+
 ## Current Status
 
 ### Implementation status

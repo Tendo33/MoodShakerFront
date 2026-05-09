@@ -1,34 +1,49 @@
-# Repository Guidelines
+# Project Agent Entrypoint
 
-## Project Structure & Module Organization
-- `app/` holds the Next.js App Router; language-specific pages live under `app/[lang]/`, and API routes live under `app/api/`.
-- `components/` contains reusable UI, organized by `layout/`, `pages/`, `ui/`, `animations/`, and `share/`.
-- `context/` manages global state (language, cocktail flow, errors). `services/`, `api/`, `lib/`, and `utils/` provide business logic and helpers.
-- `public/` is for static assets; `docs/screenshots/` stores documentation images.
-- `prisma/` contains the schema, migrations, and seed script. `proxy.ts` handles language detection and rewrites.
+This file is the cross-tool entrypoint for AI assistants in MoodShakerFront.
 
-## Build, Test, and Development Commands
-- `pnpm dev`: start the local dev server at `http://localhost:3000`.
-- `pnpm build`: create a production build.
-- `pnpm start`: run the production build locally.
-- `pnpm lint`: run ESLint (Next.js core-web-vitals + TypeScript).
-- `pnpm db:init`: generate Prisma client, apply migrations, seed data.
-- `pnpm prisma:generate`, `pnpm prisma:migrate`, `pnpm prisma:seed`: run Prisma tasks individually.
+## Read order
 
-## Coding Style & Naming Conventions
-- TypeScript + React with 2-space indentation and double quotes; follow ESLint (`pnpm lint`).
-- Tailwind CSS is the primary styling approach; global styles live in `app/globals.css`.
-- Components use `PascalCase.tsx` (e.g., `CocktailDetailPage.tsx`), hooks use `useX.ts`, contexts use `XContext.tsx`, and route files follow Next.js conventions (`page.tsx`, `layout.tsx`).
+1. Start at [.trellis/spec/README.md](.trellis/spec/README.md)
+2. Use [.trellis/spec/shared/index.md](.trellis/spec/shared/index.md) for repository-wide facts
+3. Use [.trellis/spec/frontend/index.md](.trellis/spec/frontend/index.md) before Next.js, API route, Prisma, or UI work
+4. Use [.trellis/spec/shared/verification.md](.trellis/spec/shared/verification.md) before claiming completion
 
-## Testing Guidelines
-- A lightweight automated test runner is configured through `pnpm test`. Use it together with `pnpm lint` and `pnpm build` for baseline verification.
-- There is still no end-to-end runner configured yet. Validate key flows manually in `pnpm dev` or a preview deploy: questions, recommendations, recommendation recovery, gallery, and cocktail detail.
-- If you add broader tests, document the runner and commands in `README.md` and co-locate tests or use a `tests/` directory.
+## Working rules
 
-## Commit & Pull Request Guidelines
-- Commit messages generally use a short type prefix: `feat:`, `refactor:`, `chore:`, `docs:`, and occasional `tinyfix`. Keep them concise and descriptive.
-- PRs should include: a brief summary, linked issue (if any), verification steps, and screenshots for UI changes. Call out any env or database changes.
+- Treat `.trellis/spec/` as the detailed AI-facing project contract.
+- MoodShaker is a bilingual AI cocktail recommendation product, not a generic Next.js template.
+- Preserve localized routes, private recommendation access, Prisma/Postgres data contracts, rate limiting, and deployment warnings.
+- Update Trellis specs whenever behavior, structure, scripts, public APIs, database schema, or verification commands change.
+- Keep changes minimal, typed, and explicit.
 
-## Configuration & Secrets
-- Copy `.env.example` to `.env` and set API keys plus `DATABASE_URL`. Never commit secrets.
-- For database changes, update `prisma/schema.prisma`, generate a migration, and run `pnpm db:init` to validate locally.
+## Execution style
+
+### Think before editing
+
+- State assumptions when they affect the implementation.
+- If multiple interpretations exist, surface them instead of choosing silently.
+- Prefer clarifying uncertainty before editing files.
+- If a simpler approach exists, say so before implementing.
+- Push back when warranted instead of mechanically following a weak approach.
+
+### Simplicity first
+
+- Choose the smallest change that fully solves the task.
+- Do not add speculative flexibility, configuration, or abstraction.
+- Prefer direct fixes over framework-like restructuring.
+- Do not create abstractions for single-use code.
+
+### Surgical diffs
+
+- Touch only files and lines that relate to the request.
+- Match existing project style and terminology.
+- Do not improve adjacent code, comments, or formatting unless required.
+- If you notice unrelated dead code, mention it instead of deleting it.
+
+### Goal-driven verification
+
+- Turn each task into a verifiable outcome.
+- For non-trivial work, keep a short plan and verification path in mind before editing.
+- Use [.trellis/spec/shared/verification.md](.trellis/spec/shared/verification.md) before claiming completion.
+- Keep looping until the requested outcome is verified, not just implemented.

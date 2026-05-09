@@ -1,170 +1,37 @@
-# CLAUDE.md
+# Claude Code Project Instructions
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file is Claude Code's root entrypoint for MoodShakerFront. Keep detailed
+project facts in `.trellis/spec/` and keep this file thin.
 
-## Development Commands
+## Read order
 
-### Core Development
+1. Start at [AGENTS.md](AGENTS.md)
+2. Use [.trellis/spec/README.md](.trellis/spec/README.md) for the Trellis spec overview
+3. Use [.trellis/spec/shared/index.md](.trellis/spec/shared/index.md) for repository-wide facts
+4. Use [.trellis/spec/frontend/index.md](.trellis/spec/frontend/index.md) before Next.js, API route, Prisma, or UI work
+5. Run the relevant section in [.trellis/spec/shared/verification.md](.trellis/spec/shared/verification.md)
 
-- `pnpm dev` - Start development server
-- `pnpm build` - Build production version
-- `pnpm start` - Start production server
-- `pnpm lint` - Run ESLint code quality checks
-- `pnpm test` - Run the lightweight Node regression suite
-- `pnpm db:init` - Initialize database (generate, migrate, seed)
+## Claude-specific notes
 
-### Package Manager
+- Use [AGENTS.md](AGENTS.md) as the shared project entrypoint.
+- Route task-specific work through `.trellis/spec/`.
+- Do not reintroduce a parallel AI-docs tree; `.trellis/spec/` is the detailed project contract.
+- Keep existing `.agents/skills` custom design/frontend skills intact.
+- If this file and `.trellis/spec/` disagree, update this file or follow the spec before changing code.
 
-This project uses `pnpm` as the package manager. All commands should use `pnpm` instead of `npm`.
+## Project guardrails
 
-## Architecture Overview
+- MoodShaker is a bilingual AI cocktail recommendation product, not a generic Next.js template.
+- Preserve `/cn` and `/en` localized routes, `proxy.ts` language detection, and localized dictionaries.
+- Private recommendation access uses POST body `editToken`; never put it back in the URL or echo it in responses.
+- Prisma/PostgreSQL schema changes require migration and `pnpm db:init` validation.
+- Missing shared rate-limit storage in production is a deployment error, not a silent fallback.
+- Use pnpm only; do not introduce npm/yarn lockfiles.
 
-### Framework Stack
+## Claude execution style
 
-- **Next.js 16** - React framework with App Router
-- **React 19** - Library for web and native user interfaces
-- **TypeScript** - Type-safe JavaScript
-- **Tailwind CSS** - Utility-first CSS framework
-- **Radix UI** - Accessible UI components (via shadcn/ui)
-- **Framer Motion** - Animation library
-- **Lucide React** - Icon library
-
-### Project Structure
-
-#### App Router (`app/`)
-
-- `app/[lang]/` - Internationalized routes with dynamic language support
-- `app/layout.tsx` - Root layout with context providers and font configuration
-- `proxy.ts` - Language detection and URL rewriting middleware (Next.js middleware alternative)
-
-#### Core Directories
-
-- `components/` - Reusable UI components organized by purpose
-  - `layout/` - Header, Footer, and layout components
-  - `pages/` - Page-specific components (Home, Questions, CocktailDetail, etc.)
-  - `ui/` - shadcn/ui base components
-  - `animations/` - Framer Motion animation components
-  - `share/` - Social sharing and card generation components
-- `context/` - React Context providers for state management
-  - `CocktailResultContext.tsx` - Main cocktail recommendation result state and persistence
-  - `CocktailFormContext.tsx` - Questionnaire input state
-  - `LanguageContext.tsx` - Internationalization with English/Chinese support
-  - `ErrorContext.tsx` - Global error handling
-- `api/` - External API integration modules
-  - `cocktail.ts` - AI cocktail recommendation types and local storage
-  - `image.ts` - Image generation types
-  - `openai.ts` - OpenAI and Image generation API client configuration
-- `services/` - Business logic services
-- `utils/` - Utility functions (localStorage, caching, logging, etc.)
-- `lib/` - Shared utilities and configuration
-
-### Key Architectural Patterns
-
-#### Internationalization (i18n)
-
-- **Dynamic routing**: `/en/` and `/cn/` language prefixes
-- **Middleware**: Custom proxy (`proxy.ts`) for language detection and URL rewriting
-- **Context-based**: Language state managed through React Context
-- **Cookie persistence**: Language preference stored in cookies
-- **Default language**: Chinese (cn) with English fallback
-
-#### State Management
-
-- **Context-first**: Uses React Context for global state
-- **LocalStorage persistence**: User progress saved locally
-- **Session management**: Unique session IDs for tracking
-- **Private recommendation access**: Retrieval depends on local edit access, not URL query tokens
-- **Error boundaries**: Global error handling with context
-
-#### AI Integration
-
-- **Dual agent system**: Classic vs Creative bartender personalities
-- **Structured prompts**: Detailed system prompts for consistent AI responses
-- **JSON parsing**: Robust parsing of AI responses with fallback handling
-- **Image generation**: AI-generated cocktail images with caching
-
-#### Component Architecture
-
-- **Page components**: High-level page logic in `pages/`
-- **UI components**: Reusable base components from shadcn/ui
-- **Layout components**: Header, footer, and navigation
-- **Animation components**: Reusable Framer Motion animations
-
-### Data Flow
-
-#### Cocktail Recommendation Process
-
-1. User answers questions → stored in CocktailFormContext
-2. Form request with preferences → sent to AI service
-3. AI generates cocktail recipe → parsed and validated
-4. Recommendation session metadata is persisted locally for same-session recovery
-5. Image generated asynchronously → cached locally
-6. Results displayed → saved to localStorage
-
-#### Language Handling
-
-1. Proxy detects language from URL/cookie/Accept-Language header
-2. Rewrites URL to include language prefix
-3. LanguageContext provides translations throughout app
-4. Components use `t()` function for translated strings
-
-### Styling System
-
-#### Tailwind Configuration
-
-- **shadcn/ui integration**: Custom design tokens and CSS variables
-- **Custom animations**: fadeIn, fadeOut, float keyframes
-- **Dark mode**: Default dark theme with CSS variables
-- **Responsive design**: Mobile-first approach with container queries
-
-#### CSS Variables
-
-- Design tokens stored in CSS custom properties
-- Consistent spacing, colors, and border radius
-- Theme-aware components with HSL color system
-
-### External Dependencies
-
-#### API Integration
-
-- **OpenAI**: For cocktail recipe generation (using DeepSeek or compatible model)
-- **Image Generation**: SiliconFlow API (Kolors model) for cocktail images
-- **Environment variables**: Required for API keys and configuration
-
-#### Build Configuration
-
-- **Next.js config**: image remote patterns and rewrites for static assets
-- **TypeScript**: Strict type checking enabled
-- **ESLint**: Custom rules with React hooks and refresh plugins
-
-### Development Notes
-
-#### Working with the Context System
-
-- CocktailFormContext manages questionnaire answers and user preference input
-- CocktailResultContext manages recommendation results, recovery, and image refresh state
-- LanguageContext provides translations and path utilities
-- ErrorContext handles global error states and user notifications
-
-#### AI Prompt Engineering
-
-- Prompts are carefully structured in both English and Chinese
-- Classic bartender focuses on traditional cocktails
-- Creative bartender generates unique recipes
-- JSON responses are parsed with comprehensive error handling
-
-#### Image Handling
-
-- Images are generated asynchronously after cocktail recommendations
-- Caching system prevents unnecessary API calls
-- Fallback handling for image generation failures
-- Server-side optimization only runs for allowed remote hosts
-- Version control for image refreshing
-
-#### Performance Considerations
-
-- Static assets served from language-agnostic paths
-- Client-side navigation with Next.js App Router
-- Optimized bundle with dynamic imports where needed
-- Image caching and lazy loading patterns
-- Current automated coverage is lightweight. Use `pnpm test`, `pnpm lint`, and `pnpm build` together before claiming a change is ready.
+- State assumptions explicitly when they shape the solution.
+- Keep diffs tightly scoped to the task.
+- Match existing style even when you would normally choose differently.
+- Update `.trellis/spec/` when behavior, structure, scripts, public APIs, schema, or verification commands change.
+- Before declaring success, run the relevant commands in [.trellis/spec/shared/verification.md](.trellis/spec/shared/verification.md).
