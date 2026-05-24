@@ -6,7 +6,7 @@ When the user wants to change the engineering conventions AI follows, add new sp
 
 1. `.trellis/config.yaml`
 2. `.trellis/spec/`
-3. `.trellis/workflow.md` Phase 1.3 and Phase 3.3
+3. `.trellis/workflow.md` planning artifact guidance and Phase 3.3
 4. Current task `implement.jsonl` / `check.jsonl`
 
 ## Common Needs
@@ -50,8 +50,8 @@ Monorepo example:
 Adding a spec does not mean every task automatically reads it. The current task must reference it in JSONL:
 
 ```bash
-python3 ./.trellis/scripts/task.py add-context <task> implement ".trellis/spec/webapp/security/index.md" "Security conventions"
-python3 ./.trellis/scripts/task.py add-context <task> check ".trellis/spec/webapp/security/index.md" "Security review rules"
+python ./.trellis/scripts/task.py add-context <task> implement ".trellis/spec/webapp/security/index.md" "Security conventions"
+python ./.trellis/scripts/task.py add-context <task> check ".trellis/spec/webapp/security/index.md" "Security review rules"
 ```
 
 ## Change Monorepo Packages
@@ -70,7 +70,7 @@ default_package: webapp
 After editing, run:
 
 ```bash
-python3 ./.trellis/scripts/get_context.py --mode packages
+python ./.trellis/scripts/get_context.py --mode packages
 ```
 
 Use this output to confirm AI can see the correct packages and spec layers.

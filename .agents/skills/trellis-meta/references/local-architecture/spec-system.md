@@ -58,14 +58,14 @@ default_package: cli
 The AI can run:
 
 ```bash
-python3 ./.trellis/scripts/get_context.py --mode packages
+python ./.trellis/scripts/get_context.py --mode packages
 ```
 
 This command lists packages and spec layers for the current project. Use this output as the reference when configuring context JSONL.
 
 ## How Specs Enter Tasks
 
-Before a task enters implementation, Phase 1.3 should write relevant specs into `implement.jsonl` / `check.jsonl`:
+Before a task enters implementation, planning may write relevant specs into `implement.jsonl` / `check.jsonl` when the task needs spec or research context beyond the task artifacts:
 
 ```jsonl
 {"file": ".trellis/spec/cli/backend/index.md", "reason": "CLI backend conventions"}
