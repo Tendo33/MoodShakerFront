@@ -53,6 +53,7 @@ Use a concise title from the user's request. Use a slug without a date prefix. `
 5. Include your recommended answer with the question.
 6. After each user answer, update `prd.md` before continuing.
 7. For complex tasks, create or update `design.md` and `implement.md` before implementation starts.
+8. Before final review or `task.py start`, run the PRD convergence pass below.
 
 Do not invent a project-specific product/spec hierarchy. If the repository already has product, domain, or spec docs, use them. If it does not, proceed with the evidence that exists.
 
@@ -68,6 +69,49 @@ Each question must include:
 - the trade-off if the user chooses differently
 
 Do not ask process questions such as whether to search, inspect files, or continue brainstorming. Do the evidence work directly. Ask the user only when the remaining issue is a product decision, preference, scope boundary, or risk tolerance choice.
+
+## Thinking Framework: First Principles Analysis
+
+When requirements are vague, solutions feel over-engineered, or you're about to add complexity "because everyone does" — decompose to fundamental truths before reasoning upward.
+
+### Step 1: Restate the Problem
+
+Strip away implementation details to one sentence.
+
+> Bad: "We need to add Redis caching to the user profile endpoint"
+> Good: "User profile data takes too long to load"
+
+### Step 2: List Fundamental Truths
+
+What is absolutely true (not opinion or convention)?
+
+| Category | Examples |
+|----------|----------|
+| **Physical constraints** | Network latency ≥ 0, disk I/O has limits |
+| **Business rules** | "Users must see their own data" |
+| **Technical invariants** | "Data must be consistent" |
+| **User needs** | "The user wants X within Y seconds" |
+
+### Step 3: Challenge Assumptions
+
+For each component of the current plan:
+
+- **Fact or convention?** "We always use REST" — why?
+- **What if we removed this?** If nothing breaks, it's unnecessary.
+- **Solving the actual problem or a symptom?** Trace the causal chain.
+- **Who benefits from this complexity?** If "nobody", simplify.
+
+### Step 4: Build Up from Truths
+
+1. Start with the minimum viable mechanism satisfying all truths
+2. Add complexity only when a specific truth demands it
+3. Each addition must answer: "Which truth requires this?"
+
+### Step 5: Validate
+
+- Does the solution solve the original problem?
+- What assumptions need verification?
+- What's the simplest experiment to test this?
 
 ## Artifact Rules
 
@@ -97,16 +141,33 @@ Do not ask process questions such as whether to search, inspect files, or contin
 
 Lightweight tasks may have only `prd.md`. Complex tasks must have `prd.md`, `design.md`, and `implement.md` before `task.py start`.
 
-`implement.md` is not a replacement for `implement.jsonl`. Use JSONL files only for manifest-style spec and research references when the task needs them.
+`implement.md` is not a replacement for `implement.jsonl`. On sub-agent-dispatch workflows, `implement.jsonl` and `check.jsonl` must each contain at least one real spec/research entry before `task.py start`; the seed `_example` row does not count. Inline workflows skip this JSONL gate because Phase 2 loads context through `trellis-before-dev`.
+
+## PRD Convergence Pass
+
+Before declaring planning ready or running `task.py start`, rewrite `prd.md` once against the final structure described in the artifact rules above. This is not optional cleanup; it is the final planning gate.
+
+The pass must be lossless:
+
+- Collapse repeated facts into one authoritative section.
+- Fold temporary brainstorm sections such as `What I already know`, `Assumptions`, and resolved `Open Questions` into Goal, Background, Requirements, Technical Notes, or Acceptance Criteria.
+- Remove resolved open questions instead of leaving empty or already-answered sections.
+- Merge parallel bug and requirement lists when they describe the same work; keep each defect's severity, evidence, and file:line anchors on the owning requirement.
+- Preserve every file:line anchor, decision, constraint, requirement ID, and acceptance-criteria mapping.
+- Keep only genuinely blocking open questions.
+
+After the pass, read `prd.md` top to bottom and verify that no fact is repeated across sections unless the repetition adds new information.
 
 ## Quality Bar
 
 Before declaring planning ready:
 
 - `prd.md` contains testable acceptance criteria.
+- `prd.md` has passed the PRD convergence pass: no unresolved temporary brainstorm sections, no duplicate facts across sections, and no lost anchors, decisions, or acceptance mappings.
 - Repository-answerable questions have already been answered through inspection.
 - Remaining open questions are genuinely about user intent or scope.
 - Complex tasks have `design.md` and `implement.md`.
+- Sub-agent-dispatch tasks have real curated entries in both `implement.jsonl` and `check.jsonl`; seed-only manifests are not ready.
 - The user has reviewed the final planning artifacts or explicitly approved proceeding.
 
 Do not start implementation until the user approves or asks for implementation.

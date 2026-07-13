@@ -14,13 +14,15 @@ This page lists common Trellis file locations in a user project by platform. Whe
 | Kiro | `--kiro` | `.kiro/` | `.kiro/skills/` | `.kiro/agents/` | `.kiro/hooks/` |
 | Gemini CLI | `--gemini` | `.gemini/` | `.agents/skills/` | `.gemini/agents/` | `.gemini/settings.json` + `.gemini/hooks/` |
 | Antigravity | `--antigravity` | `.agent/` | `.agent/skills/` | Usually none | `.agent/workflows/` |
-| Windsurf | `--windsurf` | `.windsurf/` | `.windsurf/skills/` | Usually none | `.windsurf/workflows/` |
+| Devin | `--devin` | `.devin/` | `.devin/skills/` | Usually none | `.devin/workflows/` |
 | Qoder | `--qoder` | `.qoder/` | `.qoder/skills/` | `.qoder/agents/` | `.qoder/hooks/` + `.qoder/settings.json` |
 | CodeBuddy | `--codebuddy` | `.codebuddy/` | `.codebuddy/skills/` | `.codebuddy/agents/` | `.codebuddy/hooks/` + `.codebuddy/settings.json` |
 | GitHub Copilot | `--copilot` | `.github/` | `.github/skills/` | `.github/agents/` | `.github/copilot/hooks/` + prompts |
 | Factory Droid | `--droid` | `.factory/` | `.factory/skills/` | `.factory/droids/` | `.factory/hooks/` + settings |
 | Pi Agent | `--pi` | `.pi/` | `.pi/skills/` | `.pi/agents/` | `.pi/extensions/trellis/` (native `trellis_subagent` tool) + `.pi/settings.json` |
+| Trae IDE | `--trae` | `.trae/` | `.trae/skills/` | `.trae/agents/` | `.trae/hooks/` + `.trae/hooks.json` |
 | Reasonix | `--reasonix` | `.reasonix/` | `.reasonix/skills/` | None — sub-agents are skills with `runAs: subagent` frontmatter | None |
+| ZCode | `--zcode` | `.zcode/` | `.zcode/skills/` | `.zcode/agents/` | pull-based prelude (no hooks) |
 
 ## Capability Groups
 
@@ -39,7 +41,9 @@ These platforms usually have `trellis-research`, `trellis-implement`, and `trell
 - GitHub Copilot
 - Factory Droid
 - Pi Agent
+- Trae IDE
 - Reasonix (delivered as skills with `runAs: subagent` under `.reasonix/skills/`, not as a separate `agents/` directory)
+- ZCode
 
 When changing implementation/check/research behavior, look for the corresponding platform agent files first.
 
@@ -57,13 +61,13 @@ These platforms rely more on workflows/skills to guide the main session:
 
 - Kilo
 - Antigravity
-- Windsurf
+- Devin
 
 When changing behavior, inspect workflows and skills first. Do not assume Trellis sub-agents exist.
 
 ### Shared `.agents/skills/`
 
-Codex writes the shared `.agents/skills/` layer. Some tools that support agentskills.io can also read this directory. If the user wants multiple compatible tools to share one skill, consider `.agents/skills/` first, but do not assume every platform reads it.
+Codex and Gemini CLI write the shared `.agents/skills/` layer. Some tools that support agentskills.io can also read this directory. If the user wants multiple compatible tools to share one skill, consider `.agents/skills/` first, but do not assume every platform reads it. ZCode keeps Trellis-managed skills under `.zcode/skills/`.
 
 ## Decision Rules When Modifying Platform Files
 
@@ -82,3 +86,20 @@ Platform ecosystems change, and user projects may already be customized. If this
 - Judge behavior by the read rules currently written in the agent file.
 
 Do not delete a custom file just because it is not listed in this path table.
+
+### `.omp/` — Oh My Pi (OMP)
+
+Extension-backed platform. OMP native provider auto-discovers all subdirectories.
+
+```
+.omp/
+├── commands/          # Slash commands (flat .md)
+├── skills/            # Auto-triggered skills (SKILL.md per dir)
+├── agents/            # Agent definitions (.md)
+└── extensions/
+    └── trellis/
+        └── index.ts   # Trellis extension (context injection)
+```
+
+No `settings.json` — OMP scans `.omp/` subdirectories automatically.
+No Python hooks — hook-equivalent behavior lives in the TypeScript extension.
