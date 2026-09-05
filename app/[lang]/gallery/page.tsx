@@ -1,7 +1,26 @@
 import { getGalleryCocktails } from "@/lib/cocktail-data";
+import {
+  isAlcoholLevel,
+  isBaseSpirit,
+  isFlavorProfile,
+} from "@/lib/domain/vocabulary";
 import { DataSourceUnavailableError } from "@/lib/runtime-errors";
 import GalleryContent from "./GalleryContent";
 import { redirect } from "next/navigation";
+
+/** Reads a single-valued query parameter, ignoring repeated ones. */
+function readParam(value: string | string[] | undefined): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+/** Reads a query parameter only if it is a valid vocabulary code. */
+function readCode<T extends string>(
+  value: string | string[] | undefined,
+  isValid: (candidate: string) => candidate is T,
+): T | undefined {
+  const raw = readParam(value);
+  return raw && isValid(raw) ? raw : undefined;
+}
 
 export default async function GalleryPage({
   params,
@@ -23,27 +42,17 @@ export default async function GalleryPage({
   }
 
   const resolvedSearchParams = await searchParams;
+
+  // Query parameters are user input, so each vocabulary filter is validated
+  // against the vocabulary and dropped when it does not match. Previously any
+  // string was passed through as a filter value, and `?spirit=xyz` silently
+  // returned an empty gallery instead of being ignored.
   const filters = {
-    search:
-      typeof resolvedSearchParams?.q === "string"
-        ? resolvedSearchParams.q
-        : undefined,
-    cursor:
-      typeof resolvedSearchParams?.cursor === "string"
-        ? resolvedSearchParams.cursor
-        : undefined,
-    spirit:
-      typeof resolvedSearchParams?.spirit === "string"
-        ? resolvedSearchParams.spirit
-        : undefined,
-    flavor:
-      typeof resolvedSearchParams?.flavor === "string"
-        ? resolvedSearchParams.flavor
-        : undefined,
-    alcohol:
-      typeof resolvedSearchParams?.alcohol === "string"
-        ? resolvedSearchParams.alcohol
-        : undefined,
+    search: readParam(resolvedSearchParams?.q),
+    cursor: readParam(resolvedSearchParams?.cursor),
+    spirit: readCode(resolvedSearchParams?.spirit, isBaseSpirit),
+    flavor: readCode(resolvedSearchParams?.flavor, isFlavorProfile),
+    alcohol: readCode(resolvedSearchParams?.alcohol, isAlcoholLevel),
   };
 
   let cocktails = null;
@@ -57,10 +66,8 @@ export default async function GalleryPage({
         flavor: filters.flavor,
         alcohol: filters.alcohol,
       },
-      {
-        cursor: filters.cursor,
-        limit: 24,
-      },
+      filters.cursor,
+      lang,
     );
   } catch (error) {
     if (!(error instanceof DataSourceUnavailableError)) {

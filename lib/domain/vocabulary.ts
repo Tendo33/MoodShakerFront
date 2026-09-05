@@ -216,3 +216,122 @@ export function coerceAlcoholLevel(
   }
   return "medium";
 }
+
+/**
+ * Compound terms that must be matched before the single-character hints below.
+ *
+ * `碳酸感` means carbonated, but contains `酸` and would otherwise be read as sour.
+ * A match here also removes the term from the string before the hint scan, so its
+ * characters cannot be counted twice.
+ */
+const FLAVOR_COMPOUNDS: ReadonlyArray<readonly [string, FlavorProfile]> = [
+  ["碳酸", "refreshing"],
+  ["气泡", "refreshing"],
+  ["焦糖", "sweet"],
+  ["巧克力", "sweet"],
+  ["蜂蜜", "sweet"],
+];
+
+/**
+ * Substrings that imply a flavour code.
+ *
+ * Every matching rule contributes, rather than the first one winning, because
+ * stored values are often compound: `甜酸` and `Sweet & Sour` each name two
+ * flavours and must not collapse to one.
+ */
+const FLAVOR_HINTS: ReadonlyArray<readonly [string, FlavorProfile]> = [
+  ["sweet", "sweet"],
+  ["甜", "sweet"],
+  ["sour", "sour"],
+  ["酸", "sour"],
+  ["bitter", "bitter"],
+  ["苦", "bitter"],
+  ["spic", "spicy"],
+  ["辛辣", "spicy"],
+  ["辣", "spicy"],
+  ["fruit", "fruity"],
+  ["citrus", "fruity"],
+  ["果", "fruity"],
+  ["柑橘", "fruity"],
+  ["herbal", "herbal"],
+  ["mint", "herbal"],
+  ["草本", "herbal"],
+  ["薄荷", "herbal"],
+  ["floral", "floral"],
+  ["花", "floral"],
+  ["smok", "smoky"],
+  ["烟熏", "smoky"],
+  ["refresh", "refreshing"],
+  ["清", "refreshing"],
+  ["爽", "refreshing"],
+  ["cream", "creamy"],
+  ["奶", "creamy"],
+  ["salt", "salty"],
+  ["咸", "salty"],
+];
+
+/**
+ * Maps stored flavour values onto codes.
+ *
+ * The column accumulated 25 distinct values of which only 9 were codes; the rest
+ * were free text like `薄荷香`, `醇厚`, and `甜酸`. Anything with no recognisable
+ * flavour becomes `other` rather than being dropped, so a row never ends up with
+ * an empty profile list.
+ *
+ * Capped at five to match the generation contract in
+ * `lib/ai/cocktail-schema.ts`; earlier entries win.
+ */
+export function coerceFlavorProfiles(
+  values: readonly string[] | null | undefined,
+): FlavorProfile[] {
+  if (!values || values.length === 0) return ["other"];
+
+  const collected = new Set<FlavorProfile>();
+  let sawUnrecognized = false;
+
+  for (const raw of values) {
+    if (typeof raw !== "string") continue;
+
+    const trimmed = raw.trim();
+    if (trimmed.length === 0) continue;
+
+    const normalized = trimmed.toLowerCase();
+
+    if (isFlavorProfile(normalized)) {
+      collected.add(normalized);
+      continue;
+    }
+
+    let matched = false;
+
+    // Consume compound terms first so their characters cannot also satisfy a
+    // single-character hint.
+    let remaining = normalized;
+    for (const [term, code] of FLAVOR_COMPOUNDS) {
+      if (remaining.includes(term)) {
+        collected.add(code);
+        remaining = remaining.split(term).join(" ");
+        matched = true;
+      }
+    }
+
+    for (const [hint, code] of FLAVOR_HINTS) {
+      if (remaining.includes(hint)) {
+        collected.add(code);
+        matched = true;
+      }
+    }
+
+    if (!matched) sawUnrecognized = true;
+  }
+
+  // Recognised flavours outrank the `other` placeholder. It used to be added in
+  // encounter order, so a drink whose first stored value was unrecognisable spent
+  // one of its five slots on the placeholder and dropped a real flavour.
+  const codes = [...collected].slice(0, 5);
+
+  if (codes.length === 0) return ["other"];
+  if (sawUnrecognized && codes.length < 5) codes.push("other");
+
+  return codes;
+}

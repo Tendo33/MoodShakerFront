@@ -5,7 +5,10 @@ test("next config includes baseline security headers", async () => {
   const mod = await import("../next.config.mjs");
   const config = mod.default;
 
-  assert.equal(typeof config.headers, "function");
+  // `assert.ok` rather than `assert.equal(typeof ...)`: only the former is typed
+  // as an assertion, so the call below narrows instead of erroring on a possibly
+  // undefined `headers`.
+  assert.ok(typeof config.headers === "function");
 
   const headerEntries = await config.headers();
   const rootHeaders = headerEntries.find(

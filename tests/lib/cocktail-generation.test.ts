@@ -93,8 +93,8 @@ test("returns a cocktail when the first response validates", async () => {
   const cocktail = await generateCocktailRecommendation(baseInput(provider));
 
   assert.equal(calls.length, 1);
-  assert.equal(cocktail.name, "莫吉托");
-  assert.equal(cocktail.english_name, "Mojito");
+  assert.equal(cocktail.content.name.cn, "莫吉托");
+  assert.equal(cocktail.content.name.en, "Mojito");
 });
 
 test("repairs invalid output on a second attempt", async () => {
@@ -108,7 +108,7 @@ test("repairs invalid output on a second attempt", async () => {
   const cocktail = await generateCocktailRecommendation(baseInput(provider));
 
   assert.equal(calls.length, 2);
-  assert.equal(cocktail.english_name, "Mojito");
+  assert.equal(cocktail.content.name.en, "Mojito");
 
   // The repair turn must carry the specific problems, not a generic retry.
   const repairMessages = calls[1].messages;
@@ -153,7 +153,7 @@ test("accepts a response wrapped in a fenced code block", async () => {
 
   const cocktail = await generateCocktailRecommendation(baseInput(provider));
 
-  assert.equal(cocktail.english_name, "Mojito");
+  assert.equal(cocktail.content.name.en, "Mojito");
 });
 
 test("rejects prose wrapped around a JSON object", async () => {
@@ -232,31 +232,31 @@ test("requests structured output on every call", async () => {
 test("maps vocabulary codes to labels in both languages", () => {
   const cocktail = mapGeneratedCocktail(validCocktail() as never);
 
-  assert.equal(cocktail.base_spirit, "朗姆酒");
-  assert.equal(cocktail.english_base_spirit, "Rum");
-  assert.equal(cocktail.alcohol_level, "低度");
-  assert.equal(cocktail.english_alcohol_level, "Low");
-  assert.deepEqual(cocktail.flavor_profiles, ["清爽", "酸"]);
-  assert.deepEqual(cocktail.english_flavor_profiles, ["Refreshing", "Sour"]);
+  // Codes, not display text. The mapper used to render these to labels in both
+  // languages because the columns held display strings.
+  assert.equal(cocktail.baseSpirit, "rum");
+  assert.equal(cocktail.alcoholLevel, "low");
+  assert.deepEqual(cocktail.flavorProfiles, ["refreshing", "sour"]);
 });
 
 test("maps nested bilingual fields", () => {
   const cocktail = mapGeneratedCocktail(validCocktail() as never);
 
-  assert.equal(cocktail.ingredients[0].name, "白朗姆酒");
-  assert.equal(cocktail.ingredients[0].english_name, "White rum");
-  assert.equal(cocktail.ingredients[0].unit, "毫升");
-  assert.equal(cocktail.tools[0].english_name, "Muddler");
-  assert.equal(cocktail.steps[0].step_number, 1);
-  assert.equal(cocktail.steps[0].english_description, "Muddle the mint leaves");
+  assert.equal(cocktail.content.ingredients[0].name.cn, "白朗姆酒");
+  assert.equal(cocktail.content.ingredients[0].name.en, "White rum");
+  assert.equal(cocktail.content.ingredients[0].unit?.cn, "毫升");
+  assert.equal(cocktail.content.tools[0].name.en, "Muddler");
+  assert.equal(cocktail.content.steps[0].stepNumber, 1);
+  assert.equal(cocktail.content.steps[0].description.en, "Muddle the mint leaves");
 });
 
-test("omits optional fields that were null", () => {
+test("keeps absent optional fields as null", () => {
   const cocktail = mapGeneratedCocktail(validCocktail() as never);
 
-  // Absent rather than an empty string, so the UI can tell "no substitute" from
-  // "substitute is blank".
-  assert.equal("substitute" in cocktail.ingredients[0], false);
-  assert.equal("alternative" in cocktail.tools[0], false);
-  assert.equal("tips" in cocktail.steps[0], false);
+  // Explicitly null rather than omitted: the stored shape is read back with
+  // `pickLocalized`, which distinguishes null from a blank string, so the UI can
+  // still tell "no substitute" from "substitute is blank".
+  assert.equal(cocktail.content.ingredients[0].substitute, null);
+  assert.equal(cocktail.content.tools[0].alternative, null);
+  assert.equal(cocktail.content.steps[0].tips, null);
 });

@@ -20,21 +20,29 @@ import {
   type LLMProvider,
   ProviderError,
 } from "@/lib/ai/provider";
-import {
-  AgentType,
-  type Cocktail,
-  type Ingredient,
-  type Step,
-  type Tool,
-} from "@/lib/cocktail-types";
-import {
-  ALCOHOL_LEVEL_LABELS,
-  BASE_SPIRIT_LABELS,
-  FLAVOR_PROFILE_LABELS,
+import { AgentType, type StoredCocktailContent } from "@/lib/cocktail-types";
+import type {
+  AlcoholLevelCode,
+  BaseSpirit,
+  FlavorProfile,
 } from "@/lib/domain/vocabulary";
 import { createLogger } from "@/utils/logger";
 
 const logger = createLogger("CocktailGeneration");
+
+/**
+ * A freshly generated cocktail, in the shape it is stored in.
+ *
+ * Deliberately not the display type: the caller persists this and then resolves
+ * it for one locale through `resolveCocktail`, so generated and stored cocktails
+ * travel the same rendering path.
+ */
+export interface GeneratedStoredCocktail {
+  content: StoredCocktailContent;
+  baseSpirit: BaseSpirit;
+  alcoholLevel: AlcoholLevelCode;
+  flavorProfiles: FlavorProfile[];
+}
 
 /**
  * Hard ceiling on provider calls per user request: one generation plus at most
@@ -95,114 +103,50 @@ function extractJsonPayload(content: string): unknown {
   }
 }
 
-function localizedPair(value: { cn: string; en: string }): [string, string] {
-  return [value.cn, value.en];
-}
-
-function mapIngredient(source: GeneratedCocktail["ingredients"][number]): Ingredient {
-  const [name, englishName] = localizedPair(source.name);
-  const [amount, englishAmount] = localizedPair(source.amount);
-
-  return {
-    name,
-    english_name: englishName,
-    amount,
-    english_amount: englishAmount,
-    ...(source.unit
-      ? { unit: source.unit.cn, english_unit: source.unit.en }
-      : {}),
-    ...(source.substitute
-      ? {
-          substitute: source.substitute.cn,
-          english_substitute: source.substitute.en,
-        }
-      : {}),
-  };
-}
-
-function mapTool(source: GeneratedCocktail["tools"][number]): Tool {
-  const [name, englishName] = localizedPair(source.name);
-
-  return {
-    name,
-    english_name: englishName,
-    ...(source.alternative
-      ? {
-          alternative: source.alternative.cn,
-          english_alternative: source.alternative.en,
-        }
-      : {}),
-  };
-}
-
-function mapStep(source: GeneratedCocktail["steps"][number]): Step {
-  const [description, englishDescription] = localizedPair(source.description);
-
-  return {
-    step_number: source.stepNumber,
-    description,
-    english_description: englishDescription,
-    ...(source.tips
-      ? { tips: source.tips.cn, english_tips: source.tips.en }
-      : {}),
-  };
-}
-
 /**
- * Maps validated output onto the legacy `Cocktail` shape.
+ * Maps validated output onto the stored shape.
  *
- * Enumerable fields are rendered to their display labels rather than stored as
- * raw codes, because the current columns and the whole display layer read these
- * values directly — writing `"rum"` would make `/cn` render "rum" instead of
- * "朗姆酒". The improvement over the previous code is that both languages now come
- * from one label map instead of `inferEnglishBaseSpirit` guessing English from a
- * Chinese substring. The columns switch to codes in the data-model batch, at
- * which point this mapper collapses.
+ * Nearly an identity mapping: the generation schema already produces
+ * `{ cn, en }` for every text field, which is exactly how content is stored.
+ * The previous version expanded each field into a `xxx` / `english_xxx` pair and
+ * rendered the vocabulary codes to display labels, because the columns held
+ * display text. With codes in the columns, all of that disappears.
  */
-export function mapGeneratedCocktail(source: GeneratedCocktail): Cocktail {
-  const [name, englishName] = localizedPair(source.name);
-  const [description, englishDescription] = localizedPair(source.description);
-  const [matchReason, englishMatchReason] = localizedPair(source.matchReason);
-  const [servingGlass, englishServingGlass] = localizedPair(source.servingGlass);
-  const [timeRequired, englishTimeRequired] = localizedPair(source.timeRequired);
-
+export function mapGeneratedCocktail(
+  source: GeneratedCocktail,
+): GeneratedStoredCocktail {
   return {
-    name,
-    english_name: englishName,
-    description,
-    english_description: englishDescription,
-    match_reason: matchReason,
-    english_match_reason: englishMatchReason,
-    base_spirit: BASE_SPIRIT_LABELS[source.baseSpirit].cn,
-    english_base_spirit: BASE_SPIRIT_LABELS[source.baseSpirit].en,
-    alcohol_level: ALCOHOL_LEVEL_LABELS[source.alcoholLevel].cn,
-    english_alcohol_level: ALCOHOL_LEVEL_LABELS[source.alcoholLevel].en,
-    serving_glass: servingGlass,
-    english_serving_glass: englishServingGlass,
-    time_required: timeRequired,
-    english_time_required: englishTimeRequired,
-    flavor_profiles: source.flavorProfiles.map(
-      (code) => FLAVOR_PROFILE_LABELS[code].cn,
-    ),
-    english_flavor_profiles: source.flavorProfiles.map(
-      (code) => FLAVOR_PROFILE_LABELS[code].en,
-    ),
-    ingredients: source.ingredients.map(mapIngredient),
-    tools: source.tools.map(mapTool),
-    steps: source.steps.map(mapStep),
+    content: {
+      name: source.name,
+      description: source.description,
+      matchReason: source.matchReason,
+      servingGlass: source.servingGlass,
+      timeRequired: source.timeRequired,
+      ingredients: source.ingredients.map((item) => ({
+        name: item.name,
+        amount: item.amount,
+        unit: item.unit,
+        substitute: item.substitute,
+      })),
+      tools: source.tools.map((item) => ({
+        name: item.name,
+        alternative: item.alternative,
+      })),
+      steps: source.steps.map((item) => ({
+        stepNumber: item.stepNumber,
+        description: item.description,
+        tips: item.tips,
+      })),
+    },
+    baseSpirit: source.baseSpirit,
+    alcoholLevel: source.alcoholLevel,
+    flavorProfiles: source.flavorProfiles,
   };
 }
 
-/**
- * Generates a cocktail recommendation.
- *
- * Output must pass schema validation before it is returned. On failure the model
- * gets exactly one repair attempt carrying the specific issues; if that also
- * fails the call throws and the route persists nothing.
- */
 export async function generateCocktailRecommendation(
   input: GenerateCocktailInput,
-): Promise<Cocktail> {
+): Promise<GeneratedStoredCocktail> {
   const { provider } = input;
   const jsonSchema = {
     name: "cocktail_recommendation",

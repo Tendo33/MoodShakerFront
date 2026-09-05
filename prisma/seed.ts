@@ -1,72 +1,45 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { popularCocktails } from "../lib/cocktail-catalog";
+import { seedCocktails } from "./seed-data";
 
 const prisma = new PrismaClient();
 
-const cocktailImages: Record<string, string> = {
-  mojito: "/vibrant-mojito.png",
-  margarita: "/vibrant-margarita.png",
-  cosmopolitan: "/city-lights-cocktail.png",
-};
-
+/**
+ * Seeds the three classic cocktails.
+ *
+ * Upserts on `slug`, which is the stable identifier. It used to upsert on `name`,
+ * relying on a unique constraint the database never actually had — two rows
+ * already shared a name in production.
+ */
 async function main() {
-  console.log("Start seeding...");
+  console.log(`Seeding ${seedCocktails.length} cocktails...`);
 
-  for (const [key, cocktail] of Object.entries(popularCocktails)) {
-    const imagePath = cocktailImages[key] || cocktail.image;
+  for (const cocktail of seedCocktails) {
+    const data = {
+      content: cocktail.content as unknown as Prisma.InputJsonValue,
+      baseSpirit: cocktail.baseSpirit,
+      alcoholLevel: cocktail.alcoholLevel,
+      flavorProfiles: cocktail.flavorProfiles,
+      imageUrl: cocktail.imageUrl,
+    };
 
     try {
       await prisma.cocktail.upsert({
-        where: { id: key },
+        where: { slug: cocktail.slug },
+        // Images generated later must survive re-seeding, so an existing
+        // imageUrl is left alone.
         update: {
-          name: cocktail.name,
-          englishName: cocktail.english_name,
-          description: cocktail.description,
-          englishDescription: cocktail.english_description,
-          matchReason: cocktail.match_reason,
-          englishMatchReason: cocktail.english_match_reason,
-          baseSpirit: cocktail.base_spirit,
-          englishBaseSpirit: cocktail.english_base_spirit,
-          alcoholLevel: cocktail.alcohol_level,
-          englishAlcoholLevel: cocktail.english_alcohol_level,
-          servingGlass: cocktail.serving_glass,
-          englishServingGlass: cocktail.english_serving_glass,
-          timeRequired: cocktail.time_required || "5 mins",
-          englishTimeRequired: cocktail.english_time_required,
-          flavorProfiles: cocktail.flavor_profiles,
-          englishFlavorProfiles: cocktail.english_flavor_profiles || [],
-          ingredients: cocktail.ingredients as unknown as Prisma.InputJsonValue,
-          tools: cocktail.tools as unknown as Prisma.InputJsonValue,
-          steps: cocktail.steps as unknown as Prisma.InputJsonValue,
-          image: imagePath,
+          content: data.content,
+          baseSpirit: data.baseSpirit,
+          alcoholLevel: data.alcoholLevel,
+          flavorProfiles: data.flavorProfiles,
         },
-        create: {
-          id: key,
-          name: cocktail.name,
-          englishName: cocktail.english_name,
-          description: cocktail.description,
-          englishDescription: cocktail.english_description,
-          matchReason: cocktail.match_reason,
-          englishMatchReason: cocktail.english_match_reason,
-          baseSpirit: cocktail.base_spirit,
-          englishBaseSpirit: cocktail.english_base_spirit,
-          alcoholLevel: cocktail.alcohol_level,
-          englishAlcoholLevel: cocktail.english_alcohol_level,
-          servingGlass: cocktail.serving_glass,
-          englishServingGlass: cocktail.english_serving_glass,
-          timeRequired: cocktail.time_required || "5 mins",
-          englishTimeRequired: cocktail.english_time_required,
-          flavorProfiles: cocktail.flavor_profiles,
-          englishFlavorProfiles: cocktail.english_flavor_profiles || [],
-          ingredients: cocktail.ingredients as unknown as Prisma.InputJsonValue,
-          tools: cocktail.tools as unknown as Prisma.InputJsonValue,
-          steps: cocktail.steps as unknown as Prisma.InputJsonValue,
-          image: imagePath,
-        },
+        create: { slug: cocktail.slug, ...data },
       });
-      console.log(`Seeded cocktail: ${cocktail.name}`);
-    } catch (e) {
-      console.error(`Error seeding ${key}:`, e);
+
+      console.log(`  ${cocktail.slug}`);
+    } catch (error) {
+      console.error(`  ${cocktail.slug} failed:`, error);
+      throw error;
     }
   }
 
@@ -74,11 +47,8 @@ async function main() {
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
   })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+  .finally(() => prisma.$disconnect());

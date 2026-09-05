@@ -13,9 +13,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:seed": "tsx prisma/seed.ts",
-    "prisma:backfill-thumbnails": "tsx prisma/backfill-thumbnails.ts",
     "db:init": "pnpm prisma:generate && pnpm prisma:migrate && pnpm prisma:seed",
-    "prisma:backfill-image-urls": "node --env-file=.env --import tsx prisma/backfill-image-urls.ts"
+    "prisma:backfill-cocktail-content": "node --env-file=.env --import tsx prisma/backfill-cocktail-content.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1127.0",

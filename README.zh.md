@@ -216,14 +216,14 @@ pnpm dev
 | `pnpm prisma:generate` | 只生成 Prisma Client |
 | `pnpm prisma:migrate` | 执行 Prisma 迁移 |
 | `pnpm prisma:seed` | 写入鸡尾酒种子数据 |
-| `pnpm prisma:backfill-thumbnails` | 回填 `thumbnail` 字段 |
+| `pnpm prisma:backfill-cocktail-content` | 从旧的双列结构回填 `slug` 与 `content`（加 `-- --dry` 可预览） |
 
 ## API 接口
 
 | 方法 | 路径 | 作用 |
 | --- | --- | --- |
 | `POST` | `/api/cocktail` | 根据问卷输入生成鸡尾酒推荐 |
-| `GET` | `/api/cocktail/:id` | 按 id 获取公开鸡尾酒详情 |
+| `GET` | `/api/cocktail/:slug?lang=cn\|en` | 按 slug 获取公开鸡尾酒详情 |
 | `POST` | `/api/image` | 在具备编辑权限时生成或刷新推荐图片 |
 | `POST` | `/api/recommendation/:id` | 通过 JSON body 中的 `editToken` 读取私有推荐 |
 

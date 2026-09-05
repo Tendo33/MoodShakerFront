@@ -219,14 +219,14 @@ Open [http://localhost:3000](http://localhost:3000). Requests to `/` are redirec
 | `pnpm prisma:generate` | Generate Prisma client only |
 | `pnpm prisma:migrate` | Apply Prisma migrations |
 | `pnpm prisma:seed` | Seed cocktail data |
-| `pnpm prisma:backfill-thumbnails` | Backfill the `thumbnail` field from stored images |
+| `pnpm prisma:backfill-cocktail-content` | Backfill `slug` and `content` from the legacy column pairs (pass `-- --dry` to preview) |
 
 ## API Endpoints
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | `POST` | `/api/cocktail` | Generate a cocktail recommendation from questionnaire input |
-| `GET` | `/api/cocktail/:id` | Fetch a public cocktail detail record by id |
+| `GET` | `/api/cocktail/:slug?lang=cn\|en` | Fetch a public cocktail detail record by slug |
 | `POST` | `/api/image` | Generate or refresh a recommendation image when the caller has edit access |
 | `POST` | `/api/recommendation/:id` | Retrieve a private recommendation by id using an `editToken` in the JSON body |
 

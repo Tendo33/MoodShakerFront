@@ -3,7 +3,7 @@
   "name": "data-model",
   "title": "数据模型统一",
   "description": "locale-keyed 鸡尾酒模型替代 english_* 双列，清理 thumbnail/build 兼容补丁，收敛 Cocktail/Gallery/Public 类型",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": null,
   "package": null,

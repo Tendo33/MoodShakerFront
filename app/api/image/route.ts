@@ -5,7 +5,7 @@ import { apiError, apiSuccess } from "@/lib/api-response";
 import { createRequestId, isSameOrigin } from "@/lib/http/request-context";
 import { buildRateLimitHeaders, consumeRateLimit } from "@/lib/rate-limit";
 import {
-  getRecommendationSessionById,
+  getRecommendationImageContext,
   updateRecommendationSessionImageUrls,
 } from "@/lib/recommendation-sessions";
 import { validateImageRequest } from "@/lib/request-validation";
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { recommendationId, editToken } = validated.data;
-    const recommendation = await getRecommendationSessionById(
+    const recommendation = await getRecommendationImageContext(
       recommendationId,
       editToken,
     );
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = buildImagePrompt(recommendation.cocktail);
+    const prompt = buildImagePrompt(recommendation.content);
 
     let sourceUrl: string;
     try {
@@ -114,8 +114,8 @@ export async function POST(request: NextRequest) {
     }
 
     const previousUrls = [
-      recommendation.image,
-      recommendation.thumbnail,
+      recommendation.imageUrl,
+      recommendation.thumbnailUrl,
     ].filter((value): value is string => typeof value === "string");
 
     const stored = await storeGeneratedImage({ recommendationId, sourceUrl });

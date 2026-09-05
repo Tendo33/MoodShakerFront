@@ -128,7 +128,10 @@ export const CocktailResultProvider = ({
       : null;
 
   const imageData =
-    volatileImageData || scopedPersistedImageData || recommendation?.image || null;
+    volatileImageData ||
+    scopedPersistedImageData ||
+    recommendation?.imageUrl ||
+    null;
 
   const loadSavedData = useCallback(() => {
     reloadData().catch(() => {
@@ -163,8 +166,8 @@ export const CocktailResultProvider = ({
 
       await updateItem("recommendation", {
         ...baseRecommendation,
-        image: image || undefined,
-        thumbnail: thumbnail || baseRecommendation.thumbnail,
+        imageUrl: image || null,
+        thumbnailUrl: thumbnail || baseRecommendation.thumbnailUrl,
       });
     },
     [updateItem],
@@ -308,7 +311,7 @@ export const CocktailResultProvider = ({
 
         await updateItem("recommendation", nextRecommendation);
         await updateItem("recommendationMeta", nextRecommendationMeta);
-        await persistImageUrl(nextRecommendation.image || null);
+        await persistImageUrl(nextRecommendation.imageUrl || null);
 
         setIsImageLoadingState(true);
 

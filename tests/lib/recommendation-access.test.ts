@@ -4,6 +4,7 @@ import {
   buildRecommendationAccessPayload,
   parseRecommendationAccessRequest,
 } from "../../lib/recommendation-access";
+import type { Cocktail } from "../../lib/cocktail-types";
 
 test("parseRecommendationAccessRequest returns 400 for invalid JSON bodies", async () => {
   const result = await parseRecommendationAccessRequest({
@@ -27,24 +28,39 @@ test("parseRecommendationAccessRequest returns 400 for invalid JSON bodies", asy
 });
 
 test("buildRecommendationAccessPayload does not expose the edit token", () => {
-  const payload = buildRecommendationAccessPayload({
+  // Built as a variable rather than inline: the point of the test is to hand the
+  // builder a record that *does* carry the token, and an inline literal would be
+  // rejected by the excess property check before it ever ran.
+  const cocktail: Cocktail = {
+    id: "rec_123",
+    slug: "negroni",
+    name: "Negroni",
+    nameAllLocales: { cn: "尼格罗尼", en: "Negroni" },
+    description: "Bittersweet classic",
+    matchReason: "Fits the mood",
+    servingGlass: "Rocks",
+    timeRequired: "3 mins",
+    baseSpirit: "gin",
+    baseSpiritLabel: "Gin",
+    alcoholLevel: "medium",
+    alcoholLevelLabel: "Medium",
+    flavorProfiles: ["bitter", "herbal"],
+    flavorProfileLabels: ["Bitter", "Herbal"],
+    ingredients: [],
+    tools: [],
+    steps: [],
+    imageUrl: null,
+    thumbnailUrl: null,
+  };
+
+  const session = {
     id: "rec_123",
     sessionId: "sess_123",
     editToken: "secret-token",
-    cocktail: {
-      id: "rec_123",
-      name: "Negroni",
-      description: "Bittersweet classic",
-      match_reason: "Fits the mood",
-      base_spirit: "Gin",
-      alcohol_level: "medium",
-      serving_glass: "Rocks",
-      flavor_profiles: ["bitter", "herbal"],
-      ingredients: [],
-      tools: [],
-      steps: [],
-    },
-  });
+    cocktail,
+  };
+
+  const payload = buildRecommendationAccessPayload(session);
 
   assert.deepEqual(payload.meta, {
     recommendationId: "rec_123",

@@ -6,14 +6,14 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
-import type { PublicCocktailSummary } from "@/lib/cocktail-types";
+import type { CocktailSummary } from "@/lib/cocktail-types";
 import { useLanguage } from "@/context/LanguageContext";
 import { GradientText } from "@/components/ui/core";
 import { shouldBypassNextImageOptimization } from "@/utils/image-optimization";
 import { Activity, Filter, GlassWater, Search, Sparkles, X } from "lucide-react";
 
 interface GalleryContentProps {
-  cocktails: PublicCocktailSummary[];
+  cocktails: CocktailSummary[];
   nextCursor: string | null;
   lang: string;
   initialFilters: {
@@ -390,50 +390,44 @@ export default function GalleryContent({
               {renderableCocktails.map((cocktail) => (
                 <motion.div key={cocktail.id} variants={itemVariants} className="content-auto">
                   <Link
-                    href={`/${lang}/cocktail/${cocktail.id}`}
+                    href={`/${lang}/cocktail/${cocktail.slug}`}
                     className="block group relative h-full focus-ring"
                   >
                     <div className="glass-panel relative h-full overflow-hidden border border-primary/35 shadow-[0_20px_42px_rgba(3,0,9,0.28),0_0_14px_rgba(255,79,216,0.1)] transition-all duration-500 group-hover:-translate-y-2.5 group-hover:scale-[1.02] group-hover:border-secondary group-hover:shadow-[0_26px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.14)] will-change-transform">
                       <div className="relative aspect-[4/5] overflow-hidden bg-black/60">
                         <Image
                           src={
-                            cocktail.thumbnail ||
+                            cocktail.thumbnailUrl ||
                             `/placeholder.svg?height=640&width=512&query=${encodeURIComponent(cocktail.name)}`
                           }
-                          alt={lang === "en" ? cocktail.english_name || cocktail.name : cocktail.name}
+                          alt={cocktail.name}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
                           className="object-cover opacity-92 transition-transform duration-500 group-hover:scale-[1.03]"
-                          unoptimized={shouldBypassNextImageOptimization(cocktail.thumbnail)}
+                          unoptimized={shouldBypassNextImageOptimization(cocktail.thumbnailUrl)}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                       </div>
                         <div className="space-y-4 p-5">
                           <div>
                           <h2 className="text-xl font-heading font-bold uppercase tracking-[0.16em] text-primary transition-colors group-hover:text-secondary">
-                            {lang === "en" ? cocktail.english_name || cocktail.name : cocktail.name}
+                            {cocktail.name}
                           </h2>
-                          {lang === "cn" && cocktail.english_name && (
+                          {lang === "cn" && cocktail.name && (
                             <p className="text-xs font-mono uppercase tracking-[0.2em] text-secondary/88">
-                              {cocktail.english_name}
+                              {cocktail.name}
                             </p>
                           )}
                         </div>
                         <p className="line-clamp-3 font-mono text-sm leading-relaxed text-foreground/82">
-                          {lang === "en"
-                            ? cocktail.english_description || cocktail.description
-                            : cocktail.description}
+                          {cocktail.description}
                         </p>
                         <div className="flex flex-wrap gap-2 text-xs font-mono uppercase tracking-[0.16em]">
                           <span className="glass-subtle border border-primary/35 px-3 py-1 text-primary">
-                            {lang === "en"
-                              ? cocktail.english_base_spirit || cocktail.base_spirit
-                              : cocktail.base_spirit}
+                            {cocktail.baseSpiritLabel}
                           </span>
                           <span className="glass-subtle border border-secondary/35 px-3 py-1 text-secondary">
-                            {lang === "en"
-                              ? cocktail.english_alcohol_level || cocktail.alcohol_level
-                              : cocktail.alcohol_level}
+                            {cocktail.alcoholLevelLabel}
                           </span>
                         </div>
                       </div>

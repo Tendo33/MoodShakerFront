@@ -13,10 +13,6 @@ interface CocktailHeroProps {
   t: (key: TranslationKey) => string;
   gradientTextClass: string;
   imageContent: ReactNode;
-  getLocalizedContent: (
-    field: keyof Cocktail,
-    englishField: keyof Cocktail,
-  ) => string | undefined;
 }
 
 export function CocktailHero({
@@ -26,7 +22,6 @@ export function CocktailHero({
   t,
   gradientTextClass,
   imageContent,
-  getLocalizedContent,
 }: CocktailHeroProps) {
   return (
     <motion.div
@@ -78,11 +73,11 @@ export function CocktailHero({
                 paddingBottom: "0.25rem",
               }}
             >
-              {getLocalizedContent("name", "english_name")}
+              {cocktail.name}
             </h1>
-            {cocktail.english_name && language === "cn" && (
+            {cocktail.nameAllLocales.en && language === "cn" && (
               <p className="text-safe-wrap text-xl font-mono uppercase tracking-[0.2em] text-secondary/90 md:text-2xl">
-                {cocktail.english_name}
+                {cocktail.nameAllLocales.en}
               </p>
             )}
           </motion.div>
@@ -95,17 +90,13 @@ export function CocktailHero({
             }}
           >
             <p className="max-w-2xl border-l-2 border-primary/65 bg-black/35 px-5 py-4 text-safe-wrap text-lg font-mono leading-relaxed text-foreground shadow-[0_14px_30px_rgba(3,0,9,0.16)]">
-              {getLocalizedContent("description", "english_description")}
+              {cocktail.description}
             </p>
           </motion.div>
 
-          <CocktailSpecs
-            t={t}
-            language={language}
-            getLocalizedContent={getLocalizedContent}
-          />
+          <CocktailSpecs t={t} language={language} cocktail={cocktail} />
 
-          {cocktail.flavor_profiles?.length > 0 && (
+          {cocktail.flavorProfileLabels.length > 0 && (
             <motion.div
               className="mt-8"
               variants={{
@@ -117,10 +108,7 @@ export function CocktailHero({
                 {t("detail.flavorProfile")}
               </p>
               <div className="flex flex-wrap gap-3">
-              {(language === "en" && cocktail.english_flavor_profiles
-                  ? cocktail.english_flavor_profiles
-                  : cocktail.flavor_profiles || []
-                ).map((flavor, index) => (
+              {cocktail.flavorProfileLabels.map((flavor, index) => (
                   <motion.span
                     key={index}
                     className="glass-subtle border border-primary/40 px-4 py-1.5 text-safe-wrap text-sm font-bold uppercase tracking-[0.18em] text-primary"

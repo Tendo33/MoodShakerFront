@@ -1,699 +1,202 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { Prisma, type Cocktail as DBCocktail } from "@prisma/client";
 import { DataSourceUnavailableError } from "@/lib/runtime-errors";
 import type {
   Cocktail,
-  GalleryCocktail,
+  GalleryQueryFilters,
   PaginatedGalleryResult,
-  PublicCocktailSummary,
 } from "@/lib/cocktail-types";
-import { popularCocktails } from "@/lib/cocktail-catalog";
+import {
+  readStoredContent,
+  resolveCocktail,
+  toCocktailSummary,
+} from "@/lib/domain/resolve-cocktail";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n/config";
+import { createLogger } from "@/utils/logger";
 
-export interface GalleryQueryFilters {
-  search?: string;
-  spirit?: string;
-  flavor?: string;
-  alcohol?: string;
+const logger = createLogger("CocktailData");
+
+const GALLERY_PAGE_SIZE = 24;
+
+/**
+ * Reads cocktails out of the database.
+ *
+ * Free text comes from the `content` JSONB column rather than eight
+ * `xxx` / `english_xxx` column pairs, and the locale is resolved at this
+ * boundary by `resolveCocktail` so callers receive plain strings.
+ *
+ * The hardcoded fallback catalogue is gone. It returned three canned cocktails
+ * whenever `DATABASE_URL` looked like a placeholder, which is how this project
+ * shipped with two migrations that had never been applied: the build succeeded
+ * against data that was never in a database. A missing database is now an error.
+ */
+
+interface CocktailRow {
+  id: string;
+  slug: string;
+  content: unknown;
+  base_spirit: string;
+  alcohol_level: string;
+  flavor_profiles: string[];
+  image_url: string | null;
+  thumbnail_url: string | null;
 }
 
-const SPIRIT_FILTER_KEYWORDS: Record<string, string[]> = {
-  gin: ["gin", "金酒"],
-  vodka: ["vodka", "伏特加"],
-  rum: ["rum", "朗姆"],
-  tequila: ["tequila", "龙舌兰"],
-  whiskey: ["whiskey", "whisky", "威士忌"],
-  brandy: ["brandy", "白兰地"],
-  other: ["other", "其他"],
-};
-
-const FLAVOR_FILTER_KEYWORDS: Record<string, string[]> = {
-  sweet: ["sweet", "甜"],
-  sour: ["sour", "酸"],
-  bitter: ["bitter", "苦"],
-  fruity: ["fruity", "果"],
-  herbal: ["herbal", "草本"],
-  smoky: ["smoky", "烟"],
-  spicy: ["spicy", "辛"],
-  salty: ["salty", "咸"],
-  creamy: ["creamy", "奶"],
-};
-
-const ALCOHOL_FILTER_KEYWORDS: Record<string, string[]> = {
-  low: ["low", "低"],
-  medium: ["medium", "中"],
-  high: ["high", "高"],
-};
-
-function normalizeFilterValue(value?: string): string | null {
-  if (!value) return null;
-  const normalized = value.trim().toLowerCase();
-  return normalized.length > 0 ? normalized : null;
-}
-
-function normalizeSearchValue(value?: string): string | null {
-  if (!value) return null;
-  const normalized = value.trim();
-  return normalized.length > 0 ? normalized : null;
-}
-
-function getFilterKeywords(
-  value: string | null,
-  mapping: Record<string, string[]>,
-): string[] {
-  if (!value) return [];
-  if (mapping[value]) return mapping[value];
-  return [value];
-}
-
-function capitalizeKeyword(value: string): string {
-  if (!value) return value;
-  return `${value[0].toUpperCase()}${value.slice(1)}`;
-}
-
-function getQueryValues(filters?: GalleryQueryFilters) {
-  const searchValue = normalizeSearchValue(filters?.search);
-  const spiritValue = normalizeFilterValue(filters?.spirit);
-  const flavorValue = normalizeFilterValue(filters?.flavor);
-  const alcoholValue = normalizeFilterValue(filters?.alcohol);
-
-  return {
-    searchValue,
-    spiritKeywords: getFilterKeywords(spiritValue, SPIRIT_FILTER_KEYWORDS),
-    flavorKeywords: getFilterKeywords(flavorValue, FLAVOR_FILTER_KEYWORDS),
-    alcoholKeywords: getFilterKeywords(alcoholValue, ALCOHOL_FILTER_KEYWORDS),
-  };
-}
-
-function filterGalleryCocktailsInMemory(
-  cocktails: GalleryCocktail[],
-  filters?: GalleryQueryFilters,
-): GalleryCocktail[] {
-  const { searchValue, spiritKeywords, flavorKeywords, alcoholKeywords } =
-    getQueryValues(filters);
-
-  return cocktails.filter((cocktail) => {
-    if (searchValue) {
-      const searchText = [
-        cocktail.name,
-        cocktail.english_name,
-        cocktail.description,
-        cocktail.english_description,
-        cocktail.base_spirit,
-        cocktail.english_base_spirit,
-        ...(cocktail.flavor_profiles || []),
-        ...(cocktail.english_flavor_profiles || []),
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
-      if (!searchText.includes(searchValue.toLowerCase())) {
-        return false;
-      }
-    }
-
-    if (spiritKeywords.length > 0) {
-      const spiritText = `${cocktail.base_spirit || ""} ${cocktail.english_base_spirit || ""}`.toLowerCase();
-      if (!spiritKeywords.some((keyword) => spiritText.includes(keyword.toLowerCase()))) {
-        return false;
-      }
-    }
-
-    if (alcoholKeywords.length > 0) {
-      const alcoholText = `${cocktail.alcohol_level || ""} ${cocktail.english_alcohol_level || ""}`.toLowerCase();
-      if (!alcoholKeywords.some((keyword) => alcoholText.includes(keyword.toLowerCase()))) {
-        return false;
-      }
-    }
-
-    if (flavorKeywords.length > 0) {
-      const flavorText = [
-        ...(cocktail.flavor_profiles || []),
-        ...(cocktail.english_flavor_profiles || []),
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      if (!flavorKeywords.some((keyword) => flavorText.includes(keyword.toLowerCase()))) {
-        return false;
-      }
-    }
-
-    return true;
+function unavailable(
+  context: string,
+  error: unknown,
+): DataSourceUnavailableError {
+  logger.error(`${context} unavailable`, {
+    message: error instanceof Error ? error.message : String(error),
   });
-}
 
-function normalizeAlcoholLevel(level: string): string {
-	if (!level) return "中度";
-	if (level === "Low" || level === "低") return "低度";
-	if (level === "Medium" || level === "中") return "中度";
-	if (level === "High" || level === "高") return "高度";
-	return level;
-}
-
-function normalizeBaseSpirit(spirit: string): string {
-	if (!spirit) return "其他";
-	const s = spirit.toLowerCase();
-	if (s.includes("vodka")) return "伏特加";
-	if (s.includes("gin")) return "金酒";
-	if (s.includes("rum") || s.includes("朗姆")) return "朗姆酒";
-	if (s.includes("tequila")) return "龙舌兰";
-	if (s.includes("whiskey") || s.includes("whisky")) return "威士忌";
-	if (s.includes("brandy")) return "白兰地";
-	return spirit;
-}
-
-function inferEnglishBaseSpirit(spirit: string, englishSpirit: string | null | undefined): string {
-	if (englishSpirit) return englishSpirit;
-	if (!spirit) return "Other";
-	const s = spirit.toLowerCase();
-	if (s.includes("伏特加")) return "Vodka";
-	if (s.includes("金酒")) return "Gin";
-	if (s.includes("朗姆")) return "Rum";
-	if (s.includes("龙舌兰")) return "Tequila";
-	if (s.includes("威士忌")) return "Whiskey";
-	if (s.includes("白兰地")) return "Brandy";
-	return spirit; // Fallback to original if unknown
-}
-
-function inferEnglishAlcoholLevel(level: string, englishLevel: string | null | undefined): string {
-	if (englishLevel) return englishLevel;
-	if (!level) return "Medium";
-	if (level.includes("低")) return "Low";
-	if (level.includes("中")) return "Medium";
-	if (level.includes("高")) return "High";
-	return "Medium";
-}
-
-function asTypedArray<T>(value: Prisma.JsonValue): T[] {
-  return (Array.isArray(value) ? value : []) as unknown as T[];
-}
-
-const THUMBNAIL_COLUMN_NAME = "cocktails.thumbnail";
-
-function shouldUseBuildFallback(): boolean {
-  return (
-    !process.env.DATABASE_URL ||
-    process.env.DATABASE_URL.includes("placeholder") ||
-    process.env.npm_lifecycle_event === "build"
-  );
-}
-
-function createDataSourceUnavailableError(context: string, error: unknown) {
-  const detail = error instanceof Error ? error.message : "Unknown data source error";
   return new DataSourceUnavailableError(
-    "COCKTAIL_DATA_UNAVAILABLE",
-    `${context} unavailable: ${detail}`,
+    "DATABASE_UNAVAILABLE",
+    `${context} is unavailable. Check the database connection and that migrations have been applied.`,
   );
 }
 
-const cocktailSelectWithoutThumbnail = {
-  id: true,
-  name: true,
-  englishName: true,
-  description: true,
-  englishDescription: true,
-  matchReason: true,
-  englishMatchReason: true,
-  baseSpirit: true,
-  englishBaseSpirit: true,
-  alcoholLevel: true,
-  englishAlcoholLevel: true,
-  servingGlass: true,
-  englishServingGlass: true,
-  timeRequired: true,
-  englishTimeRequired: true,
-  flavorProfiles: true,
-  englishFlavorProfiles: true,
-  ingredients: true,
-  tools: true,
-  steps: true,
-  image: true,
-  imageUrl: true,
-  thumbnailUrl: true,
-} satisfies Prisma.CocktailSelect;
+function mapRow(row: CocktailRow, locale: Locale): Cocktail | null {
+  const content = readStoredContent(row.content);
 
-const cocktailSelectWithThumbnail = {
-  ...cocktailSelectWithoutThumbnail,
-  thumbnail: true,
-} satisfies Prisma.CocktailSelect;
-
-const gallerySelectWithoutThumbnail = {
-  id: true,
-  name: true,
-  englishName: true,
-  description: true,
-  englishDescription: true,
-  baseSpirit: true,
-  englishBaseSpirit: true,
-  alcoholLevel: true,
-  englishAlcoholLevel: true,
-  thumbnailUrl: true,
-} satisfies Prisma.CocktailSelect;
-
-const gallerySelectWithThumbnail = {
-  ...gallerySelectWithoutThumbnail,
-  thumbnail: true,
-} satisfies Prisma.CocktailSelect;
-
-function isMissingThumbnailColumnError(error: unknown): boolean {
-  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
-    return false;
-  }
-
-  if (error.code !== "P2022") {
-    return false;
-  }
-
-  const meta = error.meta as { column?: unknown } | undefined;
-  const column = typeof meta?.column === "string" ? meta.column : "";
-
-  return (
-    error.message.includes(THUMBNAIL_COLUMN_NAME) ||
-    column.includes(THUMBNAIL_COLUMN_NAME)
-  );
-}
-
-function logThumbnailMigrationHint(scope: string): void {
-  console.warn(
-    `[DB Compatibility][${scope}] Missing "${THUMBNAIL_COLUMN_NAME}". Falling back without thumbnail. Please run "pnpm prisma:migrate" or "pnpm db:init".`,
-  );
-}
-
-async function runWithThumbnailCompatibility<T>(
-  scope: string,
-  operation: (includeThumbnail: boolean) => Promise<T>,
-): Promise<T> {
-  try {
-    return await operation(true);
-  } catch (error) {
-    if (!isMissingThumbnailColumnError(error)) {
-      throw error;
-    }
-
-    logThumbnailMigrationHint(scope);
-    return operation(false);
-  }
-}
-
-function toCocktailWithFallbackId(cocktail: Cocktail, fallbackId: string): Cocktail {
-  return {
-    ...cocktail,
-    id: cocktail.id ?? fallbackId,
-  };
-}
-
-function getPopularCocktailById(id: string): Cocktail | null {
-  const cocktail = popularCocktails[id];
-
-  if (!cocktail) {
+  if (!content) {
+    logger.warn("Skipping cocktail with unreadable content", { slug: row.slug });
     return null;
   }
 
-  return toCocktailWithFallbackId(cocktail, id);
-}
-
-function getPopularCocktailList(): Cocktail[] {
-  return Object.entries(popularCocktails).map(([fallbackId, cocktail]) =>
-    toCocktailWithFallbackId(cocktail, fallbackId),
+  return resolveCocktail(
+    {
+      id: row.id,
+      slug: row.slug,
+      content,
+      baseSpirit: row.base_spirit,
+      alcoholLevel: row.alcohol_level,
+      flavorProfiles: row.flavor_profiles,
+      imageUrl: row.image_url,
+      thumbnailUrl: row.thumbnail_url,
+    },
+    locale,
   );
 }
 
-function getPopularGalleryCocktails(filters?: GalleryQueryFilters): GalleryCocktail[] {
-  return filterGalleryCocktailsInMemory(
-    getPopularCocktailList().map(mapCocktailToGalleryCocktail),
-    filters,
-  );
-}
+const SELECT_COLUMNS = Prisma.sql`
+  id, slug, content, base_spirit, alcohol_level, flavor_profiles,
+  image_url, thumbnail_url`;
 
-function mapCocktailToPublicCocktailSummary(
-  cocktail: Cocktail,
-): PublicCocktailSummary {
-  return {
-    id: String(cocktail.id || ""),
-    name: cocktail.name,
-    english_name: cocktail.english_name,
-    description: cocktail.description,
-    english_description: cocktail.english_description,
-    base_spirit: cocktail.base_spirit,
-    english_base_spirit: cocktail.english_base_spirit,
-    alcohol_level: cocktail.alcohol_level,
-    english_alcohol_level: cocktail.english_alcohol_level,
-    thumbnail: cocktail.thumbnail,
-  };
-}
+/**
+ * Builds the filter conditions.
+ *
+ * Vocabulary filters compare codes, so the bilingual keyword maps and
+ * `capitalizeKeyword` are gone: matching on display text meant a filter had to
+ * know how a value was spelled in two languages, and it silently missed rows
+ * spelled a third way.
+ *
+ * Search still has to look at text, and that text now lives inside JSONB. It
+ * scans every language rather than the current one, so a Chinese query finds a
+ * drink while the interface is in English.
+ */
+function buildConditions(filters: GalleryQueryFilters): Prisma.Sql[] {
+  const conditions: Prisma.Sql[] = [];
 
-function getPopularGalleryPage(
-  filters?: GalleryQueryFilters,
-  cursor?: string | null,
-  limit: number = 24,
-): PaginatedGalleryResult {
-  const filtered = getPopularGalleryCocktails(filters).map((cocktail) =>
-    mapCocktailToPublicCocktailSummary(cocktail as unknown as Cocktail),
-  );
-  const startIndex = cursor
-    ? Math.max(
-        filtered.findIndex((item) => item.id === cursor) + 1,
-        0,
-      )
-    : 0;
-  const page = filtered.slice(startIndex, startIndex + limit + 1);
-  const hasMore = page.length > limit;
-  const items = hasMore ? page.slice(0, limit) : page;
-
-  return {
-    items,
-    nextCursor: hasMore ? items[items.length - 1]?.id || null : null,
-  };
-}
-
-type DBGalleryCocktail = Pick<
-  DBCocktail,
-  | "id"
-  | "name"
-  | "englishName"
-  | "description"
-  | "englishDescription"
-  | "baseSpirit"
-  | "englishBaseSpirit"
-  | "alcoholLevel"
-  | "englishAlcoholLevel"
-  | "thumbnail"
-  | "thumbnailUrl"
->;
-
-type DBCocktailWithOptionalThumbnail = Omit<DBCocktail, "thumbnail"> & {
-  thumbnail?: string | null;
-};
-
-type DBGalleryCocktailWithOptionalThumbnail = Omit<DBGalleryCocktail, "thumbnail"> & {
-  thumbnail?: string | null;
-};
-
-function mapDBCocktailToAppCocktail(
-  dbCocktail: DBCocktailWithOptionalThumbnail,
-): Cocktail {
-	const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
-	const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
-
-	return {
-		id: dbCocktail.id,
-		name: dbCocktail.name,
-		english_name: dbCocktail.englishName || dbCocktail.name,
-		description: dbCocktail.description,
-		english_description: dbCocktail.englishDescription || dbCocktail.description, // Fallback to description
-		match_reason: dbCocktail.matchReason || "",
-		english_match_reason: dbCocktail.englishMatchReason ?? undefined,
-		base_spirit: normalizedSpirit,
-		english_base_spirit: inferEnglishBaseSpirit(dbCocktail.baseSpirit, dbCocktail.englishBaseSpirit),
-		alcohol_level: normalizedLevel,
-		english_alcohol_level: inferEnglishAlcoholLevel(dbCocktail.alcoholLevel, dbCocktail.englishAlcoholLevel),
-		serving_glass: dbCocktail.servingGlass,
-		english_serving_glass: dbCocktail.englishServingGlass ?? undefined,
-		time_required: dbCocktail.timeRequired,
-		english_time_required: dbCocktail.englishTimeRequired ?? undefined,
-		flavor_profiles: dbCocktail.flavorProfiles,
-		english_flavor_profiles: dbCocktail.englishFlavorProfiles || [],
-		ingredients: asTypedArray<Cocktail["ingredients"][number]>(dbCocktail.ingredients),
-		tools: asTypedArray<Cocktail["tools"][number]>(dbCocktail.tools),
-		steps: asTypedArray<Cocktail["steps"][number]>(dbCocktail.steps),
-		// Dual read for the object-storage migration: prefer the new URL columns
-		// and fall back to the legacy inline values until the backfill completes.
-		image: dbCocktail.imageUrl || dbCocktail.image || undefined,
-		thumbnail: dbCocktail.thumbnailUrl || dbCocktail.thumbnail || undefined,
-	};
-}
-
-function mapCocktailToGalleryCocktail(cocktail: Cocktail): GalleryCocktail {
-  return {
-    id: cocktail.id,
-    name: cocktail.name,
-    english_name: cocktail.english_name,
-    description: cocktail.description,
-    english_description: cocktail.english_description,
-    base_spirit: cocktail.base_spirit,
-    english_base_spirit: cocktail.english_base_spirit,
-    alcohol_level: cocktail.alcohol_level,
-    english_alcohol_level: cocktail.english_alcohol_level,
-    flavor_profiles: cocktail.flavor_profiles,
-    english_flavor_profiles: cocktail.english_flavor_profiles,
-    ingredients: cocktail.ingredients,
-    image: cocktail.image,
-    thumbnail: cocktail.thumbnail,
-  };
-}
-
-function mapDBGalleryCocktail(
-  dbCocktail: DBGalleryCocktailWithOptionalThumbnail,
-): PublicCocktailSummary {
-  const normalizedLevel = normalizeAlcoholLevel(dbCocktail.alcoholLevel);
-  const normalizedSpirit = normalizeBaseSpirit(dbCocktail.baseSpirit);
-
-  return {
-    id: String(dbCocktail.id),
-    name: dbCocktail.name,
-    english_name: dbCocktail.englishName || dbCocktail.name,
-    description: dbCocktail.description,
-    english_description: dbCocktail.englishDescription || dbCocktail.description,
-    base_spirit: normalizedSpirit,
-    english_base_spirit: inferEnglishBaseSpirit(
-      dbCocktail.baseSpirit,
-      dbCocktail.englishBaseSpirit,
-    ),
-    alcohol_level: normalizedLevel,
-    english_alcohol_level: inferEnglishAlcoholLevel(
-      dbCocktail.alcoholLevel,
-      dbCocktail.englishAlcoholLevel,
-    ),
-    // Dual read for the object-storage migration: prefer the new URL column and
-    // fall back to the legacy inline value until the backfill completes.
-    thumbnail: dbCocktail.thumbnailUrl || dbCocktail.thumbnail || undefined,
-  };
-}
-
-export async function getAllCocktails(): Promise<Cocktail[]> {
-  const isBuildTime = shouldUseBuildFallback();
-  if (isBuildTime) {
-    return getPopularCocktailList();
+  if (filters.spirit) {
+    conditions.push(Prisma.sql`base_spirit = ${filters.spirit}`);
   }
 
+  if (filters.alcohol) {
+    conditions.push(Prisma.sql`alcohol_level = ${filters.alcohol}`);
+  }
+
+  if (filters.flavor) {
+    conditions.push(
+      Prisma.sql`flavor_profiles && ARRAY[${filters.flavor}]::text[]`,
+    );
+  }
+
+  const search = filters.search?.trim();
+  if (search) {
+    const pattern = `%${search}%`;
+    conditions.push(Prisma.sql`(
+      EXISTS (
+        SELECT 1 FROM jsonb_each_text(content->'name') AS kv
+        WHERE kv.value ILIKE ${pattern}
+      )
+      OR EXISTS (
+        SELECT 1 FROM jsonb_each_text(content->'description') AS kv
+        WHERE kv.value ILIKE ${pattern}
+      )
+    )`);
+  }
+
+  return conditions;
+}
+
+function whereClause(conditions: Prisma.Sql[]): Prisma.Sql {
+  if (conditions.length === 0) return Prisma.empty;
+  return Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}`;
+}
+
+export async function getCocktailBySlug(
+  slug: string,
+  locale: Locale = DEFAULT_LOCALE,
+): Promise<Cocktail | null> {
   try {
-    const cocktails = await runWithThumbnailCompatibility(
-      "getAllCocktails",
-      (includeThumbnail) =>
-        prisma.cocktail.findMany({
-          orderBy: { createdAt: "desc" },
-          select: includeThumbnail
-            ? cocktailSelectWithThumbnail
-            : cocktailSelectWithoutThumbnail,
-        }),
-    );
-    return cocktails.map((cocktail) =>
-      mapDBCocktailToAppCocktail(cocktail as DBCocktailWithOptionalThumbnail),
-    );
+    const rows = await prisma.$queryRaw<CocktailRow[]>(Prisma.sql`
+      SELECT ${SELECT_COLUMNS} FROM cocktails WHERE slug = ${slug} LIMIT 1`);
+
+    const row = rows[0];
+    return row ? mapRow(row, locale) : null;
   } catch (error) {
-    console.error("Error fetching cocktails from DB:", error);
-    throw createDataSourceUnavailableError("Cocktail list", error);
+    throw unavailable("Cocktail detail", error);
   }
 }
 
 export async function getGalleryCocktails(
-  filters?: GalleryQueryFilters,
-  options: {
-    cursor?: string | null;
-    limit?: number;
-  } = {},
+  filters: GalleryQueryFilters = {},
+  cursor?: string | null,
+  locale: Locale = DEFAULT_LOCALE,
 ): Promise<PaginatedGalleryResult> {
-  const { searchValue, spiritKeywords, flavorKeywords, alcoholKeywords } =
-    getQueryValues(filters);
-  const isBuildTime = shouldUseBuildFallback();
-  const limit = Math.min(Math.max(options.limit || 24, 1), 48);
-
-  if (isBuildTime) {
-    return getPopularGalleryPage(filters, options.cursor, limit);
-  }
-
   try {
-    const andFilters: Prisma.CocktailWhereInput[] = [];
+    const conditions = buildConditions(filters);
 
-    if (searchValue) {
-      const searchCandidates = Array.from(
-        new Set([searchValue, searchValue.toLowerCase(), capitalizeKeyword(searchValue)]),
-      );
-      andFilters.push({
-        OR: [
-          { name: { contains: searchValue, mode: Prisma.QueryMode.insensitive } },
-          {
-            englishName: {
-              contains: searchValue,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-          {
-            description: {
-              contains: searchValue,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-          {
-            englishDescription: {
-              contains: searchValue,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-          {
-            baseSpirit: {
-              contains: searchValue,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-          {
-            englishBaseSpirit: {
-              contains: searchValue,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-          { flavorProfiles: { hasSome: searchCandidates } },
-          { englishFlavorProfiles: { hasSome: searchCandidates } },
-        ],
-      });
+    // Keyset pagination on (created_at, id): a plain offset shifts results when a
+    // row is inserted mid-scroll, which duplicates or skips cards.
+    if (cursor) {
+      conditions.push(Prisma.sql`(created_at, id) < (
+        SELECT created_at, id FROM cocktails WHERE id = ${cursor}
+      )`);
     }
 
-    if (spiritKeywords.length > 0) {
-      andFilters.push({
-        OR: spiritKeywords.flatMap((keyword) => [
-          {
-            baseSpirit: {
-              contains: keyword,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-          {
-            englishBaseSpirit: {
-              contains: keyword,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-        ]),
-      });
-    }
+    const rows = await prisma.$queryRaw<CocktailRow[]>(Prisma.sql`
+      SELECT ${SELECT_COLUMNS} FROM cocktails
+      ${whereClause(conditions)}
+      ORDER BY created_at DESC, id DESC
+      LIMIT ${GALLERY_PAGE_SIZE + 1}`);
 
-    if (alcoholKeywords.length > 0) {
-      andFilters.push({
-        OR: alcoholKeywords.flatMap((keyword) => [
-          {
-            alcoholLevel: {
-              contains: keyword,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-          {
-            englishAlcoholLevel: {
-              contains: keyword,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-        ]),
-      });
-    }
+    const hasMore = rows.length > GALLERY_PAGE_SIZE;
+    const page = hasMore ? rows.slice(0, GALLERY_PAGE_SIZE) : rows;
 
-    if (flavorKeywords.length > 0) {
-      const flavorCandidates = Array.from(
-        new Set(
-          flavorKeywords.flatMap((keyword) => [
-            keyword,
-            keyword.toLowerCase(),
-            capitalizeKeyword(keyword),
-          ]),
-        ),
-      );
-      const flavorTextFilters: Prisma.CocktailWhereInput[] = flavorKeywords.flatMap(
-        (keyword) => [
-          {
-            description: {
-              contains: keyword,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-          {
-            englishDescription: {
-              contains: keyword,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          },
-        ],
-      );
+    const items = page
+      .map((row) => mapRow(row, locale))
+      .filter((cocktail): cocktail is Cocktail => cocktail !== null)
+      .map(toCocktailSummary);
 
-      andFilters.push({
-        OR: [
-          { flavorProfiles: { hasSome: flavorCandidates } },
-          { englishFlavorProfiles: { hasSome: flavorCandidates } },
-          ...flavorTextFilters,
-        ],
-      });
-    }
-
-    const cocktails = await runWithThumbnailCompatibility(
-      "getGalleryCocktails",
-      (includeThumbnail) =>
-        prisma.cocktail.findMany({
-          where: andFilters.length > 0 ? { AND: andFilters } : undefined,
-          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-          cursor: options.cursor ? { id: options.cursor } : undefined,
-          skip: options.cursor ? 1 : 0,
-          take: limit + 1,
-          select: includeThumbnail
-            ? gallerySelectWithThumbnail
-            : gallerySelectWithoutThumbnail,
-        }),
-    );
-    const hasMore = cocktails.length > limit;
-    const items = (hasMore ? cocktails.slice(0, limit) : cocktails).map((cocktail) =>
-      mapDBGalleryCocktail(cocktail as DBGalleryCocktailWithOptionalThumbnail),
-    );
     return {
       items,
-      nextCursor: hasMore ? items[items.length - 1]?.id || null : null,
+      nextCursor: hasMore ? (items.at(-1)?.id ?? null) : null,
     };
   } catch (error) {
-    console.error("Error fetching gallery cocktails from DB:", error);
-    throw createDataSourceUnavailableError("Gallery data", error);
+    throw unavailable("Gallery data", error);
   }
 }
 
-export async function getCocktailById(id: string): Promise<Cocktail | null> {
-  const isBuildTime = shouldUseBuildFallback();
-  if (isBuildTime) {
-    return getPopularCocktailById(id);
-  }
-
+export async function getCocktailSlugs(): Promise<string[]> {
   try {
-    // At runtime, try to fetch from DB first
-    const dbCocktail = await runWithThumbnailCompatibility(
-      "getCocktailById",
-      (includeThumbnail) =>
-        prisma.cocktail.findUnique({
-          where: { id },
-          select: includeThumbnail
-            ? cocktailSelectWithThumbnail
-            : cocktailSelectWithoutThumbnail,
-        }),
+    const rows = await prisma.$queryRaw<{ slug: string }[]>(
+      Prisma.sql`SELECT slug FROM cocktails ORDER BY created_at DESC`,
     );
 
-    if (dbCocktail) {
-      return mapDBCocktailToAppCocktail(
-        dbCocktail as DBCocktailWithOptionalThumbnail,
-      );
-    }
-
-    // Fallback to popular cocktails if ID matches a key
-    return getPopularCocktailById(id);
+    return rows.map((row) => row.slug);
   } catch (error) {
-    console.error("Error fetching cocktail from DB:", error);
-    throw createDataSourceUnavailableError("Cocktail detail", error);
+    throw unavailable("Cocktail slugs", error);
   }
-}
-
-export function getPopularCocktailIds(): string[] {
-  return Object.keys(popularCocktails);
 }

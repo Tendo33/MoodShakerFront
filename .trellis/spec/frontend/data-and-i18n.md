@@ -18,7 +18,11 @@ Rules:
 - Keep locale variants structurally aligned.
 - Build display models in `lib/` helpers instead of mutating records in
   components.
-- Keep slugs, IDs, and route params stable.
+- Keep slugs, IDs, and route params stable. Changing one is a migration, not an
+  edit: `/cocktail/[id]` became `/cocktail/[slug]` because the param carried two
+  different kinds of identifier (UUIDs and names like `mojito`), so a caller could
+  not tell what to pass. The three affected URLs kept their existing values.
+- One identifier space per route param.
 
 ## Messages
 

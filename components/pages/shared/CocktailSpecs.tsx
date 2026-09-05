@@ -8,16 +8,20 @@ import type { TranslationKey } from "@/lib/i18n/dictionary";
 interface CocktailSpecsProps {
   t: (key: TranslationKey) => string;
   language: string;
-  getLocalizedContent: (
-    field: keyof Cocktail,
-    englishField: keyof Cocktail,
-  ) => string | undefined;
+  cocktail: Cocktail;
 }
 
+/**
+ * The four spec tiles: base spirit, strength, prep time, glassware.
+ *
+ * Took a `getLocalizedContent(field, englishField)` callback and named both halves
+ * of each column pair. The data layer resolves the locale now, and the two
+ * vocabulary values arrive as display labels alongside their codes.
+ */
 export function CocktailSpecs({
   t,
   language,
-  getLocalizedContent,
+  cocktail,
 }: CocktailSpecsProps) {
   return (
     <motion.div
@@ -59,7 +63,7 @@ export function CocktailSpecs({
           </p>
         </div>
         <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
-          {getLocalizedContent("base_spirit", "english_base_spirit")}
+          {cocktail.baseSpiritLabel}
         </p>
       </motion.div>
 
@@ -77,7 +81,7 @@ export function CocktailSpecs({
           </p>
         </div>
         <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
-          {getLocalizedContent("alcohol_level", "english_alcohol_level")}
+          {cocktail.alcoholLevelLabel}
         </p>
       </motion.div>
 
@@ -95,8 +99,7 @@ export function CocktailSpecs({
           </p>
         </div>
         <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
-          {getLocalizedContent("time_required", "english_time_required") ||
-            (language === "cn" ? "5分钟" : "5 mins")}
+          {cocktail.timeRequired || (language === "cn" ? "5分钟" : "5 mins")}
         </p>
       </motion.div>
 
@@ -114,7 +117,7 @@ export function CocktailSpecs({
           </p>
         </div>
         <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
-          {getLocalizedContent("serving_glass", "english_serving_glass")}
+          {cocktail.servingGlass}
         </p>
       </motion.div>
     </motion.div>
