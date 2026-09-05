@@ -35,7 +35,7 @@ export default function GalleryContent({
   lang,
   initialFilters,
 }: GalleryContentProps) {
-  const { t } = useLanguage();
+  const { t, tDynamic } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -255,17 +255,17 @@ export default function GalleryContent({
                 )}
                 {selectedSpirit && (
                   <span className="glass-subtle border border-secondary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-secondary">
-                    {t(`gallery.spirit.${selectedSpirit.toLowerCase()}`)}
+                    {tDynamic(`gallery.spirit.${selectedSpirit.toLowerCase()}`) ?? selectedSpirit}
                   </span>
                 )}
                 {selectedAlcohol && (
                   <span className="glass-subtle border border-accent/40 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-accent">
-                    {t(`gallery.level.${selectedAlcohol.toLowerCase()}`)}
+                    {tDynamic(`gallery.level.${selectedAlcohol.toLowerCase()}`) ?? selectedAlcohol}
                   </span>
                 )}
                 {selectedFlavor && (
                   <span className="glass-subtle border border-primary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-primary">
-                    {t(`gallery.flavor.${selectedFlavor.toLowerCase()}`)}
+                    {tDynamic(`gallery.flavor.${selectedFlavor.toLowerCase()}`) ?? selectedFlavor}
                   </span>
                 )}
                 <button
@@ -308,7 +308,7 @@ export default function GalleryContent({
                         }`}
                         aria-pressed={selectedSpirit === spirit}
                       >
-                        {t(`gallery.spirit.${spirit.toLowerCase()}`)}
+                        {tDynamic(`gallery.spirit.${spirit.toLowerCase()}`) ?? spirit}
                       </button>
                     ))}
                   </div>
@@ -332,7 +332,7 @@ export default function GalleryContent({
                         }`}
                         aria-pressed={selectedAlcohol === level}
                       >
-                        {t(`gallery.level.${level.toLowerCase()}`)}
+                        {tDynamic(`gallery.level.${level.toLowerCase()}`) ?? level}
                       </button>
                     ))}
                   </div>
@@ -356,7 +356,7 @@ export default function GalleryContent({
                         }`}
                         aria-pressed={selectedFlavor === flavor}
                       >
-                        {t(`gallery.flavor.${flavor.toLowerCase()}`)}
+                        {tDynamic(`gallery.flavor.${flavor.toLowerCase()}`) ?? flavor}
                       </button>
                     ))}
                   </div>

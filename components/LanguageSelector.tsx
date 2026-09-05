@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, type KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Globe, Check, ChevronDown } from "lucide-react";
-import { useLanguage, type Language } from "@/context/LanguageContext";
+import { useLanguage, type Locale } from "@/context/LanguageContext";
 
 interface LanguageSelectorProps {
   idBase?: string;
@@ -68,7 +68,7 @@ export default function LanguageSelector({
   };
 
   const selectLanguage = (code: string) => {
-    void setLanguage(code as Language);
+    setLanguage(code as Locale);
     closeListbox();
   };
 

@@ -188,6 +188,7 @@ export const en = {
   "detail.glass": "Glass",
   "detail.flavorProfile": "Flavor Profile",
   "detail.recipe": "Recipe",
+  "detail.alternative": "Alternative",
 
   // Gallery Filters - Spirits
   "gallery.spirit.gin": "Gin",

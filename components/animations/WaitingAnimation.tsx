@@ -4,12 +4,13 @@ import { useState, useEffect, memo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
 
 interface WaitingAnimationProps {
   isShowing?: boolean;
   message?: string;
-  messageKey?: string;
-  subtitleKey?: string;
+  messageKey?: TranslationKey;
+  subtitleKey?: TranslationKey;
   progress?: number;
 }
 

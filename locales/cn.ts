@@ -189,6 +189,7 @@ export const cn = {
   "detail.glass": "酒杯",
   "detail.flavorProfile": "风味描述",
   "detail.recipe": "配方",
+  "detail.alternative": "替代方案",
 
   // Gallery Filters - Spirits
   "gallery.spirit.gin": "金酒",

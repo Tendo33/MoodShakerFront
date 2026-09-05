@@ -3,9 +3,10 @@
 import { motion } from "framer-motion";
 import { Clock, Droplet, GlassWater } from "lucide-react";
 import type { Cocktail } from "@/lib/cocktail-types";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
 
 interface CocktailSpecsProps {
-  t: (key: string) => string;
+  t: (key: TranslationKey) => string;
   language: string;
   getLocalizedContent: (
     field: keyof Cocktail,

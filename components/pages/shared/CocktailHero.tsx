@@ -4,12 +4,13 @@ import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 import type { Cocktail } from "@/lib/cocktail-types";
 import { CocktailSpecs } from "@/components/pages/shared/CocktailSpecs";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
 
 interface CocktailHeroProps {
   cocktail: Cocktail;
   language: string;
   isPageLoaded: boolean;
-  t: (key: string) => string;
+  t: (key: TranslationKey) => string;
   gradientTextClass: string;
   imageContent: ReactNode;
   getLocalizedContent: (

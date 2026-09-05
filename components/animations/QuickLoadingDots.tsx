@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
 
 interface QuickLoadingDotsProps {
   size?: "sm" | "md" | "lg";
@@ -96,7 +97,7 @@ export function PulseRingLoader({
 
 interface InlineLoadingProps {
   text?: string;
-  textKey?: string;
+  textKey?: TranslationKey;
   className?: string;
 }
 

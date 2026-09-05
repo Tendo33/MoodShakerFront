@@ -3,6 +3,7 @@
 import { useEffect, useState, memo, useCallback, useRef, useMemo } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import WaitingAnimation from "./WaitingAnimation";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
 
 interface SmartLoadingSystemProps {
   isShowing: boolean;
@@ -20,7 +21,7 @@ interface SmartLoadingSystemProps {
 
 interface LoadingConfig {
   variant: "cocktail" | "martini" | "wine" | "shot";
-  messageKey: string;
+  messageKey: TranslationKey;
   glassStyle: string;
   ambientColor: string;
   duration: number;

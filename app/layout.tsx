@@ -1,6 +1,13 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_HEADER,
+  type Locale,
+  isLocale,
+  localeFromPathname,
+} from "@/lib/i18n/config";
 import { Orbitron, Share_Tech_Mono } from "next/font/google";
 import { ErrorProvider } from "@/context/ErrorContext";
 import { CocktailProvider } from "@/context/CocktailContext";
@@ -52,33 +59,35 @@ export const metadata: Metadata = {
   generator: "v0.app",
 };
 
-const resolveLanguageFromPath = (path?: string | null) => {
-  if (!path) return null;
-  const normalized = path.split("?")[0];
-  if (normalized === "/en" || normalized.startsWith("/en/")) return "en";
-  if (normalized === "/cn" || normalized.startsWith("/cn/")) return "cn";
-  return null;
-};
-
-const resolveLanguageFromAccept = (acceptLanguage?: string | null) => {
-  if (!acceptLanguage) return null;
-  const lower = acceptLanguage.toLowerCase();
-  return lower.startsWith("en") ? "en" : "cn";
-};
-
-const resolveHtmlLang = async () => {
+/**
+ * Reads the locale the proxy decided on.
+ *
+ * This layout renders `<html>` but sits above the `[lang]` segment, so it cannot
+ * read the route param. It used to re-derive the locale from `next-url`, then a
+ * cookie, then `accept-language` — a chain that could disagree with the redirect
+ * the proxy had just performed and emit `<html lang="en">` on a `/cn` page. The
+ * proxy now forwards its decision and this is a lookup.
+ *
+ * The fallback only applies when the header is absent, which means the request
+ * bypassed the proxy.
+ */
+const resolveHtmlLocale = async (): Promise<Locale> => {
   const requestHeaders = await headers();
-  const pathLang =
-    resolveLanguageFromPath(requestHeaders.get("next-url")) ||
-    resolveLanguageFromPath(requestHeaders.get("x-nextjs-rewritten-path"));
+  const forwarded = requestHeaders.get(LOCALE_HEADER);
 
-  if (pathLang) return pathLang;
+  if (isLocale(forwarded)) return forwarded;
 
-  const cookieStore = await cookies();
-  const cookieLang = cookieStore.get("moodshaker-language")?.value;
-  if (cookieLang === "en" || cookieLang === "cn") return cookieLang;
+  return (
+    localeFromPathname(requestHeaders.get("next-url")) ??
+    localeFromPathname(requestHeaders.get("x-nextjs-rewritten-path")) ??
+    DEFAULT_LOCALE
+  );
+};
 
-  return resolveLanguageFromAccept(requestHeaders.get("accept-language")) || "cn";
+/** BCP 47 tag for the `lang` attribute; `cn` is not a valid language subtag. */
+const HTML_LANG: Record<Locale, string> = {
+  cn: "zh-CN",
+  en: "en",
 };
 
 export default async function RootLayout({
@@ -86,10 +95,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const lang = await resolveHtmlLang();
+  const locale = await resolveHtmlLocale();
   return (
     <html
-      lang={lang === "en" ? "en" : "zh-CN"}
+      lang={HTML_LANG[locale]}
       suppressHydrationWarning
       className={`${orbitron.variable} ${shareTechMono.variable} antialiased`}
     >

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
 import type { Cocktail, Ingredient, Step, Tool } from "@/lib/cocktail-types";
 import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
 
 interface CocktailRecipeSectionsProps {
   cocktail: Cocktail;
@@ -17,7 +18,7 @@ interface CocktailRecipeSectionsProps {
   getLocalizedToolName: (tool: Tool) => string;
   getLocalizedStepContent: (step: Step) => { description: string; tips?: string };
   getToolAlternative?: (tool: Tool) => string | undefined;
-  toolAlternativeLabelKey?: string;
+  toolAlternativeLabelKey?: TranslationKey;
 }
 
 export function CocktailRecipeSections({
