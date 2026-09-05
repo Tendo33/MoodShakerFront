@@ -16,6 +16,47 @@ MoodShaker uses Next.js route handlers plus Prisma/PostgreSQL.
 - `POST /api/recommendation/:id/publish` publishes a recommendation to the public
   gallery. `DELETE` on the same path withdraws it. Both take `editToken` in the
   body, never the URL.
+- `GET /api/health` reports readiness: 200 when the database and the rate-limit
+  table are both reachable, 503 otherwise, with per-check durations in the body.
+
+## Observability
+
+- Logs are one JSON object per line in production (`utils/logger.ts`), readable text
+  in development. Never build a log line by concatenating values into the message —
+  a duration or an id inside a string cannot be filtered or graphed. Pass them as
+  the `data` argument.
+- Pass the `Error` itself, not `error.message`. The logger serializes Error's
+  non-enumerable fields, so passing the error keeps the stack and `cause`;
+  `JSON.stringify(new Error("x"))` is `{}`.
+- Every API route calls `logger.forRequest(requestId)` once and uses the result for
+  that request. `forRequest` returns a new bound logger rather than setting a
+  module-level id, because concurrent requests interleave at every `await` and a
+  shared variable attaches one request's id to another's lines. Mislabeled
+  correlation is worse than none.
+- `AsyncLocalStorage` is not an option here: `utils/logger.ts` is imported by client
+  components, and `node:async_hooks` cannot be bundled for the browser.
+- A 500 response must carry `requestId` in its body (`apiError(..., { requestId })`)
+  or a user-reported failure cannot be matched to the log line that explains it.
+- Serializing user-supplied data must tolerate cycles. Cycle detection has to track
+  the current path and release on the way out — tracking every object ever seen
+  reports a *shared* reference as circular and silently drops it. A `RangeError` from
+  runaway recursion is not catchable by a `try` around `JSON.stringify`, because it
+  happens while building the object, not while stringifying it.
+
+### Health Checks
+
+- Probe `/api/health`, never `/`. The root route returns 200 from a static shell
+  whether or not the database is reachable, so a container with a dead database
+  reports itself healthy and keeps taking traffic. Both `Dockerfile` and
+  `docker-compose.yml` must point at the endpoint.
+- The timeouts form an ordered chain that has to stay ordered:
+  `probe timeout (15s) > endpoint CHECK_TIMEOUT_MS (12s) > dependency cold start`.
+  Measured on this project's Neon instance: 9963 ms for the first query after it
+  suspends, 600–1400 ms warm. At a 5 s endpoint timeout every check after a quiet
+  period returned 503, which is enough for an orchestrator to kill a container that
+  would have served traffic a second later. Change one value and check the others.
+- The endpoint declares `dynamic = "force-dynamic"`. A prerendered health check
+  reports the build machine's state, not the running instance's.
 
 ## Publish Loop
 

@@ -35,3 +35,16 @@ before upload, so a silent fallback would only store worse data.
   authoritative for blockers.
 - Automated coverage is lightweight; pair it with manual smoke checks for
   product-facing changes.
+
+## Docker Image Size
+
+`output: "standalone"` is not enabled, and enabling it is not a one-line change.
+
+Measured by trying it: the build succeeds, the standalone tree is 104 MB against
+644 MB of `node_modules`, and the standalone server serves every route including the
+database-backed `/api/health` with the correct linux-musl Prisma engine bundled.
+
+What blocks it is `scripts/docker-entrypoint.sh`, which runs `pnpm db:init` — that
+needs the prisma CLI, tsx, and pnpm, none of which standalone bundles. Adopting
+standalone means restructuring how migrations and seeding run at container start, and
+verifying that needs a working Docker daemon.
