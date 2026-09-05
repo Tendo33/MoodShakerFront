@@ -1,12 +1,35 @@
+import type { Metadata } from "next";
 import { getGalleryCocktails } from "@/lib/cocktail-data";
 import {
   isAlcoholLevel,
   isBaseSpirit,
   isFlavorProfile,
 } from "@/lib/domain/vocabulary";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { buildPageMetadata } from "@/lib/i18n/metadata";
 import { DataSourceUnavailableError } from "@/lib/runtime-errors";
 import GalleryContent from "./GalleryContent";
 import { redirect } from "next/navigation";
+
+/**
+ * The gallery previously declared no metadata at all, so both locales fell back to
+ * the root layout and served a bare `MoodShaker` title with no description.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+
+  return buildPageMetadata({
+    locale,
+    path: "/gallery",
+    titleKey: "seo.gallery.title",
+    descriptionKey: "seo.gallery.description",
+  });
+}
 
 /** Reads a single-valued query parameter, ignoring repeated ones. */
 function readParam(value: string | string[] | undefined): string | undefined {

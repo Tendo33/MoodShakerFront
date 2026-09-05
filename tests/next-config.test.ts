@@ -24,7 +24,11 @@ test("next config includes baseline security headers", async () => {
     ]),
   );
 
-  assert.ok(headerMap["Content-Security-Policy"]);
+  // No Content-Security-Policy here on purpose: it is built per-request in
+  // `proxy.ts` so it can carry a nonce, and is asserted in tests/lib/csp.test.ts.
+  // A static header cannot have a nonce, which is why the one that used to live
+  // here fell back to `script-src 'unsafe-inline'`.
+  assert.equal(headerMap["Content-Security-Policy"], undefined);
   assert.equal(headerMap["X-Frame-Options"], "DENY");
   assert.equal(headerMap["X-Content-Type-Options"], "nosniff");
   assert.equal(

@@ -29,32 +29,21 @@ const nextConfig = {
       },
     ],
   },
-  // 添加重写规则，将静态资源请求重定向到根路径
-  async rewrites() {
-    return [
-      {
-        source: "/:lang/:path*",
-        destination: "/:path*",
-        has: [
-          {
-            type: "header",
-            key: "accept",
-            value: "image/.*",
-          },
-        ],
-      },
-    ];
-  },
+  // No `rewrites`. There used to be one mapping `/:lang/:path*` to `/:path*` for
+  // any request whose `Accept` header matched `image/.*`, meant to fix localized
+  // static asset URLs. It matched on a client-controlled header, so any request
+  // that asked for an image could reach an unprefixed route — and localized asset
+  // paths are not something the app generates. `proxy.ts` already skips locale
+  // handling for static file extensions.
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "Content-Security-Policy",
-            value:
-              "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; img-src 'self' data: blob: https:; font-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https:; object-src 'none'; upgrade-insecure-requests",
-          },
+          // No Content-Security-Policy here. It is set per-request in `proxy.ts`,
+          // which is the only place a nonce can be generated. The static header
+          // this replaces allowed `script-src 'unsafe-inline'`, permitting exactly
+          // the inline injection a CSP exists to prevent.
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           {

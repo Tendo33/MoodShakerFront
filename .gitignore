@@ -43,3 +43,7 @@ next-env.d.ts
 .shared
 .backups/
 
+
+# Playwright run artifacts
+test-results/
+playwright-report/

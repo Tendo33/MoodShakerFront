@@ -250,6 +250,24 @@ export const en = {
   "notFound.description": "The requested data could not be located in the simulation matrix.",
   "notFound.action": "Return Home",
   "share.error.generate": "Failed to generate share card. Please try again.",
+
+  // Page titles and descriptions. Needed per route: without them every Chinese
+  // page served an English title to users and to crawlers.
+  "seo.home.title": "MoodShaker · Find the Cocktail That Fits Your Mood",
+  "seo.home.description":
+    "Answer a few questions and let an AI bartender recommend a cocktail for your mood, with the full recipe and steps.",
+  "seo.questions.title": "Cocktail Questionnaire | MoodShaker",
+  "seo.questions.description":
+    "Tell us your mood and taste preferences, and we will recommend a cocktail to match.",
+  "seo.gallery.title": "Cocktail Gallery | MoodShaker",
+  "seo.gallery.description":
+    "Browse cocktail recipes filtered by base spirit, strength, and flavour, each with full ingredients and steps.",
+  "seo.recommendation.title": "Your Cocktail Recommendation | MoodShaker",
+  "seo.recommendation.description":
+    "A cocktail matched to your mood, with its recipe and mixing steps.",
+  "seo.notFound.title": "Page Not Found | MoodShaker",
+  "seo.notFound.description":
+    "This page does not exist. Head back home to start over.",
 } as const;
 
 export type TranslationKey = keyof typeof en;

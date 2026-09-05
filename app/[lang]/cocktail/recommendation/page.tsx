@@ -1,53 +1,58 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import CocktailRecommendation from "@/components/pages/CocktailRecommendation";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { buildPageMetadata } from "@/lib/i18n/metadata";
 
-// 懒加载推荐页面组件
-// 注意：在App Router中，我们移除了ssr: false，因为CocktailRecommendation组件已经使用"use client"
-const CocktailRecommendation = dynamic(
-  () => import("@/components/pages/CocktailRecommendation"),
-  {
-    loading: () => (
-      <div className="flex justify-center items-center h-screen">
-        <LoadingSpinner variant="modern" />
-      </div>
-    ),
-  },
-);
+interface PageProps {
+  params: Promise<{ lang: string }>;
+}
 
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ lang: string }>;
-}): Promise<Metadata> {
+}: PageProps): Promise<Metadata> {
   const { lang } = await params;
-  const isEnglish = lang === "en";
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
 
   return {
-    title: isEnglish ? "Your Recommendation | MoodShaker" : "你的专属推荐 | MoodShaker",
-    description: isEnglish
-      ? "Your personalized cocktail recommendation is ready."
-      : "你的个性化鸡尾酒推荐已生成。",
+    ...buildPageMetadata({
+      locale,
+      path: "/cocktail/recommendation",
+      titleKey: "seo.recommendation.title",
+      descriptionKey: "seo.recommendation.description",
+    }),
+    // A recommendation is private and reached with an edit token; there is nothing
+    // here for a crawler to index, and indexing it would expose one user's result
+    // under a shared URL.
+    robots: { index: false, follow: false },
   };
 }
 
-import { Suspense } from "react";
-
-export default async function RecommendationPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+/**
+ * Imported directly rather than through `next/dynamic`.
+ *
+ * The wrapper had no `ssr: false`, so it never prevented server rendering — it
+ * only added a client chunk and a second spinner alongside the Suspense fallback.
+ */
+export default async function RecommendationPage({ params }: PageProps) {
   const { lang } = await params;
-  if (lang !== "en" && lang !== "cn") {
-    redirect("/cn/cocktail/recommendation");
+
+  if (!isLocale(lang)) {
+    redirect(`/${DEFAULT_LOCALE}/cocktail/recommendation`);
   }
 
   return (
     <ErrorBoundary>
-      <Suspense fallback={<div className="flex justify-center items-center h-screen"><LoadingSpinner variant="modern" /></div>}>
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center h-screen">
+            <LoadingSpinner variant="modern" />
+          </div>
+        }
+      >
         <CocktailRecommendation />
       </Suspense>
     </ErrorBoundary>

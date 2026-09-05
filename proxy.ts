@@ -9,6 +9,10 @@ import {
   localeFromPathname,
   isLocale,
 } from "@/lib/i18n/config";
+import {
+  buildContentSecurityPolicy,
+  createNonce,
+} from "@/lib/security/csp";
 
 /**
  * The only place language is derived from anything other than the URL.
@@ -30,10 +34,59 @@ const staticFileExtensions = [
   ".avif",
 ];
 
+/**
+ * Paths that must stay at the root, unprefixed.
+ *
+ * A crawler looks for `/sitemap.xml` and `/robots.txt` at the origin root and
+ * nowhere else. Locale handling used to redirect them to `/cn/sitemap.xml`, which
+ * made both files effectively missing — the redirect is not followed for these.
+ */
+const rootOnlyPaths = new Set([
+  "/sitemap.xml",
+  "/robots.txt",
+  "/manifest.json",
+  "/manifest.webmanifest",
+  "/favicon.ico",
+]);
+
 /** Reads the stored choice, ignoring a cookie holding an unsupported value. */
 function localeFromCookie(request: NextRequest): Locale | null {
   const value = request.cookies.get(LOCALE_COOKIE)?.value;
   return isLocale(value) ? value : null;
+}
+
+/**
+ * Attaches a per-request nonce and CSP, and forwards the nonce to the app.
+ *
+ * Next.js reads the nonce out of the CSP header on the request and stamps it onto
+ * the script tags it emits, so its own hydration scripts keep working without
+ * `unsafe-inline`.
+ */
+function withSecurityHeaders(
+  request: NextRequest,
+  extraRequestHeaders: Array<[string, string]> = [],
+): NextResponse {
+  const nonce = createNonce();
+  const csp = buildContentSecurityPolicy({
+    nonce,
+    isDevelopment: process.env.NODE_ENV !== "production",
+  });
+
+  const response = NextResponse.next({
+    request: {
+      headers: new Headers([
+        ...request.headers.entries(),
+        // Next reads the nonce from the CSP header on the request to stamp its
+        // own scripts; `x-nonce` is for application code that needs it too.
+        ["x-nonce", nonce],
+        ["content-security-policy", csp],
+        ...extraRequestHeaders,
+      ]),
+    },
+  });
+
+  response.headers.set("content-security-policy", csp);
+  return response;
 }
 
 export function proxy(request: NextRequest) {
@@ -48,17 +101,18 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Checked against the raw pathname, not the locale-stripped one: the point is
+  // that these live at the root and must not be redirected under a prefix.
+  if (rootOnlyPaths.has(pathname)) {
+    return NextResponse.next();
+  }
+
   // The prefix already answers the question. Forward it rather than deriving it
   // a second time downstream.
   if (pathLocale) {
-    const response = NextResponse.next({
-      request: {
-        headers: new Headers([
-          ...request.headers.entries(),
-          [LOCALE_HEADER, pathLocale],
-        ]),
-      },
-    });
+    const response = withSecurityHeaders(request, [
+      [LOCALE_HEADER, pathLocale],
+    ]);
     response.headers.set(LOCALE_HEADER, pathLocale);
     return response;
   }

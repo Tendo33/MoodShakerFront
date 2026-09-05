@@ -6,7 +6,12 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { getCocktailBySlug } from "@/lib/cocktail-data";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { buildCocktailMetadata } from "@/lib/i18n/metadata";
 import { DataSourceUnavailableError } from "@/lib/runtime-errors";
+import {
+  buildBreadcrumbSchema,
+  buildRecipeSchema,
+} from "@/lib/seo/recipe-schema";
 
 interface CocktailPageProps {
   params: Promise<{
@@ -23,18 +28,24 @@ export async function generateMetadata({
 
   try {
     const cocktail = await getCocktailBySlug(slug, locale);
-    return {
-      title: `${cocktail?.name || "Cocktail"} | MoodShaker`,
-      description:
-        cocktail?.description ||
-        "Discover this delicious cocktail recipe on MoodShaker",
-      icons: { icon: "/logo.png" },
-    };
+
+    if (!cocktail) {
+      return { title: "Cocktail | MoodShaker" };
+    }
+
+    return buildCocktailMetadata({
+      locale,
+      slug: cocktail.slug,
+      name: cocktail.name,
+      description: cocktail.description,
+      imageUrl: cocktail.imageUrl,
+    });
   } catch {
+    // A database outage must not fail metadata generation, which would take the
+    // whole page down rather than just its title.
     return {
       title: "Cocktail | MoodShaker",
       description: "Discover delicious cocktail recipes on MoodShaker",
-      icons: { icon: "/logo.png" },
     };
   }
 }
@@ -85,6 +96,20 @@ export default async function CocktailPage({ params }: CocktailPageProps) {
 
   return (
     <ErrorBoundary>
+      {/*
+        Structured data, so a cocktail page is eligible for recipe rich results
+        instead of reading as plain prose to a crawler. This is data rather than
+        executable code, so the CSP nonce does not apply.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            buildRecipeSchema(cocktail, lang),
+            buildBreadcrumbSchema(cocktail, lang),
+          ]),
+        }}
+      />
       <Suspense
         fallback={
           <div className="flex justify-center items-center h-screen">
