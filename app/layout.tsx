@@ -10,13 +10,16 @@ import {
 } from "@/lib/i18n/config";
 import { Orbitron, Share_Tech_Mono } from "next/font/google";
 import { ErrorProvider } from "@/context/ErrorContext";
-import { CocktailProvider } from "@/context/CocktailContext";
+// The two providers directly. A `CocktailProvider` facade used to wrap this pair;
+// it marked itself deprecated, and its combined `useCocktail` hook had no consumers
+// left, so the indirection only hid the nesting order that matters here.
+import { CocktailFormProvider } from "@/context/CocktailFormContext";
+import { CocktailResultProvider } from "@/context/CocktailResultContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ErrorAlert from "@/components/ErrorAlert";
 import PageTransition from "@/components/animations/PageTransition";
-import PerformanceMonitor from "@/components/PerformanceMonitor";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
@@ -111,18 +114,20 @@ export default async function RootLayout({
         </div>
         <ErrorProvider>
           <LanguageProvider>
-            <CocktailProvider>
-              <div className="min-h-screen flex flex-col bg-background text-foreground">
-                <Header />
-                <ErrorAlert />
-                <main className="flex-1">
-                  <PageTransition>{children}</PageTransition>
-                </main>
-                <Footer />
-                <Toaster />
-                <PerformanceMonitor />
-              </div>
-            </CocktailProvider>
+            {/* Result inside form, matching the order the removed facade used. */}
+            <CocktailFormProvider>
+              <CocktailResultProvider>
+                <div className="min-h-screen flex flex-col bg-background text-foreground">
+                  <Header />
+                  <ErrorAlert />
+                  <main className="flex-1">
+                    <PageTransition>{children}</PageTransition>
+                  </main>
+                  <Footer />
+                  <Toaster />
+                </div>
+              </CocktailResultProvider>
+            </CocktailFormProvider>
           </LanguageProvider>
         </ErrorProvider>
       </body>
