@@ -1,3 +1,16 @@
+// Derived from R2_PUBLIC_BASE_URL so the allowed image host has a single source
+// of truth. Hardcoding it would silently break images whenever the bucket domain
+// changes. The fallback keeps `next build` working without R2 credentials.
+const objectStorageHost = (() => {
+  const base = process.env.R2_PUBLIC_BASE_URL;
+  if (!base) return "img.moodshaker.de";
+  try {
+    return new URL(base).hostname;
+  } catch {
+    return "img.moodshaker.de";
+  }
+})();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   allowedDevOrigins: ["127.0.0.1", "localhost"],
@@ -6,10 +19,13 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   images: {
+    // Generated cocktail images are served from the R2 bucket's custom domain.
+    // The previous entry pointed at a third-party OSS host whose links have
+    // since expired; those rows are cleared by the image-url backfill.
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'bizyair-prod.oss-cn-shanghai.aliyuncs.com',
+        protocol: "https",
+        hostname: objectStorageHost,
       },
     ],
   },

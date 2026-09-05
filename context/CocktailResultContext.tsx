@@ -6,7 +6,6 @@ import {
   useState,
   useCallback,
   useMemo,
-  useRef,
 } from "react";
 import type { ReactNode } from "react";
 import type {
@@ -17,7 +16,6 @@ import type {
 import { AgentType } from "@/lib/cocktail-types";
 import { asyncStorage, removeStorageKeysAsync } from "@/utils/asyncStorage";
 import { useBatchAsyncState } from "@/hooks/useAsyncState";
-import { generateImagePrompt } from "@/api/image";
 import { generateSessionId } from "@/utils/generateId";
 import { cocktailLogger } from "@/utils/logger";
 import { useLanguage } from "@/context/LanguageContext";
@@ -32,8 +30,6 @@ const STORAGE_KEYS = {
   IMAGE_DATA: "moodshaker-image-data",
 };
 
-const MAX_PERSISTED_IMAGE_BYTES = 320 * 1024;
-const IMAGE_PERSIST_DEBOUNCE_MS = 5000;
 const COCKTAIL_REQUEST_TIMEOUT_MS = 90000;
 const COCKTAIL_REQUEST_RETRY_LIMIT = 2;
 
@@ -113,11 +109,6 @@ export const CocktailResultProvider = ({
     null,
   );
 
-  const imagePersistenceRef = useRef<{ signature: string; timestamp: number }>({
-    signature: "",
-    timestamp: 0,
-  });
-
   const scopedPersistedImageData =
     recommendation &&
     recommendationMeta &&
@@ -134,46 +125,19 @@ export const CocktailResultProvider = ({
     });
   }, [reloadData]);
 
-  const estimateDataUrlBytes = useCallback((dataUrl: string): number => {
-    const base64Part = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
-    return Math.floor((base64Part.length * 3) / 4);
-  }, []);
-
-  const persistImageData = useCallback(
-    async (nextImageData: string | null, force: boolean = false) => {
-      setVolatileImageData(nextImageData);
-
-      if (!nextImageData) {
-        await updateItem("imageData", null);
-        imagePersistenceRef.current = { signature: "", timestamp: 0 };
-        return;
-      }
-
-      const signature = `${nextImageData.length}:${nextImageData.slice(0, 32)}`;
-      const now = Date.now();
-      if (
-        !force &&
-        imagePersistenceRef.current.signature === signature &&
-        now - imagePersistenceRef.current.timestamp < IMAGE_PERSIST_DEBOUNCE_MS
-      ) {
-        return;
-      }
-
-      if (nextImageData.startsWith("data:")) {
-        const bytes = estimateDataUrlBytes(nextImageData);
-        if (bytes > MAX_PERSISTED_IMAGE_BYTES) {
-          cocktailLogger.warn("Skip persisting oversized image payload", {
-            bytes,
-            limit: MAX_PERSISTED_IMAGE_BYTES,
-          });
-          return;
-        }
-      }
-
-      await updateItem("imageData", nextImageData);
-      imagePersistenceRef.current = { signature, timestamp: now };
+  /**
+   * Stores the image URL.
+   *
+   * Images now live in object storage, so this persists a short URL rather than
+   * a multi-hundred-kilobyte data URL. The former size cap and write debounce
+   * existed only to keep base64 payloads out of localStorage and are gone.
+   */
+  const persistImageUrl = useCallback(
+    async (nextImageUrl: string | null) => {
+      setVolatileImageData(nextImageUrl);
+      await updateItem("imageData", nextImageUrl);
     },
-    [estimateDataUrlBytes, updateItem],
+    [updateItem],
   );
 
   const updateRecommendationImage = useCallback(
@@ -334,13 +298,14 @@ export const CocktailResultProvider = ({
 
         await updateItem("recommendation", nextRecommendation);
         await updateItem("recommendationMeta", nextRecommendationMeta);
-        await persistImageData(nextRecommendation.image || null, true);
+        await persistImageUrl(nextRecommendation.image || null);
 
         setIsImageLoadingState(true);
 
-        const prompt = generateImagePrompt(nextRecommendation);
         void (async () => {
           try {
+            // The prompt is derived server-side from the stored cocktail
+            // payload; sending one from here is rejected by the API.
             const imageResponse = await withTimeout(
               fetch("/api/image", {
                 method: "POST",
@@ -350,7 +315,6 @@ export const CocktailResultProvider = ({
                 body: JSON.stringify({
                   recommendationId: nextRecommendationMeta?.recommendationId,
                   editToken: nextRecommendationMeta?.editToken,
-                  prompt,
                 }),
               }),
               30000,
@@ -366,14 +330,14 @@ export const CocktailResultProvider = ({
               setImageError(
                 t("share.error.generate"),
               );
-              await persistImageData(null, true);
+              await persistImageUrl(null);
               return;
             }
 
             const imagePayload = await imageResponse.json();
-            const nextImage = imagePayload?.data?.image || null;
-            const nextThumbnail = imagePayload?.data?.thumbnail || null;
-            await persistImageData(nextImage, true);
+            const nextImage = imagePayload?.data?.imageUrl || null;
+            const nextThumbnail = imagePayload?.data?.thumbnailUrl || null;
+            await persistImageUrl(nextImage);
             await updateRecommendationImage(
               nextRecommendation,
               nextImage,
@@ -386,7 +350,7 @@ export const CocktailResultProvider = ({
               "Background image generation failed",
               imageGenerationError,
             );
-            await persistImageData(null, true);
+            await persistImageUrl(null);
           } finally {
             setIsImageLoadingState(false);
           }
@@ -417,7 +381,7 @@ export const CocktailResultProvider = ({
       t,
       updateItem,
       userFeedback,
-      persistImageData,
+      persistImageUrl,
       updateRecommendationImage,
     ],
   );
@@ -435,7 +399,8 @@ export const CocktailResultProvider = ({
         throw new Error("No cocktail recommendation available.");
       }
 
-      const prompt = generateImagePrompt(recommendation);
+      // The prompt is derived server-side; a caller-supplied one is rejected.
+      // Every call regenerates, so no forceRefresh flag is needed either.
       const imageResponse = await withTimeout(
         fetch("/api/image", {
           method: "POST",
@@ -445,8 +410,6 @@ export const CocktailResultProvider = ({
           body: JSON.stringify({
             recommendationId: recommendationMeta.recommendationId,
             editToken: recommendationMeta.editToken,
-            prompt,
-            forceRefresh: true,
           }),
         }),
         30000,
@@ -461,9 +424,9 @@ export const CocktailResultProvider = ({
       }
 
       const payload = await imageResponse.json();
-      const nextImage = payload?.data?.image || null;
-      const nextThumbnail = payload?.data?.thumbnail || null;
-      await persistImageData(nextImage, true);
+      const nextImage = payload?.data?.imageUrl || null;
+      const nextThumbnail = payload?.data?.thumbnailUrl || null;
+      await persistImageUrl(nextImage);
       await updateRecommendationImage(recommendation, nextImage, nextThumbnail);
       return nextImage;
     } catch (refreshError) {
@@ -481,7 +444,7 @@ export const CocktailResultProvider = ({
     recommendation,
     recommendationMeta,
     language,
-    persistImageData,
+    persistImageUrl,
     setIsImageLoading,
     updateRecommendationImage,
   ]);
@@ -500,7 +463,6 @@ export const CocktailResultProvider = ({
       setImageError(null);
       setProgressPercentage(0);
       setVolatileImageData(null);
-      imagePersistenceRef.current = { signature: "", timestamp: 0 };
     } catch {
       cocktailLogger.error("Failed to reset result data");
       setError(t("error.resetData"));

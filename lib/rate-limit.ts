@@ -177,6 +177,37 @@ export function buildRateLimitHeaders(result: RateLimitResult): HeadersInit {
   };
 }
 
+/**
+ * Probability of sweeping expired buckets after a successful consume.
+ *
+ * Nothing else deletes these rows, so the table would otherwise grow with one
+ * row per distinct client forever. Sampling keeps the cost off the common path
+ * instead of adding a DELETE to every request, and avoids needing a scheduler.
+ */
+const RATE_LIMIT_CLEANUP_PROBABILITY = 0.01;
+
+/**
+ * Removes buckets whose window has elapsed.
+ *
+ * Fire-and-forget: a failed sweep must never affect the request that triggered
+ * it, since the rate-limit decision has already been made by then.
+ */
+function scheduleExpiredBucketCleanup(): void {
+  if (Math.random() >= RATE_LIMIT_CLEANUP_PROBABILITY) {
+    return;
+  }
+
+  void prisma
+    .$executeRaw(
+      Prisma.sql`DELETE FROM rate_limit_buckets WHERE reset_at <= NOW() - INTERVAL '1 hour'`,
+    )
+    .catch((error) => {
+      rateLimitLogger.warn("Failed to clean up expired rate limit buckets", {
+        error: summarizeRateLimitError(error),
+      });
+    });
+}
+
 export async function consumeRateLimit(
   key: string,
   limit: number,
@@ -213,6 +244,9 @@ export async function consumeRateLimit(
     }
 
     const retryAfterMs = Math.max(current.reset_at.getTime() - Date.now(), 0);
+
+    // After the decision is made, so a sweep can never delay or fail it.
+    scheduleExpiredBucketCleanup();
 
     return {
       allowed: current.count <= limit,

@@ -9,24 +9,28 @@ import {
 } from "@/lib/cocktail-types";
 import { generateEditToken } from "@/utils/generateId";
 
+const recommendationSessionSelect = {
+  id: true,
+  sessionId: true,
+  editToken: true,
+  language: true,
+  agentType: true,
+  answers: true,
+  baseSpirits: true,
+  specialRequests: true,
+  cocktailPayload: true,
+  image: true,
+  thumbnail: true,
+  imageUrl: true,
+  thumbnailUrl: true,
+  status: true,
+  publishedCocktailId: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.RecommendationSessionSelect;
+
 type DBRecommendationSession = Prisma.RecommendationSessionGetPayload<{
-  select: {
-    id: true;
-    sessionId: true;
-    editToken: true;
-    language: true;
-    agentType: true;
-    answers: true;
-    baseSpirits: true;
-    specialRequests: true;
-    cocktailPayload: true;
-    image: true;
-    thumbnail: true;
-    status: true;
-    publishedCocktailId: true;
-    createdAt: true;
-    updatedAt: true;
-  };
+  select: typeof recommendationSessionSelect;
 }>;
 
 function mapRecommendationStatus(
@@ -44,6 +48,12 @@ function mapRecommendationStatus(
 
 function mapSession(record: DBRecommendationSession): RecommendationSession {
   const cocktail = record.cocktailPayload as unknown as Cocktail;
+  // Dual read for the object-storage migration: prefer the new URL columns and
+  // fall back to the legacy inline values until the backfill is complete.
+  const image = record.imageUrl || record.image || cocktail.image;
+  const thumbnail =
+    record.thumbnailUrl || record.thumbnail || cocktail.thumbnail;
+
   return {
     id: record.id,
     sessionId: record.sessionId,
@@ -56,11 +66,11 @@ function mapSession(record: DBRecommendationSession): RecommendationSession {
     cocktail: {
       ...cocktail,
       id: record.id,
-      image: record.image || cocktail.image,
-      thumbnail: record.thumbnail || cocktail.thumbnail,
+      image,
+      thumbnail,
     },
-    image: record.image || undefined,
-    thumbnail: record.thumbnail || undefined,
+    image: image || undefined,
+    thumbnail: thumbnail || undefined,
     status: mapRecommendationStatus(record.status),
     publishedCocktailId: record.publishedCocktailId || undefined,
     createdAt: record.createdAt.toISOString(),
@@ -88,27 +98,11 @@ export async function createRecommendationSession(input: {
       baseSpirits: input.baseSpirits,
       specialRequests: input.specialRequests,
       cocktailPayload: input.cocktail as unknown as Prisma.InputJsonValue,
-      image: input.cocktail.image,
-      thumbnail: input.cocktail.thumbnail,
+      imageUrl: input.cocktail.image,
+      thumbnailUrl: input.cocktail.thumbnail,
       status: PrismaRecommendationStatus.PRIVATE,
     },
-    select: {
-      id: true,
-      sessionId: true,
-      editToken: true,
-      language: true,
-      agentType: true,
-      answers: true,
-      baseSpirits: true,
-      specialRequests: true,
-      cocktailPayload: true,
-      image: true,
-      thumbnail: true,
-      status: true,
-      publishedCocktailId: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: recommendationSessionSelect,
   });
 
   return {
@@ -126,23 +120,7 @@ export async function getRecommendationSessionByIdOnly(
 ): Promise<RecommendationSession | null> {
   const record = await prisma.recommendationSession.findUnique({
     where: { id },
-    select: {
-      id: true,
-      sessionId: true,
-      editToken: true,
-      language: true,
-      agentType: true,
-      answers: true,
-      baseSpirits: true,
-      specialRequests: true,
-      cocktailPayload: true,
-      image: true,
-      thumbnail: true,
-      status: true,
-      publishedCocktailId: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: recommendationSessionSelect,
   });
 
   return record ? mapSession(record) : null;
@@ -157,33 +135,23 @@ export async function getRecommendationSessionById(
       id,
       editToken,
     },
-    select: {
-      id: true,
-      sessionId: true,
-      editToken: true,
-      language: true,
-      agentType: true,
-      answers: true,
-      baseSpirits: true,
-      specialRequests: true,
-      cocktailPayload: true,
-      image: true,
-      thumbnail: true,
-      status: true,
-      publishedCocktailId: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: recommendationSessionSelect,
   });
 
   return record ? mapSession(record) : null;
 }
 
-export async function updateRecommendationSessionImage(input: {
+/**
+ * Persists object-storage URLs for a recommendation image.
+ *
+ * Also clears the legacy inline columns so a refreshed image cannot be shadowed
+ * by a stale base64 payload during the dual-read window.
+ */
+export async function updateRecommendationSessionImageUrls(input: {
   id: string;
   editToken: string;
-  image: string;
-  thumbnail: string;
+  imageUrl: string;
+  thumbnailUrl: string;
 }): Promise<RecommendationSession | null> {
   const updated = await prisma.recommendationSession.updateMany({
     where: {
@@ -191,8 +159,10 @@ export async function updateRecommendationSessionImage(input: {
       editToken: input.editToken,
     },
     data: {
-      image: input.image,
-      thumbnail: input.thumbnail,
+      imageUrl: input.imageUrl,
+      thumbnailUrl: input.thumbnailUrl,
+      image: null,
+      thumbnail: null,
     },
   });
 

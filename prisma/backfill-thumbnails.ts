@@ -1,3 +1,14 @@
+/**
+ * DEPRECATED — do not run.
+ *
+ * This script generated base64 thumbnails into the legacy `thumbnail` column.
+ * Images now live in Cloudflare R2 and the database stores URLs, so running this
+ * would write inline payloads back into columns that are on their way out.
+ *
+ * Replaced by `prisma/backfill-image-urls.ts`
+ * (`pnpm prisma:backfill-image-urls`). Scheduled for deletion together with the
+ * legacy `image` / `thumbnail` columns in the data-model batch.
+ */
 import { PrismaClient } from "@prisma/client";
 
 interface SharpTransformer {

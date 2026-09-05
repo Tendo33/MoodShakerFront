@@ -34,8 +34,12 @@ model Cocktail {
   ingredients           Json
   tools                 Json
   steps                 Json
-  image                 String?  @db.Text // Base64 string, using Text type for large content
+  // Legacy inline image storage. Superseded by imageUrl/thumbnailUrl; retained
+  // during the dual-read window and dropped once the backfill is verified.
+  image                 String?  @db.Text
   thumbnail             String?  @db.Text
+  imageUrl              String?  @map("image_url") @db.Text
+  thumbnailUrl          String?  @map("thumbnail_url") @db.Text
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
   recommendations       RecommendationSession[]
@@ -58,8 +62,12 @@ model RecommendationSession {
   baseSpirits       String[]             @map("base_spirits")
   specialRequests   String?              @map("special_requests")
   cocktailPayload   Json                 @map("cocktail_payload")
+  // Legacy inline image storage. Superseded by imageUrl/thumbnailUrl; retained
+  // during the dual-read window and dropped once the backfill is verified.
   image             String?              @db.Text
   thumbnail         String?              @db.Text
+  imageUrl          String?              @map("image_url") @db.Text
+  thumbnailUrl      String?              @map("thumbnail_url") @db.Text
   status            RecommendationStatus @default(PRIVATE)
   publishedCocktailId String?            @map("published_cocktail_id")
   publishedCocktail Cocktail?            @relation(fields: [publishedCocktailId], references: [id], onDelete: SetNull)

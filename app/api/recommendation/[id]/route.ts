@@ -5,17 +5,31 @@ import {
   parseRecommendationAccessRequest,
 } from "@/lib/recommendation-access";
 import { getRecommendationSessionById } from "@/lib/recommendation-sessions";
+import { createRequestId, isSameOrigin } from "@/lib/http/request-context";
 import { cocktailLogger } from "@/utils/logger";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const requestId = createRequestId();
+
   try {
+    if (!isSameOrigin(request)) {
+      return apiError(
+        "FORBIDDEN_ORIGIN",
+        "Cross-site requests are not allowed.",
+        403,
+        { requestId },
+      );
+    }
+
     const { id } = await params;
 
     if (!id) {
-      return apiError("INVALID_ID", "Missing recommendation id.", 400);
+      return apiError("INVALID_ID", "Missing recommendation id.", 400, {
+        requestId,
+      });
     }
 
     const parsedRequest = await parseRecommendationAccessRequest(request);
@@ -31,12 +45,17 @@ export async function POST(
         "FORBIDDEN",
         "You do not have access to this recommendation.",
         403,
+        { requestId },
       );
     }
 
-    return apiSuccess(buildRecommendationAccessPayload(recommendation), 200);
+    return apiSuccess(buildRecommendationAccessPayload(recommendation), 200, {
+      requestId,
+    });
   } catch (error) {
-    cocktailLogger.error("Failed to load recommendation session", error);
-    return apiError("LOAD_FAILED", "Failed to load recommendation.", 500);
+    cocktailLogger.error(`Failed to load recommendation session [${requestId}]`, error);
+    return apiError("LOAD_FAILED", "Failed to load recommendation.", 500, {
+      requestId,
+    });
   }
 }

@@ -1,8 +1,20 @@
 # Project Overview
 
 MoodShakerFront is a bilingual AI cocktail recommendation product built with
-Next.js App Router, React 19, TypeScript, Prisma, PostgreSQL, and external AI
-providers.
+Next.js App Router, React 19, TypeScript, Prisma, PostgreSQL, external AI
+providers, and Cloudflare R2 for generated-image storage.
+
+## External Runtime Dependencies
+
+| Dependency | Purpose | Failure mode |
+| --- | --- | --- |
+| OpenAI-compatible chat API | Recommendation generation | `POST /api/cocktail` returns an error; nothing is persisted |
+| Image generation API | Cocktail imagery | `POST /api/image` returns `IMAGE_PROVIDER_FAILED`; nothing is persisted |
+| Cloudflare R2 (S3 API) | Stores generated images; DB holds URLs only | `OBJECT_STORE_UNAVAILABLE`; `instrumentation.ts` warns at startup when unconfigured |
+| PostgreSQL | Cocktails, recommendation sessions, rate-limit buckets | Data routes report an explicit unavailable state |
+
+`sharp` is a required dependency, not optional: the image pipeline transcodes
+before upload, so a silent fallback would only store worse data.
 
 ## Current Product Surface
 

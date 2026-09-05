@@ -229,6 +229,8 @@ const cocktailSelectWithoutThumbnail = {
   tools: true,
   steps: true,
   image: true,
+  imageUrl: true,
+  thumbnailUrl: true,
 } satisfies Prisma.CocktailSelect;
 
 const cocktailSelectWithThumbnail = {
@@ -246,6 +248,7 @@ const gallerySelectWithoutThumbnail = {
   englishBaseSpirit: true,
   alcoholLevel: true,
   englishAlcoholLevel: true,
+  thumbnailUrl: true,
 } satisfies Prisma.CocktailSelect;
 
 const gallerySelectWithThumbnail = {
@@ -376,6 +379,7 @@ type DBGalleryCocktail = Pick<
   | "alcoholLevel"
   | "englishAlcoholLevel"
   | "thumbnail"
+  | "thumbnailUrl"
 >;
 
 type DBCocktailWithOptionalThumbnail = Omit<DBCocktail, "thumbnail"> & {
@@ -413,8 +417,10 @@ function mapDBCocktailToAppCocktail(
 		ingredients: asTypedArray<Cocktail["ingredients"][number]>(dbCocktail.ingredients),
 		tools: asTypedArray<Cocktail["tools"][number]>(dbCocktail.tools),
 		steps: asTypedArray<Cocktail["steps"][number]>(dbCocktail.steps),
-		image: dbCocktail.image ?? undefined,
-		thumbnail: dbCocktail.thumbnail || undefined,
+		// Dual read for the object-storage migration: prefer the new URL columns
+		// and fall back to the legacy inline values until the backfill completes.
+		image: dbCocktail.imageUrl || dbCocktail.image || undefined,
+		thumbnail: dbCocktail.thumbnailUrl || dbCocktail.thumbnail || undefined,
 	};
 }
 
@@ -459,7 +465,9 @@ function mapDBGalleryCocktail(
       dbCocktail.alcoholLevel,
       dbCocktail.englishAlcoholLevel,
     ),
-    thumbnail: dbCocktail.thumbnail || undefined,
+    // Dual read for the object-storage migration: prefer the new URL column and
+    // fall back to the legacy inline value until the backfill completes.
+    thumbnail: dbCocktail.thumbnailUrl || dbCocktail.thumbnail || undefined,
   };
 }
 

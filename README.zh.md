@@ -190,8 +190,14 @@ pnpm dev
 | `IMAGE_API_URL` | 图片功能必填 | 图像生成接口地址 |
 | `IMAGE_API_KEY` | 图片功能必填 | 图像生成接口 Key |
 | `IMAGE_MODEL` | 否 | 图像模型名称 |
-| `IMAGE_FETCH_HOST_ALLOWLIST` | 建议配置 | 服务端抓取并优化远程图片时使用的主机白名单，多个值用逗号分隔 |
+| `IMAGE_FETCH_HOST_ALLOWLIST` | 可选 | 追加允许服务端下载生成图片的主机，逗号分隔。已内置常见 provider 的 CDN 域名，换 provider 时才需要配 |
+| `R2_ACCOUNT_ID` | 图片功能必填 | 持有 R2 bucket 的 Cloudflare 账号 ID |
+| `R2_ACCESS_KEY_ID` | 图片功能必填 | R2 API token 的 id。在 **R2 → Manage R2 API Tokens** 创建，权限选 *Object Read & Write* |
+| `R2_SECRET_ACCESS_KEY` | 图片功能必填 | R2 API token value 的 SHA-256，**不是** token 本身 |
+| `R2_BUCKET` | 图片功能必填 | bucket 名，例如 `moodshaker-images` |
+| `R2_PUBLIC_BASE_URL` | 图片功能必填 | bucket 的公开访问基址。必须配置 CORS 允许站点域名，否则分享卡片会导出没有酒的白框 |
 | `DATABASE_URL` | 是 | PostgreSQL 连接字符串 |
+| `TRUSTED_PROXY_HOPS` | 建议配置 | 可信反向代理层数。直连填 `0`，Caddy/Nginx 反代后填 `1`。用于从 `x-forwarded-for` 取出真实客户端 IP，防止伪造首跳绕过限流 |
 | `HOST_PORT` | 可选 | Docker Compose 暴露端口 |
 | `POSTGRES_USER` | 可选 | Docker Compose 数据库用户名 |
 | `POSTGRES_PASSWORD` | 可选 | Docker Compose 数据库密码 |

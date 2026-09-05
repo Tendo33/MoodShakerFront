@@ -1,151 +1,67 @@
 import { NextRequest } from "next/server";
-import { Prisma } from "@prisma/client";
 import { generateImage } from "@/api/openai";
+import { buildImagePrompt } from "@/lib/ai/image-prompt";
 import { apiError, apiSuccess } from "@/lib/api-response";
+import { createRequestId, isSameOrigin } from "@/lib/http/request-context";
 import { buildRateLimitHeaders, consumeRateLimit } from "@/lib/rate-limit";
-import { getRecommendationSessionById, updateRecommendationSessionImage } from "@/lib/recommendation-sessions";
+import {
+  getRecommendationSessionById,
+  updateRecommendationSessionImageUrls,
+} from "@/lib/recommendation-sessions";
 import { validateImageRequest } from "@/lib/request-validation";
+import { DeploymentDependencyError } from "@/lib/runtime-errors";
+import {
+  ImagePipelineError,
+  deleteStoredImages,
+  storeGeneratedImage,
+} from "@/lib/storage/image-pipeline";
 import { imageLogger } from "@/utils/logger";
 
-interface SharpTransformer {
-  rotate(): SharpTransformer;
-  resize(options: {
-    width: number;
-    withoutEnlargement: boolean;
-    fit: "inside";
-  }): SharpTransformer;
-  webp(options: { quality: number }): SharpTransformer;
-  toBuffer(): Promise<Buffer>;
-}
+const IMAGE_RATE_LIMIT = 3;
+const IMAGE_RATE_WINDOW_MS = 60 * 1000;
 
-type SharpFactory = (input: Buffer) => SharpTransformer;
-
-let sharpFactory: SharpFactory | null | undefined;
-let sharpFactoryPromise: Promise<SharpFactory | null> | null = null;
-
-function getAllowedImageHosts(): Set<string> {
-  const hosts = new Set<string>();
-  const configured = process.env.IMAGE_FETCH_HOST_ALLOWLIST;
-
-  if (configured) {
-    configured
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .forEach((host) => hosts.add(host));
-  }
-
-  if (process.env.IMAGE_API_URL) {
-    try {
-      hosts.add(new URL(process.env.IMAGE_API_URL).hostname);
-    } catch {
-      imageLogger.warn("Failed to parse IMAGE_API_URL for host allowlist");
-    }
-  }
-
-  return hosts;
-}
-
-function isAllowedRemoteImageUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return getAllowedImageHosts().has(parsed.hostname);
-  } catch {
-    return false;
-  }
-}
-
-async function getSharpFactory(): Promise<SharpFactory | null> {
-  if (sharpFactory !== undefined) {
-    return sharpFactory;
-  }
-
-  if (!sharpFactoryPromise) {
-    sharpFactoryPromise = (async () => {
-      try {
-        const sharpModuleName = "sharp";
-        const { createRequire } = await import("node:module");
-        const require = createRequire(import.meta.url);
-        const loaded = require(sharpModuleName) as {
-          default?: SharpFactory;
-        };
-        sharpFactory = (loaded.default || loaded) as SharpFactory;
-        return sharpFactory;
-      } catch {
-        sharpFactory = null;
-        imageLogger.warn("Sharp unavailable, using original image URLs");
-        return null;
-      }
-    })();
-  }
-
-  return sharpFactoryPromise;
-}
-
-async function imageUrlToBuffer(url: string): Promise<Buffer> {
-  if (!isAllowedRemoteImageUrl(url)) {
-    throw new Error("Image host is not allowed for server-side fetch.");
-  }
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000);
+/**
+ * Generates and stores the image for a private recommendation.
+ *
+ * The caller supplies only `{ recommendationId, editToken }`. The prompt is
+ * derived on the server from the stored cocktail payload, which is what closes
+ * the previous open image-generation proxy.
+ *
+ * Every failure path leaves the database untouched. Persisting the provider's
+ * temporary URL on a partial failure — as the previous implementation did on
+ * transcoding errors — stores a link that dies within hours.
+ */
+export async function POST(request: NextRequest) {
+  const requestId = createRequestId();
 
   try {
-    const response = await fetch(url, { signal: controller.signal });
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch image: ${response.status} ${response.statusText}`,
+    if (!isSameOrigin(request)) {
+      return apiError(
+        "FORBIDDEN_ORIGIN",
+        "Cross-site requests are not allowed.",
+        403,
+        { requestId },
       );
     }
 
-    const arrayBuffer = await response.arrayBuffer();
-    return Buffer.from(arrayBuffer);
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
-function bufferToDataUrl(buffer: Buffer, mimeType: string): string {
-  return `data:${mimeType};base64,${buffer.toString("base64")}`;
-}
-
-async function createOptimizedImageData(
-  sharp: SharpFactory,
-  buffer: Buffer,
-  width: number,
-  quality: number,
-): Promise<string> {
-  const optimized = await sharp(buffer)
-    .rotate()
-    .resize({
-      width,
-      withoutEnlargement: true,
-      fit: "inside",
-    })
-    .webp({ quality })
-    .toBuffer();
-
-  return bufferToDataUrl(optimized, "image/webp");
-}
-
-function isMissingJsonColumnError(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2022"
-  );
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const validated = validateImageRequest(body);
-
-    if (!validated.success) {
-      return apiError("INVALID_PAYLOAD", validated.message, 400);
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return apiError(
+        "INVALID_PAYLOAD",
+        "Request body must be valid JSON.",
+        400,
+        { requestId },
+      );
     }
 
-    const { recommendationId, editToken, prompt } = validated.data;
+    const validated = validateImageRequest(body);
+    if (!validated.success) {
+      return apiError("INVALID_PAYLOAD", validated.message, 400, { requestId });
+    }
+
+    const { recommendationId, editToken } = validated.data;
     const recommendation = await getRecommendationSessionById(
       recommendationId,
       editToken,
@@ -156,78 +72,116 @@ export async function POST(request: NextRequest) {
         "FORBIDDEN",
         "You do not have permission to update this recommendation.",
         403,
+        { requestId },
       );
     }
 
     const rateLimit = await consumeRateLimit(
       `image:${recommendationId}`,
-      3,
-      60 * 1000,
+      IMAGE_RATE_LIMIT,
+      IMAGE_RATE_WINDOW_MS,
     );
+
     if (!rateLimit.allowed) {
       return apiError(
         "RATE_LIMITED",
         "Image refresh is happening too frequently. Please wait a moment.",
         429,
-        { headers: buildRateLimitHeaders(rateLimit) },
+        { requestId, headers: buildRateLimitHeaders(rateLimit) },
       );
     }
 
-    const imageUrl = await generateImage(prompt, {
-      negative_prompt: "low quality, blurry, distorted",
-      image_size: "1024x1024",
-    });
+    const prompt = buildImagePrompt(recommendation.cocktail);
 
-    let optimizedImage = imageUrl;
-    let thumbnailImage = imageUrl;
-
+    let sourceUrl: string;
     try {
-      const sharp = await getSharpFactory();
-      if (sharp && isAllowedRemoteImageUrl(imageUrl)) {
-        const buffer = await imageUrlToBuffer(imageUrl);
-        optimizedImage = await createOptimizedImageData(sharp, buffer, 1024, 80);
-        thumbnailImage = await createOptimizedImageData(sharp, buffer, 320, 60);
-      } else if (!isAllowedRemoteImageUrl(imageUrl)) {
-        imageLogger.warn("Skipping server-side image fetch due to host allowlist");
-      }
+      sourceUrl = await generateImage(prompt, {
+        negative_prompt: "low quality, blurry, distorted",
+        image_size: "1024x1024",
+      });
     } catch (error) {
-      if (!isMissingJsonColumnError(error)) {
-        imageLogger.warn("Failed to optimize generated image", error);
-      }
+      imageLogger.error(`Image provider failed [${requestId}]`, {
+        recommendationId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return apiError(
+        "IMAGE_PROVIDER_FAILED",
+        "The image service could not generate an image right now.",
+        502,
+        { requestId, headers: buildRateLimitHeaders(rateLimit) },
+      );
     }
 
-    const updatedRecommendation = await updateRecommendationSessionImage({
+    const previousUrls = [
+      recommendation.image,
+      recommendation.thumbnail,
+    ].filter((value): value is string => typeof value === "string");
+
+    const stored = await storeGeneratedImage({ recommendationId, sourceUrl });
+
+    const updated = await updateRecommendationSessionImageUrls({
       id: recommendationId,
       editToken,
-      image: optimizedImage,
-      thumbnail: thumbnailImage,
+      imageUrl: stored.imageUrl,
+      thumbnailUrl: stored.thumbnailUrl,
     });
 
-    if (!updatedRecommendation) {
+    if (!updated) {
+      return apiError("NOT_FOUND", "Recommendation not found.", 404, {
+        requestId,
+        headers: buildRateLimitHeaders(rateLimit),
+      });
+    }
+
+    // Best effort, and only after the new URLs are committed: deleting first
+    // would risk removing an object that is still referenced.
+    void deleteStoredImages(previousUrls).catch(() => {
+      // deleteStoredImages already logs; a leftover object is harmless.
+    });
+
+    imageLogger.info(`Image stored [${requestId}]`, { recommendationId });
+
+    return apiSuccess(stored, 200, {
+      requestId,
+      headers: buildRateLimitHeaders(rateLimit),
+    });
+  } catch (error) {
+    if (error instanceof ImagePipelineError) {
+      const status = error.reason === "IMAGE_PROCESSING_FAILED" ? 500 : 502;
+      imageLogger.error(`Image pipeline failed [${requestId}]`, {
+        reason: error.reason,
+        error: error.message,
+      });
       return apiError(
-        "NOT_FOUND",
-        "Recommendation not found.",
-        404,
+        error.reason,
+        "Unable to store the generated cocktail image right now.",
+        status,
+        { requestId },
       );
     }
 
-    return apiSuccess(
-      {
-        image: updatedRecommendation.image || optimizedImage,
-        thumbnail: updatedRecommendation.thumbnail || thumbnailImage,
-      },
-      200,
-      { headers: buildRateLimitHeaders(rateLimit) },
-    );
-  } catch (error) {
+    if (error instanceof DeploymentDependencyError) {
+      imageLogger.error(`Image storage unavailable [${requestId}]`, {
+        code: error.code,
+        error: error.message,
+      });
+      return apiError(
+        "OBJECT_STORE_UNAVAILABLE",
+        "Image storage is not available. Please try again shortly.",
+        503,
+        { requestId },
+      );
+    }
+
     imageLogger.error(
-      "Image generation failed",
+      `Image generation failed [${requestId}]`,
       error instanceof Error ? error.message : "Unknown error",
     );
     return apiError(
       "IMAGE_GENERATION_FAILED",
       "Unable to generate a cocktail image right now.",
       500,
+      { requestId },
     );
   }
 }
