@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { generateImage } from "@/api/openai";
 import { buildImagePrompt } from "@/lib/ai/image-prompt";
+import { getImageProvider } from "@/lib/ai/providers/openai-compatible";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { createRequestId, isSameOrigin } from "@/lib/http/request-context";
 import { buildRateLimitHeaders, consumeRateLimit } from "@/lib/rate-limit";
@@ -95,9 +95,10 @@ export async function POST(request: NextRequest) {
 
     let sourceUrl: string;
     try {
-      sourceUrl = await generateImage(prompt, {
-        negative_prompt: "low quality, blurry, distorted",
-        image_size: "1024x1024",
+      sourceUrl = await getImageProvider().generateImage({
+        prompt,
+        negativePrompt: "low quality, blurry, distorted",
+        size: "1024x1024",
       });
     } catch (error) {
       imageLogger.error(`Image provider failed [${requestId}]`, {

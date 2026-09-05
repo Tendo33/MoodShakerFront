@@ -77,7 +77,6 @@ function useCombinedCocktailContext() {
     isImageLoading: result.isImageLoading,
     error: result.error,
     imageError: result.imageError,
-    progressPercentage: result.progressPercentage,
     submitRequest: result.submitRequest,
     setIsImageLoading: result.setIsImageLoading,
     refreshImage: result.refreshImage,

@@ -31,7 +31,20 @@ const STORAGE_KEYS = {
 };
 
 const COCKTAIL_REQUEST_TIMEOUT_MS = 90000;
-const COCKTAIL_REQUEST_RETRY_LIMIT = 2;
+
+/**
+ * Attempts for connection failures only — the server never saw the request, so
+ * nothing was spent upstream.
+ *
+ * A returned response is never retried, even a 5xx. The server budget is one
+ * generation plus at most one repair; retrying a response here would multiply
+ * that, which is how a single failed action used to cost four LLM calls at
+ * `max_tokens: 5000`.
+ */
+const COCKTAIL_CONNECTION_ATTEMPTS = 2;
+
+/** Marks a failure the server responded to, so it is not retried. */
+class ResponseError extends Error {}
 
 interface CocktailResultContextType {
   recommendation: Cocktail | null;
@@ -41,7 +54,6 @@ interface CocktailResultContextType {
   isImageLoading: boolean;
   error: string | null;
   imageError: string | null;
-  progressPercentage: number;
   loadSavedData: () => void;
   submitRequest: (regenerate?: boolean) => Promise<Cocktail>;
   resetResult: () => Promise<void>;
@@ -104,7 +116,6 @@ export const CocktailResultProvider = ({
   const [isImageLoading, setIsImageLoadingState] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
-  const [progressPercentage, setProgressPercentage] = useState(0);
   const [volatileImageData, setVolatileImageData] = useState<string | null>(
     null,
   );
@@ -164,7 +175,6 @@ export const CocktailResultProvider = ({
       setIsLoading(true);
       setError(null);
       setImageError(null);
-      setProgressPercentage(0);
       setVolatileImageData(null);
 
       let nextRecommendation: Cocktail | null = null;
@@ -201,7 +211,7 @@ export const CocktailResultProvider = ({
 
         for (
           let attempt = 1;
-          attempt <= COCKTAIL_REQUEST_RETRY_LIMIT;
+          attempt <= COCKTAIL_CONNECTION_ATTEMPTS;
           attempt += 1
         ) {
           try {
@@ -240,29 +250,30 @@ export const CocktailResultProvider = ({
                 // ignore invalid error payloads
               }
 
-              const responseError = new Error(errorMessage);
-              if (
-                response.status >= 500 &&
-                attempt < COCKTAIL_REQUEST_RETRY_LIMIT
-              ) {
-                lastRequestError = responseError;
-                continue;
-              }
-
-              throw responseError;
+              // Not retried, including 5xx. The server already spends up to two
+              // LLM calls per request (one generation plus one repair), so a
+              // client-side retry on a returned response would double that to
+              // four generations for a single user action.
+              throw new ResponseError(errorMessage);
             }
 
             cocktailResponse = response;
             break;
           } catch (requestError) {
+            // The server answered, so the LLM budget was already spent. Surface
+            // it rather than paying for the same failure again.
+            if (requestError instanceof ResponseError) {
+              throw requestError;
+            }
+
             const resolvedError =
               requestError instanceof Error
                 ? requestError
                 : new Error(t("error.generationFailed"));
             lastRequestError = resolvedError;
 
-            if (attempt < COCKTAIL_REQUEST_RETRY_LIMIT) {
-              cocktailLogger.warn("Cocktail request failed, retrying", {
+            if (attempt < COCKTAIL_CONNECTION_ATTEMPTS) {
+              cocktailLogger.warn("Cocktail request failed to connect, retrying", {
                 attempt,
                 message: resolvedError.message,
               });
@@ -277,7 +288,6 @@ export const CocktailResultProvider = ({
                 ? "Network unstable, showing your last successful recommendation."
                 : "网络不稳定，已为你展示最近一次成功推荐。";
             setError(fallbackMessage);
-            setProgressPercentage(100);
             return recommendation;
           }
           throw lastRequestError || new Error(t("error.generationFailed"));
@@ -356,7 +366,6 @@ export const CocktailResultProvider = ({
           }
         })();
 
-        setProgressPercentage(100);
         return nextRecommendation;
       } catch (submitError) {
         const errorMessage =
@@ -461,7 +470,6 @@ export const CocktailResultProvider = ({
       await reloadData();
       setError(null);
       setImageError(null);
-      setProgressPercentage(0);
       setVolatileImageData(null);
     } catch {
       cocktailLogger.error("Failed to reset result data");
@@ -478,7 +486,6 @@ export const CocktailResultProvider = ({
       isImageLoading,
       error,
       imageError,
-      progressPercentage,
       loadSavedData,
       submitRequest,
       resetResult,
@@ -494,7 +501,6 @@ export const CocktailResultProvider = ({
       isImageLoading,
       error,
       imageError,
-      progressPercentage,
       loadSavedData,
       submitRequest,
       resetResult,

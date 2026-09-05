@@ -2,7 +2,12 @@ import { NextRequest } from "next/server";
 import { generateCocktailId } from "@/utils/generateId";
 import { cocktailLogger } from "@/utils/logger";
 import { AgentType } from "@/lib/cocktail-types";
-import { generateCocktailRecommendation } from "@/lib/cocktail-generation";
+import {
+  CocktailValidationError,
+  generateCocktailRecommendation,
+} from "@/lib/ai/cocktail-generation";
+import { ProviderError } from "@/lib/ai/provider";
+import { getLLMProvider } from "@/lib/ai/providers/openai-compatible";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { buildRateLimitHeaders, consumeRateLimit } from "@/lib/rate-limit";
 import { validateCocktailRequest } from "@/lib/request-validation";
@@ -70,6 +75,7 @@ export async function POST(request: NextRequest) {
     cocktailLogger.info(`Processing cocktail request [${requestId}]`);
 
     const cocktail = await generateCocktailRecommendation({
+      provider: getLLMProvider(),
       request: { answers, baseSpirits, sessionId, specialRequests },
       language,
       agentType,
@@ -110,6 +116,29 @@ export async function POST(request: NextRequest) {
         "SERVICE_UNAVAILABLE",
         "Cocktail generation is temporarily unavailable while the service is starting up. Please try again shortly.",
         503,
+        { requestId },
+      );
+    }
+
+    // The provider itself failed, so this is an upstream outage rather than a
+    // fault in our pipeline. Reported separately so the two are not conflated
+    // when diagnosing.
+    if (error instanceof ProviderError) {
+      return apiError(
+        "LLM_PROVIDER_FAILED",
+        "The recommendation service is unavailable right now. Please try again shortly.",
+        502,
+        { requestId },
+      );
+    }
+
+    // Output never satisfied the schema, even after the repair attempt. Nothing
+    // was persisted: a partially defaulted record is worse than no record.
+    if (error instanceof CocktailValidationError) {
+      return apiError(
+        "COCKTAIL_SCHEMA_INVALID",
+        "The recommendation could not be produced in a usable form. Please try again.",
+        502,
         { requestId },
       );
     }

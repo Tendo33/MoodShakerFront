@@ -3,7 +3,7 @@
   "name": "ai-pipeline",
   "title": "AI 生成管线重写",
   "description": "结构化输出 + zod 校验 + 去除 completion 缓存 + 流式响应 + 成本与重试控制 + prompt/词表统一",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": null,
   "package": null,

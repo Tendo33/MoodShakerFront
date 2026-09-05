@@ -55,7 +55,6 @@ COPY --from=builder --chown=node:node /app/next.config.mjs ./
 
 # 复制 Prisma schema 和种子数据脚本
 COPY --from=builder --chown=node:node /app/prisma ./prisma
-COPY --from=builder --chown=node:node /app/api ./api
 COPY --from=builder --chown=node:node /app/lib ./lib
 COPY --from=builder --chown=node:node /app/tsconfig.json ./
 
