@@ -88,8 +88,11 @@ USER node
 EXPOSE 3000
 
 # 健康检查
+# 探 /api/health，不是 /。/ 返回的是静态外壳，数据库挂掉也是 200，
+# 于是一个连不上数据库的容器会一直报 healthy 并继续接流量。
+# timeout 必须大于端点自己的 CHECK_TIMEOUT_MS（12s），见 app/api/health/route.ts。
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 # 启动应用（通过启动脚本，会自动初始化数据库并写入三种酒的示例数据）
 CMD ["./scripts/docker-entrypoint.sh"]
