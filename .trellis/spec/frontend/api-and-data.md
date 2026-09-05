@@ -11,7 +11,58 @@ MoodShaker uses Next.js route handlers plus Prisma/PostgreSQL.
   caller has edit access. Body is `{ recommendationId, editToken }` only;
   returns `{ imageUrl, thumbnailUrl }`.
 - `POST /api/recommendation/:id` retrieves a private recommendation using
-  `editToken` in the JSON body.
+  `editToken` in the JSON body. The response includes `meta.isPublished` and
+  `meta.publishedSlug` so a client knows which action to offer.
+- `POST /api/recommendation/:id/publish` publishes a recommendation to the public
+  gallery. `DELETE` on the same path withdraws it. Both take `editToken` in the
+  body, never the URL.
+
+## Publish Loop
+
+- `RecommendationStatus.PUBLISHED` and `publishedCocktailId` existed in the schema
+  from the beginning with nothing ever writing them, so every recommendation stayed
+  `PRIVATE` and the gallery could only show rows from the seed script.
+  `lib/publish-cocktail.ts` is the write path that closes this.
+- Access is enforced in the SQL `WHERE` clause on `edit_token`, not a separate
+  check, so a caller cannot publish or withdraw someone else's recommendation. An
+  unknown id and a wrong token both return `NOT_FOUND` — distinguishing them turns
+  the endpoint into an id oracle.
+- Publishing is idempotent: a second call returns the existing cocktail with
+  `alreadyPublished: true` rather than creating a duplicate. `SELECT … FOR UPDATE`
+  serializes concurrent publishes of the same recommendation.
+- Withdrawal must exist before a publish button ships. Publishing without it is a
+  one-way door.
+- Both operations set an explicit transaction budget
+  (`maxWait: 15s, timeout: 30s`). Prisma's defaults are 2 s and 5 s, and publishing
+  does four round trips against a Neon instance that suspends when idle — on the
+  defaults the transaction is discarded mid-flight and the caller sees
+  `Transaction not found`, which reads like a bug rather than a timeout.
+- Any write to the published set must call `revalidatePath` for both locales'
+  gallery, the affected cocktail page, and `/sitemap.xml`. Without it a publish
+  changes nothing a visitor sees and a withdrawal leaves the public page serving a
+  deleted row. Verified by end-to-end HTTP test, not by inspection.
+
+## Gallery Search
+
+- Search matches a concatenation of every locale's name and description, so a
+  Chinese query finds a drink while the interface is in English. Per-locale search
+  missed that in both directions.
+- The match is indexed by a `pg_trgm` GIN expression index
+  (`20260906000300_add_cocktail_search_index`). `lib/cocktail-data.ts` holds the
+  same expression in `SEARCH_EXPRESSION` and the two must stay
+  character-for-character identical — the planner matches an expression index by the
+  expression itself, so any difference silently falls back to a full table scan.
+  Verify with `EXPLAIN` under `SET enable_seqscan = off`; on a small table Postgres
+  will choose a sequential scan regardless, so a plain `EXPLAIN` proves nothing.
+- Not Postgres full-text search: `to_tsvector` cannot segment Chinese without a
+  parser extension and Neon offers none. Measured on this database,
+  `to_tsvector('simple', '莫吉托清爽的古巴经典')` yields a single token, so a search
+  for 莫吉 never matches. Trigrams need no word boundaries.
+- Filter options in the UI come from `lib/domain/vocabulary.ts`, never a local copy.
+  Three hand-written arrays of display text (`"Gin"`, `"Sweet"`, `"Low"`) meant
+  every filter click was validated against the vocabulary, rejected, and silently
+  dropped — the gallery returned everything — and the lists had drifted to 9 of 12
+  flavours and 3 of 4 strengths, so some drinks could not be filtered for at all.
 
 ## Image Generation Contract
 

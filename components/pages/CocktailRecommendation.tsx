@@ -17,6 +17,7 @@ import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSection
 import { CocktailHero } from "@/components/pages/shared/CocktailHero";
 import { CocktailActions } from "@/components/pages/shared/CocktailActions";
 import { RecommendationShareAction } from "@/components/pages/shared/RecommendationShareAction";
+import RecommendationPublishAction from "@/components/pages/shared/RecommendationPublishAction";
 import { RecommendationUnavailableState } from "@/components/pages/shared/RecommendationUnavailableState";
 
 interface RecommendationAccessResponse {
@@ -344,6 +345,28 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           cardClasses={cardClasses}
           toolAlternativeLabelKey="recommendation.alternative"
         />
+
+        {/*
+          Only the holder of the edit token can publish, so this is gated on the
+          same condition as regenerating. Someone opening a shared link sees the
+          drink but no publish control — they do not own it.
+        */}
+        {canEditCurrentRecommendation &&
+        activeRecommendationId &&
+        activeEditToken ? (
+          <div className="mt-8 flex justify-center">
+            <RecommendationPublishAction
+              recommendationId={activeRecommendationId}
+              editToken={activeEditToken}
+              initialIsPublished={
+                fetchedRecommendation?.data?.meta?.isPublished ?? false
+              }
+              initialPublishedSlug={
+                fetchedRecommendation?.data?.meta?.publishedSlug ?? null
+              }
+            />
+          </div>
+        ) : null}
 
         <CocktailActions
           t={t}

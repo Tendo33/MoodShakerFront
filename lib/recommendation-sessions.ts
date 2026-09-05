@@ -218,6 +218,27 @@ export async function getRecommendationSessionById(
 }
 
 /**
+ * Resolves the public URL slug for a published recommendation.
+ *
+ * A separate read rather than a join on the main query: it is only needed for the
+ * minority of sessions that are actually published, and `publishedCocktailId` can
+ * point at a row that has since been deleted — in which case there is no slug to
+ * report and the caller should treat the recommendation as unpublished.
+ */
+export async function getPublishedCocktailSlug(
+  cocktailId: string | null | undefined,
+): Promise<string | null> {
+  if (!cocktailId) return null;
+
+  const row = await prisma.cocktail.findUnique({
+    where: { id: cocktailId },
+    select: { slug: true },
+  });
+
+  return row?.slug ?? null;
+}
+
+/**
  * Reads what the image pipeline needs, gated on the edit token.
  *
  * Returns the stored bilingual content rather than a resolved cocktail: the image

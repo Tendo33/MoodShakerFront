@@ -40,6 +40,14 @@
   silently — a crawler looks only at the root and does not follow the redirect.
   `proxy.ts` keeps a root-only path list for this; verify with
   `curl -sI localhost:3000/sitemap.xml` returning 200, not 307.
+- `app/sitemap.ts` declares `dynamic = "force-dynamic"`. Next prerenders a sitemap
+  statically by default, and the build runs with a placeholder `DATABASE_URL`, so
+  the cocktail query throws and the sitemap ships with static routes only — zero
+  cocktails, silently. Observed directly: one build produced 6 URLs and another 32,
+  differing only in whether the database happened to be awake. Same failure mode as
+  `generateStaticParams` above. A crawler reads this rarely, so a query per request
+  costs nothing worth saving.
+  Check the count, not just the status: `curl -s localhost:3000/sitemap.xml | grep -c '<loc>'`.
 
 ## Security Headers
 

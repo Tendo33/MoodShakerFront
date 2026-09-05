@@ -219,7 +219,7 @@ Open [http://localhost:3000](http://localhost:3000). Requests to `/` are redirec
 | `pnpm prisma:generate` | Generate Prisma client only |
 | `pnpm prisma:migrate` | Apply Prisma migrations |
 | `pnpm prisma:seed` | Seed cocktail data |
-| `pnpm prisma:backfill-cocktail-content` | Backfill `slug` and `content` from the legacy column pairs (pass `-- --dry` to preview) |
+| `pnpm prisma:backfill-cocktail-content` | Obsolete. The legacy columns it reads were dropped by `20260906000100_drop_legacy_cocktail_columns`, so this now fails with `column "name" does not exist`. Kept because that migration cites it as its precondition. |
 
 ## API Endpoints
 
@@ -229,6 +229,8 @@ Open [http://localhost:3000](http://localhost:3000). Requests to `/` are redirec
 | `GET` | `/api/cocktail/:slug?lang=cn\|en` | Fetch a public cocktail detail record by slug |
 | `POST` | `/api/image` | Generate or refresh a recommendation image when the caller has edit access |
 | `POST` | `/api/recommendation/:id` | Retrieve a private recommendation by id using an `editToken` in the JSON body |
+| `POST` | `/api/recommendation/:id/publish` | Publish a recommendation to the public gallery (`editToken` in the body) |
+| `DELETE` | `/api/recommendation/:id/publish` | Withdraw a published recommendation, keeping the recommendation itself |
 
 ### Security and behavior notes
 

@@ -84,6 +84,26 @@ const SELECT_COLUMNS = Prisma.sql`
   image_url, thumbnail_url`;
 
 /**
+ * The text that gallery search matches against.
+ *
+ * Must stay character-for-character identical to the expression indexed by
+ * `20260906000300_add_cocktail_search_index`. The planner matches an expression
+ * index by the expression itself, so any difference — a reordered field, a changed
+ * separator — silently drops back to a full table scan. If you edit this, write a
+ * migration for the index too.
+ *
+ * Every locale is concatenated on purpose: a Chinese query finds a drink while the
+ * interface is in English. Searching only the current locale's column, which is
+ * what this replaces, missed that in both directions.
+ */
+const SEARCH_EXPRESSION = Prisma.sql`(
+    coalesce(content->'name'->>'cn', '') || ' ' ||
+    coalesce(content->'name'->>'en', '') || ' ' ||
+    coalesce(content->'description'->>'cn', '') || ' ' ||
+    coalesce(content->'description'->>'en', '')
+  )`;
+
+/**
  * Builds the filter conditions.
  *
  * Vocabulary filters compare codes, so the bilingual keyword maps and
@@ -114,17 +134,7 @@ function buildConditions(filters: GalleryQueryFilters): Prisma.Sql[] {
 
   const search = filters.search?.trim();
   if (search) {
-    const pattern = `%${search}%`;
-    conditions.push(Prisma.sql`(
-      EXISTS (
-        SELECT 1 FROM jsonb_each_text(content->'name') AS kv
-        WHERE kv.value ILIKE ${pattern}
-      )
-      OR EXISTS (
-        SELECT 1 FROM jsonb_each_text(content->'description') AS kv
-        WHERE kv.value ILIKE ${pattern}
-      )
-    )`);
+    conditions.push(Prisma.sql`${SEARCH_EXPRESSION} ILIKE ${`%${search}%`}`);
   }
 
   return conditions;

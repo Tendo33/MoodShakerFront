@@ -7,6 +7,21 @@ import { createLogger } from "@/utils/logger";
 const logger = createLogger("Sitemap");
 
 /**
+ * Rendered per request, not at build time.
+ *
+ * Next prerenders a sitemap statically by default. The build runs with a
+ * placeholder `DATABASE_URL` and cannot reach a database, so `getCocktailSlugs()`
+ * throws, the catch below logs it, and the sitemap ships with the static routes
+ * only — zero cocktails, silently. Observed directly: a build with the database
+ * asleep produced 6 URLs where a build that happened to catch it awake produced 32.
+ *
+ * A crawler reads this rarely, so a query per request costs nothing worth saving,
+ * and it removes the dependency on build-time luck. Same failure mode as
+ * `generateStaticParams` on a database-backed page, which this project already hit.
+ */
+export const dynamic = "force-dynamic";
+
+/**
  * Sitemap covering both locales.
  *
  * The project had no sitemap and no `robots.txt`, so every cocktail page relied on

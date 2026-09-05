@@ -216,7 +216,7 @@ pnpm dev
 | `pnpm prisma:generate` | 只生成 Prisma Client |
 | `pnpm prisma:migrate` | 执行 Prisma 迁移 |
 | `pnpm prisma:seed` | 写入鸡尾酒种子数据 |
-| `pnpm prisma:backfill-cocktail-content` | 从旧的双列结构回填 `slug` 与 `content`（加 `-- --dry` 可预览） |
+| `pnpm prisma:backfill-cocktail-content` | 已失效。它读取的旧列已被 `20260906000100_drop_legacy_cocktail_columns` 删除，现在会报 `column "name" does not exist`。保留是因为该迁移把它列为前置条件。 |
 
 ## API 接口
 
@@ -226,6 +226,8 @@ pnpm dev
 | `GET` | `/api/cocktail/:slug?lang=cn\|en` | 按 slug 获取公开鸡尾酒详情 |
 | `POST` | `/api/image` | 在具备编辑权限时生成或刷新推荐图片 |
 | `POST` | `/api/recommendation/:id` | 通过 JSON body 中的 `editToken` 读取私有推荐 |
+| `POST` | `/api/recommendation/:id/publish` | 把推荐发布到公开图鉴（`editToken` 放在 body 里）|
+| `DELETE` | `/api/recommendation/:id/publish` | 从图鉴撤回，推荐本身保留 |
 
 ### 安全与行为说明
 

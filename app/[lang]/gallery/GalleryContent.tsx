@@ -8,6 +8,17 @@ import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import type { CocktailSummary } from "@/lib/cocktail-types";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  ALCOHOL_LEVELS,
+  BASE_SPIRITS,
+  FLAVOR_PROFILES,
+  alcoholLevelLabel,
+  baseSpiritLabel,
+  coerceAlcoholLevel,
+  coerceBaseSpirit,
+  coerceFlavorProfiles,
+  flavorProfileLabel,
+} from "@/lib/domain/vocabulary";
 import { GradientText } from "@/components/ui/core";
 import { shouldBypassNextImageOptimization } from "@/utils/image-optimization";
 import { Activity, Filter, GlassWater, Search, Sparkles, X } from "lucide-react";
@@ -25,9 +36,20 @@ interface GalleryContentProps {
   };
 }
 
-const BASE_SPIRITS = ["Gin", "Vodka", "Rum", "Tequila", "Whiskey", "Brandy", "Other"];
-const FLAVORS = ["Sweet", "Sour", "Bitter", "Fruity", "Herbal", "Smoky", "Spicy", "Salty", "Creamy"];
-const ALCOHOL_LEVELS = ["Low", "Medium", "High"];
+/**
+ * Filter options come from the vocabulary, not a hand-written copy.
+ *
+ * There used to be three local arrays holding display text — `"Gin"`, `"Sweet"`,
+ * `"Low"`. Two things were wrong with them. The data layer filters on codes
+ * (`gin`, `sweet`, `low`) and the page validates the query parameter against the
+ * vocabulary, so every one of these values was rejected and silently dropped:
+ * clicking any filter returned the unfiltered gallery. And the lists were
+ * incomplete — 9 of 12 flavours and 3 of 4 strengths — so no drink that was
+ * `refreshing`, `floral`, or non-alcoholic could be filtered for at all.
+ */
+const SPIRIT_OPTIONS = BASE_SPIRITS;
+const FLAVOR_OPTIONS = FLAVOR_PROFILES;
+const ALCOHOL_OPTIONS = ALCOHOL_LEVELS;
 
 export default function GalleryContent({
   cocktails,
@@ -35,7 +57,12 @@ export default function GalleryContent({
   lang,
   initialFilters,
 }: GalleryContentProps) {
-  const { t, tDynamic } = useLanguage();
+  const { t } = useLanguage();
+  // Labels come from the vocabulary rather than `gallery.*.*` dictionary keys.
+  // Those keys were a second copy of the same mapping and had already fallen
+  // behind: no entry existed for `none`, `floral`, `refreshing`, or `other`, so
+  // those options would have rendered their raw code.
+  const vocabLocale = lang === "en" ? "en" : "cn";
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -255,17 +282,17 @@ export default function GalleryContent({
                 )}
                 {selectedSpirit && (
                   <span className="glass-subtle border border-secondary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-secondary">
-                    {tDynamic(`gallery.spirit.${selectedSpirit.toLowerCase()}`) ?? selectedSpirit}
+                    {baseSpiritLabel(coerceBaseSpirit(selectedSpirit), vocabLocale)}
                   </span>
                 )}
                 {selectedAlcohol && (
                   <span className="glass-subtle border border-accent/40 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-accent">
-                    {tDynamic(`gallery.level.${selectedAlcohol.toLowerCase()}`) ?? selectedAlcohol}
+                    {alcoholLevelLabel(coerceAlcoholLevel(selectedAlcohol), vocabLocale)}
                   </span>
                 )}
                 {selectedFlavor && (
                   <span className="glass-subtle border border-primary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-primary">
-                    {tDynamic(`gallery.flavor.${selectedFlavor.toLowerCase()}`) ?? selectedFlavor}
+                    {flavorProfileLabel(coerceFlavorProfiles([selectedFlavor])[0], vocabLocale)}
                   </span>
                 )}
                 <button
@@ -296,7 +323,7 @@ export default function GalleryContent({
                     {t("gallery.filter.base")}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {BASE_SPIRITS.map((spirit) => (
+                    {SPIRIT_OPTIONS.map((spirit) => (
                       <button
                         key={spirit}
                         type="button"
@@ -308,7 +335,7 @@ export default function GalleryContent({
                         }`}
                         aria-pressed={selectedSpirit === spirit}
                       >
-                        {tDynamic(`gallery.spirit.${spirit.toLowerCase()}`) ?? spirit}
+                        {baseSpiritLabel(spirit, vocabLocale)}
                       </button>
                     ))}
                   </div>
@@ -320,7 +347,7 @@ export default function GalleryContent({
                     {t("gallery.filter.alcohol_level")}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {ALCOHOL_LEVELS.map((level) => (
+                    {ALCOHOL_OPTIONS.map((level) => (
                       <button
                         key={level}
                         type="button"
@@ -332,7 +359,7 @@ export default function GalleryContent({
                         }`}
                         aria-pressed={selectedAlcohol === level}
                       >
-                        {tDynamic(`gallery.level.${level.toLowerCase()}`) ?? level}
+                        {alcoholLevelLabel(level, vocabLocale)}
                       </button>
                     ))}
                   </div>
@@ -344,7 +371,7 @@ export default function GalleryContent({
                     {t("gallery.filter.flavor")}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {FLAVORS.map((flavor) => (
+                    {FLAVOR_OPTIONS.map((flavor) => (
                       <button
                         key={flavor}
                         type="button"
@@ -356,7 +383,7 @@ export default function GalleryContent({
                         }`}
                         aria-pressed={selectedFlavor === flavor}
                       >
-                        {tDynamic(`gallery.flavor.${flavor.toLowerCase()}`) ?? flavor}
+                        {flavorProfileLabel(flavor, vocabLocale)}
                       </button>
                     ))}
                   </div>
