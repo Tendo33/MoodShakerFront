@@ -196,42 +196,6 @@ export class AsyncStorageManager {
   }
 
   /**
-   * 清除所有带前缀的数据
-   * @param prefix 键名前缀
-   * @returns Promise<void>
-   */
-  async clearWithPrefix(prefix: string): Promise<void> {
-    if (typeof window === "undefined") return;
-
-    return new Promise((resolve, reject) => {
-      try {
-        // 从缓存中删除
-        for (const key of this.cache.keys()) {
-          if (key.startsWith(prefix)) {
-            this.cache.delete(key);
-          }
-        }
-
-        // 添加到异步队列
-        const keysToRemove: string[] = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith(prefix)) {
-            keysToRemove.push(key);
-          }
-        }
-
-        const removePromises = keysToRemove.map((key) => this.removeItem(key));
-        Promise.all(removePromises)
-          .then(() => resolve())
-          .catch(reject);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  /**
    * 从缓存获取数据
    */
   private getCachedItem<T>(key: string): T | null {
@@ -365,50 +329,10 @@ export class AsyncStorageManager {
     });
   }
 
-  /**
-   * 获取性能统计信息
-   */
-  getStats() {
-    return {
-      cacheSize: this.cache.size,
-      queueLength: this.operationQueue.length,
-      isProcessing: this.isProcessing,
-      cacheHitRate: this.calculateCacheHitRate(),
-    };
-  }
-
-  /**
-   * 计算缓存命中率
-   */
-  private calculateCacheHitRate(): number {
-    // 这里可以添加更复杂的统计逻辑
-    return this.cache.size > 0 ? 0.85 : 0; // 简化的命中率估算
-  }
-
-  /**
-   * 清理过期缓存
-   */
-  cleanupExpiredCache(): void {
-    const now = Date.now();
-    for (const [key, item] of this.cache.entries()) {
-      if (item.expiry && now > item.expiry) {
-        this.cache.delete(key);
-      }
-    }
-  }
 }
 
 // 全局单例实例
 export const asyncStorage = new AsyncStorageManager();
-
-// 便捷函数，兼容原有API
-export const saveToStorageAsync = <T>(key: string, value: T): Promise<void> => {
-  return asyncStorage.setItem(key, value);
-};
-
-export const clearStorageWithPrefixAsync = (prefix: string): Promise<void> => {
-  return asyncStorage.clearWithPrefix(prefix);
-};
 
 export const removeStorageKeysAsync = async (keys: string[]): Promise<void> => {
   await Promise.all(keys.map((key) => asyncStorage.removeItem(key)));
