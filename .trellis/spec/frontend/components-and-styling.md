@@ -23,6 +23,24 @@
 - Split large page sections when the split gives a reader a real boundary, not
   just because a file is long.
 
+## State Layer
+
+- The root layout nests `CocktailFormProvider` then `CocktailResultProvider`, in
+  that order. A `CocktailProvider` facade used to wrap the pair; it was removed
+  because its own combined hook had no consumers, so the indirection only hid the
+  nesting order that matters.
+- `utils/asyncStorage.ts` is the client persistence used by both cocktail contexts.
+  Only `asyncStorage` and `removeStorageKeysAsync` are exported — add an export only
+  when something imports it.
+- A component that returns `null` outside development still ships its client chunk
+  to every production visitor. `PerformanceMonitor` did exactly that for 302 lines.
+  Gate this kind of tooling at the import, not inside the render.
+- Before deleting a module, check for internal `this.method()` calls as well as
+  external imports. Checking only external call sites reports live methods as dead.
+- Deleting an unreferenced module is provable by static analysis plus typecheck and
+  build. Rewriting live client persistence is not — that needs browser-level
+  coverage first, which this repo does not currently have (see `quality.md`).
+
 ## Styling
 
 - Tailwind CSS is the default styling layer.
