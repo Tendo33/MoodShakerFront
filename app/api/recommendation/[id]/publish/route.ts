@@ -2,7 +2,11 @@ import { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { LOCALES } from "@/lib/i18n/config";
-import { getClientIp, isSameOrigin } from "@/lib/http/request-context";
+import {
+  createRequestId,
+  getClientIp,
+  isSameOrigin,
+} from "@/lib/http/request-context";
 import {
   publishRecommendation,
   withdrawRecommendation,
@@ -51,6 +55,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const requestId = createRequestId();
+  const requestLogger = logger.forRequest(requestId);
+
   if (!isSameOrigin(request)) {
     return apiError(
       "FORBIDDEN_ORIGIN",
@@ -132,8 +139,15 @@ export async function POST(
       { headers: buildRateLimitHeaders(rateLimit) },
     );
   } catch (error) {
-    logger.error("Failed to publish recommendation", error);
-    return apiError("PUBLISH_FAILED", "Could not publish this recommendation.", 500);
+    requestLogger.error("Failed to publish recommendation", { id, error });
+    // `requestId` in the body so a user-reported failure can be matched to the log
+    // line that explains it.
+    return apiError(
+      "PUBLISH_FAILED",
+      "Could not publish this recommendation.",
+      500,
+      { requestId },
+    );
   }
 }
 
@@ -142,6 +156,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const requestId = createRequestId();
+  const requestLogger = logger.forRequest(requestId);
+
   if (!isSameOrigin(request)) {
     return apiError("FORBIDDEN_ORIGIN", "Request origin is not allowed.", 403);
   }
@@ -175,11 +192,12 @@ export async function DELETE(
 
     return apiSuccess({ wasPublished: result.wasPublished }, 200);
   } catch (error) {
-    logger.error("Failed to withdraw recommendation", error);
+    requestLogger.error("Failed to withdraw recommendation", { id, error });
     return apiError(
       "WITHDRAW_FAILED",
       "Could not withdraw this recommendation.",
       500,
+      { requestId },
     );
   }
 }

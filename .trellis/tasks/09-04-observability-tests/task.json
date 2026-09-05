@@ -3,7 +3,7 @@
   "name": "observability-tests",
   "title": "可观测性与测试",
   "description": "结构化日志、核心指标、错误上报，生成管线与 API 路由测试、端到端主流程覆盖",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": null,
   "package": null,

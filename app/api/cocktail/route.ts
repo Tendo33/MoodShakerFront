@@ -17,6 +17,9 @@ import { getClientIp, isSameOrigin } from "@/lib/http/request-context";
 
 export async function POST(request: NextRequest) {
   const requestId = generateCocktailId();
+  // Stamps `requestId` as a field on every line below, rather than interpolating it
+  // into each message where a log aggregator cannot filter on it.
+  const logger = cocktailLogger.forRequest(requestId);
   const startTime = Date.now();
 
   try {
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    cocktailLogger.info(`Processing cocktail request [${requestId}]`);
+    logger.info("Processing cocktail request");
 
     const cocktail = await generateCocktailRecommendation({
       provider: getLLMProvider(),
@@ -92,9 +95,9 @@ export async function POST(request: NextRequest) {
     });
 
     const duration = Date.now() - startTime;
-    cocktailLogger.info(
-      `Cocktail request completed [${requestId}] (${duration}ms)`,
-    );
+    // Duration as a field, not baked into the message: this is the number worth
+    // graphing, and `(1843ms)` inside a string cannot be aggregated.
+    logger.info("Cocktail request completed", { durationMs: duration });
 
     return apiSuccess(
       {
@@ -106,10 +109,10 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     const duration = Date.now() - startTime;
-    cocktailLogger.error(
-      `Cocktail request failed [${requestId}] (${duration}ms)`,
-      error instanceof Error ? error.message : "Unknown error",
-    );
+    // The error object itself, not `error.message`. The logger serializes Error's
+    // non-enumerable fields, so this keeps the stack and any `cause` — which the
+    // previous `.message` extraction discarded at exactly the point they matter.
+    logger.error("Cocktail request failed", { durationMs: duration, error });
 
     if (error instanceof DeploymentDependencyError) {
       return apiError(

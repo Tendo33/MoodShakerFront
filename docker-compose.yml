@@ -38,9 +38,16 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      # 探 /api/health，不是 /。/ 返回的是静态外壳，数据库挂掉也是 200，
+      # 于是一个连不上数据库的容器会一直报 healthy 并继续接流量。
+      #
+      # --spider 只看状态码，正好够用：端点在依赖不可用时返回 503。
+      #
+      # timeout 必须大于端点自己的 CHECK_TIMEOUT_MS（12s），否则探测会在
+      # 端点正要给出正确答案时先放弃。改这里就要一起看 app/api/health/route.ts。
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
-      timeout: 10s
+      timeout: 15s
       retries: 3
       start_period: 40s
     deploy:

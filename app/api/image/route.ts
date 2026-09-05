@@ -33,6 +33,10 @@ const IMAGE_RATE_WINDOW_MS = 60 * 1000;
  */
 export async function POST(request: NextRequest) {
   const requestId = createRequestId();
+  // Stamps `requestId` on every line below, so the id no longer has to be
+  // interpolated into each message by hand — and it lands as a field a log
+  // aggregator can filter on rather than as text inside the message.
+  const logger = imageLogger.forRequest(requestId);
 
   try {
     if (!isSameOrigin(request)) {
@@ -101,7 +105,7 @@ export async function POST(request: NextRequest) {
         size: "1024x1024",
       });
     } catch (error) {
-      imageLogger.error(`Image provider failed [${requestId}]`, {
+      logger.error("Image provider failed", {
         recommendationId,
         error: error instanceof Error ? error.message : "Unknown error",
       });
@@ -140,7 +144,7 @@ export async function POST(request: NextRequest) {
       // deleteStoredImages already logs; a leftover object is harmless.
     });
 
-    imageLogger.info(`Image stored [${requestId}]`, { recommendationId });
+    logger.info("Image stored", { recommendationId });
 
     return apiSuccess(stored, 200, {
       requestId,
@@ -149,7 +153,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof ImagePipelineError) {
       const status = error.reason === "IMAGE_PROCESSING_FAILED" ? 500 : 502;
-      imageLogger.error(`Image pipeline failed [${requestId}]`, {
+      logger.error("Image pipeline failed", {
         reason: error.reason,
         error: error.message,
       });
@@ -162,7 +166,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (error instanceof DeploymentDependencyError) {
-      imageLogger.error(`Image storage unavailable [${requestId}]`, {
+      logger.error("Image storage unavailable", {
         code: error.code,
         error: error.message,
       });
@@ -174,8 +178,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    imageLogger.error(
-      `Image generation failed [${requestId}]`,
+    logger.error(
+      "Image generation failed",
       error instanceof Error ? error.message : "Unknown error",
     );
     return apiError(

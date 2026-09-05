@@ -3,6 +3,7 @@ import { apiError, apiSuccess } from "@/lib/api-response";
 import { getCocktailBySlug } from "@/lib/cocktail-data";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
 import { DataSourceUnavailableError } from "@/lib/runtime-errors";
+import { createRequestId } from "@/lib/http/request-context";
 import { cocktailLogger } from "@/utils/logger";
 
 /**
@@ -21,6 +22,8 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
+  const requestId = createRequestId();
+  const logger = cocktailLogger.forRequest(requestId);
 
   if (!slug) {
     return apiError("INVALID_SLUG", "Missing cocktail slug.", 400);
@@ -37,14 +40,19 @@ export async function GET(
 
     return apiSuccess(cocktail, 200);
   } catch (error) {
-    cocktailLogger.error("Failed to load cocktail detail", error);
+    logger.error("Failed to load cocktail detail", { slug, error });
+    // `requestId` in the body so a user-reported failure can be matched to the log
+    // line that explains it. Without it a 500 report is untraceable.
     if (error instanceof DataSourceUnavailableError) {
       return apiError(
         "SERVICE_UNAVAILABLE",
         "Cocktail data is temporarily unavailable.",
         503,
+        { requestId },
       );
     }
-    return apiError("LOAD_FAILED", "Failed to load cocktail.", 500);
+    return apiError("LOAD_FAILED", "Failed to load cocktail.", 500, {
+      requestId,
+    });
   }
 }

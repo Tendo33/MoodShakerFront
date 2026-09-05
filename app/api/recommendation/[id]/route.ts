@@ -16,6 +16,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const requestId = createRequestId();
+  const logger = cocktailLogger.forRequest(requestId);
 
   try {
     if (!isSameOrigin(request)) {
@@ -64,7 +65,7 @@ export async function POST(
       { requestId },
     );
   } catch (error) {
-    cocktailLogger.error(`Failed to load recommendation session [${requestId}]`, error);
+    logger.error("Failed to load recommendation session", error);
     return apiError("LOAD_FAILED", "Failed to load recommendation.", 500, {
       requestId,
     });
