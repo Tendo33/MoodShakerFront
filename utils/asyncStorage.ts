@@ -228,24 +228,19 @@ export class AsyncStorageManager {
   private addToQueue(operation: StorageOperation): void {
     this.operationQueue.push(operation);
 
-    // 如果队列满了，立即处理
+    // 队列满了就尽快处理。
+    //
+    // 如果上一批仍在处理，这次 processBatch() 会因 isProcessing 直接返回；
+    // 此时必须留下一个已安排的 timeout 作为兜底，否则这批操作无人调度。
+    // processBatch 的 finally 也会补一次调度，两者是互相独立的保险。
     if (this.operationQueue.length >= this.maxBatchSize) {
-      if (this.batchTimeout) {
-        clearTimeout(this.batchTimeout);
-        this.batchTimeout = null;
-      }
+      this.scheduleBatch();
       this.processBatch();
       return;
     }
 
     // 使用批量处理优化性能
-    if (this.batchTimeout) {
-      clearTimeout(this.batchTimeout);
-    }
-
-    this.batchTimeout = setTimeout(() => {
-      this.processBatch();
-    }, this.BATCH_DELAY);
+    this.scheduleBatch();
   }
 
   /**
@@ -261,11 +256,27 @@ export class AsyncStorageManager {
     this.operationQueue = [];
 
     try {
-      // 使用requestIdleCallback优化性能
+      // 把实际执行推迟到浏览器空闲，避免在渲染帧里做同步 localStorage 写入。
+      //
+      // executeOperations 自己 settle 每个 operation 并内部捕获异常，但这里仍然
+      // 包一层 try/catch：如果它意外抛出，抛出点在回调内部，await 等不到 resolve，
+      // 于是 isProcessing 永远为 true，整个队列从此彻底卡死。
+      const runOperations = () => {
+        try {
+          this.executeOperations(operations);
+        } catch (error) {
+          operations.forEach((op) =>
+            op.reject(
+              error instanceof Error ? error : new Error("批量操作失败"),
+            ),
+          );
+        }
+      };
+
       if (typeof window !== "undefined" && "requestIdleCallback" in window) {
         await new Promise<void>((resolve) => {
           window.requestIdleCallback(() => {
-            this.executeOperations(operations);
+            runOperations();
             resolve();
           });
         });
@@ -273,7 +284,7 @@ export class AsyncStorageManager {
         // 降级到setTimeout
         await new Promise<void>((resolve) => {
           setTimeout(() => {
-            this.executeOperations(operations);
+            runOperations();
             resolve();
           }, 0);
         });
@@ -286,7 +297,34 @@ export class AsyncStorageManager {
       });
     } finally {
       this.isProcessing = false;
+
+      // 处理这一批期间新入队的操作。
+      //
+      // 没有这一步会永久丢失操作：addToQueue 在队列满时会 clearTimeout 再调
+      // processBatch()，而此刻如果上一批仍在处理，那次调用会因 isProcessing
+      // 直接返回 —— 队列里有 10 个操作，batchTimeout 已是 null，再没有任何东西
+      // 会调度它们，对应的 promise 永远不 resolve。
+      //
+      // 实测：连续 20 次 setItem 只有 10 个落盘，另外 10 个的 await 永久悬挂。
+      // 页面上的表现是"保存"永远转圈，而不是报错。
+      if (this.operationQueue.length > 0) {
+        this.scheduleBatch();
+      }
     }
+  }
+
+  /**
+   * 安排一次批处理，覆盖此前尚未触发的那次。
+   */
+  private scheduleBatch(): void {
+    if (this.batchTimeout) {
+      clearTimeout(this.batchTimeout);
+    }
+
+    this.batchTimeout = setTimeout(() => {
+      this.batchTimeout = null;
+      this.processBatch();
+    }, this.BATCH_DELAY);
   }
 
   /**
@@ -296,11 +334,33 @@ export class AsyncStorageManager {
     operations.forEach((operation) => {
       try {
         switch (operation.type) {
-          case "get":
+          case "get": {
             const value = localStorage.getItem(operation.key!);
-            const parsed = value ? JSON.parse(value) : null;
-            operation.resolve(parsed);
+            if (value === null) {
+              operation.resolve(null);
+              break;
+            }
+
+            // 读取失败降级为 null，让 getItem 的 defaultValue 生效；写入失败才 reject。
+            //
+            // localStorage 是同源共享的：旧版本的应用、页面上的其他脚本、写到一半
+            // 被打断的值，都会留下解析不了的内容。这是预期噪声，不是异常。
+            // 之前这里让 JSON.parse 直接抛出，于是 useAsyncState 落进 catch 分支
+            // 显示错误态，CocktailResultContext 的 `|| ""` 兜底也被跳过 —— 一个坏
+            // 键就能让整块持久化状态变成报错，而它本该退回默认值。
+            //
+            // 坏值有意保留而不删除：读路径里做写入是另一类副作用，而且保留它便于
+            // 排查。代价是这个键每次读都会再解析失败一次。
+            try {
+              operation.resolve(JSON.parse(value));
+            } catch {
+              appLogger.warn("Discarding unparseable localStorage value", {
+                key: operation.key,
+              });
+              operation.resolve(null);
+            }
             break;
+          }
 
           case "set":
             localStorage.setItem(
