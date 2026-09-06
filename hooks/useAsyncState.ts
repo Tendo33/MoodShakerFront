@@ -58,6 +58,18 @@ export function useAsyncState<T>(
   const loadingRef = useRef(false);
   const mountedRef = useRef(true);
 
+  // defaultValue / onSuccess / onError 存进 ref，不进 loadData 的依赖数组。
+  //
+  // 这三个参数在调用处几乎都是内联字面量或内联箭头函数，每次渲染都是新引用。
+  // 之前 loadData 依赖它们，于是每渲染一次 loadData 就重建一次，依赖 loadData
+  // 的初始化 effect 跟着重跑，setState 再触发渲染 —— 闭环。
+  //
+  // 实测 Home.tsx 的调用形态（内联 defaultValue: {}）：1.5 秒内渲染 475 次，
+  // 换成稳定引用只有 3 次。首页一直在无界重渲染循环里，只是被存储层的批处理
+  // 延迟限了速，所以没表现成页面卡死。
+  const optionsRef = useRef({ defaultValue, onSuccess, onError });
+  optionsRef.current = { defaultValue, onSuccess, onError };
+
   // 清理函数
   useEffect(() => {
     return () => {
@@ -81,16 +93,23 @@ export function useAsyncState<T>(
       setPhase("loading");
 
       // 异步获取数据
-      const result = await asyncStorage.getItem<T>(storageKey, defaultValue);
+      const result = await asyncStorage.getItem<T>(
+        storageKey,
+        optionsRef.current.defaultValue,
+      );
 
       if (!mountedRef.current) return;
 
       setData(result);
       setPhase("success");
 
-      // 成功回调
-      if (result && onSuccess) {
-        onSuccess(result);
+      // 成功回调。
+      //
+      // 判 null 而不是判真值：之前写的是 `if (result && onSuccess)`，于是存储的
+      // false、0、"" 都不会触发回调 —— 一个存着 false 的开关状态，恢复时看起来
+      // 和"没有存过"完全一样。
+      if (result !== null && optionsRef.current.onSuccess) {
+        optionsRef.current.onSuccess(result);
       }
 
       appLogger.debug("Async state loaded successfully");
@@ -103,8 +122,8 @@ export function useAsyncState<T>(
       setPhase("error");
 
       // 错误回调
-      if (onError) {
-        onError(error);
+      if (optionsRef.current.onError) {
+        optionsRef.current.onError(error);
       }
 
       appLogger.error("Async state loading failed");
@@ -114,7 +133,9 @@ export function useAsyncState<T>(
         loadingRef.current = false;
       }
     }
-  }, [storageKey, defaultValue, onSuccess, onError]);
+    // 只依赖 storageKey。其余三个参数经 optionsRef 读取，因此换了 key 才需要重建
+    // 这个回调，而不是每次渲染都重建。
+  }, [storageKey]);
 
   /**
    * 更新数据函数
