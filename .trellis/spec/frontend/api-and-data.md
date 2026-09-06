@@ -49,12 +49,21 @@ MoodShaker uses Next.js route handlers plus Prisma/PostgreSQL.
   whether or not the database is reachable, so a container with a dead database
   reports itself healthy and keeps taking traffic. Both `Dockerfile` and
   `docker-compose.yml` must point at the endpoint.
-- The timeouts form an ordered chain that has to stay ordered:
-  `probe timeout (15s) > endpoint CHECK_TIMEOUT_MS (12s) > dependency cold start`.
-  Measured on this project's Neon instance: 9963 ms for the first query after it
-  suspends, 600–1400 ms warm. At a 5 s endpoint timeout every check after a quiet
-  period returned 503, which is enough for an orchestrator to kill a container that
-  would have served traffic a second later. Change one value and check the others.
+- `CHECK_TIMEOUT_MS` (12 s) is a backstop, not the governing deadline. Prisma's own
+  connect timeout fires first: with no `connect_timeout` in `DATABASE_URL` it gives
+  up at roughly 5 s, so a check against a suspended database returns 503 with
+  `durationMs` near 5009 — the endpoint's deadline never gets a chance to apply. Add
+  `connect_timeout=<seconds>` to `DATABASE_URL` if you want the endpoint's deadline
+  to be the one that decides.
+- Cold-start behavior is not deterministic, so do not treat a single measurement as
+  the rule. Both were observed on this project's Neon instance: a 5036 ms failure
+  (Prisma gave up while the compute was still waking) and a 9956 ms success (the
+  query waited it out). Warm queries run 600–1400 ms.
+- What actually absorbs cold starts is the probe's retry policy —
+  `retries: 3` with `start_period: 40s` in docker-compose.yml — not the endpoint
+  timeout. A single 503 during wake-up is expected and must not mark the container
+  unhealthy. Keep the probe timeout (15 s) above `CHECK_TIMEOUT_MS` so that when the
+  endpoint does hit its own deadline, the probe is still listening for the answer.
 - The endpoint declares `dynamic = "force-dynamic"`. A prerendered health check
   reports the build machine's state, not the running instance's.
 

@@ -90,8 +90,12 @@ EXPOSE 3000
 # 健康检查
 # 探 /api/health，不是 /。/ 返回的是静态外壳，数据库挂掉也是 200，
 # 于是一个连不上数据库的容器会一直报 healthy 并继续接流量。
-# timeout 必须大于端点自己的 CHECK_TIMEOUT_MS（12s），见 app/api/health/route.ts。
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+#
+# timeout 大于端点自己的 CHECK_TIMEOUT_MS（12s），见 app/api/health/route.ts。
+# 但真正兜住数据库冷启动的是 retries 和 start-period：Neon 空闲后会挂起，
+# Prisma 默认约 5s 放弃连接，唤醒期间出现单次 503 属于预期。
+# start-period 与 docker-compose.yml 保持一致（原本是 5s，理由相同却不一致）。
+HEALTHCHECK --interval=30s --timeout=30s --start-period=40s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 # 启动应用（通过启动脚本，会自动初始化数据库并写入三种酒的示例数据）

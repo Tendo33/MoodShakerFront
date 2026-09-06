@@ -19,21 +19,21 @@ const NO_STORE = {
 } as const;
 
 /**
- * How long a dependency check may take before it is called a failure.
+ * Upper bound on a single dependency check. This is a backstop, not the deadline
+ * that usually decides the outcome.
  *
- * Must exceed the dependency's cold-start time, or the check reports a dependency
- * that is merely asleep as one that is broken. Measured on this project's Neon
- * instance, which suspends when idle: the first query after a quiet period took
- * 9963 ms, subsequent ones 600-1400 ms. At the 5 s this was first set to, every
- * health check following a quiet period returned 503.
+ * Prisma's own connect timeout fires first. With no `connect_timeout` in
+ * `DATABASE_URL` it gives up at roughly 5 s, so a check against a suspended database
+ * returns 503 with `durationMs` near 5009 and this value never applies. Set
+ * `connect_timeout` on the connection string if you want this deadline to govern.
  *
- * This value sits inside a chain that has to stay ordered:
+ * Cold starts on this project's Neon instance are not deterministic — both a 5036 ms
+ * failure and a 9956 ms success were observed, against 600-1400 ms warm. So a single
+ * 503 during wake-up is expected, and what absorbs it is the probe's retry policy
+ * (`retries: 3`, `start_period: 40s` in docker-compose.yml), not this number.
  *
- *   probe timeout (15 s, docker-compose)  >  this (12 s)  >  cold start (~10 s)
- *
- * If the probe's timeout is not the largest, the probe gives up while the endpoint
- * is still producing a correct answer, and the endpoint's accuracy stops mattering.
- * Change one and check the others.
+ * Keep the probe's timeout (15 s) above this one, so that when this deadline does
+ * fire the probe is still listening rather than having given up on its own.
  */
 const CHECK_TIMEOUT_MS = 12_000;
 

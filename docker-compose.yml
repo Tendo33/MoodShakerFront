@@ -45,6 +45,11 @@ services:
       #
       # timeout 必须大于端点自己的 CHECK_TIMEOUT_MS（12s），否则探测会在
       # 端点正要给出正确答案时先放弃。改这里就要一起看 app/api/health/route.ts。
+      #
+      # retries 和 start_period 才是真正兜住数据库冷启动的东西，不是 timeout。
+      # Neon 空闲后会挂起，Prisma 默认约 5s 放弃连接，所以唤醒期间出现单次 503
+      # 属于预期；实测同一实例既出现过 5036ms 失败也出现过 9956ms 成功。
+      # 把 retries 降成 1 会让容器在冷启动时被判定不健康。
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 15s
