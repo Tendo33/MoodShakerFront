@@ -37,9 +37,38 @@
   Gate this kind of tooling at the import, not inside the render.
 - Before deleting a module, check for internal `this.method()` calls as well as
   external imports. Checking only external call sites reports live methods as dead.
-- Deleting an unreferenced module is provable by static analysis plus typecheck and
-  build. Rewriting live client persistence is not — that needs browser-level
-  coverage first, which this repo does not currently have (see `quality.md`).
+- Client-side state and hooks are testable — jsdom and `@testing-library/react` are
+  installed. See `quality.md` for the setup and the working examples.
+
+### Hook Dependency Arrays
+
+- Never put an object, array, or function parameter in a `useCallback` or `useEffect`
+  dependency array unless the caller is guaranteed to pass a stable reference. Callers
+  pass inline literals (`defaultValue: {}`) and inline arrows, which are new
+  references every render, so the callback is rebuilt every render, any effect
+  depending on it re-runs, its setState triggers another render, and the loop closes.
+- `useAsyncState` shipped with exactly this: `loadData` depended on `defaultValue`,
+  `onSuccess`, and `onError`. Measured on the home page's actual call shape — 475
+  renders in 1.5 s, against 3 with a stable reference. It did not look like a hang
+  because the storage layer's batch delay throttled it, which is why it survived
+  review. Hold such values in a ref and depend only on the primitives.
+- A render-count assertion is the only thing that catches this class of bug. Typecheck,
+  lint, and build all pass, and the page renders correctly — just hundreds of times.
+
+### Storage Reads And Writes
+
+- A read failure degrades to the caller's default; a write failure rejects.
+  `localStorage` is shared across the origin, so unparseable content is expected
+  noise, not an exception. Rejecting on it put `useAsyncState` in its error state and
+  bypassed the caller's fallback, so one bad key broke a whole screen.
+- Check against `null`, never truthiness, when deciding whether a stored value
+  exists. A persisted `false`, `0`, or `""` is a value; a truthiness check reports it
+  as absent.
+- `asyncStorage` batches writes with a queue capped at `maxBatchSize`. Anything that
+  drains it must re-schedule whatever arrived while it was busy — a batch that returns
+  early because another is in flight leaves operations with no scheduler and their
+  promises never settle. That surfaces as a save indicator spinning forever, which is
+  worse than an error. Covered by burst tests at 20 and 60 writes.
 
 ## Styling
 

@@ -28,19 +28,45 @@ Use browser smoke tests for visible or route-level changes:
 - image refresh and rate-limit feedback
 - share-card rendering and download
 
-## Browser Coverage Gap
+## Component And Hook Tests
 
-`playwright.config.ts` and `pnpm test:e2e` exist, but the browser binaries do not
-install in this environment — two attempts reached 448 KB of roughly 150 MB over
-nine minutes. There is no jsdom, vitest, or testing-library in the project either,
-so nothing here can render a component.
+Hooks and client-side state are testable here. `jsdom` and `@testing-library/react`
+are devDependencies, and `tests/hooks/useAsyncState.test.ts` plus
+`tests/utils/asyncStorage.test.ts` are the working examples to copy from.
 
-What this rules out: any change to client-side state, persistence, or context wiring
-that cannot be proven by typecheck and build. Deleting an unreferenced module is
-fine; rewriting how a context persists is not. The remaining half of the state
-slimdown is deferred for this reason, not because it lacks value.
+A correction worth keeping, because it cost real time: an earlier note in this file
+claimed there was "no jsdom to fall back on" and deferred state-layer work on that
+basis. That described what happened to be installed, not what was possible — nobody
+had tried. `pnpm add -D jsdom` takes about 2 seconds. Playwright's browser binary is
+a genuinely different problem; a pure-JS DOM is not. Check before concluding a tool
+is unavailable.
 
-What to use instead, for a change that touches rendering:
+Setup that these tests depend on, in this order, all before React is imported:
+
+- Assign `window`, `document`, and `localStorage` from the JSDOM instance onto
+  `globalThis`, and set `IS_REACT_ACT_ENVIRONMENT = true`.
+- `navigator` is a getter-only property on current Node, so it needs
+  `Object.defineProperty`, not assignment.
+- Do **not** pass `pretendToBeVisual: true`. It starts a perpetual
+  requestAnimationFrame loop that holds Node's event loop open, so the suite finishes
+  and then hangs. Nothing here needs rAF.
+- Close the window in an `after()` hook.
+- Imports go inside a helper function. tsx compiles these tests to CJS, where
+  top-level await is unavailable.
+- Generate storage keys **outside** the render callback. `useAsyncState({storageKey:
+  uniqueKey()})` inside it produces a new key every render, which correctly rebuilds
+  the hook's callbacks and re-runs its effect — a loop of the test's own making that
+  looks exactly like a product bug.
+
+## Playwright
+
+`playwright.config.ts` and `pnpm test:e2e` exist but do not run: the browser binaries
+will not install in this environment — two attempts reached 448 KB of roughly 150 MB
+over nine minutes. Full-flow checks across pages remain manual for now.
+
+## Route-Level Changes
+
+For a change that touches rendering:
 
 ```bash
 node scripts/measure-ssr.mjs   # all 8 routes: status, title, server-rendered text volume
