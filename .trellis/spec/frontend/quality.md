@@ -31,8 +31,26 @@ Use browser smoke tests for visible or route-level changes:
 ## Component And Hook Tests
 
 Hooks and client-side state are testable here. `jsdom` and `@testing-library/react`
-are devDependencies, and `tests/hooks/useAsyncState.test.ts` plus
-`tests/utils/asyncStorage.test.ts` are the working examples to copy from.
+are devDependencies. Copy from whichever example matches the shape of what you are
+testing, since each needs a different amount of setup:
+
+- Plain storage, no React — `tests/utils/asyncStorage.test.ts`.
+- A hook — `tests/hooks/useAsyncState.test.ts`.
+- A hook touching the DOM — `tests/hooks/useFocusTrap.test.ts`. Adds jsdom's element
+  constructors on `globalThis` (the hook uses `instanceof HTMLElement`, and Node's own
+  constructors do not match nodes from the jsdom document) plus a `setTimeout`-backed
+  `requestAnimationFrame`.
+- A context — `tests/context/CocktailFormContext.test.ts`, or
+  `tests/context/CocktailResultContext.test.ts` when `fetch` is involved. Both need
+  `next/navigation` mocked, because `LanguageProvider` calls `usePathname` and there is
+  no app router here. That is why `--experimental-test-module-mocks` is in the `test`
+  script; without it the full suite fails on those files while each passes alone.
+- Provider nesting has to match the real app: `LanguageProvider` outside
+  `CocktailFormProvider` outside `CocktailResultProvider`. The result context reads
+  questionnaire answers, so a missing form provider throws.
+- Reset between tests through `asyncStorage.removeItem`, not `localStorage.clear()`.
+  `asyncStorage` is a module singleton whose read-through cache outlives a test, so one
+  test's answers otherwise surface in the next.
 
 A correction worth keeping, because it cost real time: an earlier note in this file
 claimed there was "no jsdom to fall back on" and deferred state-layer work on that

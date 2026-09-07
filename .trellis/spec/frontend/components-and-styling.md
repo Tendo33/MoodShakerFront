@@ -70,6 +70,35 @@
   promises never settle. That surfaces as a save indicator spinning forever, which is
   worse than an error. Covered by burst tests at 20 and 60 writes.
 
+### Concurrent Updates
+
+- Pass an updater function to `updateItem`, never a value merged from state you read
+  first. `updateItem("answers", {...answers, [id]: value})` captures `answers` from the
+  closure, so two calls in one render read the same snapshot and the second discards the
+  first. Measured: three concurrent saves kept one.
+- `useBatchAsyncState` reads the previous value from a ref rather than state for this
+  reason — a ref is updated synchronously, so the second call in a render sees the
+  first's result.
+- Do not rely on a caller happening to serialize. `Questions.tsx` guards with
+  `selectedOption` and so never hit this, while `toggleBaseSpirit` on multi-select tags
+  did: two taps, one selection.
+
+### Background Tasks And Stale Writes
+
+- Any fire-and-forget task that writes state or storage must carry a generation marker
+  that reset and re-submit increment, and check it before writing. Image generation runs
+  up to 30 s while closing over its round's data; without the marker, tapping "start
+  over" mid-flight cleared state and storage, then the finished job wrote the old
+  recommendation back into both.
+- Check the marker **immediately before each write**, not once at the top of the
+  write-back path. Every `await` in between is a yield where the reset can complete —
+  check-then-act. The first version of this fix checked once, read correctly, and still
+  lost: instrumenting `localStorage` showed DEL, DEL, SET with the stale write last.
+  Hence the guard threaded into `persistImageUrl` and `updateRecommendationImage`.
+- The same applies to loading flags. A cancelled round must not clear a spinner the
+  current round owns, and a reset must clear the flag itself since the cancelled task's
+  `finally` no longer will.
+
 ## Styling
 
 - Tailwind CSS is the default styling layer.
