@@ -227,7 +227,7 @@ const Home = React.memo(function Home() {
               className="content-spacing"
             >
               <motion.div variants={slideUpVariants} className="mb-4">
-                <div className="glass-subtle inline-flex items-center gap-2 border border-primary/35 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.22em] text-primary shadow-[0_14px_26px_rgba(3,0,9,0.18)]">
+                <div className="glass-subtle inline-flex items-center gap-2 border border-primary/35 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-primary shadow-[0_14px_26px_rgba(3,0,9,0.18)]">
                   <Sparkles className="h-4 w-4 text-secondary animate-neon-pulse" />
                   {language === "en"
                     ? "AI-Powered Cocktail Recommendations"
@@ -432,7 +432,7 @@ const Home = React.memo(function Home() {
                               <div className="h-3 w-3 rounded-full bg-primary" />
                               <div className="h-3 w-3 rounded-full bg-secondary" />
                               <div className="h-3 w-3 rounded-full bg-accent" />
-                              <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.24em] text-secondary/90">IMAGE_DATA_RENDER.EXE</span>
+                              <span className="ml-2 font-mono text-xs uppercase tracking-[0.24em] text-secondary/90">IMAGE_DATA_RENDER.EXE</span>
                             </div>
                             
                             <SafeImage
@@ -482,15 +482,15 @@ const Home = React.memo(function Home() {
               </AnimatePresence>
 
               <div className="absolute -bottom-10 left-1/2 flex -translate-x-1/2 space-x-3">
+                {/* 按钮撑到 24x24 满足 WCAG 2.5.8 的最小触摸目标，视觉圆点仍是 10px
+                    的内层 span —— 观感不变，可点区域变成原来的 5 倍多。
+                    非激活态原为 bg-muted（rgba(219,209,239,0.4)），实测对比 2.90:1，
+                    低于 WCAG 1.4.11 对非文本组件的 3:1；改用 foreground/50 得 4.73:1。 */}
                 {featuredCocktails.map((_, index) => (
                   <motion.button
                     key={index}
                     onClick={() => setCurrentCocktailIndex(index)}
-                    className={`h-2.5 w-2.5 transition duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
-                      index === currentCocktailIndex
-                        ? "scale-110 bg-primary ring-2 ring-secondary/50"
-                        : "bg-muted hover:bg-secondary"
-                    }`}
+                    className="focus-ring group flex h-6 w-6 items-center justify-center"
                     whileHover={{ scale: 1.2, rotate: 45 }}
                     whileTap={{ scale: 0.9 }}
                     animate={{
@@ -499,7 +499,15 @@ const Home = React.memo(function Home() {
                     }}
                     transition={{ duration: 0.4, ease: "linear" }}
                     aria-label={`View cocktail ${index + 1}`}
-                  />
+                  >
+                    <span
+                      className={`h-2.5 w-2.5 transition duration-500 ${
+                        index === currentCocktailIndex
+                          ? "scale-110 bg-primary ring-2 ring-secondary/50"
+                          : "bg-foreground/50 group-hover:bg-secondary"
+                      }`}
+                    />
+                  </motion.button>
                 ))}
               </div>
             </motion.div>

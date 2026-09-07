@@ -233,7 +233,7 @@ export default function GalleryContent({
                 <input
                   type="text"
                   id="gallery-search"
-                  className="block w-full border border-primary/30 bg-black/40 py-3 pl-11 pr-10 text-sm text-foreground shadow-inner transition-all placeholder:text-muted-foreground focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  className="focus-ring block w-full border border-primary/30 bg-black/40 py-3 pl-11 pr-10 text-sm text-foreground shadow-inner transition-all placeholder:text-muted-foreground focus:border-secondary"
                   placeholder={t("gallery.search.placeholder")}
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
@@ -272,26 +272,26 @@ export default function GalleryContent({
 
             {activeFilterCount > 0 && (
               <div className="mt-3 flex flex-wrap items-center gap-2 px-1">
-                <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-foreground/55">
+                <span className="text-xs font-mono uppercase tracking-[0.2em] text-foreground/55">
                   {lang === "en" ? "Active filters" : "已启用筛选"}
                 </span>
                 {searchQuery.trim() && (
-                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-primary">
+                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-primary">
                     {lang === "en" ? "Search" : "搜索"}: {searchQuery.trim()}
                   </span>
                 )}
                 {selectedSpirit && (
-                  <span className="glass-subtle border border-secondary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-secondary">
+                  <span className="glass-subtle border border-secondary/35 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-secondary">
                     {baseSpiritLabel(coerceBaseSpirit(selectedSpirit), vocabLocale)}
                   </span>
                 )}
                 {selectedAlcohol && (
-                  <span className="glass-subtle border border-accent/40 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-accent">
+                  <span className="glass-subtle border border-accent/40 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-accent">
                     {alcoholLevelLabel(coerceAlcoholLevel(selectedAlcohol), vocabLocale)}
                   </span>
                 )}
                 {selectedFlavor && (
-                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-primary">
+                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-primary">
                     {flavorProfileLabel(coerceFlavorProfiles([selectedFlavor])[0], vocabLocale)}
                   </span>
                 )}
@@ -303,7 +303,7 @@ export default function GalleryContent({
                     setSelectedFlavor(null);
                     setSelectedAlcohol(null);
                   }}
-                  className="focus-ring ml-auto inline-flex min-h-10 items-center justify-center border border-white/10 px-3 py-2 text-[11px] font-mono uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
+                  className="focus-ring ml-auto inline-flex min-h-10 items-center justify-center border border-white/10 px-3 py-2 text-xs font-mono uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
                 >
                   {lang === "en" ? "Clear all" : "清空全部"}
                 </button>
@@ -318,7 +318,7 @@ export default function GalleryContent({
             >
               <div className="px-1 pt-1 space-y-4">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
+                  <div className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
                     <GlassWater className="h-3 w-3" />
                     {t("gallery.filter.base")}
                   </div>
@@ -342,7 +342,7 @@ export default function GalleryContent({
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
+                  <div className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
                     <Activity className="h-3 w-3" />
                     {t("gallery.filter.alcohol_level")}
                   </div>
@@ -366,7 +366,7 @@ export default function GalleryContent({
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
+                  <div className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
                     <Sparkles className="h-3 w-3" />
                     {t("gallery.filter.flavor")}
                   </div>

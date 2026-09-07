@@ -651,7 +651,7 @@ const Questions = memo(function Questions() {
                   value={feedback}
                   onChange={(event) => setFeedback(event.target.value)}
                   placeholder={t("questions.feedback.placeholder")}
-                  className="min-h-36 w-full border border-primary/30 bg-black/50 p-4 font-mono text-foreground focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/40"
+                  className="focus-ring min-h-36 w-full border border-primary/30 bg-black/50 p-4 font-mono text-foreground focus:border-secondary"
                   aria-describedby={
                     submitError
                       ? `${feedbackDescriptionId} ${feedbackErrorId}`

@@ -145,7 +145,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
             )}
 
             {/* Meta Info - With Reliable Icons */}
-            <div className="flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.1em] text-primary/90 font-bold opacity-80">
+            <div className="flex items-center justify-center gap-4 text-xs uppercase tracking-[0.1em] text-primary/90 font-bold opacity-80">
               <div className="flex items-center gap-1.5">
                 <Martini className="w-3 h-3" />
                 <span>{baseSpirit}</span>
@@ -169,7 +169,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
               {/* white/60 而非 /40：10px 属正文，需 4.5:1。在这张卡的面板底色
                   rgb(18,12,28) 上，/40 只有 3.80:1，/60 得 7.23:1。这张卡会经
                   html-to-image 导出成分享图，图片没法被辅助技术调节，更要留余量。 */}
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
+              <span className="text-xs font-black uppercase tracking-[0.25em] text-white/60 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
                 <ShoppingBasket className="w-3 h-3 text-primary/80" />
                 <span>{t("recommendation.card.ingredients")}</span>
               </span>
@@ -196,7 +196,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
           {/* 4. Steps */}
           <div className="flex-1 mb-8">
             <div className="text-center mb-6">
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
+              <span className="text-xs font-black uppercase tracking-[0.25em] text-white/60 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
                 <ScrollText className="w-3 h-3 text-secondary/80" />
                 <span>{t("recommendation.card.preparation")}</span>
               </span>
