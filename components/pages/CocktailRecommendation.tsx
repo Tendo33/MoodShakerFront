@@ -150,7 +150,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const textColorClass = "text-foreground font-mono";
   const cardClasses =
-    "glass-panel text-foreground rounded-none border-2 transition-all duration-300 shadow-[0_0_16px_rgba(255,0,255,0.15)] hover:shadow-[0_0_22px_rgba(0,255,255,0.3)]";
+    "glass-panel text-foreground rounded-none border-2 transition-all duration-300";
   const gradientText =
     "font-black font-heading uppercase tracking-[0.14em]";
 

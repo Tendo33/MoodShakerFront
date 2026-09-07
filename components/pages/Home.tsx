@@ -376,7 +376,7 @@ const Home = React.memo(function Home() {
                     icon={<ArrowRight className="h-5 w-5" />}
                     href={questionsPath}
                     variant="primary"
-                    className="shadow-[0_0_16px_var(--color-secondary)] uppercase"
+                    className=" uppercase"
                   >
                     <span className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5 animate-neon-pulse" /> 
@@ -489,8 +489,8 @@ const Home = React.memo(function Home() {
                     onClick={() => setCurrentCocktailIndex(index)}
                     className={`h-2.5 w-2.5 transition duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       index === currentCocktailIndex
-                        ? "scale-110 bg-primary shadow-[0_0_15px_var(--color-primary)] ring-2 ring-secondary/50"
-                        : "bg-muted hover:bg-secondary hover:shadow-[0_0_10px_var(--color-secondary)]"
+                        ? "scale-110 bg-primary ring-2 ring-secondary/50"
+                        : "bg-muted hover:bg-secondary"
                     }`}
                     whileHover={{ scale: 1.2, rotate: 45 }}
                     whileTap={{ scale: 0.9 }}

@@ -163,7 +163,7 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
       return (
         <div
           ref={ref}
-          className={`h-full w-px bg-primary/50 shadow-[0_0_10px_var(--color-primary)] mx-2 ${className}`}
+          className={`h-full w-px bg-primary/50 mx-2 ${className}`}
           {...props}
         />
       );
@@ -176,9 +176,9 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
           className={`relative w-full flex items-center my-4 ${className}`}
           {...props}
         >
-          <div className="grow h-0.5 bg-linear-to-r from-transparent to-primary shadow-[0_0_10px_var(--color-primary)]" />
+          <div className="grow h-0.5 bg-linear-to-r from-transparent to-primary" />
           <span className="px-4 text-sm font-mono tracking-widest text-primary uppercase">{label}</span>
-          <div className="grow h-0.5 bg-linear-to-l from-transparent to-primary shadow-[0_0_10px_var(--color-primary)]" />
+          <div className="grow h-0.5 bg-linear-to-l from-transparent to-primary" />
         </div>
       );
     }
@@ -186,7 +186,7 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
     return (
       <div
         ref={ref}
-        className={`w-full h-0.5 bg-linear-to-r from-primary via-secondary to-accent shadow-[0_0_15px_var(--color-secondary)] my-4 ${className}`}
+        className={`w-full h-0.5 bg-linear-to-r from-primary via-secondary to-accent my-4 ${className}`}
         {...props}
       />
     );

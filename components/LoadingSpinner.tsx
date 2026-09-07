@@ -80,7 +80,7 @@ export default function LoadingSpinner({
           />
 
           <motion.div
-            className="absolute top-1/2 left-1/2 w-3 h-3 bg-gradient-to-br from-amber-400 to-pink-500 rounded-full -translate-x-1/2 -translate-y-1/2 shadow-[0_0_16px_rgba(245,158,11,0.8)]"
+            className="absolute top-1/2 left-1/2 w-3 h-3 bg-gradient-to-br from-amber-400 to-pink-500 rounded-full -translate-x-1/2 -translate-y-1/2"
             animate={{
               scale: [0.8, 1.5, 0.8],
               opacity: [0.6, 1, 0.6],

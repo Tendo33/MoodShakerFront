@@ -330,7 +330,7 @@ export default function GalleryContent({
                         onClick={() => setSelectedSpirit(selectedSpirit === spirit ? null : spirit)}
                         className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
                           selectedSpirit === spirit
-                            ? "bg-secondary text-black border-secondary shadow-[0_0_15px_rgba(0,255,255,0.4)] font-semibold"
+                            ? "bg-secondary text-black border-secondary font-semibold"
                             : "bg-black/40 text-muted-foreground border-primary/20 hover:border-secondary hover:text-secondary hover:bg-secondary/10"
                         }`}
                         aria-pressed={selectedSpirit === spirit}
@@ -354,7 +354,7 @@ export default function GalleryContent({
                         onClick={() => setSelectedAlcohol(selectedAlcohol === level ? null : level)}
                         className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
                           selectedAlcohol === level
-                            ? "bg-accent text-black border-accent shadow-[0_0_15px_rgba(255,153,0,0.4)] font-semibold"
+                            ? "bg-accent text-black border-accent font-semibold"
                             : "bg-black/40 text-muted-foreground border-primary/20 hover:border-accent hover:text-accent hover:bg-accent/10"
                         }`}
                         aria-pressed={selectedAlcohol === level}
@@ -378,7 +378,7 @@ export default function GalleryContent({
                         onClick={() => setSelectedFlavor(selectedFlavor === flavor ? null : flavor)}
                         className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
                           selectedFlavor === flavor
-                            ? "bg-primary text-black border-primary shadow-[0_0_15px_rgba(255,0,255,0.4)] font-semibold"
+                            ? "bg-primary text-black border-primary font-semibold"
                             : "bg-black/40 text-muted-foreground border-primary/20 hover:border-primary hover:text-primary hover:bg-primary/10"
                         }`}
                         aria-pressed={selectedFlavor === flavor}

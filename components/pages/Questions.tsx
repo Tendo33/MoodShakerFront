@@ -428,7 +428,7 @@ const Questions = memo(function Questions() {
 
           <div className="relative z-10 h-3.5 w-full border border-primary/20 bg-black/45 shadow-[inset_0_0_10px_rgba(0,0,0,0.45)]">
             <motion.div
-              className="relative h-full overflow-hidden bg-linear-to-r from-primary via-secondary to-accent shadow-[0_0_14px_rgba(255,79,216,0.32)]"
+              className="relative h-full overflow-hidden bg-linear-to-r from-primary via-secondary to-accent"
               initial={{ width: "0%" }}
               animate={{ width: `${calculatedProgress}%` }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}

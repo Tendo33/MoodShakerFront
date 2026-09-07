@@ -32,7 +32,7 @@ export function CocktailSpecs({
       }}
     >
       <motion.div
-        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-pink-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(236,72,153,0.15)]"
+        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-pink-500 bg-black/40 hover:bg-black/60 transition-colors"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -68,7 +68,7 @@ export function CocktailSpecs({
       </motion.div>
 
       <motion.div
-        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-blue-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-blue-500 bg-black/40 hover:bg-black/60 transition-colors"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -86,7 +86,7 @@ export function CocktailSpecs({
       </motion.div>
 
       <motion.div
-        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-amber-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-amber-500 bg-black/40 hover:bg-black/60 transition-colors"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -104,7 +104,7 @@ export function CocktailSpecs({
       </motion.div>
 
       <motion.div
-        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-emerald-500 bg-black/40 hover:bg-black/60 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-emerald-500 bg-black/40 hover:bg-black/60 transition-colors"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },

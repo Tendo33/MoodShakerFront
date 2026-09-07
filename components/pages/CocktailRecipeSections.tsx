@@ -237,7 +237,7 @@ export function CocktailRecipeSections({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: step.stepNumber * 0.1 }}
                     >
-                      <div className="flex items-center justify-center w-8 h-8 rounded-none border-2 border-primary/50 bg-black/40 shadow-[0_0_10px_rgba(255,0,255,0.3)] font-bold text-primary font-mono shrink-0 z-10 text-sm">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-none border-2 border-primary/50 bg-black/40 font-bold text-primary font-mono shrink-0 z-10 text-sm">
                         {step.stepNumber}
                       </div>
                       <div className="flex-1 pt-0.5">
@@ -246,7 +246,7 @@ export function CocktailRecipeSections({
                         </p>
                         {step.tips && (
                           <motion.div
-                            className="mt-3 p-3 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden shadow-[0_0_15px_rgba(255,191,0,0.15)]"
+                            className="mt-3 p-3 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.3 }}
@@ -271,7 +271,7 @@ export function CocktailRecipeSections({
       <div className="hidden lg:grid lg:grid-cols-12 gap-10 items-start">
         <div className="lg:col-span-4 space-y-8 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin">
           <motion.div
-            className={`rounded-none overflow-hidden border-2 border-primary shadow-[0_0_16px_rgba(255,0,255,0.15)] ${cardClasses}`}
+            className={`rounded-none overflow-hidden border-2 border-primary ${cardClasses}`}
             variants={{
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
@@ -309,7 +309,7 @@ export function CocktailRecipeSections({
           </motion.div>
 
           <motion.div
-            className={`rounded-none overflow-hidden border-2 border-secondary shadow-[0_0_16px_rgba(0,255,255,0.15)] ${cardClasses}`}
+            className={`rounded-none overflow-hidden border-2 border-secondary ${cardClasses}`}
             variants={{
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.1 } },
@@ -350,7 +350,7 @@ export function CocktailRecipeSections({
 
         <div className="lg:col-span-8">
           <motion.div
-            className={`rounded-none overflow-hidden border-2 border-accent shadow-[0_0_22px_rgba(255,153,0,0.15)] ${cardClasses} h-full`}
+            className={`rounded-none overflow-hidden border-2 border-accent ${cardClasses} h-full`}
             variants={{
               hidden: { opacity: 0, x: 20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
@@ -373,7 +373,7 @@ export function CocktailRecipeSections({
                       transition={{ delay: step.stepNumber * 0.1 }}
                     >
                       <div className="flex gap-6">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-none border-2 border-primary/50 bg-black/40 shadow-[0_0_15px_rgba(255,0,255,0.4)] group-hover:border-primary group-hover:shadow-[0_0_25px_hsl(var(--primary)/0.6)] font-mono transition-all duration-300 font-bold text-primary shrink-0 z-10">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-none border-2 border-primary/50 bg-black/40 group-hover:border-primary font-mono transition-all duration-300 font-bold text-primary shrink-0 z-10">
                           {step.stepNumber}
                         </div>
                         <div className="flex-1 pt-1">
@@ -382,7 +382,7 @@ export function CocktailRecipeSections({
                           </p>
                           {step.tips && (
                             <motion.div
-                              className="mt-4 p-4 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden shadow-[0_0_16px_rgba(255,191,0,0.15)]"
+                              className="mt-4 p-4 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden"
                               initial={{ opacity: 0, y: 5 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.3 }}

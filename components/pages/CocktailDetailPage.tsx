@@ -137,7 +137,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
                       <ImageIcon className="h-5 w-5" />
                     )
                   }
-                  className="text-primary border-primary/30 hover:bg-primary/20 hover:border-primary/50 hover:shadow-[0_0_16px_hsl(var(--primary)/0.2)] transition-all duration-300"
+                  className="text-primary border-primary/30 hover:bg-primary/20 hover:border-primary/50 transition-all duration-300"
                 >
                   {t("recommendation.saveImage")}
                 </Button>
