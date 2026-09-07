@@ -171,6 +171,40 @@ Two failures worth not repeating, both from one `sed`-style pass over 13 files:
 Check `git diff --stat` after any scripted edit. A line count far above the number of
 tokens you removed means something else changed.
 
+### Unlayered Classes Silently Beat Tailwind Utilities
+
+`.glass-panel` is defined outside any `@layer` in `globals.css`. Unlayered styles win over
+`@layer utilities` regardless of specificity, so its `box-shadow` replaces the entire
+declaration — **any `shadow-*` utility on a `.glass-panel` element is dead**. Seven
+composite shadows in this repo compile a cyan glow into the bundle (`0 0 18px #5df6ff2e`
+is really there) that never paints.
+
+This cuts both ways. It means those seven do not need removing, and it means a future
+`shadow-*` added to one of those elements will silently do nothing. When a shadow you
+wrote does not appear, check the element's computed `box-shadow` against what you declared
+before assuming the class is wrong. The same applies to `.focus-ring`, which carries
+`box-shadow: 0 0 0 0` — adding it to an element that has its own depth shadow erases it,
+which is why the question cards keep their inline `ring-*` instead.
+
+### Accessibility Thresholds For Non-Text UI
+
+Contrast rules are not just for text. Measured failures found in this repo after the noise
+reduction:
+
+| Target | Rule | Found |
+| --- | --- | --- |
+| Touch target | WCAG 2.5.8 — 24x24 min | carousel dots at 10x10 |
+| Non-text contrast | WCAG 1.4.11 — 3:1 | inactive dot `bg-muted` at 2.90:1 |
+| Focus indicator | WCAG 1.4.11 — 3:1 | `focus:ring-secondary/25` at 1.81:1 |
+
+Grow a small control's hit area by wrapping the visual element in a 24x24 button rather
+than scaling the visual — appearance stays, the target grows. Keep the hover state when
+you do; moving the color classes to an inner span drops `hover:` unless you switch to
+`group-hover:`.
+
+Prefer `focus-visible:` over `focus:`. Text inputs match `:focus-visible` on click anyway,
+so nothing is lost there.
+
 ## UX Quality
 
 - UI changes must work on mobile and desktop.
