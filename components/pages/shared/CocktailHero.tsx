@@ -67,7 +67,7 @@ export function CocktailHero({
             }}
           >
             <h1
-              className={`inline-block text-safe-wrap text-4xl font-black font-heading uppercase tracking-[0.14em] drop-shadow-[0_0_12px_rgba(255,79,216,0.24)] sm:text-5xl md:text-6xl ${gradientTextClass}`}
+              className={`inline-block text-safe-wrap text-4xl font-black font-heading uppercase tracking-[0.14em] sm:text-5xl md:text-6xl ${gradientTextClass}`}
               style={{
                 lineHeight: "1.1",
                 paddingBottom: "0.25rem",

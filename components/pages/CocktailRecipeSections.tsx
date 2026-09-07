@@ -71,7 +71,7 @@ export function CocktailRecipeSections({
       }}
     >
       <motion.h2
-        className="text-3xl md:text-4xl font-black text-center mb-12 font-heading tracking-widest uppercase gradient-text drop-shadow-[0_0_15px_rgba(255,0,255,0.4)]"
+        className="text-3xl md:text-4xl font-black text-center mb-12 font-heading tracking-widest uppercase gradient-text"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -96,7 +96,7 @@ export function CocktailRecipeSections({
             aria-controls={ingredientsSectionId}
             type="button"
           >
-            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-primary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
+            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-primary transition-colors`}>
               {t("recommendation.ingredients")}
             </h3>
             {isIngredientsExpanded ? (
@@ -153,7 +153,7 @@ export function CocktailRecipeSections({
             aria-controls={toolsSectionId}
             type="button"
           >
-            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-secondary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
+            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-secondary transition-colors`}>
               {t("recommendation.tools")}
             </h3>
             {isToolsExpanded ? (
@@ -211,7 +211,7 @@ export function CocktailRecipeSections({
             aria-controls={stepsSectionId}
             type="button"
           >
-            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-accent transition-colors drop-shadow-[0_0_5px_currentColor]`}>
+            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-accent transition-colors`}>
               {t("recommendation.steps")}
             </h3>
             {isStepsExpanded ? (
@@ -278,7 +278,7 @@ export function CocktailRecipeSections({
             }}
           >
             <div className="p-5 bg-primary/10 border-b-2 border-primary">
-              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass} drop-shadow-[0_0_8px_rgba(255,0,255,0.6)]`}>
+              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass}`}>
                 {t("recommendation.ingredients")}
               </h3>
             </div>
@@ -316,7 +316,7 @@ export function CocktailRecipeSections({
             }}
           >
             <div className="p-5 bg-secondary/10 border-b-2 border-secondary">
-              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass} drop-shadow-[0_0_8px_rgba(0,255,255,0.6)]`}>
+              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass}`}>
                 {t("recommendation.tools")}
               </h3>
             </div>
@@ -357,7 +357,7 @@ export function CocktailRecipeSections({
             }}
           >
             <div className="p-5 bg-accent/10 border-b-2 border-accent">
-              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass} drop-shadow-[0_0_8px_rgba(255,153,0,0.6)]`}>
+              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass}`}>
                 {t("recommendation.steps")}
               </h3>
             </div>

@@ -56,8 +56,6 @@
 
   --surface-strong: rgba(19, 10, 37, 0.9);
   --surface-soft: rgba(19, 10, 37, 0.72);
-  --surface-glow: rgba(255, 79, 216, 0.18);
-  --surface-glow-cool: rgba(93, 246, 255, 0.16);
   --surface-stroke: rgba(255, 255, 255, 0.06);
   --surface-shadow: 0 22px 60px rgba(3, 0, 9, 0.5);
 
@@ -270,50 +268,38 @@
   border-color: var(--color-secondary);
 }
 
+/*
+ * 标题渐变。24 处在用，是产品识别度的一部分，所以保留渐变本身而不是改纯色。
+ *
+ * 原来是 accent → primary → secondary 三色，外加 gradient-shift 5s 无限循环。三个高
+ * 饱和色在一行字里轮转，加上 -webkit-text-fill-color: transparent 让文字没有实色，
+ * 观感就是发虚。
+ *
+ * 收成 foreground → primary 双色并去掉动画：洋红仍是强调色，但只有一个饱和色在动，
+ * 起点是接近正文色的亮色。注意这不是对比度问题，三个原色标单独测都达标
+ * （primary 7.06:1、secondary 15.44:1、accent 11.22:1），所以不要把它算进
+ * 「低对比处数」。
+ */
 .gradient-text {
   background: linear-gradient(
     to right,
-    var(--color-accent),
-    var(--color-primary),
-    var(--color-secondary)
+    var(--color-foreground),
+    var(--color-primary)
   );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-size: 200% auto;
-  animation: gradient-shift 5s linear infinite;
 }
 
 .gradient-text-bright {
   background: linear-gradient(
     180deg,
     #f8fbff 0%,
-    var(--color-secondary) 22%,
     var(--color-primary) 100%
   );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.neon-glow-primary {
-  text-shadow: 0 0 6px var(--color-primary), 0 0 14px var(--color-primary);
-}
-
-.neon-glow-secondary {
-  text-shadow: 0 0 4px var(--color-secondary), 0 0 8px rgba(0,255,255,0.8);
 }
 
 /* ===== Spacing Utilities (@apply outside @layer works in v4) ===== */

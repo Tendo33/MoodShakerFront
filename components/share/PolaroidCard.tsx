@@ -166,7 +166,10 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
           {/* 3. Ingredients */}
           <div className="mb-8 bg-white/[0.03] border border-white/5 rounded-xl p-6 backdrop-blur-sm">
             <div className="text-center mb-5">
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
+              {/* white/60 而非 /40：10px 属正文，需 4.5:1。在这张卡的面板底色
+                  rgb(18,12,28) 上，/40 只有 3.80:1，/60 得 7.23:1。这张卡会经
+                  html-to-image 导出成分享图，图片没法被辅助技术调节，更要留余量。 */}
+              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
                 <ShoppingBasket className="w-3 h-3 text-primary/80" />
                 <span>{t("recommendation.card.ingredients")}</span>
               </span>
@@ -193,7 +196,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
           {/* 4. Steps */}
           <div className="flex-1 mb-8">
             <div className="text-center mb-6">
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
+              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
                 <ScrollText className="w-3 h-3 text-secondary/80" />
                 <span>{t("recommendation.card.preparation")}</span>
               </span>

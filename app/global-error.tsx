@@ -25,7 +25,7 @@ export default function GlobalError({
     <html lang={isEnglish ? "en" : "zh-CN"}>
       <body className="bg-black text-white font-mono flex items-center justify-center min-h-screen">
         <div className="text-center p-8 border-2 border-[#FF00FF] shadow-[0_0_16px_rgba(255,0,255,0.5)] bg-black/80 max-w-lg">
-          <h2 className="text-3xl font-bold mb-4 text-[#00FFFF] drop-shadow-[0_0_10px_currentColor]">
+          <h2 className="text-3xl font-bold mb-4 text-[#00FFFF]">
             {isEnglish ? "System Failure" : "系统故障"}
           </h2>
           <p className="mb-6 opacity-80">

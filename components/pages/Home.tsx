@@ -240,7 +240,7 @@ const Home = React.memo(function Home() {
                 className="mb-6 max-w-3xl font-heading text-5xl font-black leading-[0.96] tracking-[0.08em] text-shadow md:text-7xl lg:text-8xl lang-en:text-5xl lang-en:md:text-7xl"
                 variants={slideUpVariants}
               >
-                <GradientText as="span" className="block leading-tight drop-shadow-[0_0_16px_rgba(255,79,216,0.28)]">
+                <GradientText as="span" className="block leading-tight">
                   {t("home.title")}
                 </GradientText>
               </motion.h1>
@@ -302,7 +302,7 @@ const Home = React.memo(function Home() {
                   <div className="mt-6 text-center relative z-10">
                     <Link
                       href={newQuestionPath}
-                      className="text-sm text-primary font-mono tracking-widest hover:text-secondary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor] focus-ring"
+                      className="text-sm text-primary font-mono tracking-widest hover:text-secondary hover:underline transition-colors uppercase focus-ring"
                     >
                       {language === "en"
                         ? "Start a new recommendation"
@@ -357,7 +357,7 @@ const Home = React.memo(function Home() {
                   <div className="mt-6 text-center relative z-10">
                     <Link
                       href={newQuestionPath}
-                      className="text-sm text-secondary font-mono tracking-widest hover:text-primary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor] focus-ring"
+                      className="text-sm text-secondary font-mono tracking-widest hover:text-primary hover:underline transition-colors uppercase focus-ring"
                     >
                       {language === "en"
                         ? "Start a new session instead"
@@ -454,7 +454,7 @@ const Home = React.memo(function Home() {
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.3, duration: 0.5 }}
                             >
-                              <h3 className="mb-1 text-3xl font-heading font-black uppercase tracking-[0.16em] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]">
+                              <h3 className="mb-1 text-3xl font-heading font-black uppercase tracking-[0.16em] text-white">
                                 {cocktail.name}
                               </h3>
                               <p className="mb-4 text-xs font-mono uppercase tracking-[0.2em] text-secondary/90">

@@ -190,7 +190,7 @@ export default function GalleryContent({
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <GradientText
               as="h1"
-              className="mb-6 text-4xl uppercase tracking-[0.16em] drop-shadow-[0_0_14px_rgba(255,79,216,0.28)] md:text-6xl lg:text-7xl"
+              className="mb-6 text-4xl uppercase tracking-[0.16em] md:text-6xl lg:text-7xl"
             >
               {t("gallery.title")}
             </GradientText>

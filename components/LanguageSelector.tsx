@@ -206,7 +206,7 @@ export default function LanguageSelector({
         type="button"
       >
         <span className="flex items-center gap-2">
-          <Globe className={`h-4 w-4 ${isOpen ? "text-primary drop-shadow-[0_0_5px_currentColor]" : ""}`} />
+          <Globe className={`h-4 w-4 ${isOpen ? "text-primary" : ""}`} />
           <span className="hidden text-sm font-bold font-mono tracking-[0.18em] md:inline">
             {t(language === "en" ? "language.en" : "language.cn")}
           </span>
@@ -253,7 +253,7 @@ export default function LanguageSelector({
                   type="button"
                 >
                   <div className="flex items-center gap-3 z-10">
-                    <span className="text-lg drop-shadow-[0_0_5px_rgba(255,0,255,0.5)]">
+                    <span className="text-lg">
                       {code === "en" ? "🇺🇸" : "🇨🇳"}
                     </span>
                     <span className="font-mono">{name}</span>

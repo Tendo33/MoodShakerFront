@@ -468,7 +468,7 @@ const Questions = memo(function Questions() {
                   </div>
                 </div>
 
-                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] drop-shadow-[0_0_12px_rgba(255,79,216,0.24)] md:text-5xl">
+                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] md:text-5xl">
                   <GradientText>{currentQuestion.title}</GradientText>
                 </h2>
 
@@ -574,7 +574,7 @@ const Questions = memo(function Questions() {
                   </div>
                 </div>
 
-                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] drop-shadow-[0_0_12px_rgba(255,79,216,0.24)] md:text-5xl">
+                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] md:text-5xl">
                   <GradientText>{t("questions.finalStep")}</GradientText>
                 </h2>
                 <p className="mx-auto max-w-2xl text-base font-mono leading-relaxed text-foreground/88 md:text-lg">
@@ -619,7 +619,7 @@ const Questions = memo(function Questions() {
                       <h3
                         className={`text-xs md:text-sm font-bold font-mono uppercase tracking-wider transition-colors duration-300 ${
                           baseSpirits.includes(spirit.value)
-                            ? "text-secondary drop-shadow-[0_0_5px_currentColor]"
+                            ? "text-secondary"
                             : "text-foreground group-hover:text-secondary"
                         }`}
                       >

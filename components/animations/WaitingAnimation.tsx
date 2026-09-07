@@ -132,7 +132,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
                 exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
                 transition={{ duration: 0.5 }}
               >
-                <h2 className="text-4xl md:text-5xl font-black text-primary font-heading tracking-widest uppercase pb-2 leading-relaxed px-4 drop-shadow-[0_0_15px_rgba(255,0,255,0.6)]">
+                <h2 className="text-4xl md:text-5xl font-black text-primary font-heading tracking-widest uppercase pb-2 leading-relaxed px-4">
                   {displayMessage}
                 </h2>
                 <motion.p

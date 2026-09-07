@@ -39,7 +39,7 @@ export function CocktailSpecs({
         }}
       >
         <div className="flex items-center mb-2">
-          <div className="mr-2 h-5 w-5 text-pink-500 drop-shadow-[0_0_5px_currentColor]">
+          <div className="mr-2 h-5 w-5 text-pink-500">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -75,7 +75,7 @@ export function CocktailSpecs({
         }}
       >
         <div className="flex items-center mb-2">
-          <Droplet className="mr-2 h-5 w-5 text-blue-500 drop-shadow-[0_0_5px_currentColor]" />
+          <Droplet className="mr-2 h-5 w-5 text-blue-500" />
           <p className="text-xs text-blue-500 uppercase tracking-widest font-mono">
             {t("detail.alcohol")}
           </p>
@@ -93,7 +93,7 @@ export function CocktailSpecs({
         }}
       >
         <div className="flex items-center mb-2">
-          <Clock className="mr-2 h-5 w-5 text-amber-500 drop-shadow-[0_0_5px_currentColor]" />
+          <Clock className="mr-2 h-5 w-5 text-amber-500" />
           <p className="text-xs text-amber-500 uppercase tracking-widest font-mono">
             {t("detail.prepTime")}
           </p>
@@ -111,7 +111,7 @@ export function CocktailSpecs({
         }}
       >
         <div className="flex items-center mb-2">
-          <GlassWater className="mr-2 h-5 w-5 text-emerald-500 drop-shadow-[0_0_5px_currentColor]" />
+          <GlassWater className="mr-2 h-5 w-5 text-emerald-500" />
           <p className="text-xs text-emerald-500 uppercase tracking-widest font-mono">
             {t("detail.glass")}
           </p>

@@ -70,7 +70,7 @@ export default function LoadingSpinner({
           ></div>
 
           <motion.div
-            className={`${sizeConfig[size].spinner} rounded-full absolute top-0 border-4 border-transparent ${colorClass} border-t-current drop-shadow-[0_0_15px_rgba(var(--primary),0.5)]`}
+            className={`${sizeConfig[size].spinner} rounded-full absolute top-0 border-4 border-transparent ${colorClass} border-t-current`}
             animate={{ rotate: 360 }}
             transition={{
               duration: 1.5,

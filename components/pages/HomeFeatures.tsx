@@ -44,7 +44,7 @@ export default function HomeFeatures() {
         >
           <GradientText
             as="h2"
-            className="mb-4 text-3xl font-heading font-black uppercase tracking-[0.16em] drop-shadow-[0_0_10px_rgba(255,79,216,0.28)] md:text-4xl lg:mb-6 lg:text-5xl"
+            className="mb-4 text-3xl font-heading font-black uppercase tracking-[0.16em] md:text-4xl lg:mb-6 lg:text-5xl"
           >
             {language === "en"
               ? "Why Choose MoodShaker?"
