@@ -130,6 +130,47 @@
   Measure before treating it as the cause of an overflow — mine was 40px, and zeroing
   the tracking entirely still overflowed by 11px.
 
+### Shadows: Layering vs Decoration
+
+The user called the UI "光污染" (light pollution). What got removed and what stayed
+follows one rule — a shadow that positions an element in depth is structure, a colored
+halo is decoration. Read the offset:
+
+| Shape | Meaning | Verdict |
+| --- | --- | --- |
+| `0_0_15px_rgba(255,79,216,…)` | zero offset, colored, blurred | glow → remove |
+| `0_24px_48px_rgba(3,0,9,…)` | has offset | layering → keep |
+| `0_0_0_1px_…` | zero blur radius | outline, not a halo → keep |
+| `… 0 0 10px inset` | inset, black | depth (e.g. progress track) → keep |
+| `0_24px_48px_…, 0_0_18px_rgba(255,79,216,…)` | composite | drop the halo layer, keep the depth |
+
+Removed 27 zero-offset `drop-shadow` and 34 zero-offset `box-shadow` uses this way.
+
+Gradients split the same way. Decorative multi-color runs (`from-primary via-secondary
+to-accent` on progress bars) collapse to one color; functional gradients stay — the
+`transparent_50%` scanline texture is part of the vaporwave direction, and black scrims
+under text on images exist for legibility.
+
+Magenta (`--primary`) is the single accent color. Cyan (`--secondary`) is for borders and
+secondary text. Orange (`--accent`) is essentially retired. Hero orbs sit at `/10`; they
+were `/18` and were the loudest thing on the landing page.
+
+### Scripted Class Removal
+
+Two failures worth not repeating, both from one `sed`-style pass over 13 files:
+
+- **Match the modifier prefix.** A pattern for `shadow-\[…\]` leaves `hover:` behind when
+  the class it modified is gone. `hover:` alone is valid TypeScript inside a string, so
+  typecheck and tests stay green while the hover state is silently dead. Use
+  `[ \t]*(?:[\w-]+:)*shadow-\[…\]`.
+- **Do not "clean up" whitespace afterward.** `re.sub(r'  +', ' ')` flattens every
+  indentation level in the file. `Home.tsx` came back as 541 insertions and 541
+  deletions. Consuming leading whitespace as part of the match means no cleanup is
+  needed at all — the working pass was 13 files, 32 insertions, 32 deletions.
+
+Check `git diff --stat` after any scripted edit. A line count far above the number of
+tokens you removed means something else changed.
+
 ## UX Quality
 
 - UI changes must work on mobile and desktop.

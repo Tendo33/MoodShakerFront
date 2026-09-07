@@ -111,6 +111,70 @@ What to measure, rather than eyeballing a screenshot:
 - Client navigation, not just a fresh load. Click through the language selector rather
   than visiting `/en` — a hard reload hid the stale-`lang` bug completely.
 
+### Measuring Contrast
+
+Do not parse `getComputedStyle(el).color` as `rgb()`. Tailwind v4's opacity modifiers
+(`text-foreground/90`) compile to `color-mix()`, which computes as `lab()` / `oklab()`.
+Pulling the first three numbers out of `lab(94.124 5.46 -8.67 / 0.9)` reads L=94 — near
+white — as a dark `R=94`. That mistake reported legible text as 1.44:1 and produced a
+"66 low-contrast elements" baseline across six pages. The real count was 0.
+
+Composite through a canvas pixel instead, and stack every translucent ancestor
+background so glass panels are accounted for:
+
+```js
+const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+const px = (stack) => {                    // stack = [outermost bg, …, text color]
+  ctx.clearRect(0, 0, 1, 1);
+  for (const c of stack) { ctx.fillStyle = c; ctx.fillRect(0, 0, 1, 1); }
+  return [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3);
+};
+```
+
+Reverse-verify any such script against known inputs before trusting a zero: pure white
+on `#0b0415` must read ~17:1, near-black ~1.1:1, and include an explicit `lab()` and
+`oklab()` case. A script that cannot fail is not evidence.
+
+Two element types need special handling:
+
+- `-webkit-text-fill-color: transparent` (the `.gradient-text` headings) have no solid
+  color, so a ratio is meaningless. Check each gradient stop separately.
+- `opacity < 0.5` usually means an entrance animation has not settled. Skip those rather
+  than reporting them.
+
+### Background Tabs Freeze Animations
+
+`browser-relay` drives a tab that is usually not focused, so `visibilityState` is
+`hidden` and Chrome suspends rAF. Framer Motion never advances past `initial`, which for
+this project means `blur(10px)` and `opacity: 0` — the page screenshots as badly smeared
+even when it is fine for a real user, who sees it settle in ~0.6s. Check
+`document.visibilityState` before concluding anything from a screenshot.
+
+`document.getAnimations().forEach(a => a.finish())` only settles WAAPI animations; Framer
+Motion drives rAF and ignores it. Neutralizing inline styles does not hold either — the
+screenshot's own paint re-runs Framer's frame and overwrites them. What works is a
+stylesheet rule with `!important` (higher priority than inline) scoped to a class you add
+to just the animated elements:
+
+```js
+style.textContent = `.__settled { filter: none !important; opacity: 1 !important;
+  transform: none !important; }`;
+document.querySelectorAll("[style]").forEach(el => {
+  if (/blur|opacity|transform/.test(el.getAttribute("style") || "")) el.classList.add("__settled");
+});
+```
+
+Do not use `* { opacity: 1 !important }` — it pulls intentionally translucent decoration
+(hero orbs at `/10`) to full strength and overstates the noise you are trying to judge.
+
+### Clipping: overflowX Matters
+
+`scrollWidth > clientWidth` alone over-reports. `overflowX: visible` does not clip — the
+content just paints past the edge. Only count an element when its own `overflowX` is
+`hidden` or `clip`, and skip `sr-only` (the 1×1px accessibility pattern is intentional).
+Widening a leaf-node scan to all elements without this check produced 5 phantom hits on
+the home page.
+
 ## Route-Level Changes
 
 For a change that touches rendering:
