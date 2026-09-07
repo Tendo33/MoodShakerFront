@@ -6,6 +6,7 @@ import {
   useState,
   useCallback,
   useMemo,
+  useRef,
 } from "react";
 import type { ReactNode } from "react";
 import type {
@@ -120,6 +121,18 @@ export const CocktailResultProvider = ({
     null,
   );
 
+  /**
+   * 标记「当前这一轮推荐」。每次提交或重置都递增。
+   *
+   * 图片生成是 fire-and-forget 的，最长 30 秒，期间闭包捕获了那一轮的
+   * nextRecommendation。请求返回后它会无条件写回 state 和 localStorage，于是：
+   * 用户在生成中点「重新开始」，重置当场看起来是成功的（state 和存储都空了），
+   * 一两秒后旧推荐在界面和存储里双双复活。
+   *
+   * 实测确认过这条链路。后台任务写回前先核对代次，不是自己那一轮就丢弃结果。
+   */
+  const generationEpochRef = useRef(0);
+
   const scopedPersistedImageData =
     recommendation &&
     recommendationMeta &&
@@ -146,8 +159,20 @@ export const CocktailResultProvider = ({
    * a multi-hundred-kilobyte data URL. The former size cap and write debounce
    * existed only to keep base64 payloads out of localStorage and are gone.
    */
+  /**
+   * 两个写入函数都接受一个可选的 `stillCurrent` 守卫，在真正落盘的那一刻同步核对。
+   *
+   * 为什么不能只在调用前检查一次：检查和写入之间隔着 await，后台任务在这段时间里
+   * 让出执行权，resetResult 的清除就在此期间跑完，写入随后落地 —— 典型的
+   * check-then-act 竞态。实测的时序是 DEL、DEL、SET，SET 赢在最后。
+   *
+   * 守卫下移到每次 updateItem 的紧前面，中间不再有 await。
+   */
   const persistImageUrl = useCallback(
-    async (nextImageUrl: string | null) => {
+    async (nextImageUrl: string | null, stillCurrent?: () => boolean) => {
+      if (stillCurrent && !stillCurrent()) {
+        return;
+      }
       setVolatileImageData(nextImageUrl);
       await updateItem("imageData", nextImageUrl);
     },
@@ -159,8 +184,12 @@ export const CocktailResultProvider = ({
       baseRecommendation: Cocktail | null,
       image: string | null,
       thumbnail?: string | null,
+      stillCurrent?: () => boolean,
     ) => {
       if (!baseRecommendation) {
+        return;
+      }
+      if (stillCurrent && !stillCurrent()) {
         return;
       }
 
@@ -175,6 +204,10 @@ export const CocktailResultProvider = ({
 
   const submitRequest = useCallback(
     async (regenerate: boolean = false): Promise<Cocktail> => {
+      // 开启新一轮：此前那一轮的后台图片任务从现在起不再有权写回。
+      const epoch = ++generationEpochRef.current;
+      const isCurrentEpoch = () => generationEpochRef.current === epoch;
+
       setIsLoading(true);
       setError(null);
       setImageError(null);
@@ -340,32 +373,58 @@ export const CocktailResultProvider = ({
                 "Image generation failed",
                 errorPayload?.error?.message,
               );
+              if (!isCurrentEpoch()) {
+                return;
+              }
               setImageError(
                 t("share.error.generate"),
               );
-              await persistImageUrl(null);
+              await persistImageUrl(null, isCurrentEpoch);
               return;
             }
 
             const imagePayload = await imageResponse.json();
             const nextImage = imagePayload?.data?.imageUrl || null;
             const nextThumbnail = imagePayload?.data?.thumbnailUrl || null;
-            await persistImageUrl(nextImage);
+
+            // 写回前核对代次。用户在这张图生成期间重置或重新提交过，这一轮就
+            // 已经作废；继续写下去会把作废的推荐重新写进 state 和 localStorage。
+            //
+            // 这里的提前返回只是快速路径。真正保证正确性的是传进去的
+            // isCurrentEpoch —— 它在每次落盘的紧前面再核对一次，因为这两个 await
+            // 之间还会让出执行权，重置可能正好在此期间跑完。
+            if (!isCurrentEpoch()) {
+              return;
+            }
+
+            await persistImageUrl(nextImage, isCurrentEpoch);
             await updateRecommendationImage(
               nextRecommendation,
               nextImage,
               nextThumbnail,
+              isCurrentEpoch,
             );
-            setImageError(null);
+            if (isCurrentEpoch()) {
+              setImageError(null);
+            }
           } catch (imageGenerationError) {
+            // 同理：作废那一轮的失败不该覆盖当前这一轮的界面状态。
+            if (!isCurrentEpoch()) {
+              return;
+            }
+
             setImageError(t("share.error.generate"));
             cocktailLogger.error(
               "Background image generation failed",
               imageGenerationError,
             );
-            await persistImageUrl(null);
+            await persistImageUrl(null, isCurrentEpoch);
           } finally {
-            setIsImageLoadingState(false);
+            // 加载指示器只归属当前这一轮：作废的任务把它关掉，会让正在进行的
+            // 新一轮显示成已完成。
+            if (isCurrentEpoch()) {
+              setIsImageLoadingState(false);
+            }
           }
         })();
 
@@ -462,6 +521,13 @@ export const CocktailResultProvider = ({
   ]);
 
   const resetResult = useCallback(async () => {
+    // 先作废进行中的那一轮，再清数据。
+    //
+    // 少了这一步，重置本身是「成功」的 —— state 和 localStorage 当场都空了 ——
+    // 但正在跑的图片任务一两秒后返回，会把刚被清掉的推荐重新写进两处。用户看到
+    // 的是：点了「重新开始」，界面短暂空白，然后旧推荐自己回来了。
+    generationEpochRef.current += 1;
+
     try {
       await removeStorageKeysAsync([
         STORAGE_KEYS.RECOMMENDATION,
@@ -474,6 +540,8 @@ export const CocktailResultProvider = ({
       setError(null);
       setImageError(null);
       setVolatileImageData(null);
+      // 那一轮的 finally 已经因为代次不符而不会再关掉这个指示器，这里自己关。
+      setIsImageLoadingState(false);
     } catch {
       cocktailLogger.error("Failed to reset result data");
       setError(t("error.resetData"));
