@@ -25,6 +25,14 @@ interface CacheItem<T> {
 }
 
 /**
+ * requestIdleCallback 的兜底上限。
+ *
+ * 不设上限时空闲回调可以被无限推后 —— 页面水合期主线程一直忙，读取就一直排不上。
+ * 50ms 取自「用户感知不到延迟」的常用阈值，同时仍给出让位给渲染帧的机会。
+ */
+const IDLE_TIMEOUT_MS = 50;
+
+/**
  * 异步存储管理器类
  * 提供高性能的localStorage操作，避免阻塞主线程
  */
@@ -275,10 +283,19 @@ export class AsyncStorageManager {
 
       if (typeof window !== "undefined" && "requestIdleCallback" in window) {
         await new Promise<void>((resolve) => {
-          window.requestIdleCallback(() => {
-            runOperations();
-            resolve();
-          });
+          // timeout 必须给。不给的话空闲回调没有上限，页面水合期主线程一直忙，
+          // 读取就被无限推后。浏览器实测：问卷页的 spinner 因此持续约 1.5 秒，而
+          // localStorage 单次读取只要 0.026ms，BATCH_DELAY 也只有 4ms。
+          //
+          // 读取的结果会挡住首屏（Questions 要等 isHydrated 才能决定显示哪一题），
+          // 所以宁可插队一次同步读，也不该让用户对着 spinner 等空闲期。
+          window.requestIdleCallback(
+            () => {
+              runOperations();
+              resolve();
+            },
+            { timeout: IDLE_TIMEOUT_MS },
+          );
         });
       } else {
         // 降级到setTimeout

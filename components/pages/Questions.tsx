@@ -38,6 +38,7 @@ const Questions = memo(function Questions() {
     answers,
     userFeedback,
     baseSpirits,
+    isHydrated,
     saveAnswer,
     removeAnswer,
     saveFeedback,
@@ -382,6 +383,33 @@ const Questions = memo(function Questions() {
         estimatedDuration={3000}
         onComplete={navigateToRecommendation}
       />
+    );
+  }
+
+  // 等存储读完再决定显示哪一题。
+  //
+  // 题号是从 answers 算出来的，而 answers 在水合完成前是 {}，所以会先渲染第一题、
+  // 落地后再跳到正确的一题。浏览器采样测到的间隔：631ms 显示第一题，1033ms 才纠正
+  // 到第三题 —— 用户有 400ms 看到自己已经答过的题目被重新问一遍。
+  //
+  // 门禁不能用 isDataLoading：它初始是 false（加载 effect 还没跑），首帧就放行，
+  // 挡不住这段空窗。isHydrated 看的是 phase 有没有结论。
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen relative overflow-hidden">
+        <Container className="relative z-10 py-16 md:py-24">
+          <div
+            className="mx-auto flex max-w-3xl items-center justify-center py-24"
+            role="status"
+            aria-live="polite"
+          >
+            {/* common.loading 而非 loading.default —— 后者是「正在调制中」，
+                这里只是在读已保存的答案，读屏用户会以为在生成配方。 */}
+            <span className="sr-only">{t("common.loading")}</span>
+            <span className="h-8 w-8 animate-spin border-2 border-primary/30 border-t-primary" />
+          </div>
+        </Container>
+      </div>
     );
   }
 

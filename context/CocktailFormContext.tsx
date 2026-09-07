@@ -24,6 +24,13 @@ interface CocktailFormContextType {
   userFeedback: string;
   baseSpirits: string[];
   isDataLoading: boolean;
+  /**
+   * 存储读取是否已有结论（成功或失败），而非「正在读取」。
+   *
+   * `isDataLoading` 初始是 false，因为加载 effect 还没跑。想「等数据到位再渲染」
+   * 不能用它 —— 首帧它就是 false，门禁直接放行。这个标志覆盖那段空窗。
+   */
+  isHydrated: boolean;
   loadSavedData: () => void;
   saveAnswer: (questionId: string, optionId: string) => Promise<void>;
   removeAnswer: (questionId: string) => Promise<void>;
@@ -51,6 +58,7 @@ export const CocktailFormProvider = ({
     data: savedData,
     isLoading: isDataLoading,
     errors: dataErrors,
+    phase: dataPhase,
     updateItem,
     reload: reloadData,
   } = useBatchAsyncState<{
@@ -184,12 +192,16 @@ export const CocktailFormProvider = ({
     }
   }, [reloadData]);
 
+  // 读存储是否已有结论。error 也算，否则读失败会把页面永久卡在加载态。
+  const isHydrated = dataPhase === "success" || dataPhase === "error";
+
   const contextValue = useMemo(
     () => ({
       answers,
       userFeedback,
       baseSpirits,
       isDataLoading,
+      isHydrated,
       loadSavedData,
       saveAnswer,
       removeAnswer,
@@ -204,6 +216,7 @@ export const CocktailFormProvider = ({
       userFeedback,
       baseSpirits,
       isDataLoading,
+      isHydrated,
       loadSavedData,
       saveAnswer,
       removeAnswer,
