@@ -186,7 +186,7 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(
     return (
       <div
         ref={ref}
-        className={`w-full h-0.5 bg-linear-to-r from-primary via-secondary to-accent my-4 ${className}`}
+        className={`w-full h-0.5 bg-linear-to-r from-primary to-transparent my-4 ${className}`}
         {...props}
       />
     );

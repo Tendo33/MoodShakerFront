@@ -75,7 +75,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           transition={{ duration: 1 }}
         >
           <motion.div
-          className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/18 blur-[84px]"
+          className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/10 blur-[84px]"
           animate={{ y: [0, -14, 0], scale: [1, 1.03, 1] }}
           transition={{
             duration: 8,
@@ -84,7 +84,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           }}
         />
         <motion.div
-          className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/18 blur-[84px]"
+          className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/10 blur-[84px]"
           animate={{ y: [0, 14, 0], scale: [1, 1.04, 1] }}
           transition={{
             duration: 10,

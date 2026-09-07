@@ -222,7 +222,7 @@ export default function LanguageSelector({
         {isOpen && (
           <motion.div
             id={listboxId}
-            className="absolute right-0 z-50 mt-3 w-48 overflow-hidden border border-primary/45 bg-black/90 shadow-[0_24px_48px_rgba(3,0,9,0.34),0_0_18px_rgba(255,79,216,0.16)] backdrop-blur-3xl"
+            className="absolute right-0 z-50 mt-3 w-48 overflow-hidden border border-primary/45 bg-black/90 shadow-[0_24px_48px_rgba(3,0,9,0.34)] backdrop-blur-3xl"
             initial="hidden"
             animate="visible"
             exit="exit"

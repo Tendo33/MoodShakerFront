@@ -162,8 +162,9 @@ const WaitingAnimation = memo(function WaitingAnimation({
           </div>
 
           <div className="w-full h-3 rounded-none overflow-hidden relative bg-black/50 border-2 border-primary/40 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] max-w-md mx-auto">
+            {/* 单色，与问卷页进度条保持一致：进度条只传达「到哪一步」。 */}
             <motion.div
-              className="h-full bg-linear-to-r from-primary via-secondary to-accent"
+              className="h-full bg-primary"
               style={{ width: `${currentProgress}%` }}
             ></motion.div>
           </div>

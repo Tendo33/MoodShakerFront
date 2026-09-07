@@ -204,18 +204,17 @@ const Home = React.memo(function Home() {
   return (
     <div className="bg-background text-foreground">
       <section className="relative hero-height flex items-center overflow-hidden section-spacing pt-16 md:pt-20 lg:pt-24">
+        {/* 两个光斑而非三个，且 /18 降到 /10。原来洋红、青、橙同时飘，是首页
+            「光污染」观感最主要的来源。橙色那个按方向去掉 —— 洋红作唯一强调色，
+            青只留在边框和次要文字上。留两个是为了保住霓虹夜店的氛围底子。 */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
-            className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/18 blur-[72px]"
+            className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/10 blur-[72px]"
             animate={floatAnimationTarget}
           />
           <motion.div
-            className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/18 blur-[72px]"
+            className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/10 blur-[72px]"
             animate={delayedFloatAnimation(1)}
-          />
-          <motion.div
-            className="absolute top-2/3 right-1/3 h-56 w-56 rounded-full bg-accent/12 blur-[60px]"
-            animate={delayedFloatAnimation(2)}
           />
         </div>
 

@@ -427,14 +427,15 @@ const Questions = memo(function Questions() {
           </div>
 
           <div className="relative z-10 h-3.5 w-full border border-primary/20 bg-black/45 shadow-[inset_0_0_10px_rgba(0,0,0,0.45)]">
+            {/* 单色而非 from-primary via-secondary to-accent。三色渐变让进度条本身
+                成了页面上最跳的元素，而它要传达的只是「第几步」这一个信息。
+                原来还叠了一层 animate-shimmer 斜纹，无限循环，一并去掉。 */}
             <motion.div
-              className="relative h-full overflow-hidden bg-linear-to-r from-primary via-secondary to-accent"
+              className="relative h-full overflow-hidden bg-primary"
               initial={{ width: "0%" }}
               animate={{ width: `${calculatedProgress}%` }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="absolute inset-0 bg-[linear-gradient(-45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-size-[20px_20px] animate-shimmer opacity-50" />
-            </motion.div>
+            />
           </div>
         </div>
 

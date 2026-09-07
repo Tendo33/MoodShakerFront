@@ -221,7 +221,7 @@ export default function GalleryContent({
           transition={{ delay: 0.3 }}
           className="sticky top-24 z-30 mb-10"
         >
-          <div className="glass-panel mx-auto max-w-4xl border border-primary/30 p-3 shadow-[0_24px_48px_rgba(3,0,9,0.3),0_0_18px_rgba(255,79,216,0.12)] backdrop-blur-3xl transition-all duration-300 hover:border-primary/50">
+          <div className="glass-panel mx-auto max-w-4xl border border-primary/30 p-3 shadow-[0_24px_48px_rgba(3,0,9,0.3)] backdrop-blur-3xl transition-all duration-300 hover:border-primary/50">
             <div className="flex flex-col items-center gap-3 md:flex-row">
               <div className="group relative w-full flex-1">
                 <label htmlFor="gallery-search" className="sr-only">
@@ -420,7 +420,7 @@ export default function GalleryContent({
                     href={`/${lang}/cocktail/${cocktail.slug}`}
                     className="block group relative h-full focus-ring"
                   >
-                    <div className="glass-panel relative h-full overflow-hidden border border-primary/35 shadow-[0_20px_42px_rgba(3,0,9,0.28),0_0_14px_rgba(255,79,216,0.1)] transition-all duration-500 group-hover:-translate-y-2.5 group-hover:scale-[1.02] group-hover:border-secondary group-hover:shadow-[0_26px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.14)] will-change-transform">
+                    <div className="glass-panel relative h-full overflow-hidden border border-primary/35 shadow-[0_20px_42px_rgba(3,0,9,0.28)] transition-all duration-500 group-hover:-translate-y-2.5 group-hover:scale-[1.02] group-hover:border-secondary group-hover:shadow-[0_26px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.14)] will-change-transform">
                       <div className="relative aspect-[4/5] overflow-hidden bg-black/60">
                         <Image
                           src={
