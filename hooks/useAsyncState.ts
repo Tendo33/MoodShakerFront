@@ -207,7 +207,10 @@ export function useBatchAsyncState<T extends Record<string, unknown>>(
   errors: Record<string, Error>;
   phase: LoadingPhase;
   reload: () => Promise<void>;
-  updateItem: <K extends keyof T>(key: K, value: T[K]) => Promise<void>;
+  updateItem: <K extends keyof T>(
+    key: K,
+    valueOrUpdater: T[K] | ((prev: T[K] | undefined) => T[K]),
+  ) => Promise<void>;
 } {
   const [data, setData] = useState<Partial<T>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -217,6 +220,12 @@ export function useBatchAsyncState<T extends Record<string, unknown>>(
   const loadingRef = useRef(false);
   const mountedRef = useRef(true);
   const configsRef = useRef(configs);
+
+  // 与 data 同步的镜像，供 updateItem 的函数式更新读取最新值。
+  //
+  // state 本身不能用：同一次渲染内的两次 updateItem 拿到的是同一份 data 快照，
+  // 后一次会覆盖前一次。ref 是同步更新的，所以第二次能看到第一次的结果。
+  const dataRef = useRef<Partial<T>>({});
 
   // 更新配置引用
   useEffect(() => {
@@ -263,6 +272,7 @@ export function useBatchAsyncState<T extends Record<string, unknown>>(
         newData[config.key] = value;
       });
 
+      dataRef.current = newData;
       setData(newData);
       setPhase("success");
 
@@ -288,14 +298,33 @@ export function useBatchAsyncState<T extends Record<string, unknown>>(
    * 更新单个项目
    */
   const updateItem = useCallback(
-    async <K extends keyof T>(key: K, value: T[K]): Promise<void> => {
+    async <K extends keyof T>(
+      key: K,
+      // 也接受更新函数。只能传具体值时，调用方必须先从 state 里读旧值再合并，
+      // 而同一次渲染内的两次调用读到的是同一份快照 —— 后一次覆盖前一次。
+      //
+      // 实测：并发保存两个不同问题的答案，只有后一个留下。目前问卷 UI 有
+      // selectedOption 守卫把调用串行化了，所以这条路径暂时走不到，但这是
+      // context API 的性质，不该依赖调用方恰好串行。
+      valueOrUpdater: T[K] | ((prev: T[K] | undefined) => T[K]),
+    ): Promise<void> => {
       const config = configsRef.current.find((c) => c.key === key);
       if (!config) {
         throw new Error(`未找到配置项: ${String(key)}`);
       }
 
+      // 从 ref 读旧值，不从 state 读：ref 是同步更新的，所以同一次渲染内的
+      // 第二次调用能看到第一次的结果。
+      const value =
+        typeof valueOrUpdater === "function"
+          ? (valueOrUpdater as (prev: T[K] | undefined) => T[K])(
+              dataRef.current[key],
+            )
+          : valueOrUpdater;
+
       try {
         // 立即更新本地状态
+        dataRef.current = { ...dataRef.current, [key]: value };
         setData((prev) => ({ ...prev, [key]: value }));
 
         // 异步保存
