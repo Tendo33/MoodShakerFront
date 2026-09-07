@@ -19,9 +19,19 @@ export default function LanguageSelector({
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const listboxId = `${idBase}-listbox`;
   const pendingFocusIndexRef = useRef<number | null>(null);
+  // availableLanguages 是数组 ["cn", "en"]，不是对象。
+  //
+  // 这里原本是 Object.entries(availableLanguages)，在数组上得到的是
+  // [["0", "cn"], ["1", "en"]] —— code 拿到的是下标字符串。后果有三个：
+  // 点击后 setLanguage("0") 跳到 /0/questions（无效路由，语言切不动）；
+  // selectedIndex 恒为 -1，当前语言永远不显示选中；
+  // 显示名变成 "cn"/"en" 而不是「中文」/「English」，国旗判断也永不成立。
   const languageOptions = useMemo(
-    () => Object.entries(availableLanguages),
-    [availableLanguages],
+    () =>
+      availableLanguages.map(
+        (code) => [code, t(`language.${code}`)] as const,
+      ),
+    [availableLanguages, t],
   );
   const selectedIndex = languageOptions.findIndex(([code]) => code === language);
 

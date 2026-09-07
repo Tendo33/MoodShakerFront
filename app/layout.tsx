@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import {
   DEFAULT_LOCALE,
+  HTML_LANG,
   LOCALE_HEADER,
   type Locale,
   isLocale,
@@ -85,12 +86,6 @@ const resolveHtmlLocale = async (): Promise<Locale> => {
     localeFromPathname(requestHeaders.get("x-nextjs-rewritten-path")) ??
     DEFAULT_LOCALE
   );
-};
-
-/** BCP 47 tag for the `lang` attribute; `cn` is not a valid language subtag. */
-const HTML_LANG: Record<Locale, string> = {
-  cn: "zh-CN",
-  en: "en",
 };
 
 export default async function RootLayout({

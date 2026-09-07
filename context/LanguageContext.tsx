@@ -1,10 +1,17 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 import type { ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   DEFAULT_LOCALE,
+  HTML_LANG,
   LOCALES,
   LOCALE_COOKIE,
   type Locale,
@@ -64,6 +71,18 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   // The proxy guarantees a prefix on every page route, so the fallback only
   // applies to a render outside that guarantee.
   const language = localeFromPathname(pathname) ?? DEFAULT_LOCALE;
+
+  // 客户端导航后同步 <html lang>。
+  //
+  // 根布局是服务端组件，客户端跳转时不会重新渲染，所以它设的 lang 会停在首次加载
+  // 的值。实测：从 /cn 点切换到 /en，URL 和文案都变成英文了，lang 仍是 zh-CN。
+  //
+  // 后果不只是标记不准。globals.css 里那组 html:lang(en) 规则全部失效，标题的
+  // overflow-wrap 拿不到 break-word，长单词又被裁回去；读屏软件也会继续用中文发音
+  // 念英文内容。硬刷新才正常，这正是这类 bug 容易被漏掉的原因。
+  useEffect(() => {
+    document.documentElement.lang = HTML_LANG[language];
+  }, [language]);
 
   const t = useCallback(
     (key: TranslationKey) => translate(language, key),

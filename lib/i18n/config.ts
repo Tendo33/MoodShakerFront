@@ -95,6 +95,20 @@ export function localeFromAcceptLanguage(
   return null;
 }
 
+/**
+ * BCP 47 tags for the `lang` attribute. `cn` is our own route prefix, not a valid
+ * language subtag.
+ *
+ * Shared because two places set this: the root layout on the server, and
+ * `LanguageContext` after a client-side navigation (the root layout is a server
+ * component and does not re-render on those, so the attribute would otherwise go
+ * stale). Two copies of this map could drift.
+ */
+export const HTML_LANG: Record<Locale, string> = {
+  cn: "zh-CN",
+  en: "en",
+};
+
 /** Prefixes a path with a locale, replacing an existing prefix. */
 export function localizePathname(pathname: string, locale: Locale): string {
   const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
