@@ -107,6 +107,29 @@
   interaction-heavy controls.
 - Keep global CSS limited to tokens, base styles, and app-wide utilities.
 
+### No !important In Global Layers
+
+- Do not add `!important` to a rule in `@layer base`. Tailwind v4 orders `utilities`
+  after `base`, so a component that states a size or spacing already wins and global
+  rules act as the fallback for elements that state nothing. `!important` inverts that
+  and leaves the component no way to opt out.
+- Measured cost of getting this wrong: `html:lang(en) h3` with
+  `font-size: clamp(1.125rem, 2.5vw, 1.75rem) !important` beat the component's
+  `text-lg sm:text-xl` and forced 25.76px into a 136px column that fits about 19.8px.
+  `ALCOHOL` overflowed by 40px and the card's `overflow-hidden` clipped the last letter.
+  The comment above the block said "scale down"; it was scaling 18px up.
+- `!important` elsewhere in `globals.css` is deliberate and should stay — the 16px on
+  `textarea` stops iOS zooming on focus, and the `prefers-reduced-motion` block has to
+  win. A guard test in `tests/components/LanguageSelector.test.ts` scopes its check to
+  `html:lang()` blocks for that reason.
+- For English text clipped in a narrow column, reach for
+  `overflow-wrap: break-word` before shrinking type or tightening tracking. It only
+  applies when a word genuinely does not fit, so titles that already fit are untouched.
+  Chinese breaks anywhere and does not need it.
+- Trailing letter-spacing is a real effect but a small one: roughly 4px at `0.16em`.
+  Measure before treating it as the cause of an overflow — mine was 40px, and zeroing
+  the tracking entirely still overflowed by 11px.
+
 ## UX Quality
 
 - UI changes must work on mobile and desktop.

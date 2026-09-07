@@ -76,11 +76,40 @@ Setup that these tests depend on, in this order, all before React is imported:
   the hook's callbacks and re-runs its effect — a loop of the test's own making that
   looks exactly like a product bug.
 
-## Playwright
+## Real-Browser Checks
 
 `playwright.config.ts` and `pnpm test:e2e` exist but do not run: the browser binaries
 will not install in this environment — two attempts reached 448 KB of roughly 150 MB
-over nine minutes. Full-flow checks across pages remain manual for now.
+over nine minutes.
+
+Use `browser-relay` instead. It drives the developer's own Chrome, needs no download,
+and is the only check here that sees actual rendering:
+
+```bash
+browser-relay navigate "http://localhost:3000/en/questions"
+browser-relay tabs                       # grab the tab id; relay loses it on restart
+browser-relay eval --tab "$TAB" --stdin  # measure the DOM
+browser-relay screenshot --tab "$TAB" /tmp/page.png   # path is positional, not --path
+```
+
+Run it for any change to typography, layout, CSS cascade, or client-side navigation.
+Three bugs shipped past typecheck, 222 passing tests, lint, a clean build, and
+`measure-ssr.mjs` because none of those evaluate CSS or re-render on navigation:
+`!important` in `@layer base` overriding component sizes, an invalid locale route from
+`Object.entries` on an array, and `<html lang>` going stale after a client navigation.
+All three were found in one browser session.
+
+What to measure, rather than eyeballing a screenshot:
+
+- Clipping: `el.scrollWidth > el.clientWidth` on leaf nodes, skipping `ellipsis` and
+  scrollable elements. Zero is the expectation on every route in both locales.
+- Cascade: `getComputedStyle(el).fontSize` against what the component asked for. A
+  mismatch means something in `base` is winning.
+- Test the narrow case. The first question renders two wide columns and clips nothing;
+  the four-column question is where 136px columns break. Seed `localStorage` with
+  `moodshaker-answers` to jump straight there.
+- Client navigation, not just a fresh load. Click through the language selector rather
+  than visiting `/en` — a hard reload hid the stale-`lang` bug completely.
 
 ## Route-Level Changes
 
