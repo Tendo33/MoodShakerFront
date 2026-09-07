@@ -67,8 +67,13 @@ export function useAsyncState<T>(
   // 实测 Home.tsx 的调用形态（内联 defaultValue: {}）：1.5 秒内渲染 475 次，
   // 换成稳定引用只有 3 次。首页一直在无界重渲染循环里，只是被存储层的批处理
   // 延迟限了速，所以没表现成页面卡死。
+  // 写入放在 effect 里，不在渲染期间：并发渲染下渲染可能被丢弃或重放，渲染期间
+  // 改 ref 的时机没有保证。useRef 的初值就是首次渲染的这三个值，所以挂载时
+  // loadData 读到的已经是对的；之后由这个 effect 保持同步。
   const optionsRef = useRef({ defaultValue, onSuccess, onError });
-  optionsRef.current = { defaultValue, onSuccess, onError };
+  useEffect(() => {
+    optionsRef.current = { defaultValue, onSuccess, onError };
+  }, [defaultValue, onSuccess, onError]);
 
   // 清理函数
   useEffect(() => {

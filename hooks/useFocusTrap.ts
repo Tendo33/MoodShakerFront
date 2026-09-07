@@ -35,6 +35,25 @@ export function useFocusTrap({
 }: UseFocusTrapOptions) {
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
+  // onClose 存进 ref，不进 effect 的依赖数组。
+  //
+  // 之前它在依赖数组里，而调用方传的是内联箭头（Header.tsx:26 的
+  // `onClose: () => setIsMobileMenuOpen(false)`），每次渲染都是新引用，于是这个
+  // effect 每次渲染都重跑一遍：cleanup 先把焦点还给打开按钮，重跑再 rAF 聚焦到
+  // 第一个可聚焦元素。
+  //
+  // 实测：用户 Tab 到第三项后触发一次重渲染，焦点被拽回第一项。抽屉打开时页面
+  // 滚动就会触发（Header.tsx:29 的滚动监听改 isScrolled），所以这在真实使用中
+  // 可达 —— 键盘用户每滚一下就被踢回菜单开头。
+  //
+  // ref 里始终是最新的回调，所以 Escape 依然调到当前那一个。
+  // 写入放在 effect 里而不是渲染期间：渲染期间改 ref 会被 react-hooks/refs 拦下，
+  // 而且在并发渲染下渲染可能被丢弃或重放，写入时机没有保证。
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -63,7 +82,7 @@ export function useFocusTrap({
 
       if (event.key === "Escape") {
         event.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -105,5 +124,7 @@ export function useFocusTrap({
       document.removeEventListener("keydown", handleKeyDown);
       restoreFocusRef.current?.focus();
     };
-  }, [containerRef, initialFocusRef, isOpen, onClose]);
+    // onClose 不在这里 —— 它经 onCloseRef 读取。containerRef 和 initialFocusRef
+    // 是调用方用 useRef 建的 ref 对象，本身稳定。
+  }, [containerRef, initialFocusRef, isOpen]);
 }
