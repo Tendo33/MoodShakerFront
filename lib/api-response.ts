@@ -3,21 +3,34 @@ import { NextResponse } from "next/server";
 export interface ApiErrorShape {
   code: string;
   message: string;
+  requestId?: string;
+}
+
+export interface ApiResponseOptions {
+  /**
+   * Correlation id echoed to the caller and written to the server logs, so a
+   * user-reported failure can be traced without guessing from timestamps.
+   */
+  requestId?: string;
+  headers?: HeadersInit;
 }
 
 export function apiSuccess<T>(
   data: T,
   status: number = 200,
-  init?: ResponseInit,
+  options: ApiResponseOptions = {},
 ) {
-  return NextResponse.json({ success: true, data }, { status, ...init });
+  return NextResponse.json(
+    { success: true, data },
+    { status, headers: options.headers },
+  );
 }
 
 export function apiError(
   code: string,
   message: string,
   status: number,
-  init?: ResponseInit,
+  options: ApiResponseOptions = {},
 ) {
   return NextResponse.json(
     {
@@ -25,8 +38,9 @@ export function apiError(
       error: {
         code,
         message,
+        ...(options.requestId ? { requestId: options.requestId } : {}),
       } satisfies ApiErrorShape,
     },
-    { status, ...init },
+    { status, headers: options.headers },
   );
 }

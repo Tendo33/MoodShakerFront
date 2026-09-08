@@ -13,38 +13,44 @@ enum RecommendationStatus {
   PUBLISHED
 }
 
+/// A published cocktail.
+///
+/// Was 26 columns, 8 of them `xxx` / `english_xxx` pairs. Every read site had to
+/// pick between a pair by hand, and adding a third language would have meant
+/// eight more columns. Free text now lives in `content` as
+/// `{ name: { cn, en }, ... }`, and the three closed vocabularies are stored as
+/// codes so no boundary has to match display text.
 model Cocktail {
-  id                    String   @id @default(uuid())
-  name                  String   @unique // Added unique constraint for cocktail names
-  englishName           String?  @map("english_name")
-  description           String
-  englishDescription    String?  @map("english_description")
-  matchReason           String?  @map("match_reason")
-  englishMatchReason    String?  @map("english_match_reason")
-  baseSpirit            String   @map("base_spirit")
-  englishBaseSpirit     String?  @map("english_base_spirit")
-  alcoholLevel          String   @map("alcohol_level")
-  englishAlcoholLevel   String?  @map("english_alcohol_level")
-  servingGlass          String   @map("serving_glass")
-  englishServingGlass   String?  @map("english_serving_glass")
-  timeRequired          String   @map("time_required")
-  englishTimeRequired   String?  @map("english_time_required")
-  flavorProfiles        String[] @map("flavor_profiles")
-  englishFlavorProfiles String[] @map("english_flavor_profiles")
-  ingredients           Json
-  tools                 Json
-  steps                 Json
-  image                 String?  @db.Text // Base64 string, using Text type for large content
-  thumbnail             String?  @db.Text
-  createdAt             DateTime @default(now()) @map("created_at")
-  updatedAt             DateTime @updatedAt @map("updated_at")
-  recommendations       RecommendationSession[]
+  id     String @id @default(uuid())
+  /// Stable URL identifier. Replaces the unique constraint that was on `name`:
+  /// two drinks may legitimately share a name, and the real requirement was a
+  /// unique URL.
+  slug   String @unique
+  /// Locale-keyed recipe content: name, description, matchReason, servingGlass,
+  /// timeRequired, ingredients, tools, steps. Mirrors the shape already used by
+  /// `RecommendationSession.cocktailPayload`.
+  content Json
 
-  // Indexes for common query patterns
+  /// Vocabulary codes from `lib/domain/vocabulary.ts`, not display text.
+  /// Kept as columns rather than folded into `content` so they stay indexable.
+  baseSpirit     String   @map("base_spirit")
+  alcoholLevel   String   @map("alcohol_level")
+  flavorProfiles String[] @map("flavor_profiles")
+
+  imageUrl     String? @map("image_url") @db.Text
+  thumbnailUrl String? @map("thumbnail_url") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  recommendations RecommendationSession[]
+
   @@index([baseSpirit], name: "idx_cocktail_base_spirit")
   @@index([alcoholLevel], name: "idx_cocktail_alcohol_level")
-  @@index([createdAt], name: "idx_cocktail_created_at")
-  @@index([englishName], name: "idx_cocktail_english_name")
+  /// Composite and descending to match the gallery's keyset pagination, which
+  /// orders by `(created_at, id)` descending. A single-column index on createdAt
+  /// leaves the tiebreaker unindexed.
+  @@index([createdAt(sort: Desc), id(sort: Desc)], name: "idx_cocktail_created_at")
   @@map("cocktails")
 }
 
@@ -58,8 +64,12 @@ model RecommendationSession {
   baseSpirits       String[]             @map("base_spirits")
   specialRequests   String?              @map("special_requests")
   cocktailPayload   Json                 @map("cocktail_payload")
+  // Legacy inline image storage. Superseded by imageUrl/thumbnailUrl; retained
+  // during the dual-read window and dropped once the backfill is verified.
   image             String?              @db.Text
   thumbnail         String?              @db.Text
+  imageUrl          String?              @map("image_url") @db.Text
+  thumbnailUrl      String?              @map("thumbnail_url") @db.Text
   status            RecommendationStatus @default(PRIVATE)
   publishedCocktailId String?            @map("published_cocktail_id")
   publishedCocktail Cocktail?            @relation(fields: [publishedCocktailId], references: [id], onDelete: SetNull)

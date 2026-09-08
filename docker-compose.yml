@@ -22,14 +22,37 @@ services:
       - IMAGE_API_URL=${IMAGE_API_URL:-https://api.siliconflow.cn/v1/images/generations}
       - IMAGE_API_KEY=${IMAGE_API_KEY}
       - IMAGE_MODEL=${IMAGE_MODEL:-Qwen/Qwen-Image}
+
+      # Cloudflare R2 对象存储 (生成图片的存放位置)
+      - R2_ACCOUNT_ID=${R2_ACCOUNT_ID}
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_BUCKET=${R2_BUCKET:-moodshaker-images}
+      - R2_PUBLIC_BASE_URL=${R2_PUBLIC_BASE_URL}
+
+      # 反向代理层数。容器跑在 Caddy/Nginx 后面时为 1。
+      # 用于从 x-forwarded-for 右侧数出可信客户端 IP，防止伪造首跳绕过限流。
+      - TRUSTED_PROXY_HOPS=${TRUSTED_PROXY_HOPS:-1}
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      # 探 /api/health，不是 /。/ 返回的是静态外壳，数据库挂掉也是 200，
+      # 于是一个连不上数据库的容器会一直报 healthy 并继续接流量。
+      #
+      # --spider 只看状态码，正好够用：端点在依赖不可用时返回 503。
+      #
+      # timeout 必须大于端点自己的 CHECK_TIMEOUT_MS（12s），否则探测会在
+      # 端点正要给出正确答案时先放弃。改这里就要一起看 app/api/health/route.ts。
+      #
+      # retries 和 start_period 才是真正兜住数据库冷启动的东西，不是 timeout。
+      # Neon 空闲后会挂起，Prisma 默认约 5s 放弃连接，所以唤醒期间出现单次 503
+      # 属于预期；实测同一实例既出现过 5036ms 失败也出现过 9956ms 成功。
+      # 把 retries 降成 1 会让容器在冷启动时被判定不健康。
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
-      timeout: 10s
+      timeout: 15s
       retries: 3
       start_period: 40s
     deploy:

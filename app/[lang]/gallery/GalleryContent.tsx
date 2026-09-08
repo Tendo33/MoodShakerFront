@@ -6,14 +6,25 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
-import type { PublicCocktailSummary } from "@/lib/cocktail-types";
+import type { CocktailSummary } from "@/lib/cocktail-types";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  ALCOHOL_LEVELS,
+  BASE_SPIRITS,
+  FLAVOR_PROFILES,
+  alcoholLevelLabel,
+  baseSpiritLabel,
+  coerceAlcoholLevel,
+  coerceBaseSpirit,
+  coerceFlavorProfiles,
+  flavorProfileLabel,
+} from "@/lib/domain/vocabulary";
 import { GradientText } from "@/components/ui/core";
 import { shouldBypassNextImageOptimization } from "@/utils/image-optimization";
 import { Activity, Filter, GlassWater, Search, Sparkles, X } from "lucide-react";
 
 interface GalleryContentProps {
-  cocktails: PublicCocktailSummary[];
+  cocktails: CocktailSummary[];
   nextCursor: string | null;
   lang: string;
   initialFilters: {
@@ -25,9 +36,20 @@ interface GalleryContentProps {
   };
 }
 
-const BASE_SPIRITS = ["Gin", "Vodka", "Rum", "Tequila", "Whiskey", "Brandy", "Other"];
-const FLAVORS = ["Sweet", "Sour", "Bitter", "Fruity", "Herbal", "Smoky", "Spicy", "Salty", "Creamy"];
-const ALCOHOL_LEVELS = ["Low", "Medium", "High"];
+/**
+ * Filter options come from the vocabulary, not a hand-written copy.
+ *
+ * There used to be three local arrays holding display text — `"Gin"`, `"Sweet"`,
+ * `"Low"`. Two things were wrong with them. The data layer filters on codes
+ * (`gin`, `sweet`, `low`) and the page validates the query parameter against the
+ * vocabulary, so every one of these values was rejected and silently dropped:
+ * clicking any filter returned the unfiltered gallery. And the lists were
+ * incomplete — 9 of 12 flavours and 3 of 4 strengths — so no drink that was
+ * `refreshing`, `floral`, or non-alcoholic could be filtered for at all.
+ */
+const SPIRIT_OPTIONS = BASE_SPIRITS;
+const FLAVOR_OPTIONS = FLAVOR_PROFILES;
+const ALCOHOL_OPTIONS = ALCOHOL_LEVELS;
 
 export default function GalleryContent({
   cocktails,
@@ -36,6 +58,11 @@ export default function GalleryContent({
   initialFilters,
 }: GalleryContentProps) {
   const { t } = useLanguage();
+  // Labels come from the vocabulary rather than `gallery.*.*` dictionary keys.
+  // Those keys were a second copy of the same mapping and had already fallen
+  // behind: no entry existed for `none`, `floral`, `refreshing`, or `other`, so
+  // those options would have rendered their raw code.
+  const vocabLocale = lang === "en" ? "en" : "cn";
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -154,7 +181,10 @@ export default function GalleryContent({
   return (
     <div className="min-h-screen bg-background text-foreground pt-24 pb-20 px-4 md:px-8 relative overflow-hidden selection:bg-primary/30">
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-8%] left-[-8%] h-[28%] w-[28%] rounded-full bg-primary/8 blur-[110px] animate-gentleFloat" />
+        {/* animate-gentleFloat 没有对应的 @keyframes（产物里 0 次出现），这个光斑
+            一直是静止的。删掉死类名而不是补一个动画：本轮方向是减少无限动画，
+            补上等于新增一个。旁边那个 animate-float 是真在动的。 */}
+        <div className="absolute top-[-8%] left-[-8%] h-[28%] w-[28%] rounded-full bg-primary/8 blur-[110px]" />
         <div className="absolute bottom-[-8%] right-[-8%] h-[28%] w-[28%] rounded-full bg-secondary/8 blur-[110px] animate-float" style={{ animationDelay: "2s" }} />
       </div>
 
@@ -163,7 +193,7 @@ export default function GalleryContent({
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <GradientText
               as="h1"
-              className="mb-6 text-4xl uppercase tracking-[0.16em] drop-shadow-[0_0_14px_rgba(255,79,216,0.28)] md:text-6xl lg:text-7xl"
+              className="mb-6 text-4xl uppercase tracking-[0.16em] md:text-6xl lg:text-7xl"
             >
               {t("gallery.title")}
             </GradientText>
@@ -194,7 +224,7 @@ export default function GalleryContent({
           transition={{ delay: 0.3 }}
           className="sticky top-24 z-30 mb-10"
         >
-          <div className="glass-panel mx-auto max-w-4xl border border-primary/30 p-3 shadow-[0_24px_48px_rgba(3,0,9,0.3),0_0_18px_rgba(255,79,216,0.12)] backdrop-blur-3xl transition-all duration-300 hover:border-primary/50">
+          <div className="glass-panel mx-auto max-w-4xl border border-primary/30 p-3 shadow-[0_24px_48px_rgba(3,0,9,0.3)] backdrop-blur-3xl transition-all duration-300 hover:border-primary/50">
             <div className="flex flex-col items-center gap-3 md:flex-row">
               <div className="group relative w-full flex-1">
                 <label htmlFor="gallery-search" className="sr-only">
@@ -206,7 +236,7 @@ export default function GalleryContent({
                 <input
                   type="text"
                   id="gallery-search"
-                  className="block w-full border border-primary/30 bg-black/40 py-3 pl-11 pr-10 text-sm text-foreground shadow-inner transition-all placeholder:text-muted-foreground focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  className="focus-ring block w-full border border-primary/30 bg-black/40 py-3 pl-11 pr-10 text-sm text-foreground shadow-inner transition-all placeholder:text-muted-foreground focus:border-secondary"
                   placeholder={t("gallery.search.placeholder")}
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
@@ -245,27 +275,27 @@ export default function GalleryContent({
 
             {activeFilterCount > 0 && (
               <div className="mt-3 flex flex-wrap items-center gap-2 px-1">
-                <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-foreground/55">
+                <span className="text-xs font-mono uppercase tracking-[0.2em] text-foreground/55">
                   {lang === "en" ? "Active filters" : "已启用筛选"}
                 </span>
                 {searchQuery.trim() && (
-                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-primary">
+                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-primary">
                     {lang === "en" ? "Search" : "搜索"}: {searchQuery.trim()}
                   </span>
                 )}
                 {selectedSpirit && (
-                  <span className="glass-subtle border border-secondary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-secondary">
-                    {t(`gallery.spirit.${selectedSpirit.toLowerCase()}`)}
+                  <span className="glass-subtle border border-secondary/35 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-secondary">
+                    {baseSpiritLabel(coerceBaseSpirit(selectedSpirit), vocabLocale)}
                   </span>
                 )}
                 {selectedAlcohol && (
-                  <span className="glass-subtle border border-accent/40 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-accent">
-                    {t(`gallery.level.${selectedAlcohol.toLowerCase()}`)}
+                  <span className="glass-subtle border border-accent/40 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-accent">
+                    {alcoholLevelLabel(coerceAlcoholLevel(selectedAlcohol), vocabLocale)}
                   </span>
                 )}
                 {selectedFlavor && (
-                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.16em] text-primary">
-                    {t(`gallery.flavor.${selectedFlavor.toLowerCase()}`)}
+                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-primary">
+                    {flavorProfileLabel(coerceFlavorProfiles([selectedFlavor])[0], vocabLocale)}
                   </span>
                 )}
                 <button
@@ -276,7 +306,7 @@ export default function GalleryContent({
                     setSelectedFlavor(null);
                     setSelectedAlcohol(null);
                   }}
-                  className="focus-ring ml-auto inline-flex min-h-10 items-center justify-center border border-white/10 px-3 py-2 text-[11px] font-mono uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
+                  className="focus-ring ml-auto inline-flex min-h-10 items-center justify-center border border-white/10 px-3 py-2 text-xs font-mono uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
                 >
                   {lang === "en" ? "Clear all" : "清空全部"}
                 </button>
@@ -291,72 +321,72 @@ export default function GalleryContent({
             >
               <div className="px-1 pt-1 space-y-4">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
+                  <div className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
                     <GlassWater className="h-3 w-3" />
                     {t("gallery.filter.base")}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {BASE_SPIRITS.map((spirit) => (
+                    {SPIRIT_OPTIONS.map((spirit) => (
                       <button
                         key={spirit}
                         type="button"
                         onClick={() => setSelectedSpirit(selectedSpirit === spirit ? null : spirit)}
                         className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
                           selectedSpirit === spirit
-                            ? "bg-secondary text-black border-secondary shadow-[0_0_15px_rgba(0,255,255,0.4)] font-semibold"
+                            ? "bg-secondary text-black border-secondary font-semibold"
                             : "bg-black/40 text-muted-foreground border-primary/20 hover:border-secondary hover:text-secondary hover:bg-secondary/10"
                         }`}
                         aria-pressed={selectedSpirit === spirit}
                       >
-                        {t(`gallery.spirit.${spirit.toLowerCase()}`)}
+                        {baseSpiritLabel(spirit, vocabLocale)}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
+                  <div className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
                     <Activity className="h-3 w-3" />
                     {t("gallery.filter.alcohol_level")}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {ALCOHOL_LEVELS.map((level) => (
+                    {ALCOHOL_OPTIONS.map((level) => (
                       <button
                         key={level}
                         type="button"
                         onClick={() => setSelectedAlcohol(selectedAlcohol === level ? null : level)}
                         className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
                           selectedAlcohol === level
-                            ? "bg-accent text-black border-accent shadow-[0_0_15px_rgba(255,153,0,0.4)] font-semibold"
+                            ? "bg-accent text-black border-accent font-semibold"
                             : "bg-black/40 text-muted-foreground border-primary/20 hover:border-accent hover:text-accent hover:bg-accent/10"
                         }`}
                         aria-pressed={selectedAlcohol === level}
                       >
-                        {t(`gallery.level.${level.toLowerCase()}`)}
+                        {alcoholLevelLabel(level, vocabLocale)}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
+                  <div className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-2 ml-1">
                     <Sparkles className="h-3 w-3" />
                     {t("gallery.filter.flavor")}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {FLAVORS.map((flavor) => (
+                    {FLAVOR_OPTIONS.map((flavor) => (
                       <button
                         key={flavor}
                         type="button"
                         onClick={() => setSelectedFlavor(selectedFlavor === flavor ? null : flavor)}
                         className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
                           selectedFlavor === flavor
-                            ? "bg-primary text-black border-primary shadow-[0_0_15px_rgba(255,0,255,0.4)] font-semibold"
+                            ? "bg-primary text-black border-primary font-semibold"
                             : "bg-black/40 text-muted-foreground border-primary/20 hover:border-primary hover:text-primary hover:bg-primary/10"
                         }`}
                         aria-pressed={selectedFlavor === flavor}
                       >
-                        {t(`gallery.flavor.${flavor.toLowerCase()}`)}
+                        {flavorProfileLabel(flavor, vocabLocale)}
                       </button>
                     ))}
                   </div>
@@ -390,50 +420,44 @@ export default function GalleryContent({
               {renderableCocktails.map((cocktail) => (
                 <motion.div key={cocktail.id} variants={itemVariants} className="content-auto">
                   <Link
-                    href={`/${lang}/cocktail/${cocktail.id}`}
+                    href={`/${lang}/cocktail/${cocktail.slug}`}
                     className="block group relative h-full focus-ring"
                   >
-                    <div className="glass-panel relative h-full overflow-hidden border border-primary/35 shadow-[0_20px_42px_rgba(3,0,9,0.28),0_0_14px_rgba(255,79,216,0.1)] transition-all duration-500 group-hover:-translate-y-2.5 group-hover:scale-[1.02] group-hover:border-secondary group-hover:shadow-[0_26px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.14)] will-change-transform">
+                    <div className="glass-panel relative h-full overflow-hidden border border-primary/35 shadow-[0_20px_42px_rgba(3,0,9,0.28)] transition-all duration-500 group-hover:-translate-y-2.5 group-hover:scale-[1.02] group-hover:border-secondary group-hover:shadow-[0_26px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.14)] will-change-transform">
                       <div className="relative aspect-[4/5] overflow-hidden bg-black/60">
                         <Image
                           src={
-                            cocktail.thumbnail ||
+                            cocktail.thumbnailUrl ||
                             `/placeholder.svg?height=640&width=512&query=${encodeURIComponent(cocktail.name)}`
                           }
-                          alt={lang === "en" ? cocktail.english_name || cocktail.name : cocktail.name}
+                          alt={cocktail.name}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
                           className="object-cover opacity-92 transition-transform duration-500 group-hover:scale-[1.03]"
-                          unoptimized={shouldBypassNextImageOptimization(cocktail.thumbnail)}
+                          unoptimized={shouldBypassNextImageOptimization(cocktail.thumbnailUrl)}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                       </div>
                         <div className="space-y-4 p-5">
                           <div>
                           <h2 className="text-xl font-heading font-bold uppercase tracking-[0.16em] text-primary transition-colors group-hover:text-secondary">
-                            {lang === "en" ? cocktail.english_name || cocktail.name : cocktail.name}
+                            {cocktail.name}
                           </h2>
-                          {lang === "cn" && cocktail.english_name && (
+                          {lang === "cn" && cocktail.name && (
                             <p className="text-xs font-mono uppercase tracking-[0.2em] text-secondary/88">
-                              {cocktail.english_name}
+                              {cocktail.name}
                             </p>
                           )}
                         </div>
                         <p className="line-clamp-3 font-mono text-sm leading-relaxed text-foreground/82">
-                          {lang === "en"
-                            ? cocktail.english_description || cocktail.description
-                            : cocktail.description}
+                          {cocktail.description}
                         </p>
                         <div className="flex flex-wrap gap-2 text-xs font-mono uppercase tracking-[0.16em]">
                           <span className="glass-subtle border border-primary/35 px-3 py-1 text-primary">
-                            {lang === "en"
-                              ? cocktail.english_base_spirit || cocktail.base_spirit
-                              : cocktail.base_spirit}
+                            {cocktail.baseSpiritLabel}
                           </span>
                           <span className="glass-subtle border border-secondary/35 px-3 py-1 text-secondary">
-                            {lang === "en"
-                              ? cocktail.english_alcohol_level || cocktail.alcohol_level
-                              : cocktail.alcohol_level}
+                            {cocktail.alcoholLevelLabel}
                           </span>
                         </div>
                       </div>

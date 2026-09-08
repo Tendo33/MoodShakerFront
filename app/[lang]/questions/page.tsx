@@ -1,17 +1,9 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import ErrorBoundary from "@/components/ErrorBoundary";
-
-// 懒加载问题页面组件
-// 注意：在App Router中，我们移除了ssr: false，因为Questions组件已经使用"use client"
-const Questions = dynamic(() => import("@/components/pages/Questions"), {
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-    </div>
-  ),
-});
+import Questions from "@/components/pages/Questions";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { buildPageMetadata } from "@/lib/i18n/metadata";
 
 interface PageProps {
   params: Promise<{
@@ -19,19 +11,32 @@ interface PageProps {
   }>;
 }
 
-export const metadata: Metadata = {
-  title: "Questions | MoodShaker",
-  description: "Answer a few questions to find your perfect cocktail",
-  icons: {
-    icon: "/logo.png",
-  },
-};
-
-export default async function QuestionsPage({ params }: PageProps) {
-  const validLangs = ["en", "cn"];
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { lang } = await params;
-  if (!validLangs.includes(lang)) {
-    redirect("/cn/questions");
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+
+  return buildPageMetadata({
+    locale,
+    path: "/questions",
+    titleKey: "seo.questions.title",
+    descriptionKey: "seo.questions.description",
+  });
+}
+
+/**
+ * Imported directly rather than through `next/dynamic`.
+ *
+ * The wrapper had no `ssr: false`, so Next server-rendered `Questions` regardless;
+ * it only added a client chunk and a spinner that could flash over content already
+ * in the HTML. See `docs/performance-baseline.md`.
+ */
+export default async function QuestionsPage({ params }: PageProps) {
+  const { lang } = await params;
+
+  if (!isLocale(lang)) {
+    redirect(`/${DEFAULT_LOCALE}/questions`);
   }
 
   return (

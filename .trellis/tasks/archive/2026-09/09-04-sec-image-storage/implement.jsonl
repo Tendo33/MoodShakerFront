@@ -1,0 +1,8 @@
+{"file": ".trellis/spec/big-question/recommendation-api-security.md", "reason": "本批次的安全修复主体（editToken 访问语义、不回显 token）直接受此约束"}
+{"file": ".trellis/spec/big-question/image-provider-failures.md", "reason": "图片 provider 失败的既有处理约定；本批次要把静默降级改为明确失败，需先读懂原约定"}
+{"file": ".trellis/spec/frontend/api-and-data.md", "reason": "/api/image 的现有契约；本批次变更请求体与响应字段"}
+{"file": ".trellis/spec/shared/project-overview.md", "reason": "运行时与部署事实；本批次新增 R2 依赖与环境变量"}
+{"file": ".trellis/spec/shared/typescript.md", "reason": "禁 any / 禁非空断言 / 禁忽略类型错误"}
+{"file": ".trellis/spec/shared/verification.md", "reason": "完成前必须执行的验证命令集"}
+{"file": ".trellis/tasks/09-04-moodshaker-restructure/design.md", "reason": "父任务技术契约第 5、7 节定义了图片链路与 HTTP 契约边界"}
+{"file": ".trellis/tasks/09-04-moodshaker-restructure/prd.md", "reason": "「批次间文件契约」定义了本批次与并行批次 2、3 的文件所有权边界，越界会导致合并冲突"}

@@ -8,19 +8,18 @@ import { useLanguage } from "@/context/LanguageContext";
 import type { Cocktail } from "@/lib/cocktail-types";
 import { CocktailImage } from "@/components/CocktailImage";
 import { Button } from "@/components/ui/core";
-import { useLocalizedCocktail } from "@/hooks/useLocalizedCocktail";
 import { CocktailSharePortal } from "@/components/share/CocktailSharePortal";
 import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSections";
 import { CocktailHero } from "@/components/pages/shared/CocktailHero";
 import { CocktailActions } from "@/components/pages/shared/CocktailActions";
 
 interface CocktailDetailPageProps {
-  id: string;
+  slug: string;
   initialData?: Cocktail | null;
 }
 
 const CocktailDetailPage = React.memo(function CocktailDetailPage({
-  id,
+  slug,
   initialData,
 }: CocktailDetailPageProps) {
   const router = useRouter();
@@ -33,14 +32,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
   const cardClasses =
     "glass-effect text-foreground transition-all duration-300 hover:shadow-primary/10";
   const gradientText = "gradient-text-bright";
-  const {
-    getLocalizedContent,
-    getLocalizedIngredientName,
-    getLocalizedIngredientAmount,
-    getLocalizedIngredientUnit,
-    getLocalizedToolName,
-    getLocalizedStepContent,
-  } = useLocalizedCocktail(cocktail);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsPageLoaded(true), 100);
@@ -84,7 +75,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           transition={{ duration: 1 }}
         >
           <motion.div
-          className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/18 blur-[84px]"
+          className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/10 blur-[84px]"
           animate={{ y: [0, -14, 0], scale: [1, 1.03, 1] }}
           transition={{
             duration: 8,
@@ -93,7 +84,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           }}
         />
         <motion.div
-          className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/18 blur-[84px]"
+          className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/10 blur-[84px]"
           animate={{ y: [0, 14, 0], scale: [1, 1.04, 1] }}
           transition={{
             duration: 10,
@@ -128,7 +119,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           <CocktailSharePortal
             cocktail={cocktail}
             imageUrl={
-              cocktail.image ||
+              cocktail.imageUrl ||
               `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`
             }
           >
@@ -146,7 +137,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
                       <ImageIcon className="h-5 w-5" />
                     )
                   }
-                  className="text-primary border-primary/30 hover:bg-primary/20 hover:border-primary/50 hover:shadow-[0_0_16px_hsl(var(--primary)/0.2)] transition-all duration-300"
+                  className="text-primary border-primary/30 hover:bg-primary/20 hover:border-primary/50 transition-all duration-300"
                 >
                   {t("recommendation.saveImage")}
                 </Button>
@@ -166,12 +157,11 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           isPageLoaded={isPageLoaded}
           t={t}
           gradientTextClass={gradientText}
-          getLocalizedContent={getLocalizedContent}
           imageContent={
             <div className="rounded-none overflow-hidden w-full h-full relative">
               <CocktailImage
-                cocktailId={id}
-                imageData={cocktail?.image || null}
+                cocktailId={slug}
+                imageData={cocktail?.imageUrl || null}
                 cocktailName={cocktail?.name}
                 priority
               />
@@ -184,11 +174,6 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           isPageLoaded={isPageLoaded}
           textColorClass={textColorClass}
           cardClasses={cardClasses}
-          getLocalizedIngredientName={getLocalizedIngredientName}
-          getLocalizedIngredientAmount={getLocalizedIngredientAmount}
-          getLocalizedIngredientUnit={getLocalizedIngredientUnit}
-          getLocalizedToolName={getLocalizedToolName}
-          getLocalizedStepContent={getLocalizedStepContent}
         />
         <CocktailActions t={t} onBack={handleBack} />
       </div>

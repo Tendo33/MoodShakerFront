@@ -38,6 +38,7 @@ const Questions = memo(function Questions() {
     answers,
     userFeedback,
     baseSpirits,
+    isHydrated,
     saveAnswer,
     removeAnswer,
     saveFeedback,
@@ -385,6 +386,33 @@ const Questions = memo(function Questions() {
     );
   }
 
+  // 等存储读完再决定显示哪一题。
+  //
+  // 题号是从 answers 算出来的，而 answers 在水合完成前是 {}，所以会先渲染第一题、
+  // 落地后再跳到正确的一题。浏览器采样测到的间隔：631ms 显示第一题，1033ms 才纠正
+  // 到第三题 —— 用户有 400ms 看到自己已经答过的题目被重新问一遍。
+  //
+  // 门禁不能用 isDataLoading：它初始是 false（加载 effect 还没跑），首帧就放行，
+  // 挡不住这段空窗。isHydrated 看的是 phase 有没有结论。
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen relative overflow-hidden">
+        <Container className="relative z-10 py-16 md:py-24">
+          <div
+            className="mx-auto flex max-w-3xl items-center justify-center py-24"
+            role="status"
+            aria-live="polite"
+          >
+            {/* common.loading 而非 loading.default —— 后者是「正在调制中」，
+                这里只是在读已保存的答案，读屏用户会以为在生成配方。 */}
+            <span className="sr-only">{t("common.loading")}</span>
+            <span className="h-8 w-8 animate-spin border-2 border-primary/30 border-t-primary" />
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       <Container className="relative z-10 py-16 md:py-24">
@@ -399,14 +427,15 @@ const Questions = memo(function Questions() {
           </div>
 
           <div className="relative z-10 h-3.5 w-full border border-primary/20 bg-black/45 shadow-[inset_0_0_10px_rgba(0,0,0,0.45)]">
+            {/* 单色而非 from-primary via-secondary to-accent。三色渐变让进度条本身
+                成了页面上最跳的元素，而它要传达的只是「第几步」这一个信息。
+                原来还叠了一层 animate-shimmer 斜纹，无限循环，一并去掉。 */}
             <motion.div
-              className="relative h-full overflow-hidden bg-linear-to-r from-primary via-secondary to-accent shadow-[0_0_14px_rgba(255,79,216,0.32)]"
+              className="relative h-full overflow-hidden bg-primary"
               initial={{ width: "0%" }}
               animate={{ width: `${calculatedProgress}%` }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="absolute inset-0 bg-[linear-gradient(-45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-size-[20px_20px] animate-shimmer opacity-50" />
-            </motion.div>
+            />
           </div>
         </div>
 
@@ -440,7 +469,7 @@ const Questions = memo(function Questions() {
                   </div>
                 </div>
 
-                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] drop-shadow-[0_0_12px_rgba(255,79,216,0.24)] md:text-5xl">
+                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] md:text-5xl">
                   <GradientText>{currentQuestion.title}</GradientText>
                 </h2>
 
@@ -546,7 +575,7 @@ const Questions = memo(function Questions() {
                   </div>
                 </div>
 
-                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] drop-shadow-[0_0_12px_rgba(255,79,216,0.24)] md:text-5xl">
+                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] md:text-5xl">
                   <GradientText>{t("questions.finalStep")}</GradientText>
                 </h2>
                 <p className="mx-auto max-w-2xl text-base font-mono leading-relaxed text-foreground/88 md:text-lg">
@@ -591,7 +620,7 @@ const Questions = memo(function Questions() {
                       <h3
                         className={`text-xs md:text-sm font-bold font-mono uppercase tracking-wider transition-colors duration-300 ${
                           baseSpirits.includes(spirit.value)
-                            ? "text-secondary drop-shadow-[0_0_5px_currentColor]"
+                            ? "text-secondary"
                             : "text-foreground group-hover:text-secondary"
                         }`}
                       >
@@ -622,7 +651,7 @@ const Questions = memo(function Questions() {
                   value={feedback}
                   onChange={(event) => setFeedback(event.target.value)}
                   placeholder={t("questions.feedback.placeholder")}
-                  className="min-h-36 w-full border border-primary/30 bg-black/50 p-4 font-mono text-foreground focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/40"
+                  className="focus-ring min-h-36 w-full border border-primary/30 bg-black/50 p-4 font-mono text-foreground focus:border-secondary"
                   aria-describedby={
                     submitError
                       ? `${feedbackDescriptionId} ${feedbackErrorId}`

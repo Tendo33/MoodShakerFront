@@ -2,8 +2,8 @@ import { AgentType } from "@/lib/cocktail-types";
 
 const MAX_SESSION_ID_LENGTH = 64;
 const MAX_EDIT_TOKEN_LENGTH = 256;
+const MAX_RECOMMENDATION_ID_LENGTH = 64;
 const MAX_SPECIAL_REQUESTS_LENGTH = 300;
-const MAX_PROMPT_LENGTH = 1600;
 const MAX_BASE_SPIRITS = 5;
 
 const ALLOWED_ANSWER_VALUES: Record<string, readonly string[]> = {
@@ -41,8 +41,6 @@ export interface ValidatedCocktailRequest {
 export interface ValidatedImageRequest {
   recommendationId: string;
   editToken: string;
-  prompt: string;
-  forceRefresh: boolean;
 }
 
 export interface ValidatedRecommendationAccessRequest {
@@ -153,10 +151,28 @@ export function validateImageRequest(
     return { success: false, message: "Request body must be an object." };
   }
 
-  const { recommendationId, editToken, prompt, forceRefresh } = input;
+  const { recommendationId, editToken } = input;
+
+  // The image prompt is derived server-side from the stored cocktail payload.
+  // A caller-supplied prompt is rejected rather than ignored: silently dropping
+  // it would leave clients believing they still control image generation, and
+  // the loud failure is what stops the old open-proxy usage from reappearing.
+  if ("prompt" in input) {
+    return {
+      success: false,
+      message: "Prompt is not accepted; it is derived server-side.",
+    };
+  }
 
   if (typeof recommendationId !== "string" || recommendationId.trim().length === 0) {
     return { success: false, message: "Recommendation id is required." };
+  }
+
+  if (recommendationId.trim().length > MAX_RECOMMENDATION_ID_LENGTH) {
+    return {
+      success: false,
+      message: `Recommendation id must be ${MAX_RECOMMENDATION_ID_LENGTH} characters or fewer.`,
+    };
   }
 
   if (typeof editToken !== "string" || editToken.trim().length === 0) {
@@ -170,28 +186,11 @@ export function validateImageRequest(
     };
   }
 
-  if (typeof prompt !== "string" || prompt.trim().length === 0) {
-    return { success: false, message: "Prompt is required." };
-  }
-
-  if (prompt.trim().length > MAX_PROMPT_LENGTH) {
-    return {
-      success: false,
-      message: `Prompt must be ${MAX_PROMPT_LENGTH} characters or fewer.`,
-    };
-  }
-
-  if (forceRefresh !== undefined && typeof forceRefresh !== "boolean") {
-    return { success: false, message: "forceRefresh must be a boolean." };
-  }
-
   return {
     success: true,
     data: {
       recommendationId: recommendationId.trim(),
       editToken: editToken.trim(),
-      prompt: prompt.trim(),
-      forceRefresh: Boolean(forceRefresh),
     },
   };
 }

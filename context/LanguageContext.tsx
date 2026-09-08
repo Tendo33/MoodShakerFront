@@ -2,34 +2,58 @@
 
 import {
   createContext,
-  useContext,
-  useState,
-  useEffect,
   useCallback,
+  useContext,
+  useEffect,
   useMemo,
 } from "react";
-import { appLogger } from "@/utils/logger";
-import { usePathname, useRouter } from "next/navigation";
-import { asyncStorage } from "@/utils/asyncStorage";
 import type { ReactNode } from "react";
-
-// Import translations from centralized locales
+import { usePathname, useRouter } from "next/navigation";
 import {
-  translations,
-  availableLanguages,
-  defaultLanguage,
-  type Language,
+  DEFAULT_LOCALE,
+  HTML_LANG,
+  LOCALES,
+  LOCALE_COOKIE,
+  type Locale,
+  localeFromPathname,
+  localizePathname,
+} from "@/lib/i18n/config";
+import {
   type TranslationKey,
-} from "@/locales";
+  translate,
+  translateDynamic,
+} from "@/lib/i18n/dictionary";
+
+/**
+ * Exposes the locale taken from the URL.
+ *
+ * The URL prefix is the only source. The previous version resolved language from
+ * the pathname, then `localStorage`, then `navigator.language`, and kept the
+ * result in state that could drift from the address bar — so `/en/gallery` could
+ * render Chinese if a stale value had been stored.
+ *
+ * Nothing is read from storage here, and nothing is persisted on load. The
+ * explicit choice is written by `setLanguage` as a cookie, which is the only
+ * form the proxy can read on an unprefixed URL.
+ */
+
+export type { Locale };
 
 interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
-  availableLanguages: Record<string, string>;
-  isLoading: boolean;
-  locale: string;
-  getPathWithLanguage: (path: string) => string;
+  language: Locale;
+  availableLanguages: readonly Locale[];
+  /** Translates a literal key. A typo or unknown key fails the build. */
+  t: (key: TranslationKey) => string;
+  /**
+   * Translates a key assembled at runtime, e.g. from a database value.
+   *
+   * Returns `null` when the key is unknown so the caller decides what to show.
+   * `t()` used to accept any string and echo it back, which is how users saw the
+   * literal text `gallery.spirit.rum` on screen.
+   */
+  tDynamic: (key: string) => string | null;
+  setLanguage: (language: Locale) => void;
+  getPathWithLanguage: (path: string, language?: Locale) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
@@ -40,168 +64,87 @@ interface LanguageProviderProps {
   children: ReactNode;
 }
 
-export function LanguageProvider({ children }: LanguageProviderProps) {
-  const router = useRouter();
+export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const pathname = usePathname();
-  const [language, setLanguageState] = useState<Language>(defaultLanguage);
-  const [isLoading, setIsLoading] = useState(true);
-  const isClient = typeof window !== "undefined";
+  const router = useRouter();
 
-  // Helper function to extract language from pathname
-  const extractLanguageFromPathname = useCallback(
-    (path: string): Language | null => {
-      if (path.startsWith("/en")) return "en";
-      if (path.startsWith("/cn")) return "cn";
-      return null;
-    },
-    [],
-  );
+  // The proxy guarantees a prefix on every page route, so the fallback only
+  // applies to a render outside that guarantee.
+  const language = localeFromPathname(pathname) ?? DEFAULT_LOCALE;
 
-  // Helper function to get path without language prefix
-  const getPathWithoutLanguage = useCallback((path: string): string => {
-    if (path.startsWith("/en/")) return path.substring(3);
-    if (path.startsWith("/cn/")) return path.substring(3);
-    if (path === "/en" || path === "/cn") return "/";
-    return path;
-  }, []);
-
-  // Helper function to get path with language prefix
-  const getPathWithLanguage = useCallback(
-    (path: string): string => {
-      const langPrefix = language === "en" ? "/en" : "/cn";
-      const pathWithoutLang = getPathWithoutLanguage(path);
-
-      if (pathWithoutLang === "/") return langPrefix;
-      return `${langPrefix}${pathWithoutLang}`;
-    },
-    [language, getPathWithoutLanguage],
-  );
-
-  // Initialize language from URL or localStorage
+  // 客户端导航后同步 <html lang>。
+  //
+  // 根布局是服务端组件，客户端跳转时不会重新渲染，所以它设的 lang 会停在首次加载
+  // 的值。实测：从 /cn 点切换到 /en，URL 和文案都变成英文了，lang 仍是 zh-CN。
+  //
+  // 后果不只是标记不准。globals.css 里那组 html:lang(en) 规则全部失效，标题的
+  // overflow-wrap 拿不到 break-word，长单词又被裁回去；读屏软件也会继续用中文发音
+  // 念英文内容。硬刷新才正常，这正是这类 bug 容易被漏掉的原因。
   useEffect(() => {
-    const initializeLanguage = async () => {
-      setIsLoading(true);
+    document.documentElement.lang = HTML_LANG[language];
+  }, [language]);
 
-      try {
-        // First check URL path for language parameter
-        if (pathname) {
-          const pathLang = extractLanguageFromPathname(pathname);
-          if (pathLang) {
-            appLogger.debug("Language detected from URL:", pathLang);
-            setLanguageState(pathLang);
-            // Save to localStorage to maintain consistency (only on client)
-            if (isClient) {
-              await asyncStorage.setItem("moodshaker-language", pathLang);
-            }
-            setIsLoading(false);
-            return;
-          }
-        }
-
-        // Then check localStorage (only on client)
-        if (isClient) {
-          const savedLanguage = await asyncStorage.getItem(
-            "moodshaker-language",
-            "",
-          );
-          if (
-            savedLanguage &&
-            (savedLanguage === "en" || savedLanguage === "cn")
-          ) {
-            appLogger.debug("Using language from localStorage:", savedLanguage);
-            setLanguageState(savedLanguage as Language);
-            setIsLoading(false);
-            return;
-          }
-        }
-
-        // Default to configured default language
-        setLanguageState(defaultLanguage);
-        if (isClient) {
-          await asyncStorage.setItem("moodshaker-language", defaultLanguage);
-        }
-        setIsLoading(false);
-      } catch (error) {
-        appLogger.error("Language initialization failed:", error);
-        // Fallback to default language
-        setLanguageState(defaultLanguage);
-        setIsLoading(false);
-      }
-    };
-
-    // Only initialize when we know we're on client or when we have pathname
-    if (isClient || pathname) {
-      initializeLanguage();
-    }
-  }, [pathname, extractLanguageFromPathname, isClient]);
-
-  // Set custom header for middleware when language changes and sync HTML lang attribute
-  useEffect(() => {
-    if (isClient && !isLoading) {
-      document.documentElement.lang = language === "en" ? "en" : "zh-CN";
-    }
-  }, [language, isLoading, isClient]);
-
-  // Update URL when language changes
-  const setLanguage = useCallback(
-    async (lang: Language) => {
-      setLanguageState(lang);
-
-      // Save to localStorage
-      if (isClient) {
-        try {
-          await asyncStorage.setItem("moodshaker-language", lang);
-        } catch (error) {
-          appLogger.error("Failed to save language preference:", error);
-        }
-      }
-
-      // Update URL path if we're on the client side
-      if (isClient && pathname) {
-        const pathWithoutLang = getPathWithoutLanguage(pathname);
-        const newPath =
-          pathWithoutLang === "/" ? `/${lang}` : `/${lang}${pathWithoutLang}`;
-        router.push(newPath);
-      }
-    },
-    [pathname, router, getPathWithoutLanguage, isClient],
-  );
-
-  // Translation function - uses imported translations
   const t = useCallback(
-    (key: string): string => {
-      return translations[language]?.[key] || key;
-    },
+    (key: TranslationKey) => translate(language, key),
     [language],
   );
 
-  const contextValue = useMemo(
+  const tDynamic = useCallback(
+    (key: string) => translateDynamic(language, key),
+    [language],
+  );
+
+  const getPathWithLanguage = useCallback(
+    (path: string, target?: Locale) => localizePathname(path, target ?? language),
+    [language],
+  );
+
+  const setLanguage = useCallback(
+    (next: Locale) => {
+      if (next === language) return;
+
+      // Persisted as a cookie because that is what the proxy reads when a URL
+      // arrives without a prefix. The old code wrote `moodshaker-language` to
+      // localStorage while the proxy looked for a cookie of the same name, so an
+      // explicit choice never survived a visit to `/` and the browser's
+      // `accept-language` won instead.
+      document.cookie = [
+        `${LOCALE_COOKIE}=${next}`,
+        "path=/",
+        `max-age=${60 * 60 * 24 * 365}`,
+        "samesite=lax",
+      ].join("; ");
+
+      router.push(localizePathname(pathname || "/", next));
+    },
+    [language, pathname, router],
+  );
+
+  const value = useMemo(
     () => ({
       language,
-      setLanguage,
+      availableLanguages: LOCALES,
       t,
-      availableLanguages,
-      isLoading,
-      locale: language === "en" ? "en" : "cn",
+      tDynamic,
+      setLanguage,
       getPathWithLanguage,
     }),
-    [language, setLanguage, t, isLoading, getPathWithLanguage],
+    [language, t, tDynamic, setLanguage, getPathWithLanguage],
   );
 
   return (
-    <LanguageContext.Provider value={contextValue}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
-}
+};
 
-export function useLanguage() {
+export const useLanguage = () => {
   const context = useContext(LanguageContext);
+
   if (context === undefined) {
     throw new Error("useLanguage must be used within a LanguageProvider");
   }
-  return context;
-}
 
-// Re-export types for convenience
-export type { Language, TranslationKey };
+  return context;
+};

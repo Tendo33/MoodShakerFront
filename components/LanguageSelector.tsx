@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, type KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Globe, Check, ChevronDown } from "lucide-react";
-import { useLanguage, type Language } from "@/context/LanguageContext";
+import { useLanguage, type Locale } from "@/context/LanguageContext";
 
 interface LanguageSelectorProps {
   idBase?: string;
@@ -19,9 +19,19 @@ export default function LanguageSelector({
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const listboxId = `${idBase}-listbox`;
   const pendingFocusIndexRef = useRef<number | null>(null);
+  // availableLanguages 是数组 ["cn", "en"]，不是对象。
+  //
+  // 这里原本是 Object.entries(availableLanguages)，在数组上得到的是
+  // [["0", "cn"], ["1", "en"]] —— code 拿到的是下标字符串。后果有三个：
+  // 点击后 setLanguage("0") 跳到 /0/questions（无效路由，语言切不动）；
+  // selectedIndex 恒为 -1，当前语言永远不显示选中；
+  // 显示名变成 "cn"/"en" 而不是「中文」/「English」，国旗判断也永不成立。
   const languageOptions = useMemo(
-    () => Object.entries(availableLanguages),
-    [availableLanguages],
+    () =>
+      availableLanguages.map(
+        (code) => [code, t(`language.${code}`)] as const,
+      ),
+    [availableLanguages, t],
   );
   const selectedIndex = languageOptions.findIndex(([code]) => code === language);
 
@@ -68,7 +78,7 @@ export default function LanguageSelector({
   };
 
   const selectLanguage = (code: string) => {
-    void setLanguage(code as Language);
+    setLanguage(code as Locale);
     closeListbox();
   };
 
@@ -196,7 +206,7 @@ export default function LanguageSelector({
         type="button"
       >
         <span className="flex items-center gap-2">
-          <Globe className={`h-4 w-4 ${isOpen ? "text-primary drop-shadow-[0_0_5px_currentColor]" : ""}`} />
+          <Globe className={`h-4 w-4 ${isOpen ? "text-primary" : ""}`} />
           <span className="hidden text-sm font-bold font-mono tracking-[0.18em] md:inline">
             {t(language === "en" ? "language.en" : "language.cn")}
           </span>
@@ -212,7 +222,7 @@ export default function LanguageSelector({
         {isOpen && (
           <motion.div
             id={listboxId}
-            className="absolute right-0 z-50 mt-3 w-48 overflow-hidden border border-primary/45 bg-black/90 shadow-[0_24px_48px_rgba(3,0,9,0.34),0_0_18px_rgba(255,79,216,0.16)] backdrop-blur-3xl"
+            className="absolute right-0 z-50 mt-3 w-48 overflow-hidden border border-primary/45 bg-black/90 shadow-[0_24px_48px_rgba(3,0,9,0.34)] backdrop-blur-3xl"
             initial="hidden"
             animate="visible"
             exit="exit"
@@ -243,7 +253,7 @@ export default function LanguageSelector({
                   type="button"
                 >
                   <div className="flex items-center gap-3 z-10">
-                    <span className="text-lg drop-shadow-[0_0_5px_rgba(255,0,255,0.5)]">
+                    <span className="text-lg">
                       {code === "en" ? "🇺🇸" : "🇨🇳"}
                     </span>
                     <span className="font-mono">{name}</span>
@@ -259,8 +269,9 @@ export default function LanguageSelector({
                     </motion.div>
                   )}
 
-                  {/* Hover sweeping glow effect */}
-                  <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
+                  {/* 原来这里还有一层 group-hover:animate-shimmer 的扫光。`shimmer`
+                      从来没有对应的 @keyframes（产物里 0 次出现），所以那层只是一条不动
+                      的静态斜纹。下面这层才是真正生效的 hover 反馈。 */}
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 </button>
               ))}

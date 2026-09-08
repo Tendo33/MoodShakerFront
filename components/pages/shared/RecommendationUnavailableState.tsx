@@ -29,7 +29,7 @@ export function RecommendationUnavailableState({
         className="glass-panel relative w-full max-w-xl overflow-hidden border border-primary/35 px-8 py-14 text-center shadow-[0_20px_48px_rgba(3,0,9,0.32)]"
       >
         <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] pointer-events-none mix-blend-overlay" />
-        <h2 className="relative z-10 mb-3 text-2xl font-black font-heading uppercase tracking-widest text-primary drop-shadow-[0_0_10px_rgba(255,79,216,0.35)]">
+        <h2 className="relative z-10 mb-3 text-2xl font-black font-heading uppercase tracking-widest text-primary">
           {title}
         </h2>
         <p className="relative z-10 mx-auto mb-8 max-w-lg border-l-2 border-primary/60 bg-black/35 p-4 font-mono leading-relaxed text-foreground">

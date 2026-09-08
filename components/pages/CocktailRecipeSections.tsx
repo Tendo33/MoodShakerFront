@@ -3,21 +3,24 @@
 import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
-import type { Cocktail, Ingredient, Step, Tool } from "@/lib/cocktail-types";
+import type { Cocktail } from "@/lib/cocktail-types";
 import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
 
+/**
+ * Recipe sections for a cocktail.
+ *
+ * Took five localization callbacks as props, one per field, because every text
+ * value existed twice on the cocktail and the caller had to decide which half to
+ * read. The data layer resolves the locale now, so these fields are plain strings
+ * and the props are gone.
+ */
 interface CocktailRecipeSectionsProps {
   cocktail: Cocktail;
   isPageLoaded: boolean;
   textColorClass: string;
   cardClasses: string;
-  getLocalizedIngredientName: (ingredient: Ingredient) => string;
-  getLocalizedIngredientAmount: (ingredient: Ingredient) => string;
-  getLocalizedIngredientUnit: (ingredient: Ingredient) => string;
-  getLocalizedToolName: (tool: Tool) => string;
-  getLocalizedStepContent: (step: Step) => { description: string; tips?: string };
-  getToolAlternative?: (tool: Tool) => string | undefined;
-  toolAlternativeLabelKey?: string;
+  toolAlternativeLabelKey?: TranslationKey;
 }
 
 export function CocktailRecipeSections({
@@ -25,19 +28,9 @@ export function CocktailRecipeSections({
   isPageLoaded,
   textColorClass,
   cardClasses,
-  getLocalizedIngredientName,
-  getLocalizedIngredientAmount,
-  getLocalizedIngredientUnit,
-  getLocalizedToolName,
-  getLocalizedStepContent,
-  getToolAlternative,
   toolAlternativeLabelKey = "detail.alternative",
 }: CocktailRecipeSectionsProps) {
   const { t } = useLanguage();
-  const resolveToolAlternative = useCallback(
-    (tool: Tool) => getToolAlternative?.(tool) || tool.alternative,
-    [getToolAlternative],
-  );
   const [isIngredientsExpanded, setIsIngredientsExpanded] = useState(true);
   const [isToolsExpanded, setIsToolsExpanded] = useState(false);
   const [isStepsExpanded, setIsStepsExpanded] = useState(false);
@@ -78,7 +71,7 @@ export function CocktailRecipeSections({
       }}
     >
       <motion.h2
-        className="text-3xl md:text-4xl font-black text-center mb-12 font-heading tracking-widest uppercase gradient-text drop-shadow-[0_0_15px_rgba(255,0,255,0.4)]"
+        className="text-3xl md:text-4xl font-black text-center mb-12 font-heading tracking-widest uppercase gradient-text"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -103,7 +96,7 @@ export function CocktailRecipeSections({
             aria-controls={ingredientsSectionId}
             type="button"
           >
-            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-primary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
+            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-primary transition-colors`}>
               {t("recommendation.ingredients")}
             </h3>
             {isIngredientsExpanded ? (
@@ -129,13 +122,13 @@ export function CocktailRecipeSections({
                     transition={{ delay: index * 0.1 }}
                   >
                     <span className={`${textColorClass} font-medium relative`}>
-                      {getLocalizedIngredientName(ingredient)}
+                      {ingredient.name}
                     </span>
                     <div className="flex-1 border-b border-dotted border-white/20 relative -top-1 opacity-50 group-hover:opacity-100 group-hover:border-primary/50 transition-all"></div>
                     <span className="text-primary font-bold shrink-0">
-                      {getLocalizedIngredientAmount(ingredient)}
-                      {getLocalizedIngredientUnit(ingredient)
-                        ? ` ${getLocalizedIngredientUnit(ingredient)}`
+                      {ingredient.amount}
+                      {ingredient.unit
+                        ? ` ${ingredient.unit}`
                         : ""}
                     </span>
                   </motion.li>
@@ -160,7 +153,7 @@ export function CocktailRecipeSections({
             aria-controls={toolsSectionId}
             type="button"
           >
-            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-secondary transition-colors drop-shadow-[0_0_5px_currentColor]`}>
+            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-secondary transition-colors`}>
               {t("recommendation.tools")}
             </h3>
             {isToolsExpanded ? (
@@ -178,7 +171,7 @@ export function CocktailRecipeSections({
             >
               <ul className="space-y-4">
                 {cocktail.tools?.map((tool, index) => {
-                  const alternative = resolveToolAlternative(tool);
+                  const alternative = tool.alternative;
                   return (
                     <motion.li
                       key={index}
@@ -188,7 +181,7 @@ export function CocktailRecipeSections({
                       transition={{ delay: index * 0.1 }}
                     >
                       <span className={`${textColorClass} font-medium`}>
-                        {getLocalizedToolName(tool)}
+                        {tool.name}
                       </span>
                       {alternative && (
                         <p className="text-sm text-muted-foreground mt-1">
@@ -218,7 +211,7 @@ export function CocktailRecipeSections({
             aria-controls={stepsSectionId}
             type="button"
           >
-            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-accent transition-colors drop-shadow-[0_0_5px_currentColor]`}>
+            <h3 className={`text-xl font-bold font-heading uppercase tracking-widest ${textColorClass} group-hover:text-accent transition-colors`}>
               {t("recommendation.steps")}
             </h3>
             {isStepsExpanded ? (
@@ -236,25 +229,24 @@ export function CocktailRecipeSections({
             >
               <ol className="space-y-10">
                 {cocktail.steps?.map((step) => {
-                  const localizedStep = getLocalizedStepContent(step);
                   return (
                     <motion.li
-                      key={step.step_number}
+                      key={step.stepNumber}
                       className="flex gap-4"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: step.step_number * 0.1 }}
+                      transition={{ delay: step.stepNumber * 0.1 }}
                     >
-                      <div className="flex items-center justify-center w-8 h-8 rounded-none border-2 border-primary/50 bg-black/40 shadow-[0_0_10px_rgba(255,0,255,0.3)] font-bold text-primary font-mono shrink-0 z-10 text-sm">
-                        {step.step_number}
+                      <div className="flex items-center justify-center w-8 h-8 rounded-none border-2 border-primary/50 bg-black/40 font-bold text-primary font-mono shrink-0 z-10 text-sm">
+                        {step.stepNumber}
                       </div>
                       <div className="flex-1 pt-0.5">
                         <p className={`${textColorClass} text-lg leading-relaxed`}>
-                          {localizedStep.description}
+                          {step.description}
                         </p>
-                        {localizedStep.tips && (
+                        {step.tips && (
                           <motion.div
-                            className="mt-3 p-3 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden shadow-[0_0_15px_rgba(255,191,0,0.15)]"
+                            className="mt-3 p-3 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.3 }}
@@ -262,7 +254,7 @@ export function CocktailRecipeSections({
                             <div className="absolute inset-0 bg-linear-to-r from-amber-500/5 to-transparent pointer-events-none" />
                             <p className="text-amber-200/90 text-xs flex items-center gap-1.5 relative z-10">
                               <Lightbulb className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
-                              <span>{localizedStep.tips}</span>
+                              <span>{step.tips}</span>
                             </p>
                           </motion.div>
                         )}
@@ -279,14 +271,14 @@ export function CocktailRecipeSections({
       <div className="hidden lg:grid lg:grid-cols-12 gap-10 items-start">
         <div className="lg:col-span-4 space-y-8 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin">
           <motion.div
-            className={`rounded-none overflow-hidden border-2 border-primary shadow-[0_0_16px_rgba(255,0,255,0.15)] ${cardClasses}`}
+            className={`rounded-none overflow-hidden border-2 border-primary ${cardClasses}`}
             variants={{
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
             }}
           >
             <div className="p-5 bg-primary/10 border-b-2 border-primary">
-              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass} drop-shadow-[0_0_8px_rgba(255,0,255,0.6)]`}>
+              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass}`}>
                 {t("recommendation.ingredients")}
               </h3>
             </div>
@@ -301,13 +293,13 @@ export function CocktailRecipeSections({
                     transition={{ delay: index * 0.1 }}
                   >
                     <span className={`${textColorClass} font-medium`}>
-                      {getLocalizedIngredientName(ingredient)}
+                      {ingredient.name}
                     </span>
                     <div className="flex-1 border-b border-dotted border-white/20 relative -top-1.5 opacity-50 group-hover:opacity-100 group-hover:border-primary/50 transition-all"></div>
                     <span className="text-primary font-bold shrink-0">
-                      {getLocalizedIngredientAmount(ingredient)}
-                      {getLocalizedIngredientUnit(ingredient)
-                        ? ` ${getLocalizedIngredientUnit(ingredient)}`
+                      {ingredient.amount}
+                      {ingredient.unit
+                        ? ` ${ingredient.unit}`
                         : ""}
                     </span>
                   </motion.li>
@@ -317,21 +309,21 @@ export function CocktailRecipeSections({
           </motion.div>
 
           <motion.div
-            className={`rounded-none overflow-hidden border-2 border-secondary shadow-[0_0_16px_rgba(0,255,255,0.15)] ${cardClasses}`}
+            className={`rounded-none overflow-hidden border-2 border-secondary ${cardClasses}`}
             variants={{
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.1 } },
             }}
           >
             <div className="p-5 bg-secondary/10 border-b-2 border-secondary">
-              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass} drop-shadow-[0_0_8px_rgba(0,255,255,0.6)]`}>
+              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass}`}>
                 {t("recommendation.tools")}
               </h3>
             </div>
             <div className="p-6 bg-black/20">
               <ul className="space-y-4">
                 {cocktail.tools?.map((tool, index) => {
-                  const alternative = resolveToolAlternative(tool);
+                  const alternative = tool.alternative;
                   return (
                     <motion.li
                       key={index}
@@ -341,7 +333,7 @@ export function CocktailRecipeSections({
                       transition={{ delay: index * 0.1 }}
                     >
                       <span className={`${textColorClass} font-medium text-lg`}>
-                        {getLocalizedToolName(tool)}
+                        {tool.name}
                       </span>
                       {alternative && (
                         <p className="text-sm text-muted-foreground mt-1">
@@ -358,40 +350,39 @@ export function CocktailRecipeSections({
 
         <div className="lg:col-span-8">
           <motion.div
-            className={`rounded-none overflow-hidden border-2 border-accent shadow-[0_0_22px_rgba(255,153,0,0.15)] ${cardClasses} h-full`}
+            className={`rounded-none overflow-hidden border-2 border-accent ${cardClasses} h-full`}
             variants={{
               hidden: { opacity: 0, x: 20 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
             }}
           >
             <div className="p-5 bg-accent/10 border-b-2 border-accent">
-              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass} drop-shadow-[0_0_8px_rgba(255,153,0,0.6)]`}>
+              <h3 className={`text-2xl font-black font-heading uppercase tracking-widest ${textColorClass}`}>
                 {t("recommendation.steps")}
               </h3>
             </div>
             <div className="p-8 bg-black/10">
               <ol className="space-y-12">
                 {cocktail.steps?.map((step) => {
-                  const localizedStep = getLocalizedStepContent(step);
                   return (
                     <motion.li
-                      key={step.step_number}
+                      key={step.stepNumber}
                       className="relative pl-2 group"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: step.step_number * 0.1 }}
+                      transition={{ delay: step.stepNumber * 0.1 }}
                     >
                       <div className="flex gap-6">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-none border-2 border-primary/50 bg-black/40 shadow-[0_0_15px_rgba(255,0,255,0.4)] group-hover:border-primary group-hover:shadow-[0_0_25px_hsl(var(--primary)/0.6)] font-mono transition-all duration-300 font-bold text-primary shrink-0 z-10">
-                          {step.step_number}
+                        <div className="flex items-center justify-center w-10 h-10 rounded-none border-2 border-primary/50 bg-black/40 group-hover:border-primary font-mono transition-all duration-300 font-bold text-primary shrink-0 z-10">
+                          {step.stepNumber}
                         </div>
                         <div className="flex-1 pt-1">
                           <p className={`${textColorClass} text-xl leading-relaxed`}>
-                            {localizedStep.description}
+                            {step.description}
                           </p>
-                          {localizedStep.tips && (
+                          {step.tips && (
                             <motion.div
-                              className="mt-4 p-4 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden shadow-[0_0_16px_rgba(255,191,0,0.15)]"
+                              className="mt-4 p-4 bg-amber-500/10 border-2 border-amber-500/40 rounded-none relative overflow-hidden"
                               initial={{ opacity: 0, y: 5 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.3 }}
@@ -399,14 +390,14 @@ export function CocktailRecipeSections({
                               <div className="absolute inset-0 bg-linear-to-r from-amber-500/5 to-transparent pointer-events-none" />
                               <p className="text-amber-200/90 text-sm flex items-start gap-2 relative z-10">
                                 <Lightbulb className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
-                                <span>{localizedStep.tips}</span>
+                                <span>{step.tips}</span>
                               </p>
                             </motion.div>
                           )}
                         </div>
                       </div>
 
-                      {step.step_number < (cocktail.steps?.length || 0) && (
+                      {step.stepNumber < (cocktail.steps?.length || 0) && (
                         <div className="absolute left-[1.7rem] top-14 -bottom-8 w-px bg-linear-to-b from-primary/50 to-transparent"></div>
                       )}
                     </motion.li>

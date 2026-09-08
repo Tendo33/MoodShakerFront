@@ -192,8 +192,14 @@ Open [http://localhost:3000](http://localhost:3000). Requests to `/` are redirec
 | `IMAGE_API_URL` | Yes for image generation | Image generation endpoint |
 | `IMAGE_API_KEY` | Yes for image generation | Image generation API key |
 | `IMAGE_MODEL` | No | Image model name |
-| `IMAGE_FETCH_HOST_ALLOWLIST` | Recommended | Comma-separated host allowlist for server-side image fetch and optimization |
+| `IMAGE_FETCH_HOST_ALLOWLIST` | Optional | Extra comma-separated hosts the server may download generated images from. Known provider CDN hosts are built in; set this when switching providers |
+| `R2_ACCOUNT_ID` | Yes for image generation | Cloudflare account id that owns the R2 bucket |
+| `R2_ACCESS_KEY_ID` | Yes for image generation | R2 API token id. Create under **R2 → Manage R2 API Tokens** with *Object Read & Write* |
+| `R2_SECRET_ACCESS_KEY` | Yes for image generation | SHA-256 of the R2 API token value, not the token itself |
+| `R2_BUCKET` | Yes for image generation | Bucket name, e.g. `moodshaker-images` |
+| `R2_PUBLIC_BASE_URL` | Yes for image generation | Public base URL for the bucket. Must have CORS allowing the site origin, otherwise share cards render without the cocktail image |
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `TRUSTED_PROXY_HOPS` | Recommended | Number of trusted reverse proxies. `0` for a direct connection, `1` behind Caddy/Nginx. Used to read the real client IP from `x-forwarded-for` so a forged first hop cannot bypass rate limiting |
 | `HOST_PORT` | Optional | Exposed web port for Docker Compose |
 | `POSTGRES_USER` | Optional | Database username for Docker Compose |
 | `POSTGRES_PASSWORD` | Optional | Database password for Docker Compose |
@@ -213,16 +219,18 @@ Open [http://localhost:3000](http://localhost:3000). Requests to `/` are redirec
 | `pnpm prisma:generate` | Generate Prisma client only |
 | `pnpm prisma:migrate` | Apply Prisma migrations |
 | `pnpm prisma:seed` | Seed cocktail data |
-| `pnpm prisma:backfill-thumbnails` | Backfill the `thumbnail` field from stored images |
+| `pnpm prisma:backfill-cocktail-content` | Obsolete. The legacy columns it reads were dropped by `20260906000100_drop_legacy_cocktail_columns`, so this now fails with `column "name" does not exist`. Kept because that migration cites it as its precondition. |
 
 ## API Endpoints
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | `POST` | `/api/cocktail` | Generate a cocktail recommendation from questionnaire input |
-| `GET` | `/api/cocktail/:id` | Fetch a public cocktail detail record by id |
+| `GET` | `/api/cocktail/:slug?lang=cn\|en` | Fetch a public cocktail detail record by slug |
 | `POST` | `/api/image` | Generate or refresh a recommendation image when the caller has edit access |
 | `POST` | `/api/recommendation/:id` | Retrieve a private recommendation by id using an `editToken` in the JSON body |
+| `POST` | `/api/recommendation/:id/publish` | Publish a recommendation to the public gallery (`editToken` in the body) |
+| `DELETE` | `/api/recommendation/:id/publish` | Withdraw a published recommendation, keeping the recommendation itself |
 
 ### Security and behavior notes
 

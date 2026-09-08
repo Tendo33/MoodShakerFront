@@ -24,6 +24,13 @@ interface CocktailFormContextType {
   userFeedback: string;
   baseSpirits: string[];
   isDataLoading: boolean;
+  /**
+   * 存储读取是否已有结论（成功或失败），而非「正在读取」。
+   *
+   * `isDataLoading` 初始是 false，因为加载 effect 还没跑。想「等数据到位再渲染」
+   * 不能用它 —— 首帧它就是 false，门禁直接放行。这个标志覆盖那段空窗。
+   */
+  isHydrated: boolean;
   loadSavedData: () => void;
   saveAnswer: (questionId: string, optionId: string) => Promise<void>;
   removeAnswer: (questionId: string) => Promise<void>;
@@ -51,6 +58,7 @@ export const CocktailFormProvider = ({
     data: savedData,
     isLoading: isDataLoading,
     errors: dataErrors,
+    phase: dataPhase,
     updateItem,
     reload: reloadData,
   } = useBatchAsyncState<{
@@ -86,34 +94,42 @@ export const CocktailFormProvider = ({
     });
   }, [reloadData]);
 
+  // 用更新函数而不是展开当前的 answers。
+  //
+  // 之前是 `updateItem("answers", { ...answers, [id]: value })`，answers 由闭包
+  // 捕获，于是同一次渲染内的两次调用读到同一份快照，后一次覆盖前一次。实测并发
+  // 保存两个答案只留下一个。
+  //
+  // 顺带把 answers 从依赖数组里去掉，回调本身也就稳定了。
   const saveAnswer = useCallback(
     async (questionId: string, optionId: string) => {
       try {
-        await updateItem("answers", {
-          ...answers,
+        await updateItem("answers", (prev) => ({
+          ...(prev ?? {}),
           [questionId]: optionId,
-        });
+        }));
       } catch {
         cocktailLogger.error("Failed to save answer");
         throw new Error(t("error.saveAnswers"));
       }
     },
-    [answers, t, updateItem],
+    [t, updateItem],
   );
 
   const removeAnswer = useCallback(
     async (questionId: string) => {
-      const nextAnswers = { ...answers };
-      delete nextAnswers[questionId];
-
       try {
-        await updateItem("answers", nextAnswers);
+        await updateItem("answers", (prev) => {
+          const nextAnswers = { ...(prev ?? {}) };
+          delete nextAnswers[questionId];
+          return nextAnswers;
+        });
       } catch {
         cocktailLogger.error("Failed to remove answer");
         throw new Error(t("error.saveAnswers"));
       }
     },
-    [answers, t, updateItem],
+    [t, updateItem],
   );
 
   const saveFeedback = useCallback(
@@ -139,19 +155,23 @@ export const CocktailFormProvider = ({
     [updateItem],
   );
 
+  // 同样改成更新函数。这个比 saveAnswer 更容易被真实触发：基酒是多选标签，
+  // 用户快速连点两个不同标签就会产生两次并发切换，闭包捕获的旧数组会让后一次
+  // 覆盖前一次 —— 表现为点了两个只选上一个。
   const toggleBaseSpirit = useCallback(
     async (spiritId: string) => {
-      const nextSpirits = baseSpirits.includes(spiritId)
-        ? baseSpirits.filter((id) => id !== spiritId)
-        : [...baseSpirits, spiritId];
-
       try {
-        await updateItem("baseSpirits", nextSpirits);
+        await updateItem("baseSpirits", (prev) => {
+          const current = prev ?? [];
+          return current.includes(spiritId)
+            ? current.filter((id) => id !== spiritId)
+            : [...current, spiritId];
+        });
       } catch {
         cocktailLogger.error("Failed to toggle base spirit");
       }
     },
-    [baseSpirits, updateItem],
+    [updateItem],
   );
 
   const isQuestionAnswered = useCallback(
@@ -172,12 +192,16 @@ export const CocktailFormProvider = ({
     }
   }, [reloadData]);
 
+  // 读存储是否已有结论。error 也算，否则读失败会把页面永久卡在加载态。
+  const isHydrated = dataPhase === "success" || dataPhase === "error";
+
   const contextValue = useMemo(
     () => ({
       answers,
       userFeedback,
       baseSpirits,
       isDataLoading,
+      isHydrated,
       loadSavedData,
       saveAnswer,
       removeAnswer,
@@ -192,6 +216,7 @@ export const CocktailFormProvider = ({
       userFeedback,
       baseSpirits,
       isDataLoading,
+      isHydrated,
       loadSavedData,
       saveAnswer,
       removeAnswer,

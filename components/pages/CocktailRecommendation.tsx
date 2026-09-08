@@ -8,16 +8,16 @@ import { ArrowLeft, RefreshCcw } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCocktailResult } from "@/context/CocktailResultContext";
 import { Button } from "@/components/ui/core";
-import type { Cocktail, Tool } from "@/lib/cocktail-types";
+import type { Cocktail } from "@/lib/cocktail-types";
 import type { RecommendationAccessPayload } from "@/lib/recommendation-access";
 import { CocktailImage } from "@/components/CocktailImage";
 import { cocktailLogger, imageLogger } from "@/utils/logger";
 import SmartLoadingSystem from "@/components/animations/SmartLoadingSystem";
-import { useLocalizedCocktail } from "@/hooks/useLocalizedCocktail";
 import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSections";
 import { CocktailHero } from "@/components/pages/shared/CocktailHero";
 import { CocktailActions } from "@/components/pages/shared/CocktailActions";
 import { RecommendationShareAction } from "@/components/pages/shared/RecommendationShareAction";
+import RecommendationPublishAction from "@/components/pages/shared/RecommendationPublishAction";
 import { RecommendationUnavailableState } from "@/components/pages/shared/RecommendationUnavailableState";
 
 interface RecommendationAccessResponse {
@@ -150,18 +150,10 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const textColorClass = "text-foreground font-mono";
   const cardClasses =
-    "glass-panel text-foreground rounded-none border-2 transition-all duration-300 shadow-[0_0_16px_rgba(255,0,255,0.15)] hover:shadow-[0_0_22px_rgba(0,255,255,0.3)]";
+    "glass-panel text-foreground rounded-none border-2 transition-all duration-300";
   const gradientText =
-    "font-black font-heading uppercase tracking-[0.14em] drop-shadow-[0_0_12px_rgba(255,79,216,0.24)]";
+    "font-black font-heading uppercase tracking-[0.14em]";
 
-  const {
-    getLocalizedContent,
-    getLocalizedIngredientName,
-    getLocalizedIngredientAmount,
-    getLocalizedIngredientUnit,
-    getLocalizedToolName,
-    getLocalizedStepContent,
-  } = useLocalizedCocktail(cocktail);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -208,13 +200,6 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     } finally {
       setIsRegenerating(false);
     }
-  };
-
-  const getRecommendationToolAlternative = (tool: Tool): string | undefined => {
-    if (language === "en" && tool.english_alternative) {
-      return tool.english_alternative;
-    }
-    return tool.alternative;
   };
 
   if (isBlockingLoading) {
@@ -280,7 +265,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
             cocktail={cocktail}
             imageUrl={
               scopedImageData ||
-              cocktail.image ||
+              cocktail.imageUrl ||
               `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktail.name)}`
             }
             saveLabel={t("recommendation.saveImage")}
@@ -294,12 +279,11 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           isPageLoaded={isPageLoaded}
           t={t}
           gradientTextClass={gradientText}
-          getLocalizedContent={getLocalizedContent}
           imageContent={
             <div className="rounded-none overflow-hidden w-full h-full relative border-[3px] border-primary/30">
               <CocktailImage
                 cocktailId={canEditCurrentRecommendation ? undefined : String(cocktail.id || "")}
-                imageData={scopedImageData || cocktail.image || null}
+                imageData={scopedImageData || cocktail.imageUrl || null}
                 cocktailName={cocktail.name}
                 priority
               />
@@ -359,14 +343,30 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           isPageLoaded={isPageLoaded}
           textColorClass={textColorClass}
           cardClasses={cardClasses}
-          getLocalizedIngredientName={getLocalizedIngredientName}
-          getLocalizedIngredientAmount={getLocalizedIngredientAmount}
-          getLocalizedIngredientUnit={getLocalizedIngredientUnit}
-          getLocalizedToolName={getLocalizedToolName}
-          getLocalizedStepContent={getLocalizedStepContent}
-          getToolAlternative={getRecommendationToolAlternative}
           toolAlternativeLabelKey="recommendation.alternative"
         />
+
+        {/*
+          Only the holder of the edit token can publish, so this is gated on the
+          same condition as regenerating. Someone opening a shared link sees the
+          drink but no publish control — they do not own it.
+        */}
+        {canEditCurrentRecommendation &&
+        activeRecommendationId &&
+        activeEditToken ? (
+          <div className="mt-8 flex justify-center">
+            <RecommendationPublishAction
+              recommendationId={activeRecommendationId}
+              editToken={activeEditToken}
+              initialIsPublished={
+                fetchedRecommendation?.data?.meta?.isPublished ?? false
+              }
+              initialPublishedSlug={
+                fetchedRecommendation?.data?.meta?.publishedSlug ?? null
+              }
+            />
+          </div>
+        ) : null}
 
         <CocktailActions
           t={t}

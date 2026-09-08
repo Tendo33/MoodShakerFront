@@ -4,18 +4,36 @@ import {
   buildRecommendationAccessPayload,
   parseRecommendationAccessRequest,
 } from "@/lib/recommendation-access";
-import { getRecommendationSessionById } from "@/lib/recommendation-sessions";
+import {
+  getPublishedCocktailSlug,
+  getRecommendationSessionById,
+} from "@/lib/recommendation-sessions";
+import { createRequestId, isSameOrigin } from "@/lib/http/request-context";
 import { cocktailLogger } from "@/utils/logger";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const requestId = createRequestId();
+  const logger = cocktailLogger.forRequest(requestId);
+
   try {
+    if (!isSameOrigin(request)) {
+      return apiError(
+        "FORBIDDEN_ORIGIN",
+        "Cross-site requests are not allowed.",
+        403,
+        { requestId },
+      );
+    }
+
     const { id } = await params;
 
     if (!id) {
-      return apiError("INVALID_ID", "Missing recommendation id.", 400);
+      return apiError("INVALID_ID", "Missing recommendation id.", 400, {
+        requestId,
+      });
     }
 
     const parsedRequest = await parseRecommendationAccessRequest(request);
@@ -31,12 +49,25 @@ export async function POST(
         "FORBIDDEN",
         "You do not have access to this recommendation.",
         403,
+        { requestId },
       );
     }
 
-    return apiSuccess(buildRecommendationAccessPayload(recommendation), 200);
+    // Only read when the recommendation claims to be published, so the common
+    // private case still costs a single query.
+    const publishedSlug = await getPublishedCocktailSlug(
+      recommendation.publishedCocktailId,
+    );
+
+    return apiSuccess(
+      buildRecommendationAccessPayload(recommendation, publishedSlug),
+      200,
+      { requestId },
+    );
   } catch (error) {
-    cocktailLogger.error("Failed to load recommendation session", error);
-    return apiError("LOAD_FAILED", "Failed to load recommendation.", 500);
+    logger.error("Failed to load recommendation session", error);
+    return apiError("LOAD_FAILED", "Failed to load recommendation.", 500, {
+      requestId,
+    });
   }
 }

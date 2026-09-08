@@ -110,18 +110,73 @@ test("validateCocktailRequest rejects overly long special requests", () => {
   }
 });
 
-test("validateImageRequest rejects overly long prompt", () => {
+test("validateImageRequest accepts an id and token only", () => {
+  const result = validateImageRequest({
+    recommendationId: "  rec_123  ",
+    editToken: "  secret-token  ",
+  });
+
+  assert.equal(result.success, true);
+
+  if (result.success) {
+    assert.deepEqual(result.data, {
+      recommendationId: "rec_123",
+      editToken: "secret-token",
+    });
+  }
+});
+
+test("validateImageRequest rejects a caller-supplied prompt", () => {
+  // The prompt is derived server-side. Accepting one would reopen the image
+  // generation proxy that let any holder of an edit token render arbitrary
+  // images on the project's provider key.
   const result = validateImageRequest({
     recommendationId: "rec_123",
     editToken: "secret-token",
-    prompt: "x".repeat(1601),
+    prompt: "a photo of anything at all",
   });
 
   assert.equal(result.success, false);
 
   if (!result.success) {
-    assert.equal(result.message, "Prompt must be 1600 characters or fewer.");
+    assert.equal(
+      result.message,
+      "Prompt is not accepted; it is derived server-side.",
+    );
   }
+});
+
+test("validateImageRequest rejects an empty prompt key", () => {
+  // Present-but-empty must fail too, otherwise a client could probe for which
+  // shapes the endpoint still tolerates.
+  const result = validateImageRequest({
+    recommendationId: "rec_123",
+    editToken: "secret-token",
+    prompt: "",
+  });
+
+  assert.equal(result.success, false);
+});
+
+test("validateImageRequest rejects a missing recommendation id", () => {
+  const result = validateImageRequest({ editToken: "secret-token" });
+
+  assert.equal(result.success, false);
+});
+
+test("validateImageRequest rejects an overly long recommendation id", () => {
+  const result = validateImageRequest({
+    recommendationId: "x".repeat(65),
+    editToken: "secret-token",
+  });
+
+  assert.equal(result.success, false);
+});
+
+test("validateImageRequest rejects a missing edit token", () => {
+  const result = validateImageRequest({ recommendationId: "rec_123" });
+
+  assert.equal(result.success, false);
 });
 
 test("validateRecommendationAccessRequest rejects missing edit token", () => {

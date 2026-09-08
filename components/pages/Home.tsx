@@ -204,18 +204,17 @@ const Home = React.memo(function Home() {
   return (
     <div className="bg-background text-foreground">
       <section className="relative hero-height flex items-center overflow-hidden section-spacing pt-16 md:pt-20 lg:pt-24">
+        {/* 两个光斑而非三个，且 /18 降到 /10。原来洋红、青、橙同时飘，是首页
+            「光污染」观感最主要的来源。橙色那个按方向去掉 —— 洋红作唯一强调色，
+            青只留在边框和次要文字上。留两个是为了保住霓虹夜店的氛围底子。 */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
-            className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/18 blur-[72px]"
+            className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/10 blur-[72px]"
             animate={floatAnimationTarget}
           />
           <motion.div
-            className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/18 blur-[72px]"
+            className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/10 blur-[72px]"
             animate={delayedFloatAnimation(1)}
-          />
-          <motion.div
-            className="absolute top-2/3 right-1/3 h-56 w-56 rounded-full bg-accent/12 blur-[60px]"
-            animate={delayedFloatAnimation(2)}
           />
         </div>
 
@@ -228,7 +227,7 @@ const Home = React.memo(function Home() {
               className="content-spacing"
             >
               <motion.div variants={slideUpVariants} className="mb-4">
-                <div className="glass-subtle inline-flex items-center gap-2 border border-primary/35 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.22em] text-primary shadow-[0_14px_26px_rgba(3,0,9,0.18)]">
+                <div className="glass-subtle inline-flex items-center gap-2 border border-primary/35 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-primary shadow-[0_14px_26px_rgba(3,0,9,0.18)]">
                   <Sparkles className="h-4 w-4 text-secondary animate-neon-pulse" />
                   {language === "en"
                     ? "AI-Powered Cocktail Recommendations"
@@ -240,7 +239,7 @@ const Home = React.memo(function Home() {
                 className="mb-6 max-w-3xl font-heading text-5xl font-black leading-[0.96] tracking-[0.08em] text-shadow md:text-7xl lg:text-8xl lang-en:text-5xl lang-en:md:text-7xl"
                 variants={slideUpVariants}
               >
-                <GradientText as="span" className="block leading-tight drop-shadow-[0_0_16px_rgba(255,79,216,0.28)]">
+                <GradientText as="span" className="block leading-tight">
                   {t("home.title")}
                 </GradientText>
               </motion.h1>
@@ -302,7 +301,7 @@ const Home = React.memo(function Home() {
                   <div className="mt-6 text-center relative z-10">
                     <Link
                       href={newQuestionPath}
-                      className="text-sm text-primary font-mono tracking-widest hover:text-secondary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor] focus-ring"
+                      className="text-sm text-primary font-mono tracking-widest hover:text-secondary hover:underline transition-colors uppercase focus-ring"
                     >
                       {language === "en"
                         ? "Start a new recommendation"
@@ -357,7 +356,7 @@ const Home = React.memo(function Home() {
                   <div className="mt-6 text-center relative z-10">
                     <Link
                       href={newQuestionPath}
-                      className="text-sm text-secondary font-mono tracking-widest hover:text-primary hover:underline transition-colors uppercase drop-shadow-[0_0_5px_currentColor] focus-ring"
+                      className="text-sm text-secondary font-mono tracking-widest hover:text-primary hover:underline transition-colors uppercase focus-ring"
                     >
                       {language === "en"
                         ? "Start a new session instead"
@@ -376,7 +375,7 @@ const Home = React.memo(function Home() {
                     icon={<ArrowRight className="h-5 w-5" />}
                     href={questionsPath}
                     variant="primary"
-                    className="shadow-[0_0_16px_var(--color-secondary)] uppercase"
+                    className=" uppercase"
                   >
                     <span className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5 animate-neon-pulse" /> 
@@ -433,7 +432,7 @@ const Home = React.memo(function Home() {
                               <div className="h-3 w-3 rounded-full bg-primary" />
                               <div className="h-3 w-3 rounded-full bg-secondary" />
                               <div className="h-3 w-3 rounded-full bg-accent" />
-                              <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.24em] text-secondary/90">IMAGE_DATA_RENDER.EXE</span>
+                              <span className="ml-2 font-mono text-xs uppercase tracking-[0.24em] text-secondary/90">IMAGE_DATA_RENDER.EXE</span>
                             </div>
                             
                             <SafeImage
@@ -454,7 +453,7 @@ const Home = React.memo(function Home() {
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.3, duration: 0.5 }}
                             >
-                              <h3 className="mb-1 text-3xl font-heading font-black uppercase tracking-[0.16em] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]">
+                              <h3 className="mb-1 text-3xl font-heading font-black uppercase tracking-[0.16em] text-white">
                                 {cocktail.name}
                               </h3>
                               <p className="mb-4 text-xs font-mono uppercase tracking-[0.2em] text-secondary/90">
@@ -483,15 +482,15 @@ const Home = React.memo(function Home() {
               </AnimatePresence>
 
               <div className="absolute -bottom-10 left-1/2 flex -translate-x-1/2 space-x-3">
+                {/* 按钮撑到 24x24 满足 WCAG 2.5.8 的最小触摸目标，视觉圆点仍是 10px
+                    的内层 span —— 观感不变，可点区域变成原来的 5 倍多。
+                    非激活态原为 bg-muted（rgba(219,209,239,0.4)），实测对比 2.90:1，
+                    低于 WCAG 1.4.11 对非文本组件的 3:1；改用 foreground/50 得 4.73:1。 */}
                 {featuredCocktails.map((_, index) => (
                   <motion.button
                     key={index}
                     onClick={() => setCurrentCocktailIndex(index)}
-                    className={`h-2.5 w-2.5 transition duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
-                      index === currentCocktailIndex
-                        ? "scale-110 bg-primary shadow-[0_0_15px_var(--color-primary)] ring-2 ring-secondary/50"
-                        : "bg-muted hover:bg-secondary hover:shadow-[0_0_10px_var(--color-secondary)]"
-                    }`}
+                    className="focus-ring group flex h-6 w-6 items-center justify-center"
                     whileHover={{ scale: 1.2, rotate: 45 }}
                     whileTap={{ scale: 0.9 }}
                     animate={{
@@ -500,7 +499,18 @@ const Home = React.memo(function Home() {
                     }}
                     transition={{ duration: 0.4, ease: "linear" }}
                     aria-label={`View cocktail ${index + 1}`}
-                  />
+                  >
+                    {/* 内层不再带 scale-110。这两个 scale 原本在同一元素上，Framer 写的
+                        inline transform 会覆盖 class，实际只有 1.2；拆成内外两层后就变成
+                        1.2 × 1.1 = 1.32 的叠乘。放大交给外层 Framer 一处管。 */}
+                    <span
+                      className={`h-2.5 w-2.5 transition duration-500 ${
+                        index === currentCocktailIndex
+                          ? "bg-primary ring-2 ring-secondary/50"
+                          : "bg-foreground/50 group-hover:bg-secondary"
+                      }`}
+                    />
+                  </motion.button>
                 ))}
               </div>
             </motion.div>

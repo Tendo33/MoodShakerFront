@@ -58,6 +58,23 @@ export function useAsyncState<T>(
   const loadingRef = useRef(false);
   const mountedRef = useRef(true);
 
+  // defaultValue / onSuccess / onError 存进 ref，不进 loadData 的依赖数组。
+  //
+  // 这三个参数在调用处几乎都是内联字面量或内联箭头函数，每次渲染都是新引用。
+  // 之前 loadData 依赖它们，于是每渲染一次 loadData 就重建一次，依赖 loadData
+  // 的初始化 effect 跟着重跑，setState 再触发渲染 —— 闭环。
+  //
+  // 实测 Home.tsx 的调用形态（内联 defaultValue: {}）：1.5 秒内渲染 475 次，
+  // 换成稳定引用只有 3 次。首页一直在无界重渲染循环里，只是被存储层的批处理
+  // 延迟限了速，所以没表现成页面卡死。
+  // 写入放在 effect 里，不在渲染期间：并发渲染下渲染可能被丢弃或重放，渲染期间
+  // 改 ref 的时机没有保证。useRef 的初值就是首次渲染的这三个值，所以挂载时
+  // loadData 读到的已经是对的；之后由这个 effect 保持同步。
+  const optionsRef = useRef({ defaultValue, onSuccess, onError });
+  useEffect(() => {
+    optionsRef.current = { defaultValue, onSuccess, onError };
+  }, [defaultValue, onSuccess, onError]);
+
   // 清理函数
   useEffect(() => {
     return () => {
@@ -81,16 +98,23 @@ export function useAsyncState<T>(
       setPhase("loading");
 
       // 异步获取数据
-      const result = await asyncStorage.getItem<T>(storageKey, defaultValue);
+      const result = await asyncStorage.getItem<T>(
+        storageKey,
+        optionsRef.current.defaultValue,
+      );
 
       if (!mountedRef.current) return;
 
       setData(result);
       setPhase("success");
 
-      // 成功回调
-      if (result && onSuccess) {
-        onSuccess(result);
+      // 成功回调。
+      //
+      // 判 null 而不是判真值：之前写的是 `if (result && onSuccess)`，于是存储的
+      // false、0、"" 都不会触发回调 —— 一个存着 false 的开关状态，恢复时看起来
+      // 和"没有存过"完全一样。
+      if (result !== null && optionsRef.current.onSuccess) {
+        optionsRef.current.onSuccess(result);
       }
 
       appLogger.debug("Async state loaded successfully");
@@ -103,8 +127,8 @@ export function useAsyncState<T>(
       setPhase("error");
 
       // 错误回调
-      if (onError) {
-        onError(error);
+      if (optionsRef.current.onError) {
+        optionsRef.current.onError(error);
       }
 
       appLogger.error("Async state loading failed");
@@ -114,7 +138,9 @@ export function useAsyncState<T>(
         loadingRef.current = false;
       }
     }
-  }, [storageKey, defaultValue, onSuccess, onError]);
+    // 只依赖 storageKey。其余三个参数经 optionsRef 读取，因此换了 key 才需要重建
+    // 这个回调，而不是每次渲染都重建。
+  }, [storageKey]);
 
   /**
    * 更新数据函数
@@ -186,7 +212,10 @@ export function useBatchAsyncState<T extends Record<string, unknown>>(
   errors: Record<string, Error>;
   phase: LoadingPhase;
   reload: () => Promise<void>;
-  updateItem: <K extends keyof T>(key: K, value: T[K]) => Promise<void>;
+  updateItem: <K extends keyof T>(
+    key: K,
+    valueOrUpdater: T[K] | ((prev: T[K] | undefined) => T[K]),
+  ) => Promise<void>;
 } {
   const [data, setData] = useState<Partial<T>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -196,6 +225,12 @@ export function useBatchAsyncState<T extends Record<string, unknown>>(
   const loadingRef = useRef(false);
   const mountedRef = useRef(true);
   const configsRef = useRef(configs);
+
+  // 与 data 同步的镜像，供 updateItem 的函数式更新读取最新值。
+  //
+  // state 本身不能用：同一次渲染内的两次 updateItem 拿到的是同一份 data 快照，
+  // 后一次会覆盖前一次。ref 是同步更新的，所以第二次能看到第一次的结果。
+  const dataRef = useRef<Partial<T>>({});
 
   // 更新配置引用
   useEffect(() => {
@@ -242,6 +277,7 @@ export function useBatchAsyncState<T extends Record<string, unknown>>(
         newData[config.key] = value;
       });
 
+      dataRef.current = newData;
       setData(newData);
       setPhase("success");
 
@@ -267,14 +303,33 @@ export function useBatchAsyncState<T extends Record<string, unknown>>(
    * 更新单个项目
    */
   const updateItem = useCallback(
-    async <K extends keyof T>(key: K, value: T[K]): Promise<void> => {
+    async <K extends keyof T>(
+      key: K,
+      // 也接受更新函数。只能传具体值时，调用方必须先从 state 里读旧值再合并，
+      // 而同一次渲染内的两次调用读到的是同一份快照 —— 后一次覆盖前一次。
+      //
+      // 实测：并发保存两个不同问题的答案，只有后一个留下。目前问卷 UI 有
+      // selectedOption 守卫把调用串行化了，所以这条路径暂时走不到，但这是
+      // context API 的性质，不该依赖调用方恰好串行。
+      valueOrUpdater: T[K] | ((prev: T[K] | undefined) => T[K]),
+    ): Promise<void> => {
       const config = configsRef.current.find((c) => c.key === key);
       if (!config) {
         throw new Error(`未找到配置项: ${String(key)}`);
       }
 
+      // 从 ref 读旧值，不从 state 读：ref 是同步更新的，所以同一次渲染内的
+      // 第二次调用能看到第一次的结果。
+      const value =
+        typeof valueOrUpdater === "function"
+          ? (valueOrUpdater as (prev: T[K] | undefined) => T[K])(
+              dataRef.current[key],
+            )
+          : valueOrUpdater;
+
       try {
         // 立即更新本地状态
+        dataRef.current = { ...dataRef.current, [key]: value };
         setData((prev) => ({ ...prev, [key]: value }));
 
         // 异步保存

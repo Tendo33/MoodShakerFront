@@ -4,12 +4,13 @@ import { useState, useEffect, memo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
 
 interface WaitingAnimationProps {
   isShowing?: boolean;
   message?: string;
-  messageKey?: string;
-  subtitleKey?: string;
+  messageKey?: TranslationKey;
+  subtitleKey?: TranslationKey;
   progress?: number;
 }
 
@@ -131,7 +132,7 @@ const WaitingAnimation = memo(function WaitingAnimation({
                 exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
                 transition={{ duration: 0.5 }}
               >
-                <h2 className="text-4xl md:text-5xl font-black text-primary font-heading tracking-widest uppercase pb-2 leading-relaxed px-4 drop-shadow-[0_0_15px_rgba(255,0,255,0.6)]">
+                <h2 className="text-4xl md:text-5xl font-black text-primary font-heading tracking-widest uppercase pb-2 leading-relaxed px-4">
                   {displayMessage}
                 </h2>
                 <motion.p
@@ -161,8 +162,9 @@ const WaitingAnimation = memo(function WaitingAnimation({
           </div>
 
           <div className="w-full h-3 rounded-none overflow-hidden relative bg-black/50 border-2 border-primary/40 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] max-w-md mx-auto">
+            {/* 单色，与问卷页进度条保持一致：进度条只传达「到哪一步」。 */}
             <motion.div
-              className="h-full bg-linear-to-r from-primary via-secondary to-accent shadow-[0_0_16px_var(--color-secondary)]"
+              className="h-full bg-primary"
               style={{ width: `${currentProgress}%` }}
             ></motion.div>
           </div>

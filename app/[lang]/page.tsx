@@ -1,34 +1,40 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import Home from "@/components/pages/Home";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { buildPageMetadata } from "@/lib/i18n/metadata";
 
-// 懒加载首页组件，减少初始包大小
-// 注意：在App Router中，我们移除了ssr: false，因为Home组件已经使用"use client"
-const Home = dynamic(() => import("@/components/pages/Home"), {
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-    </div>
-  ),
-});
-
-export const metadata: Metadata = {
-  title: "MoodShaker - Find Your Perfect Cocktail",
-  description:
-    "Answer a few simple questions and let us recommend the perfect cocktail for you",
-  icons: {
-    icon: "/logo.png",
-  },
-};
-
-export default async function LangHomePage({
-  params,
-}: {
+interface HomePageProps {
   params: Promise<{ lang: string }>;
-}) {
+}
+
+export async function generateMetadata({
+  params,
+}: HomePageProps): Promise<Metadata> {
   const { lang } = await params;
-  if (lang !== "en" && lang !== "cn") {
-    redirect("/cn");
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+
+  return buildPageMetadata({
+    locale,
+    path: "/",
+    titleKey: "seo.home.title",
+    descriptionKey: "seo.home.description",
+  });
+}
+
+/**
+ * Imported directly rather than through `next/dynamic`.
+ *
+ * The wrapper was there to "reduce the initial bundle", but it had no `ssr: false`
+ * — so Next server-rendered `Home` anyway, and the only effects were an extra
+ * client chunk and a `loading` spinner that could flash over content already
+ * present in the HTML. Measured in `docs/performance-baseline.md`.
+ */
+export default async function LangHomePage({ params }: HomePageProps) {
+  const { lang } = await params;
+
+  if (!isLocale(lang)) {
+    redirect(`/${DEFAULT_LOCALE}`);
   }
 
   return <Home />;

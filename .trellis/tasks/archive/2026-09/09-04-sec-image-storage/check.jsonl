@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/guides/review-checklist.md", "reason": "通用评审清单"}
+{"file": ".trellis/spec/shared/code-quality.md", "reason": "强制质量规则"}
+{"file": ".trellis/spec/shared/verification.md", "reason": "验证命令集"}
+{"file": ".trellis/spec/big-question/recommendation-api-security.md", "reason": "核查安全修复是否真的关闭了开放代理，且未引入新的 token 泄露"}
+{"file": ".trellis/tasks/09-04-sec-image-storage/design.md", "reason": "核查失败语义表与迁移策略是否被完整实现"}

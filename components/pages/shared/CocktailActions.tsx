@@ -3,9 +3,10 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/core";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
 
 interface CocktailActionsProps {
-  t: (key: string) => string;
+  t: (key: TranslationKey) => string;
   onBack: () => void;
   onBrowseMore?: () => void;
   browseMoreLabel?: string;

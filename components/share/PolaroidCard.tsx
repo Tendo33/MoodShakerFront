@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import type { Cocktail } from "@/lib/cocktail-types";
+import type { FlavorProfile } from "@/lib/domain/vocabulary";
 import { forwardRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import {
@@ -31,48 +32,29 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
       },
     ).format(new Date());
 
-    // Helper to get content based on language
-    const getLocalizedContent = (field: string, englishField: string) => {
-      if (language === "en" && cocktail[englishField as keyof Cocktail]) {
-        return cocktail[englishField as keyof Cocktail] as string;
-      }
-      return cocktail[field as keyof Cocktail] as string;
-    };
+    const {
+      name,
+      baseSpiritLabel: baseSpirit,
+      alcoholLevelLabel: alcoholLevel,
+      servingGlass: glass,
+    } = cocktail;
 
-    const name = getLocalizedContent("name", "english_name");
-    const alcoholLevel = getLocalizedContent(
-      "alcohol_level",
-      "english_alcohol_level",
-    );
-    const glass = getLocalizedContent("serving_glass", "english_serving_glass");
-    const baseSpirit = getLocalizedContent(
-      "base_spirit",
-      "english_base_spirit",
-    );
-    const flavors =
-      language === "en" && cocktail.english_flavor_profiles
-        ? cocktail.english_flavor_profiles
-        : cocktail.flavor_profiles || [];
-
-    // Helper for Flavor Emojis
-    const getFlavorEmoji = (flavor: string) => {
-      const lower = flavor.toLowerCase();
-      if (lower.includes("sour") || lower.includes("酸")) return "🍋";
-      if (lower.includes("sweet") || lower.includes("甜")) return "🍬";
-      if (lower.includes("bitter") || lower.includes("苦")) return "☕";
-      if (lower.includes("spicy") || lower.includes("辣")) return "🌶️";
-      if (lower.includes("fruity") || lower.includes("果")) return "🍓";
-      if (
-        lower.includes("fresh") ||
-        lower.includes("refresh") ||
-        lower.includes("清")
-      )
-        return "🍃";
-      if (lower.includes("herbal") || lower.includes("草")) return "🌿";
-      if (lower.includes("smoky") || lower.includes("烟")) return "💨";
-      if (lower.includes("strong") || lower.includes("烈")) return "🔥";
-      if (lower.includes("dry") || lower.includes("干")) return "🌵";
-      return "✨";
+    // Keyed on vocabulary codes. This used to substring-match display text in
+    // both languages, so a flavour spelled a third way fell through to the
+    // default glyph.
+    const FLAVOR_EMOJI: Record<FlavorProfile, string> = {
+      sweet: "🍬",
+      sour: "🍋",
+      bitter: "☕",
+      spicy: "🌶️",
+      fruity: "🍓",
+      herbal: "🌿",
+      floral: "🌸",
+      smoky: "💨",
+      refreshing: "🍃",
+      creamy: "🥛",
+      salty: "🧂",
+      other: "✨",
     };
 
     // Get all ingredients & steps
@@ -107,9 +89,9 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
         ></div>
 
         {/* Typographic Watermark */}
-        {cocktail.english_name && (
+        {cocktail.nameAllLocales.en && (
           <div className="absolute top-[20%] -right-10 rotate-90 origin-bottom-right text-[80px] font-black text-white/[0.02] whitespace-nowrap pointer-events-none font-heading z-0">
-            {cocktail.english_name}
+            {cocktail.nameAllLocales.en}
           </div>
         )}
 
@@ -139,29 +121,31 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
             </h2>
 
             {/* English Subtitle */}
-            {cocktail.english_name && language !== "en" && (
+            {cocktail.nameAllLocales.en && language !== "en" && (
               <p className="text-lg font-mono italic text-white/60 mb-4">
-                {cocktail.english_name}
+                {cocktail.nameAllLocales.en}
               </p>
             )}
 
             {/* Flavor Tags - Simplified Text Row */}
-            {flavors.length > 0 && (
+            {cocktail.flavorProfiles.length > 0 && (
               <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-5">
-                {flavors.map((flavor, i) => (
+                {cocktail.flavorProfiles.map((code, i) => (
                   <div
                     key={i}
                     className="flex items-center gap-1.5 text-xs font-medium text-white/80"
                   >
-                    <span className="text-sm">{getFlavorEmoji(flavor)}</span>
-                    <span className="uppercase tracking-wider">{flavor}</span>
+                    <span className="text-sm">{FLAVOR_EMOJI[code]}</span>
+                    <span className="uppercase tracking-wider">
+                      {cocktail.flavorProfileLabels[i]}
+                    </span>
                   </div>
                 ))}
               </div>
             )}
 
             {/* Meta Info - With Reliable Icons */}
-            <div className="flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.1em] text-primary/90 font-bold opacity-80">
+            <div className="flex items-center justify-center gap-4 text-xs uppercase tracking-[0.1em] text-primary/90 font-bold opacity-80">
               <div className="flex items-center gap-1.5">
                 <Martini className="w-3 h-3" />
                 <span>{baseSpirit}</span>
@@ -182,7 +166,10 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
           {/* 3. Ingredients */}
           <div className="mb-8 bg-white/[0.03] border border-white/5 rounded-xl p-6 backdrop-blur-sm">
             <div className="text-center mb-5">
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
+              {/* white/60 而非 /40：10px 属正文，需 4.5:1。在这张卡的面板底色
+                  rgb(18,12,28) 上，/40 只有 3.80:1，/60 得 7.23:1。这张卡会经
+                  html-to-image 导出成分享图，图片没法被辅助技术调节，更要留余量。 */}
+              <span className="text-xs font-black uppercase tracking-[0.25em] text-white/60 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
                 <ShoppingBasket className="w-3 h-3 text-primary/80" />
                 <span>{t("recommendation.card.ingredients")}</span>
               </span>
@@ -195,17 +182,11 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
                   className="flex justify-between items-end border-b border-dashed border-white/10 pb-1 last:border-0"
                 >
                   <span className="text-sm font-medium text-white/90">
-                    {language === "en" && ing.english_name
-                      ? ing.english_name
-                      : ing.name}
+                    {ing.name}
                   </span>
                   <span className="text-sm font-bold text-primary/90 font-mono">
-                    {language === "en" && ing.english_amount
-                      ? ing.english_amount
-                      : ing.amount}
-                    {language === "en" && ing.english_unit
-                      ? ing.english_unit
-                      : ing.unit}
+                    {ing.amount}
+                    {ing.unit}
                   </span>
                 </div>
               ))}
@@ -215,7 +196,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
           {/* 4. Steps */}
           <div className="flex-1 mb-8">
             <div className="text-center mb-6">
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
+              <span className="text-xs font-black uppercase tracking-[0.25em] text-white/60 border-b border-white/10 pb-2 flex items-center justify-center gap-2 w-fit mx-auto">
                 <ScrollText className="w-3 h-3 text-secondary/80" />
                 <span>{t("recommendation.card.preparation")}</span>
               </span>
@@ -228,9 +209,7 @@ export const PolaroidCard = forwardRef<HTMLDivElement, PolaroidCardProps>(
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <p className="text-sm text-white/80 leading-relaxed font-light">
-                    {language === "en" && step.english_description
-                      ? step.english_description
-                      : step.description}
+                    {step.description}
                   </p>
                 </div>
               ))}

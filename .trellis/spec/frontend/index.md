@@ -48,6 +48,8 @@ docs/            # Maintainer docs when present
 | --- | --- | --- |
 | [moodshaker-product.md](./moodshaker-product.md) | Product flows and i18n facts | Always |
 | [api-and-data.md](./api-and-data.md) | API route, Prisma, privacy, and rate-limit rules | API/data changes |
+| [ai-generation.md](./ai-generation.md) | Generation schema, prompts, provider access, output guarantees | Any `lib/ai/` change |
+| [i18n.md](./i18n.md) | Locale resolution and typed dictionary access | `proxy.ts`, layout, `locales/`, `lib/i18n/` |
 | [directory-structure.md](./directory-structure.md) | File placement and route-group rules | Adding files |
 | [design-md.md](./design-md.md) | `DESIGN.md` selection and usage | UI or visual-system changes |
 | [app-router.md](./app-router.md) | Server/client component and route handler rules | Route or rendering changes |

@@ -1,17 +1,9 @@
-export enum AlcoholLevel {
-  ANY = "any",
-  NONE = "none",
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-}
-
-export enum DifficultyLevel {
-  ANY = "any",
-  EASY = "easy",
-  MEDIUM = "medium",
-  HARD = "hard",
-}
+import type {
+  AlcoholLevelCode,
+  BaseSpirit,
+  FlavorProfile,
+} from "@/lib/domain/vocabulary";
+import type { LocalizedText } from "@/lib/i18n/localized";
 
 export enum AgentType {
   CLASSIC_BARTENDER = "classic_bartender",
@@ -23,90 +15,133 @@ export enum RecommendationStatus {
   PUBLISHED = "PUBLISHED",
 }
 
+/* ------------------------------------------------------------------ *
+ * Stored shape — what lives in the `content` JSONB column
+ * ------------------------------------------------------------------ */
+
+/**
+ * Recipe content as stored, with every language present.
+ *
+ * This replaces eight `xxx` / `english_xxx` column pairs. Storing both languages
+ * in one value means a read site cannot forget to check the other column, and a
+ * third language needs no schema change.
+ */
+export interface StoredCocktailContent {
+  name: LocalizedText;
+  description: LocalizedText;
+  matchReason: LocalizedText | null;
+  servingGlass: LocalizedText;
+  timeRequired: LocalizedText;
+  ingredients: StoredIngredient[];
+  tools: StoredTool[];
+  steps: StoredStep[];
+}
+
+export interface StoredIngredient {
+  name: LocalizedText;
+  amount: LocalizedText;
+  unit: LocalizedText | null;
+  substitute: LocalizedText | null;
+}
+
+export interface StoredTool {
+  name: LocalizedText;
+  alternative: LocalizedText | null;
+}
+
+export interface StoredStep {
+  stepNumber: number;
+  description: LocalizedText;
+  tips: LocalizedText | null;
+}
+
+/* ------------------------------------------------------------------ *
+ * Resolved shape — what the UI receives
+ * ------------------------------------------------------------------ */
+
+/**
+ * A cocktail with one language already chosen.
+ *
+ * The data layer resolves the locale once, at the read boundary, so components
+ * read `cocktail.name` directly. Previously every display site chose between
+ * `name` and `english_name` itself, via a `useLocalizedCocktail` hook that only
+ * client components could call — server components silently rendered Chinese.
+ *
+ * Vocabulary fields appear twice on purpose: the code drives filtering and
+ * comparison, the label is for display. Mixing the two is what made filters
+ * match on display text.
+ */
+export interface Cocktail {
+  id: string;
+  slug: string;
+
+  name: string;
+  /**
+   * The name in every language.
+   *
+   * Present because the share card's typography deliberately shows the English
+   * name alongside the localized one, as a watermark and a subtitle. That is a
+   * design choice, not the old habit of each read site picking a column — which
+   * is why this is a separate field rather than an `english_name` twin.
+   */
+  nameAllLocales: LocalizedText;
+  description: string;
+  matchReason: string | null;
+  servingGlass: string;
+  timeRequired: string;
+
+  baseSpirit: BaseSpirit;
+  baseSpiritLabel: string;
+  alcoholLevel: AlcoholLevelCode;
+  alcoholLevelLabel: string;
+  flavorProfiles: FlavorProfile[];
+  flavorProfileLabels: string[];
+
+  ingredients: Ingredient[];
+  tools: Tool[];
+  steps: Step[];
+
+  imageUrl: string | null;
+  thumbnailUrl: string | null;
+}
+
 export interface Ingredient {
   name: string;
-  english_name?: string;
   amount: string;
-  english_amount?: string;
-  unit?: string;
-  english_unit?: string;
-  substitute?: string;
-  english_substitute?: string;
+  unit: string | null;
+  substitute: string | null;
 }
 
 export interface Tool {
   name: string;
-  english_name?: string;
-  alternative?: string;
-  english_alternative?: string;
+  alternative: string | null;
 }
 
 export interface Step {
-  step_number: number;
+  stepNumber: number;
   description: string;
-  english_description?: string;
-  tips?: string;
-  english_tips?: string;
+  tips: string | null;
 }
 
-export interface Cocktail {
-  id?: string | number;
-  name: string;
-  english_name?: string;
-  description: string;
-  english_description?: string;
-  match_reason: string;
-  english_match_reason?: string;
-  base_spirit: string;
-  english_base_spirit?: string;
-  alcohol_level: string;
-  english_alcohol_level?: string;
-  serving_glass: string;
-  english_serving_glass?: string;
-  time_required?: string;
-  english_time_required?: string;
-  flavor_profiles: string[];
-  english_flavor_profiles?: string[];
-  ingredients: Ingredient[];
-  tools: Tool[];
-  steps: Step[];
-  image?: string;
-  thumbnail?: string;
-}
-
-export interface GalleryCocktail {
-  id?: string | number;
-  name: string;
-  english_name?: string;
-  description: string;
-  english_description?: string;
-  base_spirit: string;
-  english_base_spirit?: string;
-  alcohol_level: string;
-  english_alcohol_level?: string;
-  flavor_profiles: string[];
-  english_flavor_profiles?: string[];
-  ingredients?: Ingredient[];
-  image?: string;
-  thumbnail?: string;
-}
-
-export interface PublicCocktailSummary {
+/** Gallery card projection: enough to render a card, nothing more. */
+export interface CocktailSummary {
   id: string;
+  slug: string;
   name: string;
-  english_name?: string;
   description: string;
-  english_description?: string;
-  base_spirit: string;
-  english_base_spirit?: string;
-  alcohol_level: string;
-  english_alcohol_level?: string;
-  thumbnail?: string;
+  baseSpirit: BaseSpirit;
+  baseSpiritLabel: string;
+  alcoholLevel: AlcoholLevelCode;
+  alcoholLevelLabel: string;
+  flavorProfiles: FlavorProfile[];
+  flavorProfileLabels: string[];
+  imageUrl: string | null;
+  thumbnailUrl: string | null;
 }
 
-export interface PublicCocktailDetail extends Cocktail {
-  id: string;
-}
+/* ------------------------------------------------------------------ *
+ * Requests and sessions
+ * ------------------------------------------------------------------ */
 
 export interface RecommendationMeta {
   recommendationId: string;
@@ -124,8 +159,6 @@ export interface RecommendationSession {
   baseSpirits: string[];
   specialRequests?: string;
   cocktail: Cocktail;
-  image?: string;
-  thumbnail?: string;
   status: RecommendationStatus;
   publishedCocktailId?: string;
   createdAt: string;
@@ -138,7 +171,7 @@ export interface RecommendationResponse {
 }
 
 export interface PaginatedGalleryResult {
-  items: PublicCocktailSummary[];
+  items: CocktailSummary[];
   nextCursor: string | null;
 }
 
@@ -147,4 +180,11 @@ export interface BartenderRequest {
   baseSpirits: string[];
   sessionId: string;
   specialRequests?: string;
+}
+
+export interface GalleryQueryFilters {
+  spirit?: BaseSpirit;
+  alcohol?: AlcoholLevelCode;
+  flavor?: FlavorProfile;
+  search?: string;
 }

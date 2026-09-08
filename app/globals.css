@@ -56,8 +56,6 @@
 
   --surface-strong: rgba(19, 10, 37, 0.9);
   --surface-soft: rgba(19, 10, 37, 0.72);
-  --surface-glow: rgba(255, 79, 216, 0.18);
-  --surface-glow-cool: rgba(93, 246, 255, 0.16);
   --surface-stroke: rgba(255, 255, 255, 0.06);
   --surface-shadow: 0 22px 60px rgba(3, 0, 9, 0.5);
 
@@ -270,50 +268,38 @@
   border-color: var(--color-secondary);
 }
 
+/*
+ * 标题渐变。24 处在用，是产品识别度的一部分，所以保留渐变本身而不是改纯色。
+ *
+ * 原来是 accent → primary → secondary 三色，外加 gradient-shift 5s 无限循环。三个高
+ * 饱和色在一行字里轮转，加上 -webkit-text-fill-color: transparent 让文字没有实色，
+ * 观感就是发虚。
+ *
+ * 收成 foreground → primary 双色并去掉动画：洋红仍是强调色，但只有一个饱和色在动，
+ * 起点是接近正文色的亮色。注意这不是对比度问题，三个原色标单独测都达标
+ * （primary 7.06:1、secondary 15.44:1、accent 11.22:1），所以不要把它算进
+ * 「低对比处数」。
+ */
 .gradient-text {
   background: linear-gradient(
     to right,
-    var(--color-accent),
-    var(--color-primary),
-    var(--color-secondary)
+    var(--color-foreground),
+    var(--color-primary)
   );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-size: 200% auto;
-  animation: gradient-shift 5s linear infinite;
 }
 
 .gradient-text-bright {
   background: linear-gradient(
     180deg,
     #f8fbff 0%,
-    var(--color-secondary) 22%,
     var(--color-primary) 100%
   );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.neon-glow-primary {
-  text-shadow: 0 0 6px var(--color-primary), 0 0 14px var(--color-primary);
-}
-
-.neon-glow-secondary {
-  text-shadow: 0 0 4px var(--color-secondary), 0 0 8px rgba(0,255,255,0.8);
 }
 
 /* ===== Spacing Utilities (@apply outside @layer works in v4) ===== */
@@ -497,23 +483,49 @@
 
   /* English-Specific Typography overrides to globally scale down text */
   /* These act as safety nets for elements not using rem or using hardcoded classes */
+  /*
+   * 不要在这里加 !important。这些规则在 @layer base 里，而 Tailwind v4 的
+   * utilities layer 本来就排在 base 之后 —— 组件写的 text-lg / sm:text-xl 会自然
+   * 胜出，这才是「safety net」该有的行为：只兜住没显式声明字号的元素。
+   *
+   * !important 会反过来让 base 压过组件，而且组件没有任何办法退出。实测的后果：
+   * 问卷选项标题被这条 h3 规则顶到 25.76px（1.75rem × 14.72px 根字号），而四栏
+   * 布局下每列只有 136px，最多装得下 19.8px 的字。ALCOHOL 这种没处换行的长词
+   * 溢出 40px，再被卡片的 overflow-hidden 裁掉，看起来就是最后一个字母被削掉。
+   * 中文页没有这组规则，所以只有英文页出现。
+   *
+   * 注释说的是 scale down，实际做的是把 18/20px 放大到 25.76px。
+   */
   html:lang(en) body {
-    font-size: 0.875rem !important; /* equivalent to text-sm */
+    font-size: 0.875rem; /* equivalent to text-sm */
     line-height: 1.5;
   }
   html:lang(en) h1 {
-    font-size: clamp(1.5rem, 4vw, 3.5rem) !important;
+    font-size: clamp(1.5rem, 4vw, 3.5rem);
   }
   html:lang(en) h2 {
-    font-size: clamp(1.25rem, 3.5vw, 2.5rem) !important;
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
   }
   html:lang(en) h3 {
-    font-size: clamp(1.125rem, 2.5vw, 1.75rem) !important;
+    font-size: clamp(1.125rem, 2.5vw, 1.75rem);
   }
   html:lang(en) h4 {
-    font-size: clamp(1rem, 2vw, 1.25rem) !important;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+  }
+  /*
+   * 英文长单词在窄列里放不下时允许断词。中文任意位置都能断行，所以只有英文需要。
+   *
+   * 实测的例子：首页卡片标题「Personalized Recommendations」在 288px 的列里溢出
+   * 26px，被卡片的 overflow-hidden 裁掉。Recommendations 这一个词本身就超过列宽，
+   * 没有任何空格可供换行。
+   *
+   * 选它而不是调小字号或收紧字距：那两种改法会动到所有标题的设计，而这条只在真的
+   * 放不下时才生效，其余情况完全不影响排版。
+   */
+  html:lang(en) :is(h1, h2, h3, h4) {
+    overflow-wrap: break-word;
   }
   html:lang(en) p {
-    font-size: clamp(0.8125rem, 1.2vw, 1rem) !important;
+    font-size: clamp(0.8125rem, 1.2vw, 1rem);
   }
 }

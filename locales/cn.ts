@@ -141,6 +141,12 @@ export const cn = {
   "share.modal.description": "保存这张卡片，分享给朋友们吧！",
   "recommendation.share": "分享配方",
   "recommendation.copied": "链接已复制到剪贴板",
+  "recommendation.publish.publish": "发布到图鉴",
+  "recommendation.publish.withdraw": "从图鉴撤回",
+  "recommendation.publish.working": "处理中…",
+  "recommendation.publish.viewPublic": "查看公开页面",
+  "recommendation.publish.publishedHint": "这杯酒已出现在公开图鉴中，任何人都能看到。",
+  "recommendation.publish.failed": "操作失败，请稍后重试。",
   "recommendation.yourRequirements": "您的需求",
   "recommendation.recommendationReason": "为什么推荐这款",
   "recommendation.ingredients": "配料",
@@ -189,6 +195,7 @@ export const cn = {
   "detail.glass": "酒杯",
   "detail.flavorProfile": "风味描述",
   "detail.recipe": "配方",
+  "detail.alternative": "替代方案",
 
   // Gallery Filters - Spirits
   "gallery.spirit.gin": "金酒",
@@ -250,6 +257,21 @@ export const cn = {
   "notFound.description": "请求的数据未能在模拟矩阵中定位到。",
   "notFound.action": "返回首页",
   "share.error.generate": "生成分享卡失败，请重试。",
+
+  // 页面标题与描述。每个路由都需要，否则中文页面会向用户和爬虫返回英文标题。
+  "seo.home.title": "MoodShaker · 找到适合你心情的鸡尾酒",
+  "seo.home.description":
+    "回答几个问题，让 AI 调酒师根据你的心情推荐一杯鸡尾酒，附完整配方与调制步骤。",
+  "seo.questions.title": "调酒问卷 | MoodShaker",
+  "seo.questions.description":
+    "告诉我们你的心情与口味偏好，我们据此推荐一杯合适的鸡尾酒。",
+  "seo.gallery.title": "鸡尾酒图鉴 | MoodShaker",
+  "seo.gallery.description":
+    "浏览按基酒、酒精度与风味筛选的鸡尾酒配方，每杯都有完整配料与步骤。",
+  "seo.recommendation.title": "你的鸡尾酒推荐 | MoodShaker",
+  "seo.recommendation.description": "为你的心情量身定制的鸡尾酒，含配方与调制步骤。",
+  "seo.notFound.title": "页面未找到 | MoodShaker",
+  "seo.notFound.description": "这个页面不存在，回首页重新开始。",
 } as const;
 
 export type TranslationKey = keyof typeof cn;

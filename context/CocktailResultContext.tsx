@@ -17,7 +17,6 @@ import type {
 import { AgentType } from "@/lib/cocktail-types";
 import { asyncStorage, removeStorageKeysAsync } from "@/utils/asyncStorage";
 import { useBatchAsyncState } from "@/hooks/useAsyncState";
-import { generateImagePrompt } from "@/api/image";
 import { generateSessionId } from "@/utils/generateId";
 import { cocktailLogger } from "@/utils/logger";
 import { useLanguage } from "@/context/LanguageContext";
@@ -32,10 +31,21 @@ const STORAGE_KEYS = {
   IMAGE_DATA: "moodshaker-image-data",
 };
 
-const MAX_PERSISTED_IMAGE_BYTES = 320 * 1024;
-const IMAGE_PERSIST_DEBOUNCE_MS = 5000;
 const COCKTAIL_REQUEST_TIMEOUT_MS = 90000;
-const COCKTAIL_REQUEST_RETRY_LIMIT = 2;
+
+/**
+ * Attempts for connection failures only — the server never saw the request, so
+ * nothing was spent upstream.
+ *
+ * A returned response is never retried, even a 5xx. The server budget is one
+ * generation plus at most one repair; retrying a response here would multiply
+ * that, which is how a single failed action used to cost four LLM calls at
+ * `max_tokens: 5000`.
+ */
+const COCKTAIL_CONNECTION_ATTEMPTS = 2;
+
+/** Marks a failure the server responded to, so it is not retried. */
+class ResponseError extends Error {}
 
 interface CocktailResultContextType {
   recommendation: Cocktail | null;
@@ -45,7 +55,6 @@ interface CocktailResultContextType {
   isImageLoading: boolean;
   error: string | null;
   imageError: string | null;
-  progressPercentage: number;
   loadSavedData: () => void;
   submitRequest: (regenerate?: boolean) => Promise<Cocktail>;
   resetResult: () => Promise<void>;
@@ -108,15 +117,21 @@ export const CocktailResultProvider = ({
   const [isImageLoading, setIsImageLoadingState] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
-  const [progressPercentage, setProgressPercentage] = useState(0);
   const [volatileImageData, setVolatileImageData] = useState<string | null>(
     null,
   );
 
-  const imagePersistenceRef = useRef<{ signature: string; timestamp: number }>({
-    signature: "",
-    timestamp: 0,
-  });
+  /**
+   * 标记「当前这一轮推荐」。每次提交或重置都递增。
+   *
+   * 图片生成是 fire-and-forget 的，最长 30 秒，期间闭包捕获了那一轮的
+   * nextRecommendation。请求返回后它会无条件写回 state 和 localStorage，于是：
+   * 用户在生成中点「重新开始」，重置当场看起来是成功的（state 和存储都空了），
+   * 一两秒后旧推荐在界面和存储里双双复活。
+   *
+   * 实测确认过这条链路。后台任务写回前先核对代次，不是自己那一轮就丢弃结果。
+   */
+  const generationEpochRef = useRef(0);
 
   const scopedPersistedImageData =
     recommendation &&
@@ -126,7 +141,10 @@ export const CocktailResultProvider = ({
       : null;
 
   const imageData =
-    volatileImageData || scopedPersistedImageData || recommendation?.image || null;
+    volatileImageData ||
+    scopedPersistedImageData ||
+    recommendation?.imageUrl ||
+    null;
 
   const loadSavedData = useCallback(() => {
     reloadData().catch(() => {
@@ -134,46 +152,31 @@ export const CocktailResultProvider = ({
     });
   }, [reloadData]);
 
-  const estimateDataUrlBytes = useCallback((dataUrl: string): number => {
-    const base64Part = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
-    return Math.floor((base64Part.length * 3) / 4);
-  }, []);
-
-  const persistImageData = useCallback(
-    async (nextImageData: string | null, force: boolean = false) => {
-      setVolatileImageData(nextImageData);
-
-      if (!nextImageData) {
-        await updateItem("imageData", null);
-        imagePersistenceRef.current = { signature: "", timestamp: 0 };
+  /**
+   * Stores the image URL.
+   *
+   * Images now live in object storage, so this persists a short URL rather than
+   * a multi-hundred-kilobyte data URL. The former size cap and write debounce
+   * existed only to keep base64 payloads out of localStorage and are gone.
+   */
+  /**
+   * 两个写入函数都接受一个可选的 `stillCurrent` 守卫，在真正落盘的那一刻同步核对。
+   *
+   * 为什么不能只在调用前检查一次：检查和写入之间隔着 await，后台任务在这段时间里
+   * 让出执行权，resetResult 的清除就在此期间跑完，写入随后落地 —— 典型的
+   * check-then-act 竞态。实测的时序是 DEL、DEL、SET，SET 赢在最后。
+   *
+   * 守卫下移到每次 updateItem 的紧前面，中间不再有 await。
+   */
+  const persistImageUrl = useCallback(
+    async (nextImageUrl: string | null, stillCurrent?: () => boolean) => {
+      if (stillCurrent && !stillCurrent()) {
         return;
       }
-
-      const signature = `${nextImageData.length}:${nextImageData.slice(0, 32)}`;
-      const now = Date.now();
-      if (
-        !force &&
-        imagePersistenceRef.current.signature === signature &&
-        now - imagePersistenceRef.current.timestamp < IMAGE_PERSIST_DEBOUNCE_MS
-      ) {
-        return;
-      }
-
-      if (nextImageData.startsWith("data:")) {
-        const bytes = estimateDataUrlBytes(nextImageData);
-        if (bytes > MAX_PERSISTED_IMAGE_BYTES) {
-          cocktailLogger.warn("Skip persisting oversized image payload", {
-            bytes,
-            limit: MAX_PERSISTED_IMAGE_BYTES,
-          });
-          return;
-        }
-      }
-
-      await updateItem("imageData", nextImageData);
-      imagePersistenceRef.current = { signature, timestamp: now };
+      setVolatileImageData(nextImageUrl);
+      await updateItem("imageData", nextImageUrl);
     },
-    [estimateDataUrlBytes, updateItem],
+    [updateItem],
   );
 
   const updateRecommendationImage = useCallback(
@@ -181,15 +184,19 @@ export const CocktailResultProvider = ({
       baseRecommendation: Cocktail | null,
       image: string | null,
       thumbnail?: string | null,
+      stillCurrent?: () => boolean,
     ) => {
       if (!baseRecommendation) {
+        return;
+      }
+      if (stillCurrent && !stillCurrent()) {
         return;
       }
 
       await updateItem("recommendation", {
         ...baseRecommendation,
-        image: image || undefined,
-        thumbnail: thumbnail || baseRecommendation.thumbnail,
+        imageUrl: image || null,
+        thumbnailUrl: thumbnail || baseRecommendation.thumbnailUrl,
       });
     },
     [updateItem],
@@ -197,10 +204,13 @@ export const CocktailResultProvider = ({
 
   const submitRequest = useCallback(
     async (regenerate: boolean = false): Promise<Cocktail> => {
+      // 开启新一轮：此前那一轮的后台图片任务从现在起不再有权写回。
+      const epoch = ++generationEpochRef.current;
+      const isCurrentEpoch = () => generationEpochRef.current === epoch;
+
       setIsLoading(true);
       setError(null);
       setImageError(null);
-      setProgressPercentage(0);
       setVolatileImageData(null);
 
       let nextRecommendation: Cocktail | null = null;
@@ -237,7 +247,7 @@ export const CocktailResultProvider = ({
 
         for (
           let attempt = 1;
-          attempt <= COCKTAIL_REQUEST_RETRY_LIMIT;
+          attempt <= COCKTAIL_CONNECTION_ATTEMPTS;
           attempt += 1
         ) {
           try {
@@ -276,29 +286,30 @@ export const CocktailResultProvider = ({
                 // ignore invalid error payloads
               }
 
-              const responseError = new Error(errorMessage);
-              if (
-                response.status >= 500 &&
-                attempt < COCKTAIL_REQUEST_RETRY_LIMIT
-              ) {
-                lastRequestError = responseError;
-                continue;
-              }
-
-              throw responseError;
+              // Not retried, including 5xx. The server already spends up to two
+              // LLM calls per request (one generation plus one repair), so a
+              // client-side retry on a returned response would double that to
+              // four generations for a single user action.
+              throw new ResponseError(errorMessage);
             }
 
             cocktailResponse = response;
             break;
           } catch (requestError) {
+            // The server answered, so the LLM budget was already spent. Surface
+            // it rather than paying for the same failure again.
+            if (requestError instanceof ResponseError) {
+              throw requestError;
+            }
+
             const resolvedError =
               requestError instanceof Error
                 ? requestError
                 : new Error(t("error.generationFailed"));
             lastRequestError = resolvedError;
 
-            if (attempt < COCKTAIL_REQUEST_RETRY_LIMIT) {
-              cocktailLogger.warn("Cocktail request failed, retrying", {
+            if (attempt < COCKTAIL_CONNECTION_ATTEMPTS) {
+              cocktailLogger.warn("Cocktail request failed to connect, retrying", {
                 attempt,
                 message: resolvedError.message,
               });
@@ -313,7 +324,6 @@ export const CocktailResultProvider = ({
                 ? "Network unstable, showing your last successful recommendation."
                 : "网络不稳定，已为你展示最近一次成功推荐。";
             setError(fallbackMessage);
-            setProgressPercentage(100);
             return recommendation;
           }
           throw lastRequestError || new Error(t("error.generationFailed"));
@@ -334,13 +344,14 @@ export const CocktailResultProvider = ({
 
         await updateItem("recommendation", nextRecommendation);
         await updateItem("recommendationMeta", nextRecommendationMeta);
-        await persistImageData(nextRecommendation.image || null, true);
+        await persistImageUrl(nextRecommendation.imageUrl || null);
 
         setIsImageLoadingState(true);
 
-        const prompt = generateImagePrompt(nextRecommendation);
         void (async () => {
           try {
+            // The prompt is derived server-side from the stored cocktail
+            // payload; sending one from here is rejected by the API.
             const imageResponse = await withTimeout(
               fetch("/api/image", {
                 method: "POST",
@@ -350,7 +361,6 @@ export const CocktailResultProvider = ({
                 body: JSON.stringify({
                   recommendationId: nextRecommendationMeta?.recommendationId,
                   editToken: nextRecommendationMeta?.editToken,
-                  prompt,
                 }),
               }),
               30000,
@@ -363,36 +373,61 @@ export const CocktailResultProvider = ({
                 "Image generation failed",
                 errorPayload?.error?.message,
               );
+              if (!isCurrentEpoch()) {
+                return;
+              }
               setImageError(
                 t("share.error.generate"),
               );
-              await persistImageData(null, true);
+              await persistImageUrl(null, isCurrentEpoch);
               return;
             }
 
             const imagePayload = await imageResponse.json();
-            const nextImage = imagePayload?.data?.image || null;
-            const nextThumbnail = imagePayload?.data?.thumbnail || null;
-            await persistImageData(nextImage, true);
+            const nextImage = imagePayload?.data?.imageUrl || null;
+            const nextThumbnail = imagePayload?.data?.thumbnailUrl || null;
+
+            // 写回前核对代次。用户在这张图生成期间重置或重新提交过，这一轮就
+            // 已经作废；继续写下去会把作废的推荐重新写进 state 和 localStorage。
+            //
+            // 这里的提前返回只是快速路径。真正保证正确性的是传进去的
+            // isCurrentEpoch —— 它在每次落盘的紧前面再核对一次，因为这两个 await
+            // 之间还会让出执行权，重置可能正好在此期间跑完。
+            if (!isCurrentEpoch()) {
+              return;
+            }
+
+            await persistImageUrl(nextImage, isCurrentEpoch);
             await updateRecommendationImage(
               nextRecommendation,
               nextImage,
               nextThumbnail,
+              isCurrentEpoch,
             );
-            setImageError(null);
+            if (isCurrentEpoch()) {
+              setImageError(null);
+            }
           } catch (imageGenerationError) {
+            // 同理：作废那一轮的失败不该覆盖当前这一轮的界面状态。
+            if (!isCurrentEpoch()) {
+              return;
+            }
+
             setImageError(t("share.error.generate"));
             cocktailLogger.error(
               "Background image generation failed",
               imageGenerationError,
             );
-            await persistImageData(null, true);
+            await persistImageUrl(null, isCurrentEpoch);
           } finally {
-            setIsImageLoadingState(false);
+            // 加载指示器只归属当前这一轮：作废的任务把它关掉，会让正在进行的
+            // 新一轮显示成已完成。
+            if (isCurrentEpoch()) {
+              setIsImageLoadingState(false);
+            }
           }
         })();
 
-        setProgressPercentage(100);
         return nextRecommendation;
       } catch (submitError) {
         const errorMessage =
@@ -417,7 +452,7 @@ export const CocktailResultProvider = ({
       t,
       updateItem,
       userFeedback,
-      persistImageData,
+      persistImageUrl,
       updateRecommendationImage,
     ],
   );
@@ -435,7 +470,8 @@ export const CocktailResultProvider = ({
         throw new Error("No cocktail recommendation available.");
       }
 
-      const prompt = generateImagePrompt(recommendation);
+      // The prompt is derived server-side; a caller-supplied one is rejected.
+      // Every call regenerates, so no forceRefresh flag is needed either.
       const imageResponse = await withTimeout(
         fetch("/api/image", {
           method: "POST",
@@ -445,8 +481,6 @@ export const CocktailResultProvider = ({
           body: JSON.stringify({
             recommendationId: recommendationMeta.recommendationId,
             editToken: recommendationMeta.editToken,
-            prompt,
-            forceRefresh: true,
           }),
         }),
         30000,
@@ -461,9 +495,9 @@ export const CocktailResultProvider = ({
       }
 
       const payload = await imageResponse.json();
-      const nextImage = payload?.data?.image || null;
-      const nextThumbnail = payload?.data?.thumbnail || null;
-      await persistImageData(nextImage, true);
+      const nextImage = payload?.data?.imageUrl || null;
+      const nextThumbnail = payload?.data?.thumbnailUrl || null;
+      await persistImageUrl(nextImage);
       await updateRecommendationImage(recommendation, nextImage, nextThumbnail);
       return nextImage;
     } catch (refreshError) {
@@ -481,12 +515,19 @@ export const CocktailResultProvider = ({
     recommendation,
     recommendationMeta,
     language,
-    persistImageData,
+    persistImageUrl,
     setIsImageLoading,
     updateRecommendationImage,
   ]);
 
   const resetResult = useCallback(async () => {
+    // 先作废进行中的那一轮，再清数据。
+    //
+    // 少了这一步，重置本身是「成功」的 —— state 和 localStorage 当场都空了 ——
+    // 但正在跑的图片任务一两秒后返回，会把刚被清掉的推荐重新写进两处。用户看到
+    // 的是：点了「重新开始」，界面短暂空白，然后旧推荐自己回来了。
+    generationEpochRef.current += 1;
+
     try {
       await removeStorageKeysAsync([
         STORAGE_KEYS.RECOMMENDATION,
@@ -498,9 +539,9 @@ export const CocktailResultProvider = ({
       await reloadData();
       setError(null);
       setImageError(null);
-      setProgressPercentage(0);
       setVolatileImageData(null);
-      imagePersistenceRef.current = { signature: "", timestamp: 0 };
+      // 那一轮的 finally 已经因为代次不符而不会再关掉这个指示器，这里自己关。
+      setIsImageLoadingState(false);
     } catch {
       cocktailLogger.error("Failed to reset result data");
       setError(t("error.resetData"));
@@ -516,7 +557,6 @@ export const CocktailResultProvider = ({
       isImageLoading,
       error,
       imageError,
-      progressPercentage,
       loadSavedData,
       submitRequest,
       resetResult,
@@ -532,7 +572,6 @@ export const CocktailResultProvider = ({
       isImageLoading,
       error,
       imageError,
-      progressPercentage,
       loadSavedData,
       submitRequest,
       resetResult,
