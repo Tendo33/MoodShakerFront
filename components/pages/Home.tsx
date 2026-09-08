@@ -500,10 +500,13 @@ const Home = React.memo(function Home() {
                     transition={{ duration: 0.4, ease: "linear" }}
                     aria-label={`View cocktail ${index + 1}`}
                   >
+                    {/* 内层不再带 scale-110。这两个 scale 原本在同一元素上，Framer 写的
+                        inline transform 会覆盖 class，实际只有 1.2；拆成内外两层后就变成
+                        1.2 × 1.1 = 1.32 的叠乘。放大交给外层 Framer 一处管。 */}
                     <span
                       className={`h-2.5 w-2.5 transition duration-500 ${
                         index === currentCocktailIndex
-                          ? "scale-110 bg-primary ring-2 ring-secondary/50"
+                          ? "bg-primary ring-2 ring-secondary/50"
                           : "bg-foreground/50 group-hover:bg-secondary"
                       }`}
                     />

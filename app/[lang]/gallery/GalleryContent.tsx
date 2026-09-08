@@ -181,7 +181,10 @@ export default function GalleryContent({
   return (
     <div className="min-h-screen bg-background text-foreground pt-24 pb-20 px-4 md:px-8 relative overflow-hidden selection:bg-primary/30">
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-8%] left-[-8%] h-[28%] w-[28%] rounded-full bg-primary/8 blur-[110px] animate-gentleFloat" />
+        {/* animate-gentleFloat 没有对应的 @keyframes（产物里 0 次出现），这个光斑
+            一直是静止的。删掉死类名而不是补一个动画：本轮方向是减少无限动画，
+            补上等于新增一个。旁边那个 animate-float 是真在动的。 */}
+        <div className="absolute top-[-8%] left-[-8%] h-[28%] w-[28%] rounded-full bg-primary/8 blur-[110px]" />
         <div className="absolute bottom-[-8%] right-[-8%] h-[28%] w-[28%] rounded-full bg-secondary/8 blur-[110px] animate-float" style={{ animationDelay: "2s" }} />
       </div>
 

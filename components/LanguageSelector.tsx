@@ -269,8 +269,9 @@ export default function LanguageSelector({
                     </motion.div>
                   )}
 
-                  {/* Hover sweeping glow effect */}
-                  <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
+                  {/* 原来这里还有一层 group-hover:animate-shimmer 的扫光。`shimmer`
+                      从来没有对应的 @keyframes（产物里 0 次出现），所以那层只是一条不动
+                      的静态斜纹。下面这层才是真正生效的 hover 反馈。 */}
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 </button>
               ))}
