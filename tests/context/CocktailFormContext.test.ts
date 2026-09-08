@@ -10,7 +10,6 @@ import * as React from "react";
  * Everything here runs before React or the context is imported. `node --test` gives
  * each file its own process, so mutating `globalThis` is contained.
  *
- * See `.trellis/spec/frontend/quality.md` for why `pretendToBeVisual` is omitted and
  * why `navigator` needs `defineProperty`.
  */
 const dom = new JSDOM("<!doctype html><html><body></body></html>", {

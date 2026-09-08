@@ -1,6 +1,5 @@
 # Performance baseline
 
-Measured before the RSC work in `.trellis/tasks/09-04-i18n-rsc`, against
 `pnpm build && pnpm start` on localhost. Reproduce with:
 
 ```bash

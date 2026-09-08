@@ -5,7 +5,6 @@ import * as React from "react";
 
 /**
  * Focus management is DOM behavior, so these tests need a real document — jsdom
- * supplies one. See `.trellis/spec/frontend/quality.md` for the shared setup notes.
  */
 const dom = new JSDOM(
   `<!doctype html><html><body>

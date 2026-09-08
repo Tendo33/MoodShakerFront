@@ -7,7 +7,6 @@ import * as React from "react";
  * The language context derives the locale from the pathname and keeps `<html lang>` in
  * step with it.
  *
- * See `.trellis/spec/frontend/quality.md` for the shared setup notes.
  */
 const dom = new JSDOM("<!doctype html><html lang=\"zh-CN\"><body></body></html>", {
   url: "http://localhost:3000/cn",

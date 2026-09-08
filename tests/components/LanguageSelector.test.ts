@@ -8,7 +8,6 @@ import * as React from "react";
  * The language selector's contract: it lists the real locales, shows their display
  * names, and routes to a valid localized path.
  *
- * See `.trellis/spec/frontend/quality.md` for the shared setup notes.
  */
 const dom = new JSDOM("<!doctype html><html><body></body></html>", {
   url: "http://localhost:3000/cn/questions",

@@ -7,7 +7,6 @@ import * as React from "react";
  * Recommendation state: the API call, its persistence, and `editToken` handling.
  * Needs a DOM and a stubbed `fetch`, but no browser and no database.
  *
- * See `.trellis/spec/frontend/quality.md` for the shared setup notes.
  */
 const dom = new JSDOM("<!doctype html><html><body></body></html>", {
   url: "http://localhost:3000/cn",
