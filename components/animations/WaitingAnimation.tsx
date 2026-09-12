@@ -2,9 +2,15 @@
 
 import { useState, useEffect, memo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import type { TranslationKey } from "@/lib/i18n/dictionary";
+import {
+  AnimatedSpan,
+  Terminal,
+  TypingAnimation,
+} from "@/components/ui/terminal";
+import { Progress } from "@/components/ui/progress";
 
 interface WaitingAnimationProps {
   isShowing?: boolean;
@@ -92,83 +98,55 @@ const WaitingAnimation = memo(function WaitingAnimation({
         className="absolute inset-0 bg-[linear-gradient(-45deg,rgba(255,0,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,0,255,0.05)_50%,rgba(255,0,255,0.05)_75%,transparent_75%,transparent)] bg-size-[20px_20px] opacity-20"
       />
       <motion.div
-        className="max-w-3xl w-full text-center space-y-20 relative z-20"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative z-20 flex w-full max-w-xl flex-col gap-8"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="relative mx-auto w-40 h-40 flex items-center justify-center">
-          <motion.div
-            className="text-5xl"
-            animate={
-              prefersReducedMotion
-                ? undefined
-                : {
-                    scale: [1, 1.05, 1],
-                  }
-            }
-            transition={
-              prefersReducedMotion
-                ? undefined
-                : {
-                    duration: 2.5,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut",
-                  }
-            }
-          >
-            🍸
-          </motion.div>
-        </div>
+        <h2 className="sr-only">{displayMessage}</h2>
+        <p className="sr-only">{displaySubtitle}</p>
+        <Terminal
+          title="SHAKE.EXE"
+          startOnView={false}
+          sequence={!prefersReducedMotion}
+          className="mx-auto"
+        >
+          {prefersReducedMotion ? (
+            <>
+              <span className="text-secondary">{`$ moodshaker mix --live`}</span>
+              <span className="text-muted-foreground">{`> ${t("loading.rotating.1")}`}</span>
+              <span className="text-muted-foreground">{`> ${t("loading.rotating.2")}`}</span>
+              <span className="text-muted-foreground">{`> ${t("loading.rotating.3")}`}</span>
+              <span className="text-muted-foreground">{`> ${t("loading.rotating.4")}`}</span>
+            </>
+          ) : (
+            <>
+              <TypingAnimation className="text-secondary" duration={28}>
+                {`$ moodshaker mix --live`}
+              </TypingAnimation>
+              <AnimatedSpan className="text-muted-foreground">
+                {`> ${t("loading.rotating.1")}`}
+              </AnimatedSpan>
+              <AnimatedSpan className="text-muted-foreground">
+                {`> ${t("loading.rotating.2")}`}
+              </AnimatedSpan>
+              <AnimatedSpan className="text-muted-foreground">
+                {`> ${t("loading.rotating.3")}`}
+              </AnimatedSpan>
+              <AnimatedSpan className="text-muted-foreground">
+                {`> ${t("loading.rotating.4")}`}
+              </AnimatedSpan>
+            </>
+          )}
+        </Terminal>
+        <p className="text-center font-mono text-sm uppercase tracking-[0.18em] text-primary">
+          {displayMessage}
+        </p>
 
-        <div className="space-y-12">
-          <div className="min-h-[160px] flex flex-col items-center justify-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={displayMessage}
-                className="space-y-6 w-full"
-                initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
-                transition={{ duration: 0.5 }}
-              >
-                <h2 className="text-4xl md:text-5xl font-black text-primary font-heading tracking-widest uppercase pb-2 leading-relaxed px-4">
-                  {displayMessage}
-                </h2>
-                <motion.p
-                  className="text-lg text-secondary font-mono tracking-wider font-bold"
-                  animate={
-                    prefersReducedMotion
-                      ? undefined
-                      : {
-                          opacity: [0.6, 1, 0.6],
-                          textShadow: [
-                            "0 0 5px rgba(0,255,255,0.2)",
-                            "0 0 15px rgba(0,255,255,0.8)",
-                            "0 0 5px rgba(0,255,255,0.2)",
-                          ],
-                        }
-                  }
-                  transition={
-                    prefersReducedMotion
-                      ? undefined
-                      : { duration: 2, repeat: Number.POSITIVE_INFINITY }
-                  }
-                >
-                  {displaySubtitle}
-                </motion.p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <div className="w-full h-3 rounded-none overflow-hidden relative bg-black/50 border-2 border-primary/40 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] max-w-md mx-auto">
-            {/* 单色，与问卷页进度条保持一致：进度条只传达「到哪一步」。 */}
-            <motion.div
-              className="h-full bg-primary"
-              style={{ width: `${currentProgress}%` }}
-            ></motion.div>
-          </div>
-        </div>
+        <Progress
+          value={currentProgress}
+          className="mx-auto h-3 max-w-md border-2 border-primary/40"
+        />
       </motion.div>
     </div>
   );

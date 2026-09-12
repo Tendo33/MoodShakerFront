@@ -13,7 +13,17 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import { Container, Button, GradientText } from "@/components/ui/core";
+import { Button } from "@/components/ui/button";
+import { Card, cardVariants } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
+import { GradientText } from "@/components/ui/gradient-text";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
+import { TerminalLoader } from "@/components/ui/terminal-loader";
+import { cn } from "@/lib/utils";
+import { ChevronLeft } from "lucide-react";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
@@ -406,7 +416,7 @@ const Questions = memo(function Questions() {
             {/* common.loading 而非 loading.default —— 后者是「正在调制中」，
                 这里只是在读已保存的答案，读屏用户会以为在生成配方。 */}
             <span className="sr-only">{t("common.loading")}</span>
-            <span className="h-8 w-8 animate-spin border-2 border-primary/30 border-t-primary" />
+            <TerminalLoader rows={4} cols={18} />
           </div>
         </Container>
       </div>
@@ -416,7 +426,7 @@ const Questions = memo(function Questions() {
   return (
     <div className="min-h-screen relative overflow-hidden">
       <Container className="relative z-10 py-16 md:py-24">
-        <div className="glass-subtle mx-auto mb-12 max-w-3xl border border-white/10 px-4 py-5 md:mb-16 md:px-6">
+        <Card variant="subtle" className="mx-auto mb-12 max-w-3xl px-4 py-5 md:mb-16 md:px-6">
           <div className="mb-4 flex items-center justify-between gap-4 px-1">
             <span className="text-sm font-bold font-mono uppercase tracking-[0.2em] text-secondary">
               {t("questions.progress")}
@@ -426,18 +436,11 @@ const Questions = memo(function Questions() {
             </span>
           </div>
 
-          <div className="relative z-10 h-3.5 w-full border border-primary/20 bg-black/45 shadow-[inset_0_0_10px_rgba(0,0,0,0.45)]">
-            {/* 单色而非 from-primary via-secondary to-accent。三色渐变让进度条本身
-                成了页面上最跳的元素，而它要传达的只是「第几步」这一个信息。
-                原来还叠了一层 animate-shimmer 斜纹，无限循环，一并去掉。 */}
-            <motion.div
-              className="relative h-full overflow-hidden bg-primary"
-              initial={{ width: "0%" }}
-              animate={{ width: `${calculatedProgress}%` }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            />
-          </div>
-        </div>
+          <Progress
+            value={calculatedProgress}
+            aria-label={t("questions.progress")}
+          />
+        </Card>
 
         <AnimatePresence mode="wait">
           {!isFinalStep && currentQuestion && (
@@ -451,35 +454,30 @@ const Questions = memo(function Questions() {
             >
               <div className="space-y-6 text-center">
                 <div className="flex items-center justify-center gap-4">
-                  <motion.button
+                  <Button
+                    variant="outline"
+                    size="md"
                     onClick={() => void handleGoBack()}
-                    className="focus-ring inline-flex min-h-11 items-center gap-2 border border-primary/35 bg-black/30 px-4 py-2 font-mono text-sm font-bold uppercase tracking-[0.16em] text-primary transition-all duration-300 hover:border-primary/65 hover:bg-primary/10 hover:shadow-[0_14px_26px_rgba(3,0,9,0.2)]"
-                    whileHover={{ x: -3 }}
-                    whileTap={{ scale: 0.95 }}
+                    icon={<ChevronLeft className="h-4 w-4" />}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span className="text-sm font-medium">{t("questions.back")}</span>
-                  </motion.button>
-                  <div className="inline-flex items-center justify-center gap-3 border border-secondary/35 bg-black/35 px-4 py-1.5 shadow-[0_12px_24px_rgba(3,0,9,0.16)]">
-                    <span className="font-bold font-mono uppercase tracking-[0.18em] text-secondary">
-                      {t("questions.step")} {currentStep} / {totalSteps}
-                    </span>
-                  </div>
+                    {t("questions.back")}
+                  </Button>
+                  <Badge variant="secondary" className="px-4 py-1.5 font-bold tracking-[0.18em]">
+                    {t("questions.step")} {currentStep} / {totalSteps}
+                  </Badge>
                 </div>
 
                 <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] md:text-5xl">
                   <GradientText>{currentQuestion.title}</GradientText>
                 </h2>
 
-                {answerError?.questionId === currentQuestion.id && (
-                  <div className="mx-auto mt-2 max-w-2xl border border-destructive/60 bg-black/60 p-4 text-left shadow-[0_16px_28px_rgba(64,0,12,0.2)]">
-                    <p className="text-sm text-white font-mono font-bold">
+                {answerError?.questionId === currentQuestion.id ? (
+                  <Alert variant="destructive" className="mx-auto mt-2 max-w-2xl p-4 text-left">
+                    <AlertDescription className="font-bold text-white">
                       {answerError.message}
-                    </p>
-                  </div>
-                )}
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
               </div>
 
               <div
@@ -503,11 +501,13 @@ const Questions = memo(function Questions() {
                   >
                     <button
                       type="button"
-                      className={`glass-panel relative h-full min-h-[192px] w-full overflow-hidden border p-1 text-left transition-all duration-500 hover:border-secondary hover:shadow-[0_24px_40px_rgba(3,0,9,0.26),0_0_18px_rgba(93,246,255,0.18)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50 active:scale-[0.98] ${
+                      className={cn(
+                        cardVariants({ variant: "panel" }),
+                        "h-full min-h-[192px] w-full p-1 text-left transition-all duration-500 hover:border-secondary hover:shadow-[0_24px_40px_rgba(3,0,9,0.26),0_0_18px_rgba(93,246,255,0.18)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50 active:scale-[0.98]",
                         selectedOption === option.value
                           ? "scale-[1.02] border-secondary shadow-[0_26px_44px_rgba(3,0,9,0.3),0_0_20px_rgba(93,246,255,0.22)]"
-                          : "border-primary/35"
-                      }`}
+                          : "border-primary/35",
+                      )}
                       onClick={() => void handleAnswer(currentQuestion.id, option.value)}
                       onKeyDown={(event) =>
                         handleCardKeyDown(event, () => {
@@ -557,22 +557,17 @@ const Questions = memo(function Questions() {
             >
               <div className="space-y-6 text-center">
                 <div className="flex items-center justify-center gap-4">
-                  <motion.button
+                  <Button
+                    variant="outline"
+                    size="md"
                     onClick={() => void handleGoBack()}
-                    className="focus-ring inline-flex min-h-11 items-center gap-2 border border-primary/35 bg-black/30 px-4 py-2 font-mono text-sm font-bold uppercase tracking-[0.16em] text-primary transition-all duration-300 hover:border-primary/65 hover:bg-primary/10 hover:shadow-[0_14px_26px_rgba(3,0,9,0.2)]"
-                    whileHover={{ x: -3 }}
-                    whileTap={{ scale: 0.95 }}
+                    icon={<ChevronLeft className="h-4 w-4" />}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span className="text-sm font-medium">{t("questions.back")}</span>
-                  </motion.button>
-                  <div className="inline-flex items-center justify-center gap-3 border border-secondary/35 bg-black/35 px-4 py-1.5 shadow-[0_12px_24px_rgba(3,0,9,0.16)]">
-                    <span className="font-bold font-mono uppercase tracking-[0.18em] text-secondary">
-                      {t("questions.step")} {currentStep} / {totalSteps}
-                    </span>
-                  </div>
+                    {t("questions.back")}
+                  </Button>
+                  <Badge variant="secondary" className="px-4 py-1.5 font-bold tracking-[0.18em]">
+                    {t("questions.step")} {currentStep} / {totalSteps}
+                  </Badge>
                 </div>
 
                 <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] md:text-5xl">
@@ -631,7 +626,7 @@ const Questions = memo(function Questions() {
                 ))}
               </div>
 
-              <div className="glass-panel space-y-4 border border-primary/35 p-6 shadow-[0_22px_42px_rgba(3,0,9,0.24)]">
+              <Card className="flex flex-col gap-4 p-6 shadow-[0_22px_42px_rgba(3,0,9,0.24)]">
                 <div className="space-y-2">
                   <h3 className="text-xl font-heading font-bold uppercase tracking-[0.16em] text-primary">
                     {t("questions.feedback.title")}
@@ -646,12 +641,11 @@ const Questions = memo(function Questions() {
                 <label htmlFor="questions-feedback" className="sr-only">
                   {t("questions.feedback.title")}
                 </label>
-                <textarea
+                <Textarea
                   id="questions-feedback"
                   value={feedback}
                   onChange={(event) => setFeedback(event.target.value)}
                   placeholder={t("questions.feedback.placeholder")}
-                  className="focus-ring min-h-36 w-full border border-primary/30 bg-black/50 p-4 font-mono text-foreground focus:border-secondary"
                   aria-describedby={
                     submitError
                       ? `${feedbackDescriptionId} ${feedbackErrorId}`
@@ -659,16 +653,14 @@ const Questions = memo(function Questions() {
                   }
                   aria-invalid={submitError ? "true" : "false"}
                 />
-                {submitError && (
-                  <div
-                    id={feedbackErrorId}
-                    className="border-2 border-destructive bg-black/60 p-4 text-sm font-mono text-white"
-                    role="alert"
-                  >
-                    {submitError}
-                  </div>
-                )}
-                <div className="flex flex-col sm:flex-row gap-4 justify-between">
+                {submitError ? (
+                  <Alert variant="destructive" id={feedbackErrorId} className="border-2 bg-black/60 p-4">
+                    <AlertDescription className="text-white">
+                      {submitError}
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+                <div className="flex flex-col justify-between gap-4 sm:flex-row">
                   <Button onClick={() => void handleReset()} variant="outline" size="lg">
                     {t("questions.reset")}
                   </Button>
@@ -676,7 +668,7 @@ const Questions = memo(function Questions() {
                     {t("questions.submit")}
                   </Button>
                 </div>
-              </div>
+              </Card>
             </motion.div>
           )}
         </AnimatePresence>

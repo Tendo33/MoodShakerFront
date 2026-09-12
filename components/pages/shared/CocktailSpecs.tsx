@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock, Droplet, GlassWater } from "lucide-react";
+import { Clock, Droplet, FlaskConical, GlassWater } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import type { Cocktail } from "@/lib/cocktail-types";
 import type { TranslationKey } from "@/lib/i18n/dictionary";
 
@@ -32,93 +33,85 @@ export function CocktailSpecs({
       }}
     >
       <motion.div
-        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-pink-500 bg-black/40 hover:bg-black/60 transition-colors"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
         }}
       >
-        <div className="flex items-center mb-2">
-          <div className="mr-2 h-5 w-5 text-pink-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M10 2v7.31"></path>
-              <path d="M14 9.3V1.99"></path>
-              <path d="M8.5 2h7"></path>
-              <path d="M14 9.3a6 6 0 1 1-4 0"></path>
-              <path d="M5.52 16h12.96"></path>
-            </svg>
+        <Card className="flex min-w-0 flex-col items-center border-l-2 border-primary bg-black/40 p-4 transition-colors hover:bg-black/60 md:items-start">
+          <div className="mb-2 flex items-center">
+            <FlaskConical className="mr-2 h-5 w-5 text-primary" />
+            <p className="font-mono text-xs uppercase tracking-widest text-primary">
+              {t("detail.baseSpirit")}
+            </p>
           </div>
-          <p className="text-xs text-pink-500 uppercase tracking-widest font-mono">
-            {t("detail.baseSpirit")}
+          <p className="text-center font-mono text-base font-bold text-white drop-shadow-md text-safe-wrap md:text-left md:text-lg">
+            {cocktail.baseSpiritLabel}
           </p>
-        </div>
-        <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
-          {cocktail.baseSpiritLabel}
-        </p>
+        </Card>
       </motion.div>
 
       <motion.div
-        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-blue-500 bg-black/40 hover:bg-black/60 transition-colors"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
         }}
       >
-        <div className="flex items-center mb-2">
-          <Droplet className="mr-2 h-5 w-5 text-blue-500" />
-          <p className="text-xs text-blue-500 uppercase tracking-widest font-mono">
-            {t("detail.alcohol")}
+        <Card
+          variant="secondary"
+          className="flex min-w-0 flex-col items-center border-l-2 border-secondary bg-black/40 p-4 transition-colors hover:bg-black/60 md:items-start"
+        >
+          <div className="mb-2 flex items-center">
+            <Droplet className="mr-2 h-5 w-5 text-secondary" />
+            <p className="font-mono text-xs uppercase tracking-widest text-secondary">
+              {t("detail.alcohol")}
+            </p>
+          </div>
+          <p className="text-center font-mono text-base font-bold text-white drop-shadow-md text-safe-wrap md:text-left md:text-lg">
+            {cocktail.alcoholLevelLabel}
           </p>
-        </div>
-        <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
-          {cocktail.alcoholLevelLabel}
-        </p>
+        </Card>
       </motion.div>
 
       <motion.div
-        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-amber-500 bg-black/40 hover:bg-black/60 transition-colors"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
         }}
       >
-        <div className="flex items-center mb-2">
-          <Clock className="mr-2 h-5 w-5 text-amber-500" />
-          <p className="text-xs text-amber-500 uppercase tracking-widest font-mono">
-            {t("detail.prepTime")}
+        <Card
+          variant="accent"
+          className="flex min-w-0 flex-col items-center border-l-2 border-accent bg-black/40 p-4 transition-colors hover:bg-black/60 md:items-start"
+        >
+          <div className="mb-2 flex items-center">
+            <Clock className="mr-2 h-5 w-5 text-accent" />
+            <p className="font-mono text-xs uppercase tracking-widest text-accent">
+              {t("detail.prepTime")}
+            </p>
+          </div>
+          <p className="text-center font-mono text-base font-bold text-white drop-shadow-md text-safe-wrap md:text-left md:text-lg">
+            {cocktail.timeRequired || (language === "cn" ? "5分钟" : "5 mins")}
           </p>
-        </div>
-        <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
-          {cocktail.timeRequired || (language === "cn" ? "5分钟" : "5 mins")}
-        </p>
+        </Card>
       </motion.div>
 
       <motion.div
-        className="flex min-w-0 flex-col items-center md:items-start p-4 rounded-none glass-panel border-l-2 border-emerald-500 bg-black/40 hover:bg-black/60 transition-colors"
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
         }}
       >
-        <div className="flex items-center mb-2">
-          <GlassWater className="mr-2 h-5 w-5 text-emerald-500" />
-          <p className="text-xs text-emerald-500 uppercase tracking-widest font-mono">
-            {t("detail.glass")}
+        <Card className="flex min-w-0 flex-col items-center border-l-2 border-secondary bg-black/40 p-4 transition-colors hover:bg-black/60 md:items-start">
+          <div className="mb-2 flex items-center">
+            <GlassWater className="mr-2 h-5 w-5 text-secondary" />
+            <p className="font-mono text-xs uppercase tracking-widest text-secondary">
+              {t("detail.glass")}
+            </p>
+          </div>
+          <p className="text-center font-mono text-base font-bold text-white drop-shadow-md text-safe-wrap md:text-left md:text-lg">
+            {cocktail.servingGlass}
           </p>
-        </div>
-        <p className="font-mono font-bold text-base md:text-lg text-white drop-shadow-md text-center md:text-left text-safe-wrap">
-          {cocktail.servingGlass}
-        </p>
+        </Card>
       </motion.div>
     </motion.div>
   );

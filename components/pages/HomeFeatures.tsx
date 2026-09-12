@@ -1,7 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Container, GradientText } from "@/components/ui/core";
+import { Container } from "@/components/ui/container";
+import { GradientText } from "@/components/ui/gradient-text";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { TerminalNote } from "@/components/ui/terminal-note";
 import { useLanguage } from "@/context/LanguageContext";
 import { useInViewAnimation } from "@/utils/animation-utils";
 import { Sparkles, BookOpen, Beaker } from "lucide-react";
@@ -67,9 +75,12 @@ export default function HomeFeatures() {
               }
               transition={{ duration: 0.6, delay: index * 0.2 }}
             >
-              <div className="glass-panel card-hover group relative h-full overflow-hidden border border-primary/35 p-8 text-center transition-all duration-500 hover:border-secondary hover:shadow-[0_24px_48px_rgba(3,0,9,0.28),0_0_18px_rgba(93,246,255,0.16)]">
-                <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay" />
-                <div className="relative z-10 text-spacing">
+              <Card
+                hover="lift"
+                scanline
+                className="group h-full p-8 text-center"
+              >
+                <CardHeader className="text-spacing">
                   <motion.div
                     className="mx-auto mb-6 flex h-16 w-16 items-center justify-center border border-primary/45 bg-black/55 shadow-[0_16px_26px_rgba(3,0,9,0.22)] transition-all duration-300 transform group-hover:border-secondary group-hover:shadow-[0_18px_30px_rgba(3,0,9,0.24)]"
                     whileHover={{
@@ -86,14 +97,16 @@ export default function HomeFeatures() {
                       {feature.icon}
                     </motion.div>
                   </motion.div>
-                  <h3 className="mb-4 text-xl font-bold font-heading uppercase tracking-[0.16em] text-primary transition-colors group-hover:text-secondary lg:text-2xl">
+                  <CardTitle className="mb-4 transition-colors group-hover:text-secondary">
                     {feature.title}
-                  </h3>
-                  <p className="border-l-2 border-primary/60 bg-black/40 p-4 text-sm font-mono leading-relaxed text-foreground/88 transition-colors group-hover:border-secondary md:text-base">
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <TerminalNote className="text-sm transition-colors group-hover:border-secondary md:text-base">
                     {feature.description}
-                  </p>
-                </div>
-              </div>
+                  </TerminalNote>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </div>

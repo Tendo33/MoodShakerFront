@@ -8,6 +8,7 @@ import {
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
 import { buildPageMetadata } from "@/lib/i18n/metadata";
 import { DataSourceUnavailableError } from "@/lib/runtime-errors";
+import { Card, CardTitle } from "@/components/ui/card";
 import GalleryContent from "./GalleryContent";
 import { redirect } from "next/navigation";
 
@@ -102,16 +103,16 @@ export default async function GalleryPage({
   if (isUnavailable || !cocktails) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-xl w-full border-2 border-primary/40 bg-black/70 p-8 text-center glass-panel">
-          <h1 className="text-2xl font-heading font-black tracking-widest uppercase text-primary mb-4">
+        <Card className="w-full max-w-xl border-2 border-primary/40 bg-black/70 p-8 text-center">
+          <CardTitle className="mb-4 text-2xl font-black tracking-widest">
             {lang === "en" ? "Gallery temporarily unavailable" : "酒单库暂时不可用"}
-          </h1>
-          <p className="font-mono text-foreground/80 leading-relaxed">
+          </CardTitle>
+          <p className="font-mono leading-relaxed text-foreground/80">
             {lang === "en"
               ? "We cannot load live cocktail data right now. Please try again shortly."
               : "当前无法加载实时酒单数据，请稍后再试。"}
           </p>
-        </div>
+        </Card>
       </div>
     );
   }

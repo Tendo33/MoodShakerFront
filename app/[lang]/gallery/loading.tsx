@@ -1,16 +1,16 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { TerminalLoader } from "@/components/ui/terminal-loader";
 
 export default function Loading() {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black/90 text-white">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="h-10 w-10 animate-spin text-pink-500" />
-        <p className="text-lg font-medium animate-pulse text-white/80">
+    <div className="flex min-h-screen items-center justify-center bg-black/90">
+      <div className="flex flex-col items-center gap-4" role="status" aria-live="polite">
+        <TerminalLoader rows={5} cols={20} />
+        <p className="font-mono text-sm uppercase tracking-[0.18em] text-muted-foreground">
           {t("common.loading")}
         </p>
       </div>

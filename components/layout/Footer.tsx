@@ -11,7 +11,8 @@ import {
   Martini as Cocktail,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { Container, Divider } from "@/components/ui/core";
+import { Container } from "@/components/ui/container";
+import { Separator } from "@/components/ui/separator";
 import { gradientStyles } from "@/utils/style-constants";
 
 export default function Footer() {
@@ -108,7 +109,7 @@ export default function Footer() {
               </motion.div>
             </div>
 
-            <Divider className="my-8 border-white/10" />
+            <Separator className="my-8 border-white/10" />
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}

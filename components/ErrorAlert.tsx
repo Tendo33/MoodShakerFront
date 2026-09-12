@@ -1,5 +1,7 @@
 "use client";
 
+import { CircleAlert, X } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useError } from "@/context/ErrorContext";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -15,65 +17,33 @@ export default function ErrorAlert() {
 
   return (
     <div
-      className="fixed inset-0 flex items-end justify-center px-4 py-6 pointer-events-none sm:p-6 sm:items-start sm:justify-end z-50"
-      role="alert"
+      className="pointer-events-none fixed inset-0 z-50 flex items-end justify-center px-4 py-6 sm:items-start sm:justify-end sm:p-6"
       aria-live="assertive"
     >
-      <div
-        className={`max-w-sm w-full shadow-lg rounded-none pointer-events-auto overflow-hidden transform ease-out duration-300 transition ${
+      <Alert
+        variant="destructive"
+        className={`max-w-sm pointer-events-auto p-4 shadow-lg transition duration-300 ease-out ${
           isVisible
             ? "translate-y-0 opacity-100 sm:translate-x-0"
             : "translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-        } glass-effect`}
+        }`}
       >
-        <div className="p-4">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-6 w-6 text-red-500"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className="ml-3 w-0 flex-1 pt-0.5">
-              <p className="text-sm font-medium text-foreground">
-                {t("common.error")}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">{message}</p>
-            </div>
-            <div className="ml-4 flex-shrink-0 flex">
-              <button
-                onClick={() => clearError(errors[0].id)}
-                className="inline-flex text-muted-foreground focus:outline-none focus:text-foreground transition ease-in-out duration-150 hover:text-foreground focus-ring"
-                type="button"
-                aria-label={language === "en" ? "Close" : "关闭"}
-              >
-                <svg
-                  className="h-5 w-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </div>
+        <div className="flex items-start">
+          <CircleAlert className="h-6 w-6 shrink-0 text-destructive" />
+          <div className="ml-3 w-0 flex-1 pt-0.5">
+            <AlertTitle>{t("common.error")}</AlertTitle>
+            <AlertDescription className="mt-1">{message}</AlertDescription>
           </div>
+          <button
+            onClick={() => clearError(errors[0].id)}
+            className="ml-4 inline-flex text-muted-foreground transition duration-150 ease-in-out hover:text-foreground focus:text-foreground focus-ring"
+            type="button"
+            aria-label={language === "en" ? "Close" : "关闭"}
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
-      </div>
+      </Alert>
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Error({
   error,
@@ -17,21 +19,22 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="text-center p-8 max-w-md border-2 border-primary bg-black/80">
-        <h2 className="text-3xl font-heading font-black mb-4 text-primary">
-          {t("error.page.title")}
-        </h2>
-        <p className="text-muted-foreground font-mono mb-8">
-          {t("error.page.description")}
-        </p>
-        <button
-          onClick={() => reset()}
-          className="px-6 py-2 border-2 border-accent text-accent font-mono uppercase tracking-widest hover:bg-accent/20 transition-all"
-        >
-          {t("error.page.action")}
-        </button>
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-black px-4">
+      <Card className="max-w-md border-2 border-primary p-8 text-center">
+        <CardHeader>
+          <CardTitle className="mb-4 text-3xl font-black">
+            {t("error.page.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-8 font-mono text-muted-foreground">
+            {t("error.page.description")}
+          </p>
+          <Button variant="outline" onClick={() => reset()}>
+            {t("error.page.action")}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

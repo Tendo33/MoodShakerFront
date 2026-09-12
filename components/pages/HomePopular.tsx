@@ -1,44 +1,15 @@
 ﻿"use client";
 
-import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Container, GradientText } from "@/components/ui/core";
+import { Container } from "@/components/ui/container";
+import { GradientText } from "@/components/ui/gradient-text";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { TerminalNote } from "@/components/ui/terminal-note";
 import { useLanguage } from "@/context/LanguageContext";
 import { useInViewAnimation } from "@/utils/animation-utils";
 import Link from "next/link";
-import Image from "next/image";
 import { cocktailImages } from "@/utils/cocktail-images";
-
-type SafeImageProps = Omit<React.ComponentProps<typeof Image>, "src" | "alt"> & {
-  src?: string;
-  fallbackSrc: string;
-  alt: string;
-};
-
-const SafeImage = React.memo(function SafeImage({
-  src,
-  fallbackSrc,
-  alt,
-  onError,
-  ...props
-}: SafeImageProps) {
-  const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  const preferredSrc = src ?? fallbackSrc;
-  const imgSrc = failedSrc === preferredSrc ? fallbackSrc : preferredSrc;
-
-  return (
-    <Image
-      {...props}
-      src={imgSrc}
-      alt={alt}
-      onError={(event) => {
-        setFailedSrc(preferredSrc);
-        onError?.(event);
-      }}
-    />
-  );
-});
-SafeImage.displayName = "SafeImage";
+import { SafeImage } from "@/components/SafeImage";
 
 export default function HomePopular() {
   const { language } = useLanguage();
@@ -117,9 +88,7 @@ export default function HomePopular() {
                 href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}
                 className="focus-ring"
               >
-                <div className="glass-panel card-hover group relative h-full overflow-hidden border border-primary/35 p-8 transition-all duration-500 hover:border-secondary hover:shadow-[0_24px_48px_rgba(3,0,9,0.28),0_0_18px_rgba(93,246,255,0.16)]">
-                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay z-0" />
-                  
+                <Card hover="lift" scanline className="group h-full p-8">
                   <div className="relative z-10 mb-6 h-40 overflow-hidden border border-primary/45 transition-colors group-hover:border-secondary md:h-48">
                     <motion.div
                       className="w-full h-full relative"
@@ -138,15 +107,15 @@ export default function HomePopular() {
                     </motion.div>
                     <div className="absolute inset-0 bg-linear-to-br from-primary/30 to-secondary/30 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-300" />
                   </div>
-                  <div className="text-spacing relative z-10">
-                    <h3 className="mb-3 text-xl font-bold font-heading uppercase tracking-[0.16em] text-primary transition-colors duration-300 group-hover:text-secondary lg:text-2xl">
+                  <CardContent className="text-spacing">
+                    <CardTitle className="mb-3 transition-colors duration-300 group-hover:text-secondary">
                       {cocktail.name}
-                    </h3>
-                    <p className="border-l-2 border-primary/60 bg-black/40 p-3 text-sm font-mono leading-relaxed text-foreground/88 transition-colors group-hover:border-secondary md:text-base">
+                    </CardTitle>
+                    <TerminalNote className="p-3 text-sm transition-colors group-hover:border-secondary md:text-base">
                       {cocktail.description}
-                    </p>
-                  </div>
-                </div>
+                    </TerminalNote>
+                  </CardContent>
+                </Card>
               </Link>
             </motion.div>
           ))}

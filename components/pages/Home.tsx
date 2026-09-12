@@ -13,8 +13,13 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
-import Image from "next/image";
-import { Button, Container, GradientText } from "@/components/ui/core";
+import { Button } from "@/components/ui/button";
+import { SafeImage } from "@/components/SafeImage";
+import { Container } from "@/components/ui/container";
+import { GradientText } from "@/components/ui/gradient-text";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TerminalNote } from "@/components/ui/terminal-note";
 import {
   animations,
   useDelayedAnimation,
@@ -30,38 +35,6 @@ import type { RecommendationMeta } from "@/lib/cocktail-types";
 import { hasRecoverableRecommendation } from "@/lib/recommendation-state";
 
 import { cocktailImages } from "@/utils/cocktail-images";
-
-// Robust Image component that handles errors without direct DOM manipulation
-type SafeImageProps = Omit<React.ComponentProps<typeof Image>, "src" | "alt"> & {
-  src?: string;
-  fallbackSrc: string;
-  alt: string;
-};
-
-const SafeImage = React.memo(function SafeImage({
-  src,
-  fallbackSrc,
-  alt,
-  onError,
-  ...props
-}: SafeImageProps) {
-  const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  const preferredSrc = src ?? fallbackSrc;
-  const imgSrc = failedSrc === preferredSrc ? fallbackSrc : preferredSrc;
-
-  return (
-    <Image
-      {...props}
-      src={imgSrc}
-      alt={alt}
-      onError={(event) => {
-        setFailedSrc(preferredSrc);
-        onError?.(event);
-      }}
-    />
-  );
-});
-SafeImage.displayName = "SafeImage";
 
 const Home = React.memo(function Home() {
   const { t, language, getPathWithLanguage } = useLanguage();
@@ -227,12 +200,15 @@ const Home = React.memo(function Home() {
               className="content-spacing"
             >
               <motion.div variants={slideUpVariants} className="mb-4">
-                <div className="glass-subtle inline-flex items-center gap-2 border border-primary/35 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-primary shadow-[0_14px_26px_rgba(3,0,9,0.18)]">
+                <Badge
+                  variant="primary"
+                  className="gap-2 px-4 py-2 text-xs font-bold tracking-[0.22em] shadow-[0_14px_26px_rgba(3,0,9,0.18)]"
+                >
                   <Sparkles className="h-4 w-4 text-secondary animate-neon-pulse" />
                   {language === "en"
                     ? "AI-Powered Cocktail Recommendations"
                     : "AI 驱动的鸡尾酒推荐"}
-                </div>
+                </Badge>
               </motion.div>
 
               <motion.h1
@@ -252,117 +228,114 @@ const Home = React.memo(function Home() {
               </motion.p>
 
               {hasRecommendation ? (
-                <motion.div
-                  className="glass-panel relative mb-8 max-w-xl overflow-hidden border border-secondary/30 p-6 shadow-[0_22px_46px_rgba(3,0,9,0.26)]"
-                  variants={slideUpVariants}
-                >
-                  {/* Decorative Scanline inside card */}
-                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay"></div>
-                  
-                  <div className="relative z-10 mb-6 flex items-center">
-                    <motion.div
-                      className="mr-4 flex h-12 w-12 shrink-0 items-center justify-center border border-secondary/45 bg-black/55 shadow-[0_14px_24px_rgba(3,0,9,0.18)] rotate-45"
-                      whileHover={{ scale: 1.1, rotate: 90 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Sparkles className="h-6 w-6 text-secondary -rotate-45 group-hover:rotate-0 transition-transform" />
-                    </motion.div>
-                    <h3 className="text-xl font-heading font-bold uppercase tracking-[0.2em] text-secondary lang-en:text-lg">
-                      {language === "en" ? "Your Recommendation" : "您的推荐"}
-                    </h3>
-                  </div>
-                  <p className="relative z-10 mb-8 text-sm font-mono leading-relaxed text-foreground/84 lang-en:text-sm lang-en:leading-normal">
-                    {language === "en"
-                      ? "> SYSTEM LOG: Personalized cocktail sequence initialized. View output or explore alternative logic paths."
-                      : "> 系统日志：专属鸡尾酒序列已生成，请查看输出或探索替代逻辑路径。"}
-                  </p>
-                  <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-4 relative z-10">
-                    <Button
-                      size="lg"
-                      iconPosition="right"
-                      icon={<ChevronRight className="h-4 w-4" />}
-                      href={recommendationPath}
-                      variant="primary"
-                    >
-                      <span className="flex items-center gap-2">
-                        <Martini className="h-4 w-4" /> 
-                        <span>{language === "en" ? "View Cocktail" : "查看鸡尾酒"}</span>
-                      </span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      href={galleryPath}
-                      icon={<Library className="h-5 w-5" />}
-                    >
-                      {language === "en" ? "Browse More" : "浏览更多"}
-                    </Button>
-                  </div>
-                  <div className="mt-6 text-center relative z-10">
-                    <Link
-                      href={newQuestionPath}
-                      className="text-sm text-primary font-mono tracking-widest hover:text-secondary hover:underline transition-colors uppercase focus-ring"
-                    >
-                      {language === "en"
-                        ? "Start a new recommendation"
-                        : "重新开始推荐"}
-                    </Link>
-                  </div>
+                <motion.div variants={slideUpVariants}>
+                  <Card variant="secondary" scanline className="mb-8 max-w-xl p-6">
+                    <CardHeader className="mb-6 flex-row items-center">
+                      <motion.div
+                        className="mr-4 flex h-12 w-12 shrink-0 rotate-45 items-center justify-center border border-secondary/45 bg-black/55 shadow-[0_14px_24px_rgba(3,0,9,0.18)]"
+                        whileHover={{ scale: 1.1, rotate: 90 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <Sparkles className="h-6 w-6 -rotate-45 text-secondary" />
+                      </motion.div>
+                      <CardTitle className="text-secondary tracking-[0.2em] lang-en:text-lg">
+                        {language === "en" ? "Your Recommendation" : "您的推荐"}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="mb-8 text-sm font-mono leading-relaxed text-foreground/84 lang-en:text-sm lang-en:leading-normal">
+                        {language === "en"
+                          ? "> SYSTEM LOG: Personalized cocktail sequence initialized. View output or explore alternative logic paths."
+                          : "> 系统日志：专属鸡尾酒序列已生成，请查看输出或探索替代逻辑路径。"}
+                      </p>
+                      <div className="button-group flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+                        <Button
+                          size="lg"
+                          iconPosition="right"
+                          icon={<ChevronRight className="h-4 w-4" />}
+                          href={recommendationPath}
+                          variant="primary"
+                        >
+                          <span className="flex items-center gap-2">
+                            <Martini className="h-4 w-4" />
+                            <span>{language === "en" ? "View Cocktail" : "查看鸡尾酒"}</span>
+                          </span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          href={galleryPath}
+                          icon={<Library className="h-5 w-5" />}
+                        >
+                          {language === "en" ? "Browse More" : "浏览更多"}
+                        </Button>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="mt-6 justify-center">
+                      <Link
+                        href={newQuestionPath}
+                        className="text-sm text-primary font-mono tracking-widest hover:text-secondary hover:underline transition-colors uppercase focus-ring"
+                      >
+                        {language === "en"
+                          ? "Start a new recommendation"
+                          : "重新开始推荐"}
+                      </Link>
+                    </CardFooter>
+                  </Card>
                 </motion.div>
               ) : hasSavedSession ? (
-                <motion.div
-                  className="glass-panel relative mb-8 max-w-xl overflow-hidden border border-primary/30 p-6 shadow-[0_22px_46px_rgba(3,0,9,0.26)]"
-                  variants={slideUpVariants}
-                >
-                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-size-[100%_4px] pointer-events-none mix-blend-overlay"></div>
-                  
-                  <div className="relative z-10 mb-6 flex items-center">
-                    <motion.div
-                      className="mr-4 flex h-12 w-12 shrink-0 items-center justify-center border border-primary/45 bg-black/55 shadow-[0_14px_24px_rgba(3,0,9,0.18)] rotate-45"
-                      whileHover={{ scale: 1.1, rotate: 90 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <History className="h-6 w-6 text-primary -rotate-45 group-hover:rotate-0 transition-transform" />
-                    </motion.div>
-                    <h3 className="text-xl font-heading font-bold uppercase tracking-[0.2em] text-primary lang-en:text-lg">
-                      {t("home.savedSession")}
-                    </h3>
-                  </div>
-                  <p className="relative z-10 mb-8 text-sm font-mono leading-relaxed text-foreground/84 lang-en:text-sm lang-en:leading-normal">
-                    {t("home.savedSessionDesc")}
-                  </p>
-                  <div className="button-group flex flex-col sm:flex-row sm:flex-wrap gap-4 relative z-10">
-                    <Button
-                      size="lg"
-                      iconPosition="right"
-                      icon={<ChevronRight className="h-4 w-4" />}
-                      href={questionsPath}
-                      variant="secondary"
-                    >
-                      <span className="flex items-center gap-2">
-                        <History className="h-4 w-4" /> 
-                        <span>{t("home.continue")}</span>
-                      </span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      href={galleryPath}
-                      icon={<Library className="h-5 w-5" />}
-                    >
-                      {language === "en" ? "Browse Gallery" : "浏览酒单"}
-                    </Button>
-                  </div>
-                  <div className="mt-6 text-center relative z-10">
-                    <Link
-                      href={newQuestionPath}
-                      className="text-sm text-secondary font-mono tracking-widest hover:text-primary hover:underline transition-colors uppercase focus-ring"
-                    >
-                      {language === "en"
-                        ? "Start a new session instead"
-                        : "开始新的会话"}
-                    </Link>
-                  </div>
+                <motion.div variants={slideUpVariants}>
+                  <Card scanline className="mb-8 max-w-xl border-primary/30 p-6">
+                    <CardHeader className="mb-6 flex-row items-center">
+                      <motion.div
+                        className="mr-4 flex h-12 w-12 shrink-0 rotate-45 items-center justify-center border border-primary/45 bg-black/55 shadow-[0_14px_24px_rgba(3,0,9,0.18)]"
+                        whileHover={{ scale: 1.1, rotate: 90 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <History className="h-6 w-6 -rotate-45 text-primary" />
+                      </motion.div>
+                      <CardTitle className="tracking-[0.2em] lang-en:text-lg">
+                        {t("home.savedSession")}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="mb-8 text-sm font-mono leading-relaxed text-foreground/84 lang-en:text-sm lang-en:leading-normal">
+                        {t("home.savedSessionDesc")}
+                      </p>
+                      <div className="button-group flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+                        <Button
+                          size="lg"
+                          iconPosition="right"
+                          icon={<ChevronRight className="h-4 w-4" />}
+                          href={questionsPath}
+                          variant="secondary"
+                        >
+                          <span className="flex items-center gap-2">
+                            <History className="h-4 w-4" />
+                            <span>{t("home.continue")}</span>
+                          </span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          href={galleryPath}
+                          icon={<Library className="h-5 w-5" />}
+                        >
+                          {language === "en" ? "Browse Gallery" : "浏览酒单"}
+                        </Button>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="mt-6 justify-center">
+                      <Link
+                        href={newQuestionPath}
+                        className="text-sm text-secondary font-mono tracking-widest hover:text-primary hover:underline transition-colors uppercase focus-ring"
+                      >
+                        {language === "en"
+                          ? "Start a new session instead"
+                          : "开始新的会话"}
+                      </Link>
+                    </CardFooter>
+                  </Card>
                 </motion.div>
               ) : (
                 <motion.div
@@ -426,7 +399,10 @@ const Home = React.memo(function Home() {
                               ease: "easeInOut",
                             }}
                           />
-                          <div className="glass-panel relative h-full overflow-hidden border border-secondary/45 shadow-[0_24px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.1)] transition duration-500 group-hover:border-secondary group-hover:shadow-[0_30px_62px_rgba(3,0,9,0.36),0_0_24px_rgba(93,246,255,0.16)]">
+                          <Card
+                            variant="secondary"
+                            className="h-full border-secondary/45 shadow-[0_24px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.1)] transition duration-500 group-hover:border-secondary group-hover:shadow-[0_30px_62px_rgba(3,0,9,0.36),0_0_24px_rgba(93,246,255,0.16)]"
+                          >
                             {/* Neon Terminal Title Bar overlay */}
                             <div className="absolute top-0 z-20 flex w-full items-center gap-2 border-b border-secondary/45 bg-black/72 px-4 py-2 backdrop-blur-md">
                               <div className="h-3 w-3 rounded-full bg-primary" />
@@ -459,22 +435,23 @@ const Home = React.memo(function Home() {
                               <p className="mb-4 text-xs font-mono uppercase tracking-[0.2em] text-secondary/90">
                                 {cocktail.englishName}
                               </p>
-                              <p className="mb-6 border-l-2 border-primary/65 bg-black/45 p-3 text-sm font-mono leading-relaxed text-foreground">
+                              <TerminalNote className="mb-6 p-3 text-sm text-foreground">
                                 {cocktail.description}
-                              </p>
+                              </TerminalNote>
 
                               <div className="flex flex-wrap gap-2">
-                                {cocktail.tags.map((tag, tagIndex) => (
-                                  <div
-                                    key={tagIndex}
-                                    className="glass-subtle inline-flex items-center border border-secondary/35 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-secondary"
+                                {cocktail.tags.map((tag) => (
+                                  <Badge
+                                    key={tag}
+                                    variant="secondary"
+                                    className="font-bold tracking-[0.18em]"
                                   >
                                     {tag}
-                                  </div>
+                                  </Badge>
                                 ))}
                               </div>
                             </motion.div>
-                          </div>
+                          </Card>
                         </Link>
                       </motion.div>
                     ),
@@ -529,30 +506,35 @@ const Home = React.memo(function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-size-[100%_4px] pointer-events-none z-10"></div>
         <Container size="xl" className="relative z-20">
           <motion.div
-            className="glass-panel container-narrow border border-secondary/35 p-8 text-center shadow-[0_26px_54px_rgba(3,0,9,0.32),0_0_20px_rgba(93,246,255,0.12)] md:p-14"
+            className="container-narrow"
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
             animate={ctaInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 50, scale: 0.95 }}
             transition={{ duration: 0.5, ease: "linear" }}
           >
-            <GradientText
-              as="h2"
-              className="mb-6 text-4xl font-black uppercase tracking-[0.08em] md:text-5xl lg:text-6xl"
+            <Card
+              variant="secondary"
+              className="border-secondary/35 p-8 text-center shadow-[0_26px_54px_rgba(3,0,9,0.32),0_0_20px_rgba(93,246,255,0.12)] md:p-14"
             >
-              {t("home.cta.title")}
-            </GradientText>
-            <p className="mb-12 text-lg font-mono leading-relaxed tracking-[0.06em] text-foreground/90 drop-shadow-md md:text-xl">
-              {t("home.cta.subtitle")}
-            </p>
-            <Button
-              size="xl"
-              iconPosition="right"
-              icon={<ArrowRight className="h-5 w-5" />}
-              href={questionsPath}
-              variant="primary"
-              className="shadow-2xl"
-            >
-              <span className="mr-2">→</span> {t("home.start")}
-            </Button>
+              <GradientText
+                as="h2"
+                className="mb-6 text-4xl font-black uppercase tracking-[0.08em] md:text-5xl lg:text-6xl"
+              >
+                {t("home.cta.title")}
+              </GradientText>
+              <p className="mb-12 text-lg font-mono leading-relaxed tracking-[0.06em] text-foreground/90 drop-shadow-md md:text-xl">
+                {t("home.cta.subtitle")}
+              </p>
+              <Button
+                size="xl"
+                iconPosition="right"
+                icon={<ArrowRight className="h-5 w-5" />}
+                href={questionsPath}
+                variant="primary"
+                className="shadow-2xl"
+              >
+                <span className="mr-2">→</span> {t("home.start")}
+              </Button>
+            </Card>
           </motion.div>
         </Container>
       </section>

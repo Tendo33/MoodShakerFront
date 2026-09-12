@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import "./globals.css";
 
 export default function GlobalError({
   error,
@@ -23,23 +27,28 @@ export default function GlobalError({
 
   return (
     <html lang={isEnglish ? "en" : "zh-CN"}>
-      <body className="bg-black text-white font-mono flex items-center justify-center min-h-screen">
-        <div className="text-center p-8 border-2 border-[#FF00FF] bg-black/80 max-w-lg">
-          <h2 className="text-3xl font-bold mb-4 text-[#00FFFF]">
-            {isEnglish ? "System Failure" : "系统故障"}
-          </h2>
-          <p className="mb-6 opacity-80">
-            {isEnglish
-              ? "A critical error occurred in the atmospheric simulation matrix."
-              : "模拟矩阵发生了严重错误。"}
-          </p>
-          <button
-            className="px-6 py-2 border-2 border-[#FF9900] text-[#FF9900] hover:bg-[#FF9900]/20 transition-all uppercase tracking-widest"
-            onClick={() => reset()}
-          >
-            {isEnglish ? "Reboot System" : "重启系统"}
-          </button>
-        </div>
+      <body className="flex min-h-screen items-center justify-center bg-black font-mono text-white">
+        <Card className="max-w-lg border-2 border-primary p-8 text-center">
+          <CardHeader>
+            <CardTitle className="mb-4 text-3xl font-black text-secondary">
+              {isEnglish ? "System Failure" : "系统故障"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-6 text-muted-foreground">
+              {isEnglish
+                ? "A critical error occurred in the atmospheric simulation matrix."
+                : "模拟矩阵发生了严重错误。"}
+            </p>
+            <button
+              className={cn(buttonVariants({ variant: "outline" }))}
+              onClick={() => reset()}
+              type="button"
+            >
+              {isEnglish ? "Reboot System" : "重启系统"}
+            </button>
+          </CardContent>
+        </Card>
       </body>
     </html>
   );

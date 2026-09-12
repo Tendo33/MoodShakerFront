@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/core";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { TerminalNote } from "@/components/ui/terminal-note";
 
 interface RecommendationUnavailableStateProps {
   title: string;
@@ -26,25 +28,33 @@ export function RecommendationUnavailableState({
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-        className="glass-panel relative w-full max-w-xl overflow-hidden border border-primary/35 px-8 py-14 text-center shadow-[0_20px_48px_rgba(3,0,9,0.32)]"
+        className="w-full max-w-xl"
       >
-        <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] pointer-events-none mix-blend-overlay" />
-        <h2 className="relative z-10 mb-3 text-2xl font-black font-heading uppercase tracking-widest text-primary">
-          {title}
-        </h2>
-        <p className="relative z-10 mx-auto mb-8 max-w-lg border-l-2 border-primary/60 bg-black/35 p-4 font-mono leading-relaxed text-foreground">
-          {description}
-        </p>
-        <div className="relative z-10 flex flex-col justify-center gap-4 sm:flex-row">
-          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-            <Button onClick={onRestart} variant="secondary" size="lg" effect="glow">
-              {restartLabel}
+        <Card
+          scanline
+          className="px-8 py-14 text-center shadow-[0_20px_48px_rgba(3,0,9,0.32)]"
+        >
+          <CardHeader>
+            <CardTitle className="mb-3 text-2xl font-black tracking-widest">
+              {title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TerminalNote className="mx-auto mb-8 max-w-lg bg-black/35 text-foreground">
+              {description}
+            </TerminalNote>
+          </CardContent>
+          <CardFooter className="flex-col justify-center gap-4 sm:flex-row">
+            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+              <Button onClick={onRestart} variant="secondary" size="lg" effect="glow">
+                {restartLabel}
+              </Button>
+            </motion.div>
+            <Button onClick={onBack} variant="primary" size="lg" effect="lift">
+              {backLabel}
             </Button>
-          </motion.div>
-          <Button onClick={onBack} variant="primary" size="lg" effect="lift">
-            {backLabel}
-          </Button>
-        </div>
+          </CardFooter>
+        </Card>
       </motion.div>
     </div>
   );

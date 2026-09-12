@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, memo } from "react";
-import Image from "next/image";
+import { useMemo, memo } from "react";
 import { motion } from "framer-motion";
 import { cocktailImages } from "@/utils/cocktail-images";
 import { shouldBypassNextImageOptimization } from "@/utils/image-optimization";
-import { imageLogger } from "@/utils/logger";
+import { SafeImage } from "@/components/SafeImage";
 
 interface CocktailImageProps {
   cocktailId?: string;
@@ -20,87 +19,35 @@ const CocktailImage = memo(function CocktailImage({
   cocktailName = "Cocktail",
   priority = false,
 }: CocktailImageProps) {
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Generate a placeholder URL for fallback
   const placeholderUrl = `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(cocktailName || "cocktail")}`;
-
-  useEffect(() => {
-    const loadImage = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // Check if we have image data from the context
-        if (imageData) {
-          setImageSrc(imageData);
-          return;
-        }
-
-        // If we have a cocktail ID, try to get the static image first
-        if (cocktailId && cocktailId in cocktailImages) {
-          setImageSrc(
-            cocktailImages[cocktailId as keyof typeof cocktailImages],
-          );
-          return;
-        }
-
-        // Fallback to placeholder
-        setImageSrc(placeholderUrl);
-      } catch (err) {
-        imageLogger.error("Error loading cocktail image", err);
-        setError("Failed to load image");
-        setImageSrc(placeholderUrl);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadImage();
-  }, [cocktailId, imageData, cocktailName, placeholderUrl]);
+  const imageSrc = useMemo(() => {
+    if (imageData) {
+      return imageData;
+    }
+    if (cocktailId && cocktailId in cocktailImages) {
+      return cocktailImages[cocktailId as keyof typeof cocktailImages];
+    }
+    return placeholderUrl;
+  }, [cocktailId, imageData, placeholderUrl]);
 
   return (
-    <>
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-800 animate-pulse">
-          <span className="sr-only">Loading...</span>
-        </div>
-      )}
-
-      {imageSrc && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isLoading ? 0 : 1 }}
-          transition={{ duration: 0.5 }}
-          className="relative w-full h-full"
-        >
-          <Image
-            src={imageSrc || "/placeholder.svg"}
-            alt={cocktailName || "Cocktail"}
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            priority={priority}
-            unoptimized={shouldBypassNextImageOptimization(imageSrc)}
-            className="object-cover"
-            onLoad={() => setIsLoading(false)}
-            onError={() => {
-              setError("Failed to load image");
-              setImageSrc(placeholderUrl);
-            }}
-            placeholder="blur" // 添加模糊占位符
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/wA=" // 1x1像素的模糊占位符
-          />
-        </motion.div>
-      )}
-
-      {error && (
-        <div className="absolute bottom-2 left-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded">
-          {error}
-        </div>
-      )}
-    </>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="relative h-full w-full"
+    >
+      <SafeImage
+        src={imageSrc}
+        fallbackSrc={placeholderUrl}
+        alt={cocktailName || "Cocktail"}
+        fill
+        sizes="(max-width: 768px) 100vw, 50vw"
+        priority={priority}
+        unoptimized={shouldBypassNextImageOptimization(imageSrc)}
+        className="object-cover"
+      />
+    </motion.div>
   );
 });
 

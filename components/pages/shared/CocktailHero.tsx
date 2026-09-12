@@ -5,6 +5,9 @@ import type { ReactNode } from "react";
 import type { Cocktail } from "@/lib/cocktail-types";
 import { CocktailSpecs } from "@/components/pages/shared/CocktailSpecs";
 import type { TranslationKey } from "@/lib/i18n/dictionary";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { TerminalNote } from "@/components/ui/terminal-note";
 
 interface CocktailHeroProps {
   cocktail: Cocktail;
@@ -42,11 +45,15 @@ export function CocktailHero({
           }}
         >
           <motion.div
-            className="glass-panel relative aspect-square overflow-hidden border border-secondary/45 p-2 shadow-[0_24px_52px_rgba(3,0,9,0.34),0_0_20px_rgba(93,246,255,0.12)]"
             whileHover={{ scale: 1.01 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
-            {imageContent}
+            <Card
+              variant="secondary"
+              className="aspect-square border-secondary/45 p-2 shadow-[0_24px_52px_rgba(3,0,9,0.34),0_0_20px_rgba(93,246,255,0.12)]"
+            >
+              {imageContent}
+            </Card>
           </motion.div>
         </motion.div>
 
@@ -89,9 +96,9 @@ export function CocktailHero({
               visible: { opacity: 1, transition: { duration: 0.5 } },
             }}
           >
-            <p className="max-w-2xl border-l-2 border-primary/65 bg-black/35 px-5 py-4 text-safe-wrap text-lg font-mono leading-relaxed text-foreground shadow-[0_14px_30px_rgba(3,0,9,0.16)]">
+            <TerminalNote className="max-w-2xl bg-black/35 px-5 py-4 text-safe-wrap text-lg text-foreground shadow-[0_14px_30px_rgba(3,0,9,0.16)]">
               {cocktail.description}
-            </p>
+            </TerminalNote>
           </motion.div>
 
           <CocktailSpecs t={t} language={language} cocktail={cocktail} />
@@ -109,20 +116,24 @@ export function CocktailHero({
               </p>
               <div className="flex flex-wrap gap-3">
               {cocktail.flavorProfileLabels.map((flavor, index) => (
-                  <motion.span
-                    key={index}
-                    className="glass-subtle border border-primary/40 px-4 py-1.5 text-safe-wrap text-sm font-bold uppercase tracking-[0.18em] text-primary"
+                  <motion.div
+                    key={flavor}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.1 }}
                     whileHover={{
                       scale: 1.04,
                       backgroundColor: "rgba(255, 79, 216, 0.12)",
-                      boxShadow: "0 14px 24px rgba(3, 0, 9, 0.18)"
+                      boxShadow: "0 14px 24px rgba(3, 0, 9, 0.18)",
                     }}
                   >
-                    {flavor}
-                  </motion.span>
+                    <Badge
+                      variant="primary"
+                      className="px-4 py-1.5 text-safe-wrap text-sm font-bold tracking-[0.18em]"
+                    >
+                      {flavor}
+                    </Badge>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>

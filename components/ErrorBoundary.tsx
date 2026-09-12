@@ -1,49 +1,32 @@
 "use client";
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { CircleAlert } from "lucide-react";
 import { appLogger, safeLogger } from "@/utils/logger";
-import { gradientStyles } from "@/utils/style-constants";
 import { useLanguage } from "@/context/LanguageContext";
+import { Button } from "@/components/ui/button";
 
-// Error fallback component that can use hooks
 function ErrorFallback() {
   const { t } = useLanguage();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] p-6 text-center">
-      <div className={`w-16 h-16 mb-4 rounded-full ${gradientStyles.iconBackground} flex items-center justify-center`}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-8 w-8 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-      </div>
-      <h2 className="text-xl font-bold mb-2 font-heading tracking-wide text-primary">
+    <div className="flex min-h-[50vh] flex-col items-center justify-center p-6 text-center">
+      <CircleAlert className="mb-4 h-10 w-10 text-primary" />
+      <h2 className="mb-2 font-heading text-xl font-bold tracking-wide text-primary">
         {t("error.boundary.title")}
       </h2>
-      <p className="text-muted-foreground mb-4 max-w-md font-mono">
+      <p className="mb-4 max-w-md font-mono text-muted-foreground">
         {t("error.boundary.description")}
       </p>
-      <button
-        onClick={() => {
-          if (typeof window !== "undefined") {
-            window.location.reload();
-          }
-        }}
-        className={`px-4 py-2 ${gradientStyles.primaryButton} transition-all focus-ring`}
+      <Button
+        variant="primary"
         type="button"
+        onClick={() => {
+          window.location.reload();
+        }}
       >
         {t("error.boundary.refresh")}
-      </button>
+      </Button>
     </div>
   );
 }

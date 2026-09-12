@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Image as ImageIcon, Loader2 } from "lucide-react";
 import { CocktailSharePortal } from "@/components/share/CocktailSharePortal";
-import { Button } from "@/components/ui/core";
+import { Button } from "@/components/ui/button";
 import type { Cocktail } from "@/lib/cocktail-types";
 
 interface RecommendationShareActionProps {

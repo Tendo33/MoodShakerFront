@@ -7,7 +7,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, RefreshCcw } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCocktailResult } from "@/context/CocktailResultContext";
-import { Button } from "@/components/ui/core";
+import { Button } from "@/components/ui/button";
+import { TerminalLoader } from "@/components/ui/terminal-loader";
 import type { Cocktail } from "@/lib/cocktail-types";
 import type { RecommendationAccessPayload } from "@/lib/recommendation-access";
 import { CocktailImage } from "@/components/CocktailImage";
@@ -150,7 +151,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
 
   const textColorClass = "text-foreground font-mono";
   const cardClasses =
-    "glass-panel text-foreground rounded-none border-2 transition-all duration-300";
+    "text-foreground border-2 transition-all duration-300";
   const gradientText =
     "font-black font-heading uppercase tracking-[0.14em]";
 
@@ -305,16 +306,16 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
                 </motion.div>
               )}
 
-              {(isRefreshingImage || isImageLoading) && (
-                <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center rounded-none">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mx-auto mb-2" />
-                    <p className="text-sm text-white font-medium">
+              {isRefreshingImage || isImageLoading ? (
+                <div className="absolute inset-0 flex items-center justify-center rounded-none bg-black/55 backdrop-blur-sm">
+                  <div className="flex flex-col items-center gap-3 text-center">
+                    <TerminalLoader rows={5} cols={18} />
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-white">
                       {t("recommendation.imageLoading")}
                     </p>
                   </div>
                 </div>
-              )}
+              ) : null}
 
               {imageError && canEditCurrentRecommendation && !isImageLoading && (
                 <div className="absolute bottom-4 left-4 right-4 border border-destructive/50 bg-destructive/88 px-4 py-3 text-white shadow-lg backdrop-blur-md">

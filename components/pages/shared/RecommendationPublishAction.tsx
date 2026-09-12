@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Globe, Loader2, Undo2 } from "lucide-react";
-import { Button } from "@/components/ui/core";
+import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
 import { createLogger } from "@/utils/logger";
 

@@ -7,7 +7,8 @@ import { ArrowLeft, Image as ImageIcon, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Cocktail } from "@/lib/cocktail-types";
 import { CocktailImage } from "@/components/CocktailImage";
-import { Button } from "@/components/ui/core";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CocktailSharePortal } from "@/components/share/CocktailSharePortal";
 import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSections";
 import { CocktailHero } from "@/components/pages/shared/CocktailHero";
@@ -30,7 +31,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
   // Style constants matching Recommendation Page
   const textColorClass = "text-foreground";
   const cardClasses =
-    "glass-effect text-foreground transition-all duration-300 hover:shadow-primary/10";
+    "text-foreground transition-all duration-300 hover:shadow-primary/10";
   const gradientText = "gradient-text-bright";
 
   useEffect(() => {
@@ -46,20 +47,21 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
     return (
       <div className="min-h-screen">
         <div className="container mx-auto py-16 md:py-24">
-          <div className="text-center py-12 glass-effect rounded-none">
-            <h2 className={`text-2xl font-medium mb-4 ${textColorClass}`}>
-              {t("recommendation.notFound")}
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              {t("recommendation.notFoundDesc")}
-            </p>
-            <Button
-              onClick={handleBack}
-              variant="primary"
-            >
-              {t("recommendation.back")}
-            </Button>
-          </div>
+          <Card variant="effect" className="py-12 text-center">
+            <CardHeader>
+              <CardTitle className={`mb-4 text-2xl font-medium ${textColorClass}`}>
+                {t("recommendation.notFound")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-6 text-muted-foreground">
+                {t("recommendation.notFoundDesc")}
+              </p>
+              <Button onClick={handleBack} variant="primary">
+                {t("recommendation.back")}
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );

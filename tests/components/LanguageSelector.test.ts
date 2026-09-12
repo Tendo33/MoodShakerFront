@@ -33,6 +33,8 @@ for (const name of [
   "Event",
   "KeyboardEvent",
   "MouseEvent",
+  "CustomEvent",
+  "PointerEvent",
 ] as const) {
   globals[name] = (domWindow as unknown as Record<string, unknown>)[name];
 }
@@ -44,6 +46,7 @@ const raf = (callback: (time: number) => void) =>
 const caf = (handle: number) => domWindow.clearTimeout(handle);
 globals.requestAnimationFrame = raf;
 globals.cancelAnimationFrame = caf;
+globals.getComputedStyle = domWindow.getComputedStyle.bind(domWindow);
 (domWindow as unknown as Record<string, unknown>).requestAnimationFrame = raf;
 (domWindow as unknown as Record<string, unknown>).cancelAnimationFrame = caf;
 
@@ -90,12 +93,6 @@ async function mountSelector(): Promise<{
   return { rtl, container: rendered.container as HTMLElement, unmount: rendered.unmount };
 }
 
-function buttonTexts(container: HTMLElement): string[] {
-  return [...container.querySelectorAll("button")].map((button) =>
-    (button.textContent || "").trim(),
-  );
-}
-
 test("the trigger shows a display name, not a locale code", async () => {
   // Regression test. `languageOptions` was built with
   // `Object.entries(availableLanguages)`, but `availableLanguages` is the array
@@ -118,11 +115,15 @@ test("the dropdown lists both locales with display names", async () => {
 
   const trigger = container.querySelector("button") as HTMLElement;
   rtl.act(() => {
-    trigger.click();
+    trigger.focus();
+    rtl.fireEvent.pointerDown(trigger, { button: 0, pointerType: "mouse" });
+    rtl.fireEvent.keyDown(trigger, { key: "ArrowDown" });
   });
   await new Promise((resolve) => setTimeout(resolve, 200));
 
-  const texts = buttonTexts(container).slice(1);
+  const texts = [...document.body.querySelectorAll("[role='menuitem']")].map(
+    (item) => (item.textContent || "").trim(),
+  );
   assert.equal(texts.length, 2, `expected 2 options, got ${texts.length}`);
   assert.ok(
     texts.some((text) => text.includes("中文")),
@@ -143,12 +144,14 @@ test("choosing English routes to the English path", async () => {
 
   const trigger = container.querySelector("button") as HTMLElement;
   rtl.act(() => {
-    trigger.click();
+    trigger.focus();
+    rtl.fireEvent.pointerDown(trigger, { button: 0, pointerType: "mouse" });
+    rtl.fireEvent.keyDown(trigger, { key: "ArrowDown" });
   });
   await new Promise((resolve) => setTimeout(resolve, 200));
 
-  const englishOption = [...container.querySelectorAll("button")].find((button) =>
-    /English/i.test(button.textContent || ""),
+  const englishOption = [...document.body.querySelectorAll("[role='menuitem']")].find(
+    (item) => /English/i.test(item.textContent || ""),
   ) as HTMLElement;
   assert.ok(englishOption, "no English option to click");
 

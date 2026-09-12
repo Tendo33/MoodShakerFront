@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowLeft, RefreshCcw } from "lucide-react";
-import { Button } from "@/components/ui/core";
+import { Button } from "@/components/ui/button";
 import type { TranslationKey } from "@/lib/i18n/dictionary";
 
 interface CocktailActionsProps {

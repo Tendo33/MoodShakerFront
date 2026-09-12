@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useTransition, useId } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { SafeImage } from "@/components/SafeImage";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
@@ -19,7 +19,12 @@ import {
   coerceFlavorProfiles,
   flavorProfileLabel,
 } from "@/lib/domain/vocabulary";
-import { GradientText } from "@/components/ui/core";
+import { GradientText } from "@/components/ui/gradient-text";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { FilterChip } from "@/components/ui/filter-chip";
+import { Button } from "@/components/ui/button";
 import { shouldBypassNextImageOptimization } from "@/utils/image-optimization";
 import { Activity, Filter, GlassWater, Search, Sparkles, X } from "lucide-react";
 
@@ -224,52 +229,54 @@ export default function GalleryContent({
           transition={{ delay: 0.3 }}
           className="sticky top-24 z-30 mb-10"
         >
-          <div className="glass-panel mx-auto max-w-4xl border border-primary/30 p-3 shadow-[0_24px_48px_rgba(3,0,9,0.3)] backdrop-blur-3xl transition-all duration-300 hover:border-primary/50">
+          <Card className="mx-auto max-w-4xl border-primary/30 p-3 shadow-[0_24px_48px_rgba(3,0,9,0.3)] backdrop-blur-3xl transition-all duration-300 hover:border-primary/50">
             <div className="flex flex-col items-center gap-3 md:flex-row">
               <div className="group relative w-full flex-1">
                 <label htmlFor="gallery-search" className="sr-only">
                   {t("gallery.search.placeholder")}
                 </label>
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-muted-foreground group-focus-within:text-secondary transition-colors duration-300" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                  <Search className="h-4 w-4 text-muted-foreground transition-colors duration-300 group-focus-within:text-secondary" />
                 </div>
-                <input
+                <Input
                   type="text"
                   id="gallery-search"
-                  className="focus-ring block w-full border border-primary/30 bg-black/40 py-3 pl-11 pr-10 text-sm text-foreground shadow-inner transition-all placeholder:text-muted-foreground focus:border-secondary"
+                  className="pl-11 pr-10"
                   placeholder={t("gallery.search.placeholder")}
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   autoComplete="off"
                   aria-label={t("gallery.search.placeholder")}
                 />
-                {searchQuery && (
+                {searchQuery ? (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-1 top-1/2 inline-flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center text-muted-foreground hover:text-foreground transition-colors focus-ring"
+                    className="absolute right-1 top-1/2 inline-flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-ring"
                     aria-label={lang === "en" ? "Clear search" : "清空搜索"}
                   >
                     <X className="h-3 w-3" />
                   </button>
-                )}
+                ) : null}
               </div>
 
               <div className="flex w-full gap-2 md:w-auto">
-                <button
+                <Button
                   type="button"
-                  onClick={() => setIsFilterOpen((value) => !value)}
-                  className={`focus-ring flex min-h-11 flex-1 items-center justify-center gap-2 border px-4 py-2.5 text-sm font-mono uppercase tracking-[0.18em] transition-all duration-300 md:flex-none ${
+                  variant={
                     isFilterOpen || selectedSpirit || selectedFlavor || selectedAlcohol
-                      ? "border-primary/50 bg-primary/16 text-primary shadow-[0_16px_28px_rgba(3,0,9,0.22)] hover:bg-primary/22"
-                      : "border-primary/20 bg-black/40 text-muted-foreground hover:border-primary/45 hover:text-primary"
-                  }`}
+                      ? "secondary"
+                      : "outline"
+                  }
+                  size="md"
+                  onClick={() => setIsFilterOpen((value) => !value)}
+                  className="flex-1 md:flex-none"
                   aria-expanded={isFilterOpen}
                   aria-controls={filterPanelId}
+                  icon={<Filter className="h-3.5 w-3.5" />}
                 >
-                  <Filter className="h-3.5 w-3.5" />
-                  <span className="font-medium">{t("gallery.filter.button")}</span>
-                </button>
+                  {t("gallery.filter.button")}
+                </Button>
               </div>
             </div>
 
@@ -278,38 +285,40 @@ export default function GalleryContent({
                 <span className="text-xs font-mono uppercase tracking-[0.2em] text-foreground/55">
                   {lang === "en" ? "Active filters" : "已启用筛选"}
                 </span>
-                {searchQuery.trim() && (
-                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-primary">
+                {searchQuery.trim() ? (
+                  <Badge variant="primary">
                     {lang === "en" ? "Search" : "搜索"}: {searchQuery.trim()}
-                  </span>
-                )}
-                {selectedSpirit && (
-                  <span className="glass-subtle border border-secondary/35 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-secondary">
+                  </Badge>
+                ) : null}
+                {selectedSpirit ? (
+                  <Badge variant="secondary">
                     {baseSpiritLabel(coerceBaseSpirit(selectedSpirit), vocabLocale)}
-                  </span>
-                )}
-                {selectedAlcohol && (
-                  <span className="glass-subtle border border-accent/40 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-accent">
+                  </Badge>
+                ) : null}
+                {selectedAlcohol ? (
+                  <Badge variant="accent">
                     {alcoholLevelLabel(coerceAlcoholLevel(selectedAlcohol), vocabLocale)}
-                  </span>
-                )}
-                {selectedFlavor && (
-                  <span className="glass-subtle border border-primary/35 px-3 py-1 text-xs font-mono uppercase tracking-[0.16em] text-primary">
+                  </Badge>
+                ) : null}
+                {selectedFlavor ? (
+                  <Badge variant="primary">
                     {flavorProfileLabel(coerceFlavorProfiles([selectedFlavor])[0], vocabLocale)}
-                  </span>
-                )}
-                <button
+                  </Badge>
+                ) : null}
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="ml-auto tracking-[0.16em]"
                   onClick={() => {
                     setSearchQuery("");
                     setSelectedSpirit(null);
                     setSelectedFlavor(null);
                     setSelectedAlcohol(null);
                   }}
-                  className="focus-ring ml-auto inline-flex min-h-10 items-center justify-center border border-white/10 px-3 py-2 text-xs font-mono uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
                 >
                   {lang === "en" ? "Clear all" : "清空全部"}
-                </button>
+                </Button>
               </div>
             )}
 
@@ -327,19 +336,14 @@ export default function GalleryContent({
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {SPIRIT_OPTIONS.map((spirit) => (
-                      <button
+                      <FilterChip
                         key={spirit}
-                        type="button"
+                        tone="secondary"
+                        pressed={selectedSpirit === spirit}
                         onClick={() => setSelectedSpirit(selectedSpirit === spirit ? null : spirit)}
-                        className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
-                          selectedSpirit === spirit
-                            ? "bg-secondary text-black border-secondary font-semibold"
-                            : "bg-black/40 text-muted-foreground border-primary/20 hover:border-secondary hover:text-secondary hover:bg-secondary/10"
-                        }`}
-                        aria-pressed={selectedSpirit === spirit}
                       >
                         {baseSpiritLabel(spirit, vocabLocale)}
-                      </button>
+                      </FilterChip>
                     ))}
                   </div>
                 </div>
@@ -351,19 +355,14 @@ export default function GalleryContent({
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {ALCOHOL_OPTIONS.map((level) => (
-                      <button
+                      <FilterChip
                         key={level}
-                        type="button"
+                        tone="accent"
+                        pressed={selectedAlcohol === level}
                         onClick={() => setSelectedAlcohol(selectedAlcohol === level ? null : level)}
-                        className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
-                          selectedAlcohol === level
-                            ? "bg-accent text-black border-accent font-semibold"
-                            : "bg-black/40 text-muted-foreground border-primary/20 hover:border-accent hover:text-accent hover:bg-accent/10"
-                        }`}
-                        aria-pressed={selectedAlcohol === level}
                       >
                         {alcoholLevelLabel(level, vocabLocale)}
-                      </button>
+                      </FilterChip>
                     ))}
                   </div>
                 </div>
@@ -375,40 +374,35 @@ export default function GalleryContent({
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {FLAVOR_OPTIONS.map((flavor) => (
-                      <button
+                      <FilterChip
                         key={flavor}
-                        type="button"
+                        tone="primary"
+                        pressed={selectedFlavor === flavor}
                         onClick={() => setSelectedFlavor(selectedFlavor === flavor ? null : flavor)}
-                        className={`min-h-11 px-4 py-2.5 rounded-none text-xs transition-all duration-300 border-2 backdrop-blur-md active:scale-95 font-mono uppercase tracking-widest focus-ring ${
-                          selectedFlavor === flavor
-                            ? "bg-primary text-black border-primary font-semibold"
-                            : "bg-black/40 text-muted-foreground border-primary/20 hover:border-primary hover:text-primary hover:bg-primary/10"
-                        }`}
-                        aria-pressed={selectedFlavor === flavor}
                       >
                         {flavorProfileLabel(flavor, vocabLocale)}
-                      </button>
+                      </FilterChip>
                     ))}
                   </div>
                 </div>
               </div>
             </div>
 
-            {isPending && (
+            {isPending ? (
               <p className="px-3 pt-2 text-xs text-muted-foreground">
                 {t("common.loading")}
               </p>
-            )}
-          </div>
+            ) : null}
+          </Card>
         </motion.div>
 
         {renderableCocktails.length === 0 ? (
-          <div className="glass-panel mx-auto max-w-2xl border border-primary/30 p-10 text-center shadow-[0_24px_46px_rgba(3,0,9,0.28)]">
-            <h2 className="mb-4 text-2xl font-heading font-bold uppercase tracking-[0.16em] text-primary">
+          <Card className="mx-auto max-w-2xl border-primary/30 p-10 text-center shadow-[0_24px_46px_rgba(3,0,9,0.28)]">
+            <CardTitle className="mb-4 text-2xl">
               {t("gallery.noResults.title")}
-            </h2>
+            </CardTitle>
             <p className="font-mono text-foreground/80">{t("gallery.noResults.desc")}</p>
-          </div>
+          </Card>
         ) : (
           <>
             <motion.div
@@ -423,13 +417,11 @@ export default function GalleryContent({
                     href={`/${lang}/cocktail/${cocktail.slug}`}
                     className="block group relative h-full focus-ring"
                   >
-                    <div className="glass-panel relative h-full overflow-hidden border border-primary/35 shadow-[0_20px_42px_rgba(3,0,9,0.28)] transition-all duration-500 group-hover:-translate-y-2.5 group-hover:scale-[1.02] group-hover:border-secondary group-hover:shadow-[0_26px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.14)] will-change-transform">
+                    <Card className="h-full shadow-[0_20px_42px_rgba(3,0,9,0.28)] transition-all duration-500 will-change-transform group-hover:-translate-y-2.5 group-hover:scale-[1.02] group-hover:border-secondary group-hover:shadow-[0_26px_52px_rgba(3,0,9,0.32),0_0_18px_rgba(93,246,255,0.14)]">
                       <div className="relative aspect-[4/5] overflow-hidden bg-black/60">
-                        <Image
-                          src={
-                            cocktail.thumbnailUrl ||
-                            `/placeholder.svg?height=640&width=512&query=${encodeURIComponent(cocktail.name)}`
-                          }
+                        <SafeImage
+                          src={cocktail.thumbnailUrl}
+                          fallbackSrc={`/placeholder.svg?height=640&width=512&query=${encodeURIComponent(cocktail.name)}`}
                           alt={cocktail.name}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
@@ -438,30 +430,26 @@ export default function GalleryContent({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                       </div>
-                        <div className="space-y-4 p-5">
-                          <div>
-                          <h2 className="text-xl font-heading font-bold uppercase tracking-[0.16em] text-primary transition-colors group-hover:text-secondary">
+                      <CardContent className="flex flex-col gap-4 p-5">
+                        <CardHeader className="gap-1">
+                          <CardTitle className="transition-colors group-hover:text-secondary">
                             {cocktail.name}
-                          </h2>
-                          {lang === "cn" && cocktail.name && (
+                          </CardTitle>
+                          {lang === "cn" && cocktail.name ? (
                             <p className="text-xs font-mono uppercase tracking-[0.2em] text-secondary/88">
                               {cocktail.name}
                             </p>
-                          )}
-                        </div>
+                          ) : null}
+                        </CardHeader>
                         <p className="line-clamp-3 font-mono text-sm leading-relaxed text-foreground/82">
                           {cocktail.description}
                         </p>
-                        <div className="flex flex-wrap gap-2 text-xs font-mono uppercase tracking-[0.16em]">
-                          <span className="glass-subtle border border-primary/35 px-3 py-1 text-primary">
-                            {cocktail.baseSpiritLabel}
-                          </span>
-                          <span className="glass-subtle border border-secondary/35 px-3 py-1 text-secondary">
-                            {cocktail.alcoholLevelLabel}
-                          </span>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="primary">{cocktail.baseSpiritLabel}</Badge>
+                          <Badge variant="secondary">{cocktail.alcoholLevelLabel}</Badge>
                         </div>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   </Link>
                 </motion.div>
               ))}
@@ -469,12 +457,13 @@ export default function GalleryContent({
 
             {nextCursor && (
               <div className="mt-12 flex justify-center">
-                <Link
+                <Button
                   href={`${pathname}?${createQueryString({ cursor: nextCursor })}`}
-                  className="focus-ring inline-flex min-h-11 items-center justify-center border border-primary/35 px-6 py-3 font-mono uppercase tracking-[0.16em] text-primary transition-all duration-300 hover:border-primary/70 hover:bg-primary hover:text-black"
+                  variant="outline"
+                  size="lg"
                 >
                   {lang === "en" ? "Next Page" : "下一页"}
-                </Link>
+                </Button>
               </div>
             )}
           </>
