@@ -48,15 +48,14 @@ MoodShaker 是一个中英双语鸡尾酒推荐 Web 应用。用户不需要先�
 - 服务端接口使用稳定错误码，500 不再直接向客户端泄露内部错误。
 - 推荐和图片接口会返回限流响应头，并支持基于 Postgres 的共享限流桶。
 
-## 页面截图
+## 当前界面
 
-| 首页 | 问卷页 |
-| --- | --- |
-| ![Home](docs/screenshots/home_full.png) | ![Questionnaire](docs/screenshots/questions_start.png) |
+`docs/screenshots/` 里的图还是改版前的霓虹落地页和圆角酒单，不要当成现在的页面。
 
-| 酒单页 | 详情页 |
-| --- | --- |
-| ![Gallery](docs/screenshots/gallery.png) | ![Cocktail Detail](docs/screenshots/cocktail_detail.png) |
+- 首页：顶栏下面左右对半。左边是纯色标题、一句说明、一个青色按钮和 `01 / 02 / 03`。右边是贴边的酒图轮播，酒名压在图上。
+- 问卷：同样对半。左边是步骤和纯色问题，右边是大方块选项。选中为品红。只有最后一步有青色提交。
+- 酒单：第一张占两列两行，其余是 1px 缝的方图。悬停看基酒和酒精度。
+- 详情：面包屑、左边大图、右边是原料 / 步骤两个标签。基酒、酒精度、时间和杯型收成一行。
 
 ## 体验流程
 
@@ -244,37 +243,53 @@ pnpm dev
 - 没有语言前缀的请求会自动重定向到对应语言路径。
 - 词典文件位于 [locales/cn.ts](./locales/cn.ts) 和 [locales/en.ts](./locales/en.ts)。
 
-## 部署与发版
+## 部署
 
-仓库里已经准备好了容器化部署所需的主要文件：
+### 环境
 
-- [Dockerfile](./Dockerfile) 用于多阶段构建
-- [docker-compose.yml](./docker-compose.yml) 用于同时启动 Web 和 PostgreSQL
-- [scripts/docker-entrypoint.sh](./scripts/docker-entrypoint.sh) 用于启动时初始化 schema 和 seed
+- Docker 与 Docker Compose v2
+- Compose 拉取已发布镜像 `simonsun3/moodshaker:latest`，同时启动 Postgres 15。这条命令不会用仓库里的 Dockerfile 现编镜像
+- 自己构建镜像时才需要本机 Node.js `>=22` 和 pnpm `>=10`
 
-### 最低部署检查清单
+### 配置
 
-1. 配齐所有必需环境变量。
-2. 在目标数据库执行 Prisma migration。
-3. 确认 `rate_limit_buckets` 表已经存在。
-4. 执行验证命令：
+```bash
+cp .env.example .env
+```
+
+至少填好上一节里的必填项：`OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`、图像接口、R2，以及 `DATABASE_URL` 在非 Compose 场景下的值。Compose 里的数据库账号有默认值。反代后面把 `TRUSTED_PROXY_HOPS` 设为 `1`，直连设为 `0`。Web 端口用 `HOST_PORT`，默认 `3000`。
+
+### 启动
+
+```bash
+docker compose up -d
+```
+
+容器启动时会等待数据库，执行 `prisma db push`，并写入种子数据。见 [scripts/docker-entrypoint.sh](./scripts/docker-entrypoint.sh)。
+
+### 打开
+
+- 应用：<http://localhost:3000>
+- 健康检查：<http://localhost:3000/api/health>
+
+`HOST_PORT` 改过时，把上面的 `3000` 换成那个端口。
+
+### 发版前检查
 
 ```bash
 pnpm test
+pnpm test:e2e
 pnpm lint
 pnpm build
 ```
 
-5. 做一轮手工 smoke：
-   - 首页 -> 问卷 -> 推荐
-   - 图片生成 / 刷新
-   - 同一浏览器会话中的推荐恢复
-   - 酒单搜索和筛选
-   - 中英文详情页切换
+同时确认：
 
-### 当前发版提醒
+- `/api/health` 在数据库不可用时返回 `503`，而不是一个仍显示健康的页面
+- `rate_limit_buckets` 已随 schema 同步存在。共享限流表缺失时，生产环境会把推荐和图片请求当成部署错误
+- 手工走通：首页到问卷到推荐、图片生成、同一浏览器里恢复推荐、酒单搜索、中英文详情
 
-项目暂时还不适合直接全量正式发布。在从 staging / beta 提升到生产前，请先阅读 [docs/release-readiness.md](./docs/release-readiness.md)。
+从 staging 提升到正式环境前，先看 [docs/release-readiness.md](./docs/release-readiness.md)。
 
 ## 常见问题
 

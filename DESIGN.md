@@ -9,7 +9,7 @@ Use this document as the visual contract for MoodShaker. Keep the values concret
 - Primary task: answer a short questionnaire, receive a cocktail, browse the gallery, share a recipe
 - Visual direction: retro-futurist vaporwave cocktail terminal
 - Tone: late-night, precise, a little theatrical; copy reads like a system log, not a SaaS landing page
-- Memorable idea: sharp neon geometry on a CRT bar screen — magenta, cyan, and amber against deep violet, never rounded cards
+- Memorable idea: one drink on a CRT bar screen, recipe as a terminal log — magenta, cyan, and amber against deep violet, never rounded cards
 
 ## Colors
 
@@ -24,7 +24,7 @@ Use this document as the visual contract for MoodShaker. Keep the values concret
 - Usage rules:
   - Magenta is identity and selected state. Cyan is the primary action and hover lift. Amber is flavor, time, and caution.
   - Do not introduce extra neon hues. Do not use pure black or pure white fills.
-  - Title gradient is `foreground → primary` only. Do not restore the old three-color animated gradient text.
+  - Home, gallery, detail, and questionnaire titles are solid Orbitron in the foreground. No gradient and no neon pulse on those headings. The header wordmark is the only place that uses the `gradient-text-bright` class. Do not put `GradientText` back on a page title.
 
 ## Typography
 
@@ -37,9 +37,9 @@ Use this document as the visual contract for MoodShaker. Keep the values concret
 
 ## Spacing, radius, and elevation
 
-- Base spacing unit: 4px; section padding `py-14 md:py-20 lg:py-28`
-- Content max width: `max-w-4xl` for copy, `max-w-6xl` / `Container size="xl"` for grids
-- Common gaps: cards `gap-6 md:gap-8 lg:gap-10`; controls `gap-3`–`gap-4`
+- Base spacing unit: 4px
+- Home and the questionnaire fill `min-h-[calc(100vh-5rem)]`. They are not a centered `max-w-4xl` column
+- Gallery and detail use the viewport width. Copy inside a pane can still sit in `max-w-md`
 - Control height: minimum `44px` (`min-h-11`); gallery chips and header actions included
 - Radius scale: `0`. No rounded cards, buttons, inputs, or dialogs
 - Shadow / border treatment: `0 22px 60px rgba(3, 0, 9, 0.5)` plus a cyan or magenta outer glow on hover; 1px glass stroke; never soft gray Material shadows
@@ -52,26 +52,25 @@ Use this document as the visual contract for MoodShaker. Keep the values concret
 - Cards and surfaces: `components/ui/card.tsx`. Variants map to `glass-panel`, `glass-subtle`, `glass-effect`, `glass-popup`. Optional CRT scanline overlay. Hover lift is opt-in.
 - Navigation: sticky header, transparent until scroll then `glass-popup`. Mobile menu is `components/ui/sheet.tsx` (right, `w-72`). Language uses `components/ui/dropdown-menu.tsx` (`modal={false}` so it works inside the sheet).
 - Overlays: share card uses `components/ui/dialog.tsx`. Both sit at `z-[100]`, zero radius, glass/black surfaces. Do not reintroduce a hand-rolled focus trap for these.
-- Recipe: below `lg`, sections are `components/ui/accordion.tsx` (`type="multiple"`, ingredients open). Desktop stays a two-column always-open card layout.
-- Tables and dense data: none. Recipe lists are terminal rows with dotted leaders, not tables.
-- Empty, loading, and error states: empty uses a centered `Card`; generation wait uses Magic UI `Terminal` (`components/ui/terminal.tsx`) inside `WaitingAnimation`; image load uses `SafeImage` + Great UI `TerminalLoader`; errors use `Alert` destructive plus the existing toast viewport.
+- Recipe: `Tabs` inside `ScrollArea` (`md:h-[70vh]`). Ingredients, including tools, is the first tab. Steps is the second. Lists stay terminal rows with dotted leaders.
+- Empty, loading, and error states: a gallery search with no matches uses `Empty`. A missing image uses `Skeleton` inside `AspectRatio`. Generation wait uses Magic UI `Terminal` inside `WaitingAnimation`. Errors use `Alert` destructive plus the existing toast viewport.
 - Focus and disabled states: `focus-visible:ring-2 ring-secondary/90 ring-offset-2 ring-offset-background`. Disabled is `opacity-50` + `grayscale`, no pointer events.
 
 ## Motion and responsive behavior
 
-- Motion intensity: low-medium. Transform and opacity only; one language per page (ease-out / cubic-bezier `0.16, 1, 0.3, 1`)
-- Main transition language: card lift, page fade/slide, neon pulse on the primary sparkle only
+- Motion intensity: low. Transform and opacity only; one language per page (ease-out / cubic-bezier `0.16, 1, 0.3, 1`, about 0.45s)
+- Main transition language: a short opacity and transform enter. No infinite glow pulse on the hero. Honor `prefers-reduced-motion`
 - Reduced-motion behavior: existing global cut in `globals.css`; CRT grid animation off
-- Mobile layout changes: single column; hero shortens; gallery filters stack; recipe sections collapse to accordions below `lg`
+- Mobile layout changes: home and questionnaire stack to one column. Gallery stays a 2-column gap-px grid, and the first tile spans two columns only from `md`. Detail stacks the image above the tabs. Recipe tabs stay on both widths.
 - Breakpoints or container rules: container padding `2rem`, `1rem` below 640px; touch targets stay ≥ 44px
 
 ## Do and do not
 
-- Do: reuse `Card`, `Button`, `Badge`, `Input`, `Textarea`, `Progress`, `FilterChip`, `Alert`, `Separator`, `Container`, `GradientText`, `Dialog`, `Sheet`, `Accordion`, `DropdownMenu`
+- Do: reuse `Card`, `Button`, `Badge`, `Input`, `Textarea`, `Progress`, `FilterChip`, `Alert`, `Separator`, `Container`, `Dialog`, `Sheet`, `DropdownMenu`, `Carousel`, `AspectRatio`, `Breadcrumb`, `Tabs`, `ScrollArea`, `HoverCard`, `Empty`, `Skeleton`
 - Do: keep bilingual routes, dictionaries, and private `editToken` in POST bodies
 - Do: allow English headings to break long Latin words (`overflow-wrap: break-word`)
 - Do not: add a second component library or replace vaporwave tokens with a generic shadcn theme
-- Do not: round corners, restore animated tricolor gradient text, or wrap every block in a card
+- Do not: round corners, restore animated tricolor gradient text, wrap every block in a card, or bring back hero window chrome, glow blobs, or four spec boxes. Specs are one mono line (`spirit · strength · time · glass`). Gallery tiles are square, gap `1px`, and the first result spans two columns and two rows from `md`
 - Do not: mix glow, glass, 3D tilt, particles, and parallax in the same view
 - Avoid unless product-specific: extra scanlines, CRT flicker, and neon pulse — they already exist on the shell
 
@@ -80,5 +79,12 @@ Use this document as the visual contract for MoodShaker. Keep the values concret
 - Component foundation: shadcn-shaped source in `components/ui/*` (CVA + `cn` + Radix Slot/Toast). Visual tokens stay MoodShaker.
 - Token file / CSS variables: `app/globals.css` `@theme inline` and `:root`
 - Icon set: `lucide-react`
-- Approved reference components: existing Button variants; Card glass variants; gallery FilterChip; recipe cards; Magic UI Terminal for generation wait; Great UI TerminalLoader for image load only
-- Product primitives that are not generic UI: `GradientText`, `TerminalNote`, cocktail share polaroid, `SHAKE.EXE` waiting terminal
+- Approved reference components: existing Button variants; Card glass variants; gallery FilterChip; recipe tabs; Magic UI Terminal for generation wait; Great UI TerminalLoader for image load only
+- Product primitives that are not generic UI: `TerminalNote`, cocktail share polaroid, `SHAKE.EXE` waiting terminal
+
+## Screens
+
+- Home: `md:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]`. Left is the eyebrow, one solid title, one mood line, one cyan action, then `01` `02` `03`. Right is a `Carousel` of `AspectRatio` 4/5 photos, flush to the pane, with the drink name on the photo. Magenta marks the selected index.
+- Questionnaire: the same kind of split, `md:grid-cols-[minmax(18rem,0.75fr)_minmax(0,1.25fr)]`. Left is the breadcrumb, step count, solid question, and progress. Right is the option tiles. Choosing an option advances the step. The cyan submit exists on the final step.
+- Gallery: sticky search and filters. `grid-cols-2 md:grid-cols-4` with `gap-px`. The first tile is `md:col-span-2 md:row-span-2`. `HoverCard` shows spirit and strength. The link stays in the tab order.
+- Detail: `Breadcrumb` is Gallery / name. Desktop is `md:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)]` with a sticky image. Specs are one mono line above the recipe tabs.

@@ -107,6 +107,10 @@ export const pulseAnimation = {
   },
 } satisfies TargetAndTransition;
 
+/** One enter: opacity plus a short translate. No loops. */
+export const enterEase = [0.16, 1, 0.3, 1] as const;
+export const enterDuration = 0.45;
+
 // Hook to delay animations until component is mounted
 export function useDelayedAnimation(delay = 0): boolean {
   const [shouldAnimate, setShouldAnimate] = useState(false);

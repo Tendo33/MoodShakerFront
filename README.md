@@ -14,7 +14,7 @@ An AI-powered bilingual cocktail experience that turns a quick mood check into a
 [![Overview](https://img.shields.io/badge/Overview-What%20it%20does-22c55e?style=flat-square)](#overview)
 [![Status](https://img.shields.io/badge/Status-Current%20state-f59e0b?style=flat-square)](#current-status)
 [![Quick Start](https://img.shields.io/badge/Quick%20Start-Run%20locally-3b82f6?style=flat-square)](#quick-start)
-[![Deployment](https://img.shields.io/badge/Deployment-Checklist-ef4444?style=flat-square)](#deployment-and-release)
+[![Deployment](https://img.shields.io/badge/Deployment-Checklist-ef4444?style=flat-square)](#deployment)
 
 </div>
 
@@ -49,15 +49,14 @@ Formal release blockers are tracked in [docs/release-readiness.md](./docs/releas
 - Server responses use stable error codes and generic client-safe 500 messages.
 - Recommendation and image endpoints emit rate-limit headers and can use shared Postgres-backed buckets.
 
-## Screenshots
+## Current interface
 
-| Home | Questionnaire |
-| --- | --- |
-| ![Home](docs/screenshots/home_full.png) | ![Questionnaire](docs/screenshots/questions_start.png) |
+The files in `docs/screenshots/` are the previous neon landing page and rounded gallery. They are not the current screens.
 
-| Gallery | Cocktail Detail |
-| --- | --- |
-| ![Gallery](docs/screenshots/gallery.png) | ![Cocktail Detail](docs/screenshots/cocktail_detail.png) |
+- Home: a split under the header. The left side is a solid title, one line, one cyan action, and `01 / 02 / 03`. The right side is an edge-to-edge drink carousel with the name on the photo.
+- Questionnaire: the same split. The question is solid type on the left. Options are large tiles on the right. Magenta marks the selection. Cyan submit appears only on the last step.
+- Gallery: the first result spans two columns and two rows. The rest are square tiles with a 1px gap. Hover shows spirit and strength.
+- Detail: a breadcrumb, a large image, and Ingredients / Steps tabs. Spirit, strength, time, and glass are one mono line.
 
 ## Demo Flow
 
@@ -246,21 +245,38 @@ Open [http://localhost:3000](http://localhost:3000). Requests to `/` are redirec
 - Requests without a language prefix are redirected to a localized route.
 - Translation dictionaries live in [locales/cn.ts](./locales/cn.ts) and [locales/en.ts](./locales/en.ts).
 
-## Deployment And Release
+## Deployment
 
-This repository already includes the essentials for containerized deployment:
+### Runtime
 
-- [Dockerfile](./Dockerfile) for multi-stage image builds
-- [docker-compose.yml](./docker-compose.yml) for the web app and PostgreSQL
-- [scripts/docker-entrypoint.sh](./scripts/docker-entrypoint.sh) for startup-time schema initialization and seed handling
+- Docker and Docker Compose v2
+- Compose pulls the published image `simonsun3/moodshaker:latest` and starts Postgres 15. This command does not build the Dockerfile in the repository
+- Node.js `>=22` and pnpm `>=10` are only required when you build that image yourself
 
-### Minimum deployment checklist
+### Configure
 
-1. Set all required environment variables.
-2. Run Prisma migrations against the target database.
-3. Verify the `rate_limit_buckets` table exists after deploy.
-4. Verify the recommendation endpoint returns `503` instead of a generic `500` when shared limiter storage or the primary database is unavailable.
-5. Run the verification commands:
+```bash
+cp .env.example .env
+```
+
+Fill the required values from the table above: `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`, the image API, R2, and `DATABASE_URL` when you are not using Compose. Compose has defaults for the database account. Set `TRUSTED_PROXY_HOPS` to `1` behind a reverse proxy, or `0` when the process is reached directly. `HOST_PORT` publishes the web port and defaults to `3000`.
+
+### Start
+
+```bash
+docker compose up -d
+```
+
+On startup the container waits for Postgres, runs `prisma db push`, and seeds the database. See [scripts/docker-entrypoint.sh](./scripts/docker-entrypoint.sh).
+
+### Open
+
+- App: <http://localhost:3000>
+- Health: <http://localhost:3000/api/health>
+
+If `HOST_PORT` is set, use that port instead of `3000`.
+
+### Before release
 
 ```bash
 pnpm test
@@ -269,16 +285,13 @@ pnpm lint
 pnpm build
 ```
 
-6. Run a manual smoke pass:
-   - home -> questions -> recommendation
-   - image generation / refresh
-   - recommendation restore from the same browser session
-   - gallery search and filter
-   - cocktail detail page in both languages
+Also confirm:
 
-### Current release warning
+- `/api/health` returns `503` when the database is unavailable, rather than a page that still looks healthy
+- `rate_limit_buckets` exists after the schema sync. In production, missing shared limiter storage fails recommendation and image requests as a deployment error
+- A manual pass covers home to questions to a recommendation, image generation, restoring a recommendation in the same browser, gallery search, and both language detail pages
 
-The project is not yet ready for a full GA release. See [docs/release-readiness.md](./docs/release-readiness.md) before promoting beyond staging or a controlled beta.
+Read [docs/release-readiness.md](./docs/release-readiness.md) before promoting a staging deploy to a full public release.
 
 ## Troubleshooting
 

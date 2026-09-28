@@ -1,126 +1,94 @@
-﻿"use client";
+"use client";
 
-import { motion } from "framer-motion";
-import { Container } from "@/components/ui/container";
-import { GradientText } from "@/components/ui/gradient-text";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { TerminalNote } from "@/components/ui/terminal-note";
-import { useLanguage } from "@/context/LanguageContext";
-import { useInViewAnimation } from "@/utils/animation-utils";
 import Link from "next/link";
-import { cocktailImages } from "@/utils/cocktail-images";
+import { useReducedMotion } from "framer-motion";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import { SafeImage } from "@/components/SafeImage";
+import { useLanguage } from "@/context/LanguageContext";
+import { cocktailImages } from "@/utils/cocktail-images";
 
-export default function HomePopular() {
-  const { language } = useLanguage();
-  const [popularRef, popularInView] = useInViewAnimation();
+export interface FeaturedDrink {
+  id: string;
+  name: string;
+  image: string;
+}
 
-  const getPathWithLanguage = (path: string) => {
-    const langPrefix = language === "en" ? "en" : "cn";
-    return `/${langPrefix}${path}`;
-  };
-
-  const featuredCocktails = [
+export function featuredDrinks(language: string): FeaturedDrink[] {
+  const english = language === "en";
+  return [
     {
       id: "mojito",
-      name: language === "en" ? "Mojito" : "莫吉托",
-      description:
-        language === "en"
-          ? "A refreshing blend of mint and lime"
-          : "清新薄荷与青柠的完美结合",
+      name: english ? "Mojito" : "莫吉托",
       image: cocktailImages.mojito,
     },
     {
       id: "margarita",
-      name: language === "en" ? "Margarita" : "玛格丽特",
-      description:
-        language === "en"
-          ? "Classic tequila cocktail with perfect balance"
-          : "经典龙舌兰鸡尾酒，酸甜平衡",
+      name: english ? "Margarita" : "玛格丽特",
       image: cocktailImages.margarita,
     },
     {
       id: "cosmopolitan",
-      name: language === "en" ? "Cosmopolitan" : "大都会",
-      description:
-        language === "en"
-          ? "Stylish cranberry vodka cocktail"
-          : "时尚优雅的蔓越莓伏特加鸡尾酒",
+      name: english ? "Cosmopolitan" : "大都会",
       image: cocktailImages.cosmopolitan,
     },
   ];
+}
+
+interface HomePopularProps {
+  drinks: FeaturedDrink[];
+  setApi: (api: CarouselApi) => void;
+}
+
+export default function HomePopular({ drinks, setApi }: HomePopularProps) {
+  const { getPathWithLanguage } = useLanguage();
+  const reduceMotion = useReducedMotion() === true;
 
   return (
-    <section ref={popularRef} className="section-spacing bg-card/50">
-      <Container size="xl">
-        <motion.div
-          className="container-narrow mb-8 text-center lg:mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={
-            popularInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-          }
-          transition={{ duration: 0.6 }}
-        >
-          <GradientText
-            as="h2"
-            className="mb-4 text-3xl font-heading font-black uppercase tracking-[0.16em] md:text-4xl lg:mb-6 lg:text-5xl"
-          >
-            {language === "en" ? "Popular Cocktails" : "热门鸡尾酒"}
-          </GradientText>
-          <p className="mt-4 text-base font-mono leading-relaxed text-foreground/84 drop-shadow-md md:text-lg">
-            {language === "en"
-              ? "> QUERYING MOST ACCESSED SELECTION ALGORITHMS..."
-              : "> 正在查询最常用的选择算法..."}
-          </p>
-        </motion.div>
-
-        <div className="card-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredCocktails.map((cocktail, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              animate={
-                popularInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
-              }
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-            >
-              <Link
-                href={getPathWithLanguage(`/cocktail/${cocktail.id}`)}
-                className="focus-ring"
-              >
-                <Card hover="lift" scanline className="group h-full p-8">
-                  <div className="relative z-10 mb-6 h-40 overflow-hidden border border-primary/45 transition-colors group-hover:border-secondary md:h-48">
-                    <motion.div
-                      className="w-full h-full relative"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    >
-                      <SafeImage
-                        src={cocktail.image}
-                        fallbackSrc={`/placeholder.svg?height=300&width=400&query=${encodeURIComponent(cocktail.name)}`}
-                        alt={cocktail.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                        className="object-cover opacity-95 transition-transform duration-500 group-hover:scale-[1.03]"
-                        loading="lazy"
-                      />
-                    </motion.div>
-                    <div className="absolute inset-0 bg-linear-to-br from-primary/30 to-secondary/30 mix-blend-overlay pointer-events-none group-hover:opacity-0 transition-opacity duration-300" />
-                  </div>
-                  <CardContent className="text-spacing">
-                    <CardTitle className="mb-3 transition-colors duration-300 group-hover:text-secondary">
-                      {cocktail.name}
-                    </CardTitle>
-                    <TerminalNote className="p-3 text-sm transition-colors group-hover:border-secondary md:text-base">
-                      {cocktail.description}
-                    </TerminalNote>
-                  </CardContent>
-                </Card>
-              </Link>
-            </motion.div>
+    <div className="relative h-full min-h-0 w-full">
+      <Carousel
+        setApi={setApi}
+        opts={{ align: "start", duration: reduceMotion ? 0 : 22 }}
+        className="h-full"
+      >
+        <CarouselContent className="ml-0 h-full">
+          {drinks.map((drink, index) => (
+            <CarouselItem key={drink.id} className="relative h-auto pl-0 md:h-full">
+              <div className="relative w-full md:absolute md:inset-0 md:overflow-hidden">
+                <div className="relative w-full md:absolute md:top-1/2 md:left-1/2 md:w-[max(100%,calc((100vh-5rem)*0.8))] md:-translate-x-1/2 md:-translate-y-1/2">
+                  <AspectRatio ratio={4 / 5} className="overflow-hidden bg-black">
+                    <SafeImage
+                      src={drink.image}
+                      fallbackSrc={`/placeholder.svg?height=1000&width=800&query=${encodeURIComponent(drink.name)}`}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, 60vw"
+                      priority={index === 0}
+                      className="object-cover"
+                    />
+                  </AspectRatio>
+                </div>
+                <Link
+                  href={getPathWithLanguage(`/cocktail/${drink.id}`)}
+                  className="focus-ring absolute inset-0 z-[1] block"
+                >
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#080212] via-[#080212]/80 to-transparent px-5 pt-16 pb-6 md:px-8 md:pb-8">
+                    <span className="text-safe-wrap block font-heading text-3xl font-bold uppercase tracking-[0.12em] text-foreground md:text-5xl">
+                      {drink.name}
+                    </span>
+                    <span className="mt-4 block h-px w-20 bg-primary" />
+                  </span>
+                </Link>
+              </div>
+            </CarouselItem>
           ))}
-        </div>
-      </Container>
-    </section>
+        </CarouselContent>
+      </Carousel>
+    </div>
   );
 }

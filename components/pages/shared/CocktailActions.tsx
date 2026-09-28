@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, RefreshCcw } from "lucide-react";
+import { enterDuration, enterEase } from "@/utils/animation-utils";
 import { Button } from "@/components/ui/button";
 import type { TranslationKey } from "@/lib/i18n/dictionary";
 
@@ -24,51 +25,41 @@ export function CocktailActions({
   regenerateLabel,
   isRegenerating = false,
 }: CocktailActionsProps) {
+  const reduceMotion = useReducedMotion() === true;
+
   return (
     <motion.div
-      className="mt-16 flex flex-col sm:flex-row gap-4 justify-center items-center"
-      initial={{ opacity: 0, y: 20 }}
+      className="mt-16 flex flex-col items-center justify-center gap-4 sm:flex-row"
+      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, duration: 0.5 }}
+      transition={{ duration: reduceMotion ? 0 : enterDuration, ease: enterEase }}
     >
       <Button
         onClick={onBack}
         variant="outline"
         size="lg"
-        effect="lift"
         icon={<ArrowLeft className="h-4 w-4" />}
       >
         {t("recommendation.back")}
       </Button>
 
-      {onRegenerate && regenerateLabel && (
-        <motion.div
-          whileHover={{ scale: isRegenerating ? 1 : 1.05 }}
-          whileTap={{ scale: isRegenerating ? 1 : 0.95 }}
-        >
-          <Button
-            onClick={onRegenerate}
-            disabled={isRegenerating}
-            variant="primary"
-            size="lg"
-            effect="glow"
-            icon={<RefreshCcw className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`} />}
-          >
-            {regenerateLabel}
-          </Button>
-        </motion.div>
-      )}
-
-      {onBrowseMore && browseMoreLabel && (
+      {onRegenerate && regenerateLabel ? (
         <Button
-          onClick={onBrowseMore}
-          variant="outline"
+          onClick={onRegenerate}
+          disabled={isRegenerating}
+          variant="primary"
           size="lg"
-          effect="lift"
+          icon={<RefreshCcw className={`h-4 w-4 ${isRegenerating ? "animate-spin" : ""}`} />}
         >
+          {regenerateLabel}
+        </Button>
+      ) : null}
+
+      {onBrowseMore && browseMoreLabel ? (
+        <Button onClick={onBrowseMore} variant="outline" size="lg">
           {browseMoreLabel}
         </Button>
-      )}
+      ) : null}
     </motion.div>
   );
 }

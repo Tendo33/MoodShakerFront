@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Martini, Library, Sparkles } from "lucide-react";
+import { Menu, X, Martini, Library } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
@@ -80,27 +80,20 @@ export default function Header() {
         </Link>
 
         <div className="hidden items-center gap-3 md:flex">
-          <div className="flex items-center gap-3">
-            <Button
+          <nav className="flex items-center gap-1" aria-label={language === "cn" ? "站点导航" : "Site navigation"}>
+            <Link
               href={galleryLink}
-              variant="outline"
-              size="md"
-              effect="lift"
-              icon={<Library className="h-4 w-4" />}
+              className="focus-ring inline-flex min-h-11 items-center px-3 font-mono text-xs uppercase tracking-[0.18em] text-foreground/65 hover:text-foreground"
             >
               {language === "cn" ? "酒单库" : "Gallery"}
-            </Button>
-            <Button
+            </Link>
+            <Link
               href={questionsLink}
-              size="md"
-              variant="primary"
-              effect="shine"
-              className="shadow-xl"
-              icon={<Sparkles className="h-4 w-4" />}
+              className="focus-ring inline-flex min-h-11 items-center px-3 font-mono text-xs uppercase tracking-[0.18em] text-secondary hover:text-foreground"
             >
               {t("home.start")}
-            </Button>
-          </div>
+            </Link>
+          </nav>
 
           <Separator orientation="vertical" className="mx-1 h-7 bg-white/12" />
 
@@ -187,10 +180,8 @@ export default function Header() {
                   href={questionsLink}
                   size="lg"
                   variant="primary"
-                  effect="shine"
                   fullWidth
-                  className="mt-2 text-base shadow-lg"
-                  icon={<Sparkles className="h-5 w-5" />}
+                  className="mt-2 text-base"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {t("home.start")}

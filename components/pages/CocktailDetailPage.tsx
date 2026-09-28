@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, Image as ImageIcon, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Cocktail } from "@/lib/cocktail-types";
@@ -13,6 +13,7 @@ import { CocktailSharePortal } from "@/components/share/CocktailSharePortal";
 import { CocktailRecipeSections } from "@/components/pages/CocktailRecipeSections";
 import { CocktailHero } from "@/components/pages/shared/CocktailHero";
 import { CocktailActions } from "@/components/pages/shared/CocktailActions";
+import { enterDuration, enterEase } from "@/utils/animation-utils";
 
 interface CocktailDetailPageProps {
   slug: string;
@@ -27,12 +28,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
   const { t, getPathWithLanguage, language } = useLanguage();
   const cocktail = initialData || null;
   const [isPageLoaded, setIsPageLoaded] = useState(false);
-
-  // Style constants matching Recommendation Page
-  const textColorClass = "text-foreground";
-  const cardClasses =
-    "text-foreground transition-all duration-300 hover:shadow-primary/10";
-  const gradientText = "gradient-text-bright";
+  const reduceMotion = useReducedMotion() === true;
 
   useEffect(() => {
     const timer = setTimeout(() => setIsPageLoaded(true), 100);
@@ -49,7 +45,7 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
         <div className="container mx-auto py-16 md:py-24">
           <Card variant="effect" className="py-12 text-center">
             <CardHeader>
-              <CardTitle className={`mb-4 text-2xl font-medium ${textColorClass}`}>
+              <CardTitle className="mb-4 text-2xl font-medium text-foreground">
                 {t("recommendation.notFound")}
               </CardTitle>
             </CardHeader>
@@ -69,44 +65,14 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
 
   return (
     <div className="min-h-screen">
-      {/* Shared Background with Recommendation Page */}
+      <div className="container relative mx-auto min-w-0 px-4 py-8 md:py-12">
         <motion.div
-          className="fixed inset-0 overflow-hidden opacity-30 pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.3 }}
-          transition={{ duration: 1 }}
-        >
-          <motion.div
-          className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/10 blur-[84px]"
-          animate={{ y: [0, -14, 0], scale: [1, 1.03, 1] }}
-          transition={{
-            duration: 8,
-            repeat: Number.POSITIVE_INFINITY,
-            repeatType: "reverse",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/3 left-1/3 h-72 w-72 rounded-full bg-secondary/10 blur-[84px]"
-          animate={{ y: [0, 14, 0], scale: [1, 1.04, 1] }}
-          transition={{
-            duration: 10,
-            repeat: Number.POSITIVE_INFINITY,
-            repeatType: "reverse",
-            delay: 1,
-          }}
-        />
-      </motion.div>
-
-      <div className="container mx-auto py-12 md:py-20 px-4 relative">
-        {/* Navigation */}
-        <motion.div
-          className="flex flex-wrap justify-between items-center mb-8 md:mb-12"
-          initial="hidden"
-          animate={isPageLoaded ? "visible" : "hidden"}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { duration: 0.5 } },
-          }}
+          className="mb-8 flex flex-wrap items-center justify-between md:mb-12"
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={
+            reduceMotion || isPageLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }
+          }
+          transition={{ duration: reduceMotion ? 0 : enterDuration, ease: enterEase }}
         >
           <div className="flex items-center gap-4">
             <Button
@@ -158,9 +124,8 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
           language={language}
           isPageLoaded={isPageLoaded}
           t={t}
-          gradientTextClass={gradientText}
           imageContent={
-            <div className="rounded-none overflow-hidden w-full h-full relative">
+            <div className="relative h-full w-full">
               <CocktailImage
                 cocktailId={slug}
                 imageData={cocktail?.imageUrl || null}
@@ -169,14 +134,9 @@ const CocktailDetailPage = React.memo(function CocktailDetailPage({
               />
             </div>
           }
-        />
-
-        <CocktailRecipeSections
-          cocktail={cocktail}
-          isPageLoaded={isPageLoaded}
-          textColorClass={textColorClass}
-          cardClasses={cardClasses}
-        />
+        >
+          <CocktailRecipeSections cocktail={cocktail} isPageLoaded={isPageLoaded} />
+        </CocktailHero>
         <CocktailActions t={t} onBack={handleBack} />
       </div>
     </div>

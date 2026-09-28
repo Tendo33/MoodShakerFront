@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, RefreshCcw } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCocktailResult } from "@/context/CocktailResultContext";
@@ -20,6 +20,7 @@ import { CocktailActions } from "@/components/pages/shared/CocktailActions";
 import { RecommendationShareAction } from "@/components/pages/shared/RecommendationShareAction";
 import RecommendationPublishAction from "@/components/pages/shared/RecommendationPublishAction";
 import { RecommendationUnavailableState } from "@/components/pages/shared/RecommendationUnavailableState";
+import { enterDuration, enterEase } from "@/utils/animation-utils";
 
 interface RecommendationAccessResponse {
   data: RecommendationAccessPayload | null;
@@ -149,11 +150,7 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
     !recommendationAccessError &&
     (isContextLoading || isSWRLoading);
 
-  const textColorClass = "text-foreground font-mono";
-  const cardClasses =
-    "text-foreground border-2 transition-all duration-300";
-  const gradientText =
-    "font-black font-heading uppercase tracking-[0.14em]";
+  const reduceMotion = useReducedMotion() === true;
 
 
   useEffect(() => {
@@ -239,16 +236,15 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden pt-20">
+    <div className="relative min-h-screen min-w-0 overflow-x-clip pt-20">
       <div className="container mx-auto pb-12 md:pb-20 px-4 relative z-10">
         <motion.div
-          className="flex flex-wrap justify-between items-center mb-8 md:mb-12"
-          initial="hidden"
-          animate={isPageLoaded ? "visible" : "hidden"}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { duration: 0.5 } },
-          }}
+          className="mb-8 flex flex-wrap items-center justify-between md:mb-12"
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={
+            reduceMotion || isPageLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }
+          }
+          transition={{ duration: reduceMotion ? 0 : enterDuration, ease: enterEase }}
         >
           <div className="flex items-center gap-4">
             <Button
@@ -279,9 +275,8 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
           language={language}
           isPageLoaded={isPageLoaded}
           t={t}
-          gradientTextClass={gradientText}
           imageContent={
-            <div className="rounded-none overflow-hidden w-full h-full relative border-[3px] border-primary/30">
+            <div className="relative h-full w-full">
               <CocktailImage
                 cocktailId={canEditCurrentRecommendation ? undefined : String(cocktail.id || "")}
                 imageData={scopedImageData || cocktail.imageUrl || null}
@@ -337,15 +332,13 @@ const CocktailRecommendation = React.memo(function CocktailRecommendation() {
               )}
             </div>
           }
-        />
-
-        <CocktailRecipeSections
-          cocktail={cocktail}
-          isPageLoaded={isPageLoaded}
-          textColorClass={textColorClass}
-          cardClasses={cardClasses}
-          toolAlternativeLabelKey="recommendation.alternative"
-        />
+        >
+          <CocktailRecipeSections
+            cocktail={cocktail}
+            isPageLoaded={isPageLoaded}
+            toolAlternativeLabelKey="recommendation.alternative"
+          />
+        </CocktailHero>
 
         {/*
           Only the holder of the edit token can publish, so this is gated on the

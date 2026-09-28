@@ -1,35 +1,36 @@
 "use client";
 
-import {
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type KeyboardEvent,
-} from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import dynamic from "next/dynamic";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, cardVariants } from "@/components/ui/card";
-import { Container } from "@/components/ui/container";
-import { GradientText } from "@/components/ui/gradient-text";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { TerminalLoader } from "@/components/ui/terminal-loader";
-import { cn } from "@/lib/utils";
-import { ChevronLeft } from "lucide-react";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import { useSmartLoading } from "@/components/animations/SmartLoadingSystem";
 import { useCocktailForm } from "@/context/CocktailFormContext";
 import { useCocktailResult } from "@/context/CocktailResultContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { cn } from "@/lib/utils";
+import { enterDuration, enterEase } from "@/utils/animation-utils";
 import { appLogger, safeLogger } from "@/utils/logger";
 import { withTimeout } from "@/utils/withTimeout";
 
@@ -39,11 +40,20 @@ const SmartLoadingSystem = dynamic(
 );
 
 const QUESTIONS = ["1", "2", "3"] as const;
+const MANY_OPTIONS = 4;
+
+type QuestionnaireChoice = {
+  value: string;
+  label: string;
+  image?: string;
+  description?: string;
+};
 
 const Questions = memo(function Questions() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, getPathWithLanguage } = useLanguage();
+  const reduceMotion = useReducedMotion() === true;
   const {
     answers,
     userFeedback,
@@ -226,16 +236,6 @@ const Questions = memo(function Questions() {
   const currentStep = isFinalStep ? totalSteps : nextQuestionIndex + 1;
   const calculatedProgress = (currentStep / totalSteps) * 100;
 
-  const handleCardKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLButtonElement>, action: () => void) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        action();
-      }
-    },
-    [],
-  );
-
   const handleAnswer = useCallback(
     async (questionId: string, option: string) => {
       if (selectedOption) {
@@ -406,276 +406,323 @@ const Questions = memo(function Questions() {
   // 挡不住这段空窗。isHydrated 看的是 phase 有没有结论。
   if (!isHydrated) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
-        <Container className="relative z-10 py-16 md:py-24">
-          <div
-            className="mx-auto flex max-w-3xl items-center justify-center py-24"
-            role="status"
-            aria-live="polite"
-          >
-            {/* common.loading 而非 loading.default —— 后者是「正在调制中」，
-                这里只是在读已保存的答案，读屏用户会以为在生成配方。 */}
-            <span className="sr-only">{t("common.loading")}</span>
-            <TerminalLoader rows={4} cols={18} />
-          </div>
-        </Container>
+      <div className="flex min-h-[calc(100vh-5rem)] w-full min-w-0 flex-col px-4 py-8 md:px-8">
+        <QuestionBreadcrumb />
+        <div
+          className="flex flex-1 items-center justify-center"
+          role="status"
+          aria-live="polite"
+        >
+          {/* common.loading 而非 loading.default —— 后者是「正在调制中」，
+              这里只是在读已保存的答案，读屏用户会以为在生成配方。 */}
+          <span className="sr-only">{t("common.loading")}</span>
+          <TerminalLoader rows={4} cols={18} />
+        </div>
       </div>
     );
   }
 
+  const panel = isFinalStep
+    ? {
+        id: "final",
+        title: t("questions.finalStep"),
+        hint: t("questions.base_spirits.description"),
+        options: baseSpiritsOptions,
+      }
+    : currentQuestion
+      ? {
+          id: currentQuestion.id,
+          title: currentQuestion.title,
+          hint: undefined,
+          options: currentQuestion.options,
+        }
+      : null;
+
+  if (!panel) {
+    return null;
+  }
+
+  const choiceLocked = !isFinalStep && selectedOption !== null;
+  const actionButtonClass = "max-w-full whitespace-normal sm:whitespace-normal";
+
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <Container className="relative z-10 py-16 md:py-24">
-        <Card variant="subtle" className="mx-auto mb-12 max-w-3xl px-4 py-5 md:mb-16 md:px-6">
-          <div className="mb-4 flex items-center justify-between gap-4 px-1">
-            <span className="text-sm font-bold font-mono uppercase tracking-[0.2em] text-secondary">
-              {t("questions.progress")}
-            </span>
-            <span className="border border-primary/35 bg-black/35 px-3 py-1 text-sm font-bold font-mono tracking-[0.18em] text-primary shadow-[0_12px_24px_rgba(3,0,9,0.18)]">
-              {Math.round(calculatedProgress)}%
-            </span>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={panel.id}
+        initial={reduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{
+          duration: reduceMotion ? 0 : enterDuration,
+          ease: enterEase,
+        }}
+        className="grid min-h-[calc(100vh-5rem)] w-full min-w-0 grid-cols-1 items-start md:grid-cols-[minmax(18rem,0.75fr)_minmax(0,1.25fr)] md:items-stretch"
+      >
+        <div className="flex min-w-0 flex-col justify-center gap-6 px-4 py-10 md:px-8 lg:px-12">
+          <QuestionBreadcrumb />
+          <p className="font-mono text-xs uppercase tracking-[0.22em] text-foreground/55">
+            {t("questions.step")} {currentStep} / {totalSteps}
+          </p>
+          <div className="flex flex-col gap-4">
+            <h1 className="text-safe-wrap font-heading text-[clamp(1.75rem,4vw,3.25rem)] font-bold uppercase leading-[1.05] tracking-[0.08em] text-foreground">
+              {panel.title}
+            </h1>
+            {panel.hint ? (
+              <p className="text-safe-wrap max-w-md font-mono text-sm leading-relaxed text-foreground/80">
+                {panel.hint}
+              </p>
+            ) : null}
           </div>
 
-          <Progress
-            value={calculatedProgress}
-            aria-label={t("questions.progress")}
-          />
-        </Card>
+          {!isFinalStep && answerError?.questionId === panel.id ? (
+            <Alert variant="destructive" className="p-4">
+              <AlertDescription className="font-mono text-foreground">
+                {answerError.message}
+              </AlertDescription>
+            </Alert>
+          ) : null}
 
-        <AnimatePresence mode="wait">
-          {!isFinalStep && currentQuestion && (
-            <motion.div
-              key={currentQuestion.id}
-              initial={{ opacity: 0, y: 30, scale: 0.95, filter: "blur(10px)" }}
-              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -30, scale: 0.95, filter: "blur(10px)" }}
-              transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-              className="space-y-10 md:space-y-12"
-            >
-              <div className="space-y-6 text-center">
-                <div className="flex items-center justify-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="md"
-                    onClick={() => void handleGoBack()}
-                    icon={<ChevronLeft className="h-4 w-4" />}
-                  >
-                    {t("questions.back")}
-                  </Button>
-                  <Badge variant="secondary" className="px-4 py-1.5 font-bold tracking-[0.18em]">
-                    {t("questions.step")} {currentStep} / {totalSteps}
-                  </Badge>
-                </div>
-
-                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] md:text-5xl">
-                  <GradientText>{currentQuestion.title}</GradientText>
-                </h2>
-
-                {answerError?.questionId === currentQuestion.id ? (
-                  <Alert variant="destructive" className="mx-auto mt-2 max-w-2xl p-4 text-left">
-                    <AlertDescription className="font-bold text-white">
-                      {answerError.message}
-                    </AlertDescription>
-                  </Alert>
-                ) : null}
-              </div>
-
-              <div
-                className={`mx-auto grid min-h-[26rem] content-start gap-4 ${
-                  currentQuestion.options.length === 2
-                    ? "grid-cols-1 sm:grid-cols-2 max-w-xl"
-                    : currentQuestion.options.length === 3
-                      ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-3xl"
-                      : "grid-cols-2 sm:grid-cols-2 md:grid-cols-4 max-w-4xl"
-                }`}
+          {isFinalStep ? (
+            <div className="flex min-w-0 flex-col gap-3">
+              <h2 className="text-safe-wrap font-heading text-lg font-bold uppercase tracking-[0.12em] text-foreground">
+                {t("questions.feedback.title")}
+              </h2>
+              <p
+                id={feedbackDescriptionId}
+                className="text-safe-wrap font-mono text-sm leading-relaxed text-foreground/80"
               >
-                {currentQuestion.options.map((option, index) => (
-                  <motion.div
-                    key={option.value}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.08 }}
-                    whileHover={{ y: -10, scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="h-full"
-                  >
-                    <button
-                      type="button"
-                      className={cn(
-                        cardVariants({ variant: "panel" }),
-                        "h-full min-h-[192px] w-full p-1 text-left transition-all duration-500 hover:border-secondary hover:shadow-[0_24px_40px_rgba(3,0,9,0.26),0_0_18px_rgba(93,246,255,0.18)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50 active:scale-[0.98]",
-                        selectedOption === option.value
-                          ? "scale-[1.02] border-secondary shadow-[0_26px_44px_rgba(3,0,9,0.3),0_0_20px_rgba(93,246,255,0.22)]"
-                          : "border-primary/35",
-                      )}
-                      onClick={() => void handleAnswer(currentQuestion.id, option.value)}
-                      onKeyDown={(event) =>
-                        handleCardKeyDown(event, () => {
-                          void handleAnswer(currentQuestion.id, option.value);
-                        })
-                      }
-                      aria-pressed={selectedOption === option.value}
-                      disabled={selectedOption !== null}
-                    >
-                      <div className="relative flex h-full flex-col overflow-hidden bg-black/50 p-4">
-                        <div className="absolute inset-0 bg-linear-to-br from-primary/10 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <div className="absolute inset-0 bg-size-[100%_4px] bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.3)_50%)] pointer-events-none mix-blend-overlay z-0" />
+                {t("questions.feedback.description")}
+              </p>
+              <label htmlFor="questions-feedback" className="sr-only">
+                {t("questions.feedback.title")}
+              </label>
+              <Textarea
+                id="questions-feedback"
+                value={feedback}
+                onChange={(event) => setFeedback(event.target.value)}
+                placeholder={t("questions.feedback.placeholder")}
+                aria-describedby={
+                  submitError
+                    ? `${feedbackDescriptionId} ${feedbackErrorId}`
+                    : feedbackDescriptionId
+                }
+                aria-invalid={submitError ? "true" : "false"}
+                className="min-h-28"
+              />
+              {submitError ? (
+                <Alert variant="destructive" id={feedbackErrorId} className="p-4">
+                  <AlertDescription className="font-mono text-foreground">
+                    {submitError}
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+            </div>
+          ) : null}
 
-                        <div className="relative z-10 mb-3 aspect-square overflow-hidden border border-primary/30 bg-black/75 transition-colors duration-500 group-hover:border-secondary">
-                        <Image
-                          src={option.image}
-                          alt={option.label}
-                          fill
-                          sizes="(max-width: 768px) 50vw, 33vw"
-                          className="object-cover opacity-88 transition-transform duration-500 group-hover:scale-[1.04] group-hover:opacity-100"
-                        />
-                        </div>
+          <div className="flex min-w-0 flex-col gap-2">
+            <div className="flex items-center justify-between gap-3 font-mono text-xs uppercase tracking-[0.16em]">
+              <span className="text-foreground/55">{t("questions.progress")}</span>
+              <span className="text-primary">{Math.round(calculatedProgress)}%</span>
+            </div>
+            <Progress
+              value={calculatedProgress}
+              aria-label={t("questions.progress")}
+            />
+          </div>
 
-                        <div className="relative z-10 mt-auto border-l-2 border-primary/60 bg-black/70 p-3 transition-colors group-hover:border-secondary">
-                          <h3 className="mb-1 text-lg font-bold font-heading uppercase tracking-[0.16em] text-primary transition-colors duration-300 group-hover:text-secondary sm:text-xl">
-                            {option.label}
-                          </h3>
-                          <p className="text-xs font-mono leading-relaxed text-foreground/88 sm:text-sm">
-                            {option.description}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {isFinalStep && (
-            <motion.div
-              key="final-step"
-              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -30, filter: "blur(10px)" }}
-              className="space-y-10 max-w-5xl mx-auto"
+          <div className="flex flex-col items-start gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={() => void handleGoBack()}
+              icon={<ChevronLeft className="h-4 w-4" />}
+              className={actionButtonClass}
             >
-              <div className="space-y-6 text-center">
-                <div className="flex items-center justify-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="md"
-                    onClick={() => void handleGoBack()}
-                    icon={<ChevronLeft className="h-4 w-4" />}
-                  >
-                    {t("questions.back")}
-                  </Button>
-                  <Badge variant="secondary" className="px-4 py-1.5 font-bold tracking-[0.18em]">
-                    {t("questions.step")} {currentStep} / {totalSteps}
-                  </Badge>
-                </div>
+              {t("questions.back")}
+            </Button>
+            {isFinalStep ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="md"
+                  onClick={() => void handleReset()}
+                  className={actionButtonClass}
+                >
+                  {t("questions.reset")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  onClick={() => void handleFeedbackSubmit()}
+                  className={actionButtonClass}
+                >
+                  {t("questions.submit")}
+                </Button>
+              </>
+            ) : null}
+          </div>
+        </div>
 
-                <h2 className="text-center text-3xl font-black font-heading uppercase leading-tight tracking-[0.12em] md:text-5xl">
-                  <GradientText>{t("questions.finalStep")}</GradientText>
-                </h2>
-                <p className="mx-auto max-w-2xl text-base font-mono leading-relaxed text-foreground/88 md:text-lg">
-                  {t("questions.base_spirits.description")}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
-                {baseSpiritsOptions.map((spirit, index) => (
-                  <motion.div
-                    key={spirit.value}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.04 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <button
-                      type="button"
-                      className={`group relative h-full w-full overflow-hidden border p-2 text-center transition-all duration-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/50 active:scale-[0.96] ${
-                        baseSpirits.includes(spirit.value)
-                          ? "border-secondary bg-secondary/16 shadow-[0_20px_34px_rgba(3,0,9,0.24),0_0_16px_rgba(93,246,255,0.18)]"
-                          : "border-primary/28 bg-black/35 hover:border-secondary hover:bg-black/60 hover:shadow-[0_18px_32px_rgba(3,0,9,0.2)]"
-                      }`}
-                      onClick={() => void toggleBaseSpirit(spirit.value)}
-                      onKeyDown={(event) =>
-                        handleCardKeyDown(event, () => {
-                          void toggleBaseSpirit(spirit.value);
-                        })
-                      }
-                      aria-pressed={baseSpirits.includes(spirit.value)}
-                    >
-                      <div className="relative mb-2 aspect-square overflow-hidden border border-white/10 bg-black/40 transition-shadow">
-                        <Image
-                          src={spirit.image}
-                          alt={spirit.label}
-                          fill
-                          sizes="(max-width: 768px) 33vw, 16vw"
-                          className="object-cover opacity-88 group-hover:opacity-100 group-hover:scale-[1.04] transition-transform duration-500"
-                        />
-                      </div>
-                      <h3
-                        className={`text-xs md:text-sm font-bold font-mono uppercase tracking-wider transition-colors duration-300 ${
-                          baseSpirits.includes(spirit.value)
-                            ? "text-secondary"
-                            : "text-foreground group-hover:text-secondary"
-                        }`}
-                      >
-                        {spirit.label}
-                      </h3>
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-
-              <Card className="flex flex-col gap-4 p-6 shadow-[0_22px_42px_rgba(3,0,9,0.24)]">
-                <div className="space-y-2">
-                  <h3 className="text-xl font-heading font-bold uppercase tracking-[0.16em] text-primary">
-                    {t("questions.feedback.title")}
-                  </h3>
-                  <p
-                    id={feedbackDescriptionId}
-                    className="text-sm font-mono text-foreground/80"
-                  >
-                    {t("questions.feedback.description")}
-                  </p>
-                </div>
-                <label htmlFor="questions-feedback" className="sr-only">
-                  {t("questions.feedback.title")}
-                </label>
-                <Textarea
-                  id="questions-feedback"
-                  value={feedback}
-                  onChange={(event) => setFeedback(event.target.value)}
-                  placeholder={t("questions.feedback.placeholder")}
-                  aria-describedby={
-                    submitError
-                      ? `${feedbackDescriptionId} ${feedbackErrorId}`
-                      : feedbackDescriptionId
-                  }
-                  aria-invalid={submitError ? "true" : "false"}
-                />
-                {submitError ? (
-                  <Alert variant="destructive" id={feedbackErrorId} className="border-2 bg-black/60 p-4">
-                    <AlertDescription className="text-white">
-                      {submitError}
-                    </AlertDescription>
-                  </Alert>
-                ) : null}
-                <div className="flex flex-col justify-between gap-4 sm:flex-row">
-                  <Button onClick={() => void handleReset()} variant="outline" size="lg">
-                    {t("questions.reset")}
-                  </Button>
-                  <Button onClick={() => void handleFeedbackSubmit()} variant="primary" size="lg">
-                    {t("questions.submit")}
-                  </Button>
-                </div>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </Container>
-    </div>
+        <div className="min-w-0 bg-black">
+          <ChoiceGrid
+            options={panel.options}
+            scroll={panel.options.length >= MANY_OPTIONS}
+            locked={choiceLocked}
+            isSelected={(value) =>
+              isFinalStep
+                ? baseSpirits.includes(value)
+                : selectedOption === value
+            }
+            onSelect={(value) => {
+              if (isFinalStep) {
+                void toggleBaseSpirit(value);
+                return;
+              }
+              void handleAnswer(panel.id, value);
+            }}
+          />
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 });
+
+function QuestionBreadcrumb() {
+  const { t, getPathWithLanguage } = useLanguage();
+
+  return (
+    <Breadcrumb>
+      <BreadcrumbList className="font-mono text-xs uppercase tracking-[0.16em]">
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link href={getPathWithLanguage("/")} className="focus-ring">
+              {t("nav.home")}
+            </Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage className="text-safe-wrap">
+            {t("nav.questions")}
+          </BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
+
+function ChoiceGrid({
+  options,
+  scroll,
+  locked,
+  isSelected,
+  onSelect,
+}: {
+  options: QuestionnaireChoice[];
+  scroll: boolean;
+  locked: boolean;
+  isSelected: (value: string) => boolean;
+  onSelect: (value: string) => void;
+}) {
+  const grid = (
+    <div className="grid w-full min-w-0 grid-cols-2 gap-2">
+      {options.map((option) => (
+        <ChoiceTile
+          key={option.value}
+          option={option}
+          selected={isSelected(option.value)}
+          disabled={locked}
+          onSelect={() => onSelect(option.value)}
+        />
+      ))}
+    </div>
+  );
+
+  if (scroll) {
+    return (
+      <ScrollArea className="h-[70vh] w-full md:h-[calc(100vh-5rem)]">
+        <div className="p-2 md:p-3">{grid}</div>
+      </ScrollArea>
+    );
+  }
+
+  return (
+    <div className="flex h-full w-full min-w-0 items-center">
+      <div className="w-full min-w-0 p-2 md:p-3">{grid}</div>
+    </div>
+  );
+}
+
+function ChoiceTile({
+  option,
+  selected,
+  disabled,
+  onSelect,
+}: {
+  option: QuestionnaireChoice;
+  selected: boolean;
+  disabled: boolean;
+  onSelect: () => void;
+}) {
+  const [ready, setReady] = useState(false);
+  const dimmed = disabled && !selected;
+
+  return (
+    <button
+      type="button"
+      className={cn(
+        "focus-ring group relative block w-full min-w-0 overflow-hidden border-2 text-left transition-colors",
+        selected
+          ? "border-primary bg-primary/40"
+          : "border-white/15 bg-[#080212] hover:border-secondary",
+        dimmed && "opacity-50 grayscale",
+      )}
+      onClick={onSelect}
+      aria-pressed={selected}
+      disabled={disabled}
+    >
+      <AspectRatio ratio={1} className="overflow-hidden bg-[#080212]">
+        {option.image ? (
+          <>
+            {ready ? null : <Skeleton className="absolute inset-0 z-[1] size-full" />}
+            <Image
+              src={option.image}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 50vw, 30vw"
+              className={cn("object-cover", ready ? "opacity-100" : "opacity-0")}
+              onLoad={() => setReady(true)}
+              onError={() => setReady(true)}
+            />
+          </>
+        ) : (
+          <span className="absolute inset-0 bg-[#120322]" />
+        )}
+        <span
+          aria-hidden
+          className={cn(
+            "absolute inset-0",
+            selected ? "bg-primary/40" : "bg-transparent",
+          )}
+        />
+        <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#080212] via-[#080212]/85 to-transparent px-3 pt-10 pb-3">
+          <span className="text-safe-wrap block font-heading text-sm font-bold uppercase tracking-[0.12em] text-foreground md:text-base">
+            {option.label}
+          </span>
+          {option.description ? (
+            <span className="text-safe-wrap mt-1 line-clamp-2 font-mono text-[0.7rem] leading-snug text-foreground/80 md:text-xs">
+              {option.description}
+            </span>
+          ) : null}
+          <span className="mt-2 block h-px bg-primary" />
+        </span>
+      </AspectRatio>
+    </button>
+  );
+}
 
 Questions.displayName = "Questions";
 
