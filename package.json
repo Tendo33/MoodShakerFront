@@ -71,5 +71,11 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@10.9.0"
+  "packageManager": "pnpm@10.9.0",
+  "pnpm": {
+    "overrides": {
+      "brace-expansion@>=1.0 <1.1.16": "^1.1.16",
+      "browserslist@>=4.0 <4.28.7": "^4.28.7"
+    }
+  }
 }
