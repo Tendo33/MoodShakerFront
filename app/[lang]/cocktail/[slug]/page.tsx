@@ -5,6 +5,7 @@ import CocktailDetailPage from "@/components/pages/CocktailDetailPage";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { getCocktailBySlug } from "@/lib/cocktail-data";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
 import { buildCocktailMetadata } from "@/lib/i18n/metadata";
 import { DataSourceUnavailableError } from "@/lib/runtime-errors";
@@ -104,7 +105,7 @@ export default async function CocktailPage({ params }: CocktailPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([
+          __html: serializeJsonLd([
             buildRecipeSchema(cocktail, lang),
             buildBreadcrumbSchema(cocktail, lang),
           ]),
