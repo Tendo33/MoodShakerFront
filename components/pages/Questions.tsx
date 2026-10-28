@@ -483,6 +483,30 @@ const Questions = memo(function Questions() {
           ) : null}
 
           {isFinalStep ? (
+            // On mobile the grid column stacks below the CTA, so users could
+            // submit before ever seeing the spirit choices. Show them first.
+            <div className="-mx-4 bg-black md:hidden">
+            <ChoiceGrid
+              options={panel.options}
+              scroll={false}
+              locked={choiceLocked}
+              isSelected={(value) =>
+                isFinalStep
+                  ? baseSpirits.includes(value)
+                  : selectedOption === value
+              }
+              onSelect={(value) => {
+                if (isFinalStep) {
+                  void toggleBaseSpirit(value);
+                  return;
+                }
+                void handleAnswer(panel.id, value);
+              }}
+            />
+            </div>
+          ) : null}
+
+          {isFinalStep ? (
             <div className="flex min-w-0 flex-col gap-3">
               <h2 className="text-safe-wrap font-heading text-lg font-bold uppercase tracking-[0.12em] text-foreground">
                 {t("questions.feedback.title")}
@@ -566,7 +590,9 @@ const Questions = memo(function Questions() {
           </div>
         </div>
 
-        <div className="min-w-0 bg-black">
+        <div
+          className={cn("min-w-0 bg-black", isFinalStep && "hidden md:block")}
+        >
           <ChoiceGrid
             options={panel.options}
             scroll={panel.options.length >= MANY_OPTIONS}
