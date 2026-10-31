@@ -1,125 +1,101 @@
-import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
-import { Suspense } from "react";
-import CocktailDetailPage from "@/components/pages/CocktailDetailPage";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import { getCocktailBySlug } from "@/lib/cocktail-data";
-import { serializeJsonLd } from "@/lib/seo/json-ld";
-import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
-import { buildCocktailMetadata } from "@/lib/i18n/metadata";
-import { DataSourceUnavailableError } from "@/lib/runtime-errors";
-import {
-  buildBreadcrumbSchema,
-  buildRecipeSchema,
-} from "@/lib/seo/recipe-schema";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
+import { DrinkSheet } from "@/components/DrinkSheet";
+import { Specimen } from "@/components/Specimen";
+import { getPublishedDrink, listPublishedDrinks } from "@/lib/db/drinks";
+import { orEmpty, summarize } from "@/lib/summaries";
+import { format, getDictionary } from "@/lib/dictionaries";
+import { localize } from "@/lib/domain/recipe";
+import { isLocale, localizePath, type Locale } from "@/lib/i18n";
+import { pageMetadata, recipeJsonLd, serializeJsonLd } from "@/lib/seo";
 
-interface CocktailPageProps {
-  params: Promise<{
-    lang: string;
-    slug: string;
-  }>;
+// Metadata and the page both need the row; one query per request.
+const loadDrink = cache((slug: string) => getPublishedDrink(slug));
+
+export async function generateMetadata({ params }: PageProps<"/[lang]/cocktail/[slug]">) {
+  const { lang, slug } = await params;
+  const locale: Locale = isLocale(lang) ? lang : "cn";
+  const row = await loadDrink(slug);
+  if (!row) return {};
+  const recipe = localize(row.recipe, locale);
+  return pageMetadata({
+    locale,
+    path: `/cocktail/${slug}`,
+    title: `${recipe.name} · ${recipe.altName}`,
+    description: recipe.description,
+    image: row.imageUrl,
+  });
 }
 
-export async function generateMetadata({
-  params,
-}: CocktailPageProps): Promise<Metadata> {
+export default async function CocktailPage({ params }: PageProps<"/[lang]/cocktail/[slug]">) {
   const { lang, slug } = await params;
-  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+  const locale = lang as Locale;
+  const row = await loadDrink(slug);
+  if (!row) notFound();
 
-  try {
-    const cocktail = await getCocktailBySlug(slug, locale);
+  const dict = getDictionary(locale);
+  const recipe = localize(row.recipe, locale);
+  const mood = row.order?.mood;
 
-    if (!cocktail) {
-      return { title: "Cocktail | MoodShaker" };
-    }
-
-    return buildCocktailMetadata({
-      locale,
-      slug: cocktail.slug,
-      name: cocktail.name,
-      description: cocktail.description,
-      imageUrl: cocktail.imageUrl,
-    });
-  } catch {
-    // A database outage must not fail metadata generation, which would take the
-    // whole page down rather than just its title.
-    return {
-      title: "Cocktail | MoodShaker",
-      description: "Discover delicious cocktail recipes on MoodShaker",
-    };
-  }
-}
-
-/**
- * Rendered on demand rather than pre-generated.
- *
- * `generateStaticParams` used to pre-render three cocktails from a hardcoded
- * catalogue, because the build runs with a placeholder `DATABASE_URL` and cannot
- * reach a database. That catalogue doubled as a silent runtime fallback, which is
- * how the project shipped with two migrations that had never been applied — the
- * build succeeded against data that was never in a database.
- */
-export default async function CocktailPage({ params }: CocktailPageProps) {
-  const { lang, slug } = await params;
-
-  if (!isLocale(lang)) {
-    redirect(`/${DEFAULT_LOCALE}/cocktail/${slug}`);
-  }
-
-  let cocktail = null;
-  try {
-    cocktail = await getCocktailBySlug(slug, lang);
-  } catch (error) {
-    if (!(error instanceof DataSourceUnavailableError)) {
-      throw error;
-    }
-
-    return (
-      <div className="flex justify-center items-center min-h-screen px-6">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-semibold mb-3">
-            {lang === "en" ? "Temporarily unavailable" : "暂时无法访问"}
-          </h1>
-          <p className="text-muted-foreground">
-            {lang === "en"
-              ? "We could not reach the cocktail database. Please try again shortly."
-              : "无法连接鸡尾酒数据库，请稍后重试。"}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!cocktail) {
-    notFound();
-  }
+  // Same mood first, then anything else, so the closing row is always full.
+  const pool = await orEmpty(
+    listPublishedDrinks({ limit: 24 }).then((page) =>
+      page.drinks.filter((other) => other.id !== row.id).map((other) => summarize(other, locale)),
+    ),
+    "cocktail",
+  );
+  const others = [...pool.filter((other) => other.mood === mood), ...pool.filter((other) => other.mood !== mood)].slice(0, 4);
 
   return (
-    <ErrorBoundary>
-      {/*
-        Structured data, so a cocktail page is eligible for recipe rich results
-        instead of reading as plain prose to a crawler. This is data rather than
-        executable code, so the CSP nonce does not apply.
-      */}
+    <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd([
-            buildRecipeSchema(cocktail, lang),
-            buildBreadcrumbSchema(cocktail, lang),
-          ]),
-        }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(recipeJsonLd(recipe, slug, locale, row.imageUrl)) }}
       />
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center h-screen">
-            <LoadingSpinner variant="modern" />
+      <DrinkSheet
+        recipe={recipe}
+        mood={mood ?? null}
+        imageUrl={row.imageUrl}
+        dict={dict}
+        actions={
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+            <Link href={`${localizePath("/questions", locale)}${mood ? `?mood=${mood}` : ""}`} className="btn btn-primary">
+              {dict.detail.shakeYours} <span aria-hidden>→</span>
+            </Link>
+            {mood && <p>{format(dict.detail.pouredFor, { mood: dict.options.moods[mood].label })}</p>}
           </div>
         }
-      >
-        <CocktailDetailPage slug={slug} initialData={cocktail} />
-      </Suspense>
-    </ErrorBoundary>
+        more={
+          <section className="frame mt-[clamp(120px,18vh,220px)]" aria-labelledby="more-heading">
+            <div className="flex flex-wrap items-baseline justify-between gap-4">
+              <h2 id="more-heading" className="reveal text-head">
+                {mood ? format(dict.detail.moreForMood, { mood: dict.options.moods[mood].label }) : dict.detail.more}
+              </h2>
+              <Link href={localizePath("/gallery", locale)} className="link text-lead">
+                {dict.detail.back} →
+              </Link>
+            </div>
+            <ul className="mt-10 grid grid-cols-2 gap-2 lg:grid-cols-4">
+              {others.map((other, index) => (
+                <li key={other.slug} className="reveal" style={{ ["--i" as string]: index }}>
+                  <Link href={localizePath(`/cocktail/${other.slug}`, locale)} className="group block">
+                    <Specimen
+                      src={other.thumbnailUrl}
+                      alt={other.name}
+                      mood={other.mood}
+                      sizes="(min-width: 1024px) 25vw, 50vw"
+                      className="aspect-[4/5] transition-transform duration-500 ease-out group-hover:scale-[0.985]"
+                    />
+                    <p className="mt-3 font-medium">{other.name}</p>
+                    <p className="text-small text-muted">{dict.vocab.spirits[other.baseSpirit]}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        }
+      />
+    </>
   );
 }

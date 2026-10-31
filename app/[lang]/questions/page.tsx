@@ -1,47 +1,42 @@
-import { redirect } from "next/navigation";
-import type { Metadata } from "next";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import Questions from "@/components/pages/Questions";
-import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
-import { buildPageMetadata } from "@/lib/i18n/metadata";
+import { Questionnaire, type MoodImages } from "@/components/Questionnaire";
+import { listPublishedDrinks } from "@/lib/db/drinks";
+import { MOODS, type Mood } from "@/lib/domain/vocabulary";
+import { orEmpty } from "@/lib/summaries";
+import { getDictionary } from "@/lib/dictionaries";
+import { isLocale, type Locale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 
-interface PageProps {
-  params: Promise<{
-    lang: string;
-  }>;
-}
-
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/[lang]/questions">) {
   const { lang } = await params;
-  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
-
-  return buildPageMetadata({
+  const locale: Locale = isLocale(lang) ? lang : "cn";
+  const dict = getDictionary(locale);
+  return pageMetadata({
     locale,
     path: "/questions",
-    titleKey: "seo.questions.title",
-    descriptionKey: "seo.questions.description",
+    title: dict.meta.questionsTitle,
+    description: dict.meta.questionsDescription,
   });
 }
 
-/**
- * Imported directly rather than through `next/dynamic`.
- *
- * The wrapper had no `ssr: false`, so Next server-rendered `Questions` regardless;
- * it only added a client chunk and a spinner that could flash over content already
- * in the HTML. See `docs/performance-baseline.md`.
- */
-export default async function QuestionsPage({ params }: PageProps) {
+export default async function QuestionsPage({ params, searchParams }: PageProps<"/[lang]/questions">) {
   const { lang } = await params;
+  const { mood } = await searchParams;
+  const locale = lang as Locale;
+  const dict = getDictionary(locale);
 
-  if (!isLocale(lang)) {
-    redirect(`/${DEFAULT_LOCALE}/questions`);
+  const drinks = await orEmpty(listPublishedDrinks({ limit: 48 }).then((page) => page.drinks), "questions");
+  const moodImages: MoodImages = {};
+  for (const drink of drinks) {
+    const code = drink.order?.mood;
+    if (code && drink.imageUrl) (moodImages[code] ??= []).push(drink.imageUrl);
   }
 
   return (
-    <ErrorBoundary>
-      <Questions />
-    </ErrorBoundary>
+    <Questionnaire
+      locale={locale}
+      dict={{ questions: dict.questions, options: dict.options, vocab: dict.vocab }}
+      moodImages={moodImages}
+      initialMood={(MOODS as readonly unknown[]).includes(mood) ? (mood as Mood) : null}
+    />
   );
 }

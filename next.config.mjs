@@ -14,14 +14,12 @@ const objectStorageHost = (() => {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   allowedDevOrigins: ["127.0.0.1", "localhost"],
-  // TypeScript 严格模式 - 不忽略构建错误
-  typescript: {
-    ignoreBuildErrors: false,
-  },
   images: {
+    // Development only: proxies with fake-IP DNS (Clash, Surge) resolve the
+    // bucket's domain into 198.18.0.0/15, which the optimizer's SSRF guard
+    // rejects. Production keeps the guard.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
     // Generated cocktail images are served from the R2 bucket's custom domain.
-    // The previous entry pointed at a third-party OSS host whose links have
-    // since expired; those rows are cleared by the image-url backfill.
     remotePatterns: [
       {
         protocol: "https",
@@ -29,12 +27,17 @@ const nextConfig = {
       },
     ],
   },
-  // No `rewrites`. There used to be one mapping `/:lang/:path*` to `/:path*` for
-  // any request whose `Accept` header matched `image/.*`, meant to fix localized
-  // static asset URLs. It matched on a client-controlled header, so any request
-  // that asked for an image could reach an unprefixed route — and localized asset
-  // paths are not something the app generates. `proxy.ts` already skips locale
-  // handling for static file extensions.
+  // The 0.x result page read the drink from browser storage; private drinks now
+  // live at /drink/[id], so old bookmarks go back to the questionnaire.
+  async redirects() {
+    return [
+      {
+        source: "/:lang(cn|en)/cocktail/recommendation",
+        destination: "/:lang/questions",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [
       {

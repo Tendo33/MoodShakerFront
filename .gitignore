@@ -47,3 +47,5 @@ next-env.d.ts
 # Playwright run artifacts
 test-results/
 playwright-report/
+eval-output/
+.taste-skill/
