@@ -27,7 +27,7 @@ const LETTERS = "MOODSHAKER".split("");
 const FIELDS = Object.values(MOOD_COLORS);
 const HEIGHTS = [78, 100, 64, 88, 72, 96, 60, 84, 92, 70];
 const MARK_W = 1000;
-const MARK_H = 340;
+const MARK_H = 230;
 const GAP = 4;
 const BLOCK_W = (MARK_W - GAP * (LETTERS.length - 1)) / LETTERS.length;
 
@@ -45,7 +45,7 @@ function BlockMark() {
               x={x + BLOCK_W / 2}
               y={MARK_H - 8}
               textAnchor="middle"
-              fontSize={118}
+              fontSize={112}
               fontWeight={500}
               letterSpacing={-4}
               fill="#1a1a1a"

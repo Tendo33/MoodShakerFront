@@ -154,6 +154,7 @@ export const cn: Dictionary = {
     sharing: "正在生成……",
     again: "再调一杯",
     retry: "重试",
+    fromMenu: "或者，从酒单上挑一杯",
     actionFailed: "操作没有成功，请再试一次。",
   },
   gallery: {

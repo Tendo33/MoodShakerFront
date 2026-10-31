@@ -2,6 +2,7 @@ import { DrinkClient } from "@/components/DrinkClient";
 import { getDictionary } from "@/lib/dictionaries";
 import { isLocale, type Locale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
+import { menuSuggestions } from "@/lib/summaries";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/drink/[id]">) {
   const { lang, id } = await params;
@@ -26,6 +27,7 @@ export default async function DrinkPage({ params }: PageProps<"/[lang]/drink/[id
       id={id}
       locale={locale}
       dict={{ drink: dict.drink, recipe: dict.recipe, vocab: dict.vocab }}
+      suggestions={await menuSuggestions(locale)}
     />
   );
 }

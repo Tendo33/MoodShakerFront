@@ -153,6 +153,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
 
       {finale && (
         <section
+          data-bleed-end
           className="relative mt-[clamp(120px,18vh,240px)] flex min-h-[90svh] items-center overflow-hidden"
           style={{ backgroundColor: MOOD_COLORS[finale.mood ?? "romantic"] }}
           aria-labelledby="close-title"

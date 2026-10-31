@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { DrinkSheet } from "@/components/DrinkSheet";
+import { EmptyState, type Suggestion } from "@/components/EmptyState";
 import { callApi, useSavedDrinks } from "@/lib/client";
 import type { DrinkView } from "@/lib/db/drinks";
 import type { Dictionary } from "@/lib/dictionaries";
@@ -16,7 +17,18 @@ type ImageState = "idle" | "pending" | "failed";
 type Busy = "publish" | "withdraw" | "share" | null;
 
 /** A private drink, opened with the token this browser saved when it was poured. */
-export function DrinkClient({ id, locale, dict }: { id: string; locale: Locale; dict: Labels }) {
+export function DrinkClient({
+  id,
+  locale,
+  dict,
+  suggestions,
+}: {
+  id: string;
+  locale: Locale;
+  dict: Labels;
+  /** Drinks from the menu, offered when this one cannot be opened. */
+  suggestions: Suggestion[];
+}) {
   const t = dict.drink;
   const savedDrinks = useSavedDrinks();
   const token = savedDrinks?.find((item) => item.id === id)?.editToken ?? null;
@@ -107,27 +119,28 @@ export function DrinkClient({ id, locale, dict }: { id: string; locale: Locale; 
 
   if (phase === "missing" || phase === "failed" || !drink) {
     return (
-      <div className="frame py-32">
-        <h1 className="max-w-[18ch] text-head">{phase === "failed" ? t.actionFailed : t.missingTitle}</h1>
-        {phase !== "failed" && <p className="mt-6 max-w-[48ch] text-lead">{t.missingBody}</p>}
-        <div className="mt-10 flex flex-wrap gap-3">
-          {phase === "failed" && (
-            <button
-              type="button"
-              className="btn btn-quiet"
-              onClick={() => {
-                setFetchPhase("loading");
-                setAttempt((n) => n + 1);
-              }}
-            >
-              {t.retry}
-            </button>
-          )}
-          <Link href={localizePath("/questions", locale)} className="btn btn-primary">
-            {t.again} <span aria-hidden>→</span>
-          </Link>
-        </div>
-      </div>
+      <EmptyState
+        title={phase === "failed" ? t.actionFailed : t.missingTitle}
+        body={phase === "failed" ? undefined : t.missingBody}
+        suggestionsTitle={t.fromMenu}
+        suggestions={suggestions}
+      >
+        {phase === "failed" && (
+          <button
+            type="button"
+            className="btn btn-quiet"
+            onClick={() => {
+              setFetchPhase("loading");
+              setAttempt((n) => n + 1);
+            }}
+          >
+            {t.retry}
+          </button>
+        )}
+        <Link href={localizePath("/questions", locale)} className="btn btn-primary">
+          {t.again} <span aria-hidden>→</span>
+        </Link>
+      </EmptyState>
     );
   }
 
@@ -152,7 +165,7 @@ export function DrinkClient({ id, locale, dict }: { id: string; locale: Locale; 
 
   const actions = (
     <div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
         <button type="button" className="btn btn-primary" disabled={busy !== null} onClick={() => void share(recipe.name)}>
           {busy === "share" ? t.sharing : t.share}
         </button>
@@ -164,7 +177,7 @@ export function DrinkClient({ id, locale, dict }: { id: string; locale: Locale; 
         >
           {busy === "publish" ? t.publishing : drink.published ? t.withdraw : t.publish}
         </button>
-        <Link href={localizePath("/questions", locale)} className="link ml-2">
+        <Link href={localizePath("/questions", locale)} className="link col-span-2 py-2 sm:ml-2">
           {t.again} →
         </Link>
       </div>

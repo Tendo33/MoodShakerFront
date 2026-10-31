@@ -202,6 +202,11 @@
   }
 }
 
+/* A page that ends on a colour field runs straight into the footer. */
+main:has([data-bleed-end]) ~ footer {
+  margin-top: 0;
+}
+
 /* The one moving picture: the drink on the plinth breathes very slightly. */
 @keyframes drift {
   from {

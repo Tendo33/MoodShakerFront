@@ -60,7 +60,9 @@ export function MoodPlinth({
 
   return (
     <div className="grid gap-10 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-8 lg:gap-y-12">
-      <p className="enter max-w-[30ch] text-lead [--i:1] lg:col-span-5">{dict.home.lede}</p>
+      <p className="enter max-w-[30ch] text-[clamp(1.375rem,1rem+1.2vw,2.125rem)] leading-[1.3] tracking-[-0.015em] [--i:1] lg:col-span-5">
+        {dict.home.lede}
+      </p>
       <div className="order-3 lg:order-none lg:col-span-5 lg:row-start-2 lg:self-end">
         <fieldset className="enter [--i:2]">
           <legend className="text-lead font-medium">{dict.home.moodPrompt}</legend>

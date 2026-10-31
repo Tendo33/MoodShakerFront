@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { DrinkView } from "@/lib/db/drinks";
 import type { Dictionary } from "@/lib/dictionaries";
 import { format } from "@/lib/dictionaries";
@@ -90,6 +90,15 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
   const [pouring, setPouring] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // On a new question, move focus to its heading so keyboard and screen-reader
+  // users start there instead of back at the top of the page. Not on first load.
+  const firstStep = useRef(step);
+  useEffect(() => {
+    if (step === firstStep.current) return;
+    firstStep.current = -1;
+    document.getElementById("question-title")?.focus({ preventScroll: false });
+  }, [step]);
+
   useEffect(() => {
     try {
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ step, draft }));
@@ -156,7 +165,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
   const field = draft.mood ? MOOD_COLORS[draft.mood] : undefined;
 
   return (
-    <div className="transition-colors duration-700 ease-out" style={{ backgroundColor: field }}>
+    <div data-bleed-end className="transition-colors duration-700 ease-out" style={{ backgroundColor: field }}>
       {pouring && draft.mood ? (
         <Shaking dict={t.shaking} images={moodImages[draft.mood] ?? []} />
       ) : (
@@ -347,7 +356,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                   </button>
                 )}
               </div>
-              <button type="submit" className="btn btn-primary" disabled={!canContinue}>
+              <button type="submit" className="btn btn-primary max-sm:order-first max-sm:w-full" disabled={!canContinue}>
                 {current === "style" ? t.submit : t.next} <span aria-hidden>→</span>
               </button>
             </div>
@@ -361,7 +370,13 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
 function Question({ title, hint, children }: { title: string; hint: string; children: React.ReactNode }) {
   return (
     <>
-      <h1 className="enter text-[clamp(2.5rem,1rem+5vw,6rem)] leading-[0.92] tracking-[-0.05em]">{title}</h1>
+      <h1
+        id="question-title"
+        tabIndex={-1}
+        className="enter text-[clamp(2.5rem,1rem+5vw,6rem)] leading-[0.92] tracking-[-0.05em] focus:outline-none"
+      >
+        {title}
+      </h1>
       <p className="enter mt-5 max-w-[40ch] text-lead [--i:1]">{hint}</p>
       <div className="mt-10">{children}</div>
     </>

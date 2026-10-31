@@ -22,7 +22,7 @@ export const en: Dictionary = {
     lede: "Tell us how tonight feels. An AI bartender writes you one cocktail, with the recipe and a photograph.",
     moodPrompt: "Tonight feels",
     ctaForMood: "Shake one for {mood}",
-    pouredFor: "Poured for a guest feeling {mood}",
+    pouredFor: "Poured for a guest feeling “{mood}”",
     statement: ["Say how tonight feels", " and what's on your shelf.", " Get one drink, with its photograph", "."],
     stepsTitle: "From mood to glass",
     steps: [
@@ -154,6 +154,7 @@ export const en: Dictionary = {
     sharing: "Rendering…",
     again: "Shake another",
     retry: "Try again",
+    fromMenu: "Or pick one from the menu",
     actionFailed: "That didn't work. Please try again.",
   },
   gallery: {

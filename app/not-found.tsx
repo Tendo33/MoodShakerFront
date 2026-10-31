@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { headers } from "next/headers";
+import { EmptyState } from "@/components/EmptyState";
+import { Reveals } from "@/components/Reveals";
+import { menuSuggestions } from "@/lib/summaries";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { getDictionary } from "@/lib/dictionaries";
 import { DEFAULT_LOCALE, isLocale, localizePath } from "@/lib/i18n";
@@ -16,14 +19,20 @@ export default async function NotFound() {
   return (
     <>
       <SiteHeader locale={locale} dict={dict} />
-      <main className="frame py-32">
-        <h1 className="max-w-[16ch] text-head">{dict.notFound.title}</h1>
-        <p className="mt-6 text-lead">{dict.notFound.body}</p>
-        <Link href={localizePath("/", locale)} className="btn btn-primary mt-10">
-          {dict.notFound.home}
-        </Link>
+      <main>
+        <EmptyState
+          title={dict.notFound.title}
+          body={dict.notFound.body}
+          suggestionsTitle={dict.drink.fromMenu}
+          suggestions={await menuSuggestions(locale)}
+        >
+          <Link href={localizePath("/", locale)} className="btn btn-primary">
+            {dict.notFound.home}
+          </Link>
+        </EmptyState>
       </main>
       <SiteFooter locale={locale} dict={dict} />
+      <Reveals />
     </>
   );
 }

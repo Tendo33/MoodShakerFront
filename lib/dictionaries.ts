@@ -104,6 +104,7 @@ export interface Dictionary {
     | "sharing"
     | "again"
     | "retry"
+    | "fromMenu"
     | "actionFailed",
     string
   >;
