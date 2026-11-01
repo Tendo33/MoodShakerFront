@@ -7,7 +7,7 @@
     "dev": "next dev",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "node --import tsx --test \"tests/**/*.test.ts\"",
     "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
