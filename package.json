@@ -48,7 +48,9 @@
   "pnpm": {
     "overrides": {
       "brace-expansion@>=1.0 <1.1.16": "^1.1.16",
-      "browserslist@>=4.0 <4.28.7": "^4.28.7"
+      "browserslist@>=4.0 <4.28.7": "^4.28.7",
+      "@esbuild-kit/core-utils>esbuild": "^0.25.0",
+      "minimatch@<11.0.1": "^11.0.1"
     }
   }
 }
