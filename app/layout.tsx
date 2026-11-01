@@ -1,131 +1,48 @@
-import type React from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Hanken_Grotesk, Noto_Sans_SC } from "next/font/google";
 import { headers } from "next/headers";
-import {
-  DEFAULT_LOCALE,
-  HTML_LANG,
-  LOCALE_HEADER,
-  type Locale,
-  isLocale,
-  localeFromPathname,
-} from "@/lib/i18n/config";
-import { Orbitron, Share_Tech_Mono } from "next/font/google";
-import { ErrorProvider } from "@/context/ErrorContext";
-// The two providers directly. A `CocktailProvider` facade used to wrap this pair;
-// it marked itself deprecated, and its combined `useCocktail` hook had no consumers
-// left, so the indirection only hid the nesting order that matters here.
-import { CocktailFormProvider } from "@/context/CocktailFormContext";
-import { CocktailResultProvider } from "@/context/CocktailResultContext";
-import { LanguageProvider } from "@/context/LanguageContext";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import ErrorAlert from "@/components/ErrorAlert";
-import PageTransition from "@/components/animations/PageTransition";
-import { Toaster } from "@/components/ui/toaster";
+import { DEFAULT_LOCALE, HTML_LANG, isLocale } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
-// Orbitron for headings
-const orbitron = Orbitron({
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  variable: "--font-orbitron",
-  display: "swap",
-  preload: true,
-  weight: ["400", "500", "700", "900"], 
-  style: ["normal"],
-  adjustFontFallback: false,
-  fallback: ["sans-serif"],
+  weight: ["400", "500"],
+  variable: "--font-hanken",
 });
 
-// Share Tech Mono for body and UI
-const shareTechMono = Share_Tech_Mono({
-  subsets: ["latin"],
-  variable: "--font-share-tech-mono",
-  display: "swap",
-  preload: true,
-  weight: ["400"],
-  style: ["normal"],
-  adjustFontFallback: false,
-  fallback: ["monospace", "sans-serif"],
+// Chinese glyphs come in many unicode-range slices; preloading them all would
+// stall first paint, so the browser fetches only the slices a page uses.
+const notoSansSC = Noto_Sans_SC({
+  weight: ["400", "500"],
+  preload: false,
+  variable: "--font-noto-sans-sc",
 });
 
 export const metadata: Metadata = {
-  title: "MoodShaker",
-  description:
-    "Answer a few simple questions and let us recommend the perfect cocktail for you",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon.ico", type: "image/x-icon" },
-    ],
-    apple: [{ url: "/favicon.ico", sizes: "180x180", type: "image/x-icon" }],
-    shortcut: ["/favicon.ico"],
-  },
-  generator: "v0.app",
+  metadataBase: new URL(SITE_URL),
+  title: { default: "MoodShaker", template: "%s · MoodShaker" },
+  icons: { icon: "/favicon.ico" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#e6e0d2",
 };
 
 /**
- * Reads the locale the proxy decided on.
- *
- * This layout renders `<html>` but sits above the `[lang]` segment, so it cannot
- * read the route param. It used to re-derive the locale from `next-url`, then a
- * cookie, then `accept-language` — a chain that could disagree with the redirect
- * the proxy had just performed and emit `<html lang="en">` on a `/cn` page. The
- * proxy now forwards its decision and this is a lookup.
- *
- * The fallback only applies when the header is absent, which means the request
- * bypassed the proxy.
+ * The root layout sits above `[lang]` so `not-found` has a shell to render in.
+ * `proxy.ts` passes the locale down as a request header; reading headers also
+ * keeps every page dynamic, which the per-request CSP nonce requires.
  */
-const resolveHtmlLocale = async (): Promise<Locale> => {
-  const requestHeaders = await headers();
-  const forwarded = requestHeaders.get(LOCALE_HEADER);
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = (await headers()).get("x-locale");
 
-  if (isLocale(forwarded)) return forwarded;
-
-  return (
-    localeFromPathname(requestHeaders.get("next-url")) ??
-    localeFromPathname(requestHeaders.get("x-nextjs-rewritten-path")) ??
-    DEFAULT_LOCALE
-  );
-};
-
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const locale = await resolveHtmlLocale();
   return (
     <html
-      lang={HTML_LANG[locale]}
-      suppressHydrationWarning
-      className={`${orbitron.variable} ${shareTechMono.variable} antialiased`}
+      lang={HTML_LANG[isLocale(locale) ? locale : DEFAULT_LOCALE]}
+      className={`${hanken.variable} ${notoSansSC.variable}`}
     >
-      <body className="dark vaporwave-theme selection:bg-[#FF00FF] selection:text-white">
-        {/* Global Vaporwave Elements */}
-        <div className="fixed inset-0 crt-overlay pointer-events-none z-50"></div>
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 vapor-sun pointer-events-none z-0"></div>
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="vaporwave-grid absolute inset-x-0 bottom-0 h-full w-full opacity-30"></div>
-        </div>
-        <ErrorProvider>
-          <LanguageProvider>
-            {/* Result inside form, matching the order the removed facade used. */}
-            <CocktailFormProvider>
-              <CocktailResultProvider>
-                <div className="min-h-screen flex flex-col bg-background text-foreground">
-                  <Header />
-                  <ErrorAlert />
-                  <main className="flex-1">
-                    <PageTransition>{children}</PageTransition>
-                  </main>
-                  <Footer />
-                  <Toaster />
-                </div>
-              </CocktailResultProvider>
-            </CocktailFormProvider>
-          </LanguageProvider>
-        </ErrorProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

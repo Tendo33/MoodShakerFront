@@ -1,27 +1,38 @@
-"use client";
-
 import Link from "next/link";
-import { useLanguage } from "@/context/LanguageContext";
+import { headers } from "next/headers";
+import { EmptyState } from "@/components/EmptyState";
+import { Reveals } from "@/components/Reveals";
+import { menuSuggestions } from "@/lib/summaries";
+import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
+import { getDictionary } from "@/lib/dictionaries";
+import { DEFAULT_LOCALE, isLocale, localizePath } from "@/lib/i18n";
 
-export default function NotFound() {
-  const { t, getPathWithLanguage } = useLanguage();
+/**
+ * Rendered for any unmatched URL. It sits outside `[lang]`, so it draws its own
+ * header and footer, taking the locale from the header `proxy.ts` set.
+ */
+export default async function NotFound() {
+  const header = (await headers()).get("x-locale");
+  const locale = isLocale(header) ? header : DEFAULT_LOCALE;
+  const dict = getDictionary(locale);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="text-center p-8 max-w-md border-2 border-secondary bg-black/80">
-        <h2 className="text-3xl font-heading font-black mb-4 text-secondary">
-          {t("notFound.title")}
-        </h2>
-        <p className="text-muted-foreground font-mono mb-8">
-          {t("notFound.description")}
-        </p>
-        <Link
-          href={getPathWithLanguage("/")}
-          className="inline-flex px-6 py-2 border-2 border-primary text-primary font-mono uppercase tracking-widest hover:bg-primary/20 transition-all"
+    <>
+      <SiteHeader locale={locale} dict={dict} />
+      <main>
+        <EmptyState
+          title={dict.notFound.title}
+          body={dict.notFound.body}
+          suggestionsTitle={dict.drink.fromMenu}
+          suggestions={await menuSuggestions(locale)}
         >
-          {t("notFound.action")}
-        </Link>
-      </div>
-    </div>
+          <Link href={localizePath("/", locale)} className="btn btn-primary">
+            {dict.notFound.home}
+          </Link>
+        </EmptyState>
+      </main>
+      <SiteFooter locale={locale} dict={dict} />
+      <Reveals />
+    </>
   );
 }

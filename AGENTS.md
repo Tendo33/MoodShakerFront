@@ -5,7 +5,7 @@ This file is the cross-tool entrypoint for AI assistants in MoodShakerFront.
 ## Working rules
 
 - MoodShaker is a bilingual AI cocktail recommendation product, not a generic Next.js template.
-- Preserve localized routes, private recommendation access, Prisma/Postgres data contracts, rate limiting, and deployment warnings.
+- Preserve localized routes, private drink access (edit token in POST bodies only), the Drizzle/Postgres schema and migrations, rate limiting, and deployment warnings. Visual rules live in DESIGN.md.
 - Keep changes minimal, typed, and explicit.
 
 ## Execution style
@@ -36,3 +36,13 @@ This file is the cross-tool entrypoint for AI assistants in MoodShakerFront.
 
 - Turn each task into a verifiable outcome.
 - For non-trivial work, keep a short plan and verification path in mind before editing.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

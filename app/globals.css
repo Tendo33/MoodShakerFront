@@ -1,531 +1,218 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
-/* ===== Language Variants ===== */
-@custom-variant lang-en {
-  &:lang(en) {
-    @slot;
-  }
+/*
+ * MoodShaker: the specimen catalogue. Each drink stands alone on the colour of
+ * the mood it was poured for. One ground (bone), one ink, one accent (Campari
+ * red, on the primary action only), and six mood fields. See DESIGN.md.
+ */
+@theme {
+  --color-bone: #e6e0d2;
+  --color-surface: #dcd5c5;
+  --color-ink: #1a1a1a;
+  --color-muted: #5f5b52;
+  --color-accent: #ed4b44;
+  --color-night: #1a1a1a;
+
+  --color-unwind: #a9d3b5;
+  --color-celebrate: #f2c94c;
+  --color-blue: #aebfd6;
+  --color-romantic: #f2aca4;
+  --color-spark: #d4e157;
+  --color-reflect: #cbbfa8;
+
+  --font-sans: var(--font-hanken), var(--font-noto-sans-sc), "PingFang SC", system-ui, sans-serif;
+
+  /* Five sizes do all the work. */
+  --text-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
+  --text-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --text-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --text-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+  --text-display: clamp(3.25rem, 1rem + 8vw, 8.5rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@custom-variant lang-zh {
-  &:lang(zh-CN), &:lang(zh) {
-    @slot;
-  }
-}
-
-/* ===== Container (removed from Tailwind v4 core) ===== */
-@utility container {
-  width: 100%;
-  margin-inline: auto;
-  padding-inline: 2rem;
-  @media (width >= 1536px) {
-    max-width: 1400px;
-  }
-}
-
-/* ===== Theme — replaces tailwind.config.ts ===== */
-@theme inline {
-  --color-background: #0b0415;
-  --color-foreground: #f3ebff;
-
-  --color-primary: #ff4fd8;
-  --color-primary-foreground: #14031f;
-
-  --color-secondary: #5df6ff;
-  --color-secondary-foreground: #08131b;
-
-  --color-accent: #ffb15b;
-  --color-accent-foreground: #201004;
-
-  --color-muted: rgba(219, 209, 239, 0.4);
-  --color-muted-foreground: rgba(219, 209, 239, 0.78);
-
-  --color-border: rgba(145, 112, 214, 0.34);
-  --color-input: rgba(11, 4, 21, 0.78);
-  --color-ring: rgba(93, 246, 255, 0.92);
-
-  --color-popover: rgba(18, 9, 33, 0.96);
-  --color-popover-foreground: #f3ebff;
-
-  --color-card: rgba(20, 10, 38, 0.78);
-  --color-card-foreground: #f3ebff;
-
-  --color-destructive: #ff5b76;
-  --color-destructive-foreground: #fff3f6;
-
-  --surface-strong: rgba(19, 10, 37, 0.9);
-  --surface-soft: rgba(19, 10, 37, 0.72);
-  --surface-stroke: rgba(255, 255, 255, 0.06);
-  --surface-shadow: 0 22px 60px rgba(3, 0, 9, 0.5);
-
-  --radius-lg: 0px;
-  --radius-md: 0px;
-  --radius-sm: 0px;
-
-  --font-heading: var(--font-orbitron), sans-serif;
-  --font-mono: var(--font-share-tech-mono), monospace;
-
-  /* Vaporwave Animations */
-  --animate-grid-move: grid-move 5s linear infinite;
-  --animate-crt-flicker: crt-flicker 8s ease-in-out infinite;
-  --animate-neon-pulse: neon-pulse 2s infinite alternate;
-  --animate-float: float 7s ease-in-out infinite;
-  --animate-fadeIn: fadeIn 0.4s linear forwards;
-  --animate-fadeOut: fadeOut 0.3s linear forwards;
-  --animate-slideUp: slideUp 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
-  --animate-scaleIn: scaleIn 0.3s linear forwards;
-}
-
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-@keyframes slideUp {
-  0% { transform: translateY(40px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-@keyframes scaleIn {
-  0% { transform: scale(0.85); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
-@keyframes grid-move {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 0 0, 0 40px; }
-}
-@keyframes crt-flicker {
-  0% { opacity: 0.95; }
-  50% { opacity: 0.85; }
-  100% { opacity: 1; }
-}
-@keyframes neon-pulse {
-  0% { filter: brightness(1); }
-  100% { filter: brightness(1.2) contrast(1.1); }
-}
-
-/* Font handled by layout.tsx */
-
-/* ===== Custom Utilities (Tailwind v4: @utility replaces @layer utilities + @apply) ===== */
-
-@utility text-balance {
-  text-wrap: balance;
-}
-
-@utility text-safe-wrap {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-/* Rendering Optimization Utilities */
-@utility content-auto {
-  content-visibility: auto;
-  contain-intrinsic-size: 320px 520px;
-}
-
-/* Vaporwave Structural Utilities */
-@utility crt-overlay {
-  background: linear-gradient(rgba(18,16,20,0) 50%, rgba(0,0,0,0.25) 50%);
-  background-size: 100% 4px;
-  mix-blend-mode: overlay;
-  z-index: 100;
-  pointer-events: none;
-  opacity: 0.35;
-}
-
-@utility crt-scanline {
-  background: linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
-  pointer-events: none;
-}
-
-@utility vaporwave-grid {
-  background-image: 
-    linear-gradient(transparent 95%, #FF00FF 95%), 
-    linear-gradient(90deg, transparent 95%, #FF00FF 95%);
-  background-size: 40px 40px;
-  transform: perspective(600px) rotateX(60deg) translateY(-50px) scale(2.5);
-  mask-image: linear-gradient(to bottom, transparent, black);
-  animation: grid-move 5s linear infinite;
-  transform-origin: top center;
-}
-
-@utility vapor-sun {
-  width: 600px;
-  height: 600px;
-  background: linear-gradient(to bottom, #FF9900, #FF00FF);
-  border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.2;
-}
-
-/* Base Design System overwriting defaults via standard variables. We are not using standard HSL palettes for Vaporwave since it uses pure saturation. */
 @layer base {
-  :root {
-    /* Pure hex values replaced for explicit tailwind generation */
-    --background: #0b0415;
-    --foreground: #f3ebff;
-    --card: rgba(20, 10, 38, 0.78);
-    --card-foreground: #f3ebff;
-    --primary: #ff4fd8;
-    --primary-foreground: #14031f;
-    --secondary: #5df6ff;
-    --secondary-foreground: #08131b;
-    --accent: #ffb15b;
-    --border: rgba(145, 112, 214, 0.34);
-    --radius: 0px; /* Zero radius for aggressive geometric edges */
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
   }
 
-  /* Root Font Scaling for English to compensate for wider Latin characters */
-  html:lang(en) {
-    font-size: 92%;
-  }
-}
-
-/* ===== Base Styles (raw CSS — no @apply inside @layer in v4) ===== */
-@layer base {
-  * {
-    border-color: var(--color-border);
-  }
-  body, html {
-    background:
-      radial-gradient(circle at top left, rgba(255, 79, 216, 0.13), transparent 30%),
-      radial-gradient(circle at top right, rgba(93, 246, 255, 0.1), transparent 28%),
-      linear-gradient(180deg, #120322 0%, var(--color-background) 22%, #080212 100%);
-    color: var(--color-foreground);
+  body {
+    min-height: 100dvh;
+    background: var(--color-bone);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+    font-feature-settings: "tnum" 0;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-family: var(--font-mono);
-    min-height: 100%;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    text-transform: uppercase;
+  h1,
+  h2,
+  h3 {
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    text-wrap: balance;
   }
 
-  button,
-  [role="button"],
-  a {
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+  :lang(zh-CN) h1,
+  :lang(zh-CN) h2,
+  :lang(zh-CN) h3 {
+    letter-spacing: -0.02em;
+    line-height: 1.08;
   }
 
-  @media screen and (max-width: 768px) {
-    input,
-    select,
-    textarea {
-      font-size: 16px !important;
-    }
+  p {
+    text-wrap: pretty;
   }
 
   ::selection {
-    background: rgba(255, 79, 216, 0.22);
-    color: var(--color-foreground);
+    background: var(--color-ink);
+    color: var(--color-bone);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-ink);
+    outline-offset: 3px;
   }
 }
 
-/* ===== Scrollbar ===== */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+@layer components {
+  /* One pair of outer margins for the whole site. */
+  .frame {
+    width: 100%;
+    max-width: 1600px;
+    margin-inline: auto;
+    padding-inline: clamp(20px, 3.5vw, 56px);
+  }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    min-height: 3.25rem;
+    padding: 0 1.75rem;
+    font-size: var(--text-body);
+    font-weight: 500;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      transform 300ms var(--ease-out);
+  }
+  .btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--color-accent);
+    color: var(--color-ink);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-ink);
+    color: var(--color-bone);
+  }
+  .btn-quiet {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  .btn-quiet:hover:not(:disabled) {
+    background: var(--color-ink);
+    color: var(--color-bone);
+  }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(219, 209, 239, 0.24);
-  border-radius: 10px;
-  transition: background-color 0.3s ease;
-}
+  .link {
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    transition: text-decoration-color 200ms ease;
+  }
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(219, 209, 239, 0.42);
-}
+  /* A drink photographed on white, laid on its mood's field. */
+  .specimen {
+    mix-blend-mode: multiply;
+    object-fit: contain;
+  }
 
-/* ===== Component Styles ===== */
-.card-hover {
-  transition:
-    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.32s ease,
-    background-color 0.32s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-8px);
-  box-shadow:
-    0 16px 38px rgba(3, 0, 9, 0.32),
-    0 0 18px rgba(93, 246, 255, 0.18);
-  border-color: var(--color-secondary);
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 /*
- * 标题渐变。24 处在用，是产品识别度的一部分，所以保留渐变本身而不是改纯色。
- *
- * 原来是 accent → primary → secondary 三色，外加 gradient-shift 5s 无限循环。三个高
- * 饱和色在一行字里轮转，加上 -webkit-text-fill-color: transparent 让文字没有实色，
- * 观感就是发虚。
- *
- * 收成 foreground → primary 双色并去掉动画：洋红仍是强调色，但只有一个饱和色在动，
- * 起点是接近正文色的亮色。注意这不是对比度问题，三个原色标单独测都达标
- * （primary 7.06:1、secondary 15.44:1、accent 11.22:1），所以不要把它算进
- * 「低对比处数」。
+ * Entrances. Driven by the scroll timeline where supported, so nothing waits on
+ * a script and content is visible wherever the feature is missing.
  */
-.gradient-text {
-  background: linear-gradient(
-    to right,
-    var(--color-foreground),
-    var(--color-primary)
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.gradient-text-bright {
-  background: linear-gradient(
-    180deg,
-    #f8fbff 0%,
-    var(--color-primary) 100%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* ===== Spacing Utilities (@apply outside @layer works in v4) ===== */
-.section-spacing {
-  @apply py-14 md:py-20 lg:py-28;
-}
-
-.content-spacing {
-  @apply space-y-6 md:space-y-10 lg:space-y-12;
-}
-
-.card-spacing {
-  @apply p-6 md:p-8 lg:p-10;
-}
-
-.container-narrow {
-  @apply max-w-4xl mx-auto;
-}
-
-.container-content {
-  @apply max-w-6xl mx-auto;
-}
-
-@media (max-width: 640px) {
-  .container {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
   }
-
-  .section-spacing {
-    @apply py-10;
+}
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
   }
-  .content-spacing {
-    @apply space-y-5;
-  }
-  .card-spacing {
-    @apply p-5;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
 }
 
-.hero-height {
-  min-height: 85vh;
+.enter {
+  animation: rise 900ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
 }
 
-@media (max-width: 768px) {
-  .hero-height {
-    min-height: 75vh;
-  }
+.reveals .reveal:not(.is-in) {
+  opacity: 0;
+  transform: translateY(24px);
+}
+.reveals .reveal-picture:not(.is-in) {
+  opacity: 0;
+  transform: scale(1.06);
+}
+.reveals .reveal,
+.reveals .reveal-picture {
+  transition:
+    opacity 700ms var(--ease-out),
+    transform 900ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 80ms);
 }
 
-@media (max-width: 480px) {
-  .hero-height {
-    min-height: 65vh;
-  }
-}
-
-.card-grid {
-  @apply grid gap-6 md:gap-8 lg:gap-10;
-}
-
-.text-spacing {
-  @apply space-y-4 md:space-y-6;
-}
-
-.text-spacing p {
-  @apply mb-4 last:mb-0;
-}
-
-.button-group {
-  @apply flex flex-col sm:flex-row gap-4 md:gap-6;
-}
-
-.focus-ring {
-  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/90 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
-  box-shadow: 0 0 0 0 rgba(93, 246, 255, 0);
-}
-
-.page-transition {
-  transition: all 0.2s linear;
-}
-
-.glass-subtle {
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
-    var(--surface-soft);
-  border: 1px solid var(--surface-stroke);
-  box-shadow: var(--surface-shadow);
-  transform: translateZ(0);
-}
-
-.glass-panel {
-  -webkit-backdrop-filter: blur(22px);
-  backdrop-filter: blur(22px);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 24%),
-    linear-gradient(135deg, rgba(255, 79, 216, 0.08), transparent 44%),
-    var(--surface-soft);
-  border: 1px solid var(--surface-stroke);
-  border-top: 1px solid rgba(93, 246, 255, 0.52);
-  box-shadow:
-    var(--surface-shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transform: translateZ(0);
-}
-
-.glass-popup {
-  -webkit-backdrop-filter: blur(28px);
-  backdrop-filter: blur(28px);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 28%),
-    rgba(14, 7, 26, 0.95);
-  border: 1px solid rgba(93, 246, 255, 0.4);
-  box-shadow:
-    0 24px 60px rgba(3, 0, 9, 0.6),
-    0 0 24px rgba(93, 246, 255, 0.12);
-  transform: translateZ(0);
-}
-
-.glass-effect {
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 26%),
-    linear-gradient(135deg, rgba(255, 79, 216, 0.06), transparent 48%),
-    var(--surface-strong);
-  border: 1px solid var(--surface-stroke);
-  border-top: 1px solid rgba(93, 246, 255, 0.35);
-  box-shadow: var(--surface-shadow);
-  transform: translateZ(0);
-  will-change: transform, opacity;
-}
-
-/* Reduced motion: minimize heavy animations and transitions */
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .crt-overlay,
-  .vaporwave-grid {
+  *,
+  *::before,
+  *::after {
     animation: none !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-/* ===== Fluid Typography ===== */
-@layer base {
-  /* Default (Chinese) */
-  h1 {
-    font-size: clamp(1.875rem, 5vw, 4.5rem);
-    line-height: 1.1;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-  }
-  h2 {
-    font-size: clamp(1.5rem, 4vw, 3rem);
-    line-height: 1.2;
-    font-weight: 700;
-    letter-spacing: 0.025em;
-  }
-  h3 {
-    font-size: clamp(1.25rem, 3vw, 2rem);
-    line-height: 1.3;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-  }
-  h4 {
-    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
-    line-height: 1.35;
-    font-weight: 600;
-    letter-spacing: 0.015em;
-  }
-  p {
-    font-size: clamp(0.9375rem, 1.5vw, 1.125rem);
-    line-height: 1.65;
-  }
+/* A page that ends on a colour field runs straight into the footer. */
+main:has([data-bleed-end]) ~ footer {
+  margin-top: 0;
+}
 
-  /* English-Specific Typography overrides to globally scale down text */
-  /* These act as safety nets for elements not using rem or using hardcoded classes */
-  /*
-   * 不要在这里加 !important。这些规则在 @layer base 里，而 Tailwind v4 的
-   * utilities layer 本来就排在 base 之后 —— 组件写的 text-lg / sm:text-xl 会自然
-   * 胜出，这才是「safety net」该有的行为：只兜住没显式声明字号的元素。
-   *
-   * !important 会反过来让 base 压过组件，而且组件没有任何办法退出。实测的后果：
-   * 问卷选项标题被这条 h3 规则顶到 25.76px（1.75rem × 14.72px 根字号），而四栏
-   * 布局下每列只有 136px，最多装得下 19.8px 的字。ALCOHOL 这种没处换行的长词
-   * 溢出 40px，再被卡片的 overflow-hidden 裁掉，看起来就是最后一个字母被削掉。
-   * 中文页没有这组规则，所以只有英文页出现。
-   *
-   * 注释说的是 scale down，实际做的是把 18/20px 放大到 25.76px。
-   */
-  html:lang(en) body {
-    font-size: 0.875rem; /* equivalent to text-sm */
-    line-height: 1.5;
+/* The one moving picture: the drink on the plinth breathes very slightly. */
+@keyframes drift {
+  from {
+    transform: translateY(0) scale(1);
   }
-  html:lang(en) h1 {
-    font-size: clamp(1.5rem, 4vw, 3.5rem);
-  }
-  html:lang(en) h2 {
-    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
-  }
-  html:lang(en) h3 {
-    font-size: clamp(1.125rem, 2.5vw, 1.75rem);
-  }
-  html:lang(en) h4 {
-    font-size: clamp(1rem, 2vw, 1.25rem);
-  }
-  /*
-   * 英文长单词在窄列里放不下时允许断词。中文任意位置都能断行，所以只有英文需要。
-   *
-   * 实测的例子：首页卡片标题「Personalized Recommendations」在 288px 的列里溢出
-   * 26px，被卡片的 overflow-hidden 裁掉。Recommendations 这一个词本身就超过列宽，
-   * 没有任何空格可供换行。
-   *
-   * 选它而不是调小字号或收紧字距：那两种改法会动到所有标题的设计，而这条只在真的
-   * 放不下时才生效，其余情况完全不影响排版。
-   */
-  html:lang(en) :is(h1, h2, h3, h4) {
-    overflow-wrap: break-word;
-  }
-  html:lang(en) p {
-    font-size: clamp(0.8125rem, 1.2vw, 1rem);
+  to {
+    transform: translateY(-1.5%) scale(1.025);
   }
 }

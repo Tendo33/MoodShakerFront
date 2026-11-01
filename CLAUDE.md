@@ -15,8 +15,8 @@ This file is Claude Code's root entrypoint for MoodShakerFront.
 
 - MoodShaker is a bilingual AI cocktail recommendation product, not a generic Next.js template.
 - Preserve `/cn` and `/en` localized routes, `proxy.ts` language detection, and localized dictionaries.
-- Private recommendation access uses POST body `editToken`; never put it back in the URL or echo it in responses.
-- Prisma/PostgreSQL schema changes require migration and `pnpm db:init` validation.
+- Private drink access uses POST body `editToken`; never put it in a URL. It is returned exactly once, by `POST /api/drinks`, and stored only as a SHA-256 hash; no other response may include it.
+- Drizzle/PostgreSQL schema changes go through `pnpm db:generate` (versioned SQL in `drizzle/`) and must pass `pnpm db:init` against a local database.
 - Missing shared rate-limit storage in production is a deployment error, not a silent fallback.
 - Use pnpm only; do not introduce npm/yarn lockfiles.
 

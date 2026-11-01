@@ -1,48 +1,18 @@
-# Dependencies
-node_modules
-npm-debug.log
-pnpm-debug.log
-yarn-error.log
-
-# Next.js
-.next
-out
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Git
 .git
-.gitignore
-
-# Docker
+.next
+node_modules
+.env*
+!.env.example
+*.md
+tests
+playwright.config.ts
+test-results
+playwright-report
+.agents
+.claude
+.cursor
+.impeccable
+.history
+.backups
 Dockerfile
 docker-compose.yml
-.dockerignore
-
-# Documentation
-README.md
-*.md
-
-# Tests
-coverage
-.nyc_output
-
-# Misc
-.eslintcache
-
