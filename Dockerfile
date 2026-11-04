@@ -15,8 +15,12 @@ RUN apk add --no-cache libc6-compat && corepack enable && corepack prepare pnpm@
 
 ENV NODE_ENV=production PORT=3000
 
-COPY --from=builder --chown=node:node /app/package.json /app/pnpm-lock.yaml /app/next.config.mjs /app/tsconfig.json ./
-COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+# Production deps only. tsx stays a dependency because the entrypoint runs the
+# TypeScript migrate and seed scripts; Playwright, eslint, and the rest do not.
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod && chown -R node:node /app
+
+COPY --from=builder --chown=node:node /app/next.config.mjs /app/tsconfig.json ./
 COPY --from=builder --chown=node:node /app/.next ./.next
 COPY --from=builder --chown=node:node /app/public ./public
 # Migrations and seed run at start-up (see docker-entrypoint.sh).

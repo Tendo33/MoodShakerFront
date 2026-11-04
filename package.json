@@ -26,6 +26,7 @@
     "react-dom": "^19",
     "server-only": "^0.0.1",
     "sharp": "^0.35.4",
+    "tsx": "^4.20.6",
     "zod": "^4.6.6"
   },
   "devDependencies": {
@@ -38,7 +39,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4.1.0",
-    "tsx": "^4.20.6",
     "typescript": "^5"
   },
   "engines": {
