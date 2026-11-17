@@ -1,8 +1,7 @@
 name: CI
 
+# 仓库自己的检查。PR 上直接跑；推 main / 打标签时由 image.yml、release.yml 调用。
 on:
-  push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
   workflow_call:

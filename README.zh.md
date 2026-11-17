@@ -49,7 +49,20 @@ drizzle/                 版本化 SQL 迁移
 
 ## 部署
 
-推送 `v*` 标签会触发 `.github/workflows/release.yml`，构建镜像并推送到 Docker Hub 的 `simonsun3/moodshaker`。`docker compose up -d` 运行的是这个已发布的镜像和 Postgres，配置从 `.env` 读取（复制 `.env.example`）；要跑当前代码，先执行 `docker build -t simonsun3/moodshaker:latest .`。
+镜像由 CI 推到 `ghcr.io/tendo33/moodshaker`（`linux/amd64`、`linux/arm64`），服务器只拉镜像：
+
+```bash
+cp .env.example .env   # 然后填好配置
+docker compose pull && docker compose up -d
+```
+
+这会运行已发布的镜像和 Postgres。固定或回滚版本：`IMAGE_TAG=sha-abc1234 docker compose up -d`。要跑当前代码：`docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build`。
+
+| 触发 | workflow | 结果 |
+|---|---|---|
+| PR | `ci.yml`、`image.yml` | lint、typecheck、test、build；试构建镜像，不推送 |
+| 推 `main` | `image.yml` | 检查通过后推送 `sha-<7 位>` 和 `latest` |
+| 推 `v*` 标签 | `image.yml`、`release.yml` | 检查通过后推送 `<版本>`、`<主>.<次>`，并创建 GitHub Release |
 
 容器启动时先执行迁移（`pnpm db:migrate`），写入三款经典酒，再启动 Next。数据库不可达时 `/api/health` 返回 503。配置项说明见 `.env.example`。
 
