@@ -1,12 +1,15 @@
 # App + Postgres. Settings come from .env (see .env.example).
-# The image is the one release.yml publishes on a v* tag; to run the current
-# checkout instead: docker build -t simonsun3/moodshaker:latest .
+# Production pulls the image CI pushes to GHCR; the server never builds:
+#   docker compose pull && docker compose up -d
+# Pin or roll back with IMAGE_TAG=sha-xxxxxxx (or 1.0.0).
+# To run the current checkout instead, layer the build override:
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 x-logging: &logging
   options: { max-size: "10m", max-file: "3" }
 
 services:
   web:
-    image: simonsun3/moodshaker:latest
+    image: ghcr.io/tendo33/moodshaker:${IMAGE_TAG:-latest}
     env_file: .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-moodshaker}

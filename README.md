@@ -49,7 +49,20 @@ Rules the code holds to:
 
 ## Deploying
 
-Pushing a `v*` tag runs `.github/workflows/release.yml`, which builds the image and pushes `simonsun3/moodshaker` to Docker Hub. `docker compose up -d` runs that published image plus Postgres, reading settings from `.env` (copy `.env.example`); to run the current checkout instead, `docker build -t simonsun3/moodshaker:latest .` first.
+CI publishes the image to `ghcr.io/tendo33/moodshaker` (`linux/amd64`, `linux/arm64`); the server only pulls it:
+
+```bash
+cp .env.example .env   # then fill it in
+docker compose pull && docker compose up -d
+```
+
+That runs the published image plus Postgres. Pin or roll back with `IMAGE_TAG=sha-abc1234 docker compose up -d`. To run the current checkout instead: `docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build`.
+
+| Trigger | Workflow | Result |
+|---|---|---|
+| Pull request | `ci.yml`, `image.yml` | lint, typecheck, test, build; image built but not pushed |
+| Push to `main` | `image.yml` | after the checks pass, pushes `sha-<7 chars>` and `latest` |
+| Push a `v*` tag | `image.yml`, `release.yml` | after the checks pass, pushes `<version>` and `<major>.<minor>`, and creates the GitHub release |
 
 On start the container applies migrations (`pnpm db:migrate`), seeds three classics, and starts Next. `/api/health` returns 503 while the database is unreachable. Configuration is described in `.env.example`.
 

@@ -1,0 +1,94 @@
+# 镜像发布：构建 Dockerfile 并推到 GHCR。服务器只 docker compose pull，不在服务器上构建。
+#
+# 这份文件在 SimonHome、MoodShakerFront、IdeaGo、VariaGen、SimonZZwebsite 里保持一致，
+# 只有 on.push.branches 和下面的 env 按仓库调整。改规则时几个仓库一起改。
+#
+# 标签：
+#   推 main            sha-<7 位>、latest
+#   推其他部署分支     sha-<7 位>、<分支>-latest（例如 IdeaGo 的 saas-latest）
+#   推 v* 标签         sha-<7 位>、<版本>，正式版另加 <主>.<次>；不动 latest
+#   PR                 只构建不推送，提前发现 Dockerfile 的问题
+#
+# 推送前先跑 ci.yml，检查没过就不推。
+# 回滚：服务器上 IMAGE_TAG=sha-xxxxxxx docker compose up -d
+name: Image
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # GHCR 只接受小写镜像名，owner Tendo33 要写成 tendo33。
+  IMAGE: ghcr.io/tendo33/moodshaker
+  PLATFORMS: linux/amd64,linux/arm64
+  # Dockerfile 的目标 stage，留空表示最后一个 stage。
+  TARGET: ""
+  # 构建期参数，每行一个 KEY=value。只放本来就会进前端包的公开值。
+  BUILD_ARGS: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-${{ github.ref }}
+  # PR 有新提交时取消旧构建；发布不取消，避免推到一半。
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verify:
+    # PR 上 ci.yml 会自己跑，这里不重复。
+    if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/ci.yml
+
+  image:
+    needs: verify
+    # PR 上 verify 被跳过也要构建；其他情况必须 verify 成功才发布。
+    if: ${{ !cancelled() && (needs.verify.result == 'success' || github.event_name == 'pull_request') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - if: ${{ contains(env.PLATFORMS, ',') && github.event_name != 'pull_request' }}
+        uses: docker/setup-qemu-action@v4
+
+      - uses: docker/setup-buildx-action@v4
+
+      - if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          # 关掉 semver 自动加 latest：latest 只跟 main 走。
+          flavor: latest=false
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ github.ref_name }}-latest,enable=${{ github.event_name != 'pull_request' && github.ref_type == 'branch' && github.ref_name != github.event.repository.default_branch }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: ${{ env.TARGET }}
+          # PR 只验证能构建，用单架构省时间。
+          platforms: ${{ github.event_name == 'pull_request' && 'linux/amd64' || env.PLATFORMS }}
+          build-args: ${{ env.BUILD_ARGS }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

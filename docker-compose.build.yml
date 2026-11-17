@@ -1,0 +1,8 @@
+# Local build override. Not for the production server.
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+services:
+  web:
+    build:
+      context: .
+    # Replaces the GHCR name so a local build never passes for a published image.
+    image: moodshaker:local
