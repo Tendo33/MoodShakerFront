@@ -24,7 +24,7 @@ export function RecentDrinks({ locale, title, hint }: { locale: Locale; title: s
               href={localizePath(`/drink/${drink.id}`, locale)}
               className="block bg-surface px-5 py-3 text-lead transition-colors duration-200 hover:bg-ink hover:text-bone"
             >
-              {drink.name[locale]}
+              {drink.name?.[locale] ?? drink.id}
             </Link>
           </li>
         ))}

@@ -128,6 +128,18 @@
     color: var(--color-bone);
   }
 
+  /* First stop for keyboard users; out of sight until it has focus. */
+  .skip-link {
+    position: absolute;
+    top: 0.75rem;
+    left: clamp(20px, 3.5vw, 56px);
+    z-index: 10;
+    transform: translateY(-300%);
+  }
+  .skip-link:focus {
+    transform: none;
+  }
+
   .link {
     text-decoration: underline;
     text-decoration-thickness: 1.5px;

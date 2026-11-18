@@ -125,7 +125,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             </h2>
             <div className="reveal lg:col-span-5 lg:col-start-8 [--i:1]">
               <p className="text-lead">{dict.home.menuStatement}</p>
-              <Link href={localizePath("/gallery", locale)} className="link mt-5 inline-block">
+              <Link href={localizePath("/gallery", locale)} className="link mt-3 inline-block py-2">
                 {dict.home.viewMenu} →
               </Link>
             </div>

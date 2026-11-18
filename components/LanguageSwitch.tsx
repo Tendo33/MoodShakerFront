@@ -12,13 +12,14 @@ export function LanguageSwitch({ locale, label, ariaLabel }: { locale: Locale; l
     <a
       href={localizePath(pathname, target)}
       hrefLang={target === "cn" ? "zh-CN" : "en"}
+      lang={target === "cn" ? "zh-CN" : "en"}
       aria-label={ariaLabel}
       onClick={(event) => {
         document.cookie = `${LOCALE_COOKIE}=${target}; path=/; max-age=31536000; samesite=lax`;
         // Keep filters such as ?spirit= across the switch.
         event.currentTarget.href = localizePath(pathname, target) + window.location.search;
       }}
-      className="link"
+      className="link py-2"
     >
       {label}
     </a>

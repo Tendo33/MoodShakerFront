@@ -16,6 +16,8 @@ export function pageMetadata(options: {
   image?: string | null;
   noIndex?: boolean;
 }): Metadata {
+  // Pages without a picture of their own share the site card (scripts/build-og.mjs).
+  const image = options.image ?? "/og.png";
   const languages: Record<string, string> = { "x-default": absoluteUrl(options.path, "cn") };
   for (const locale of LOCALES) languages[HTML_LANG[locale]] = absoluteUrl(options.path, locale);
 
@@ -30,9 +32,9 @@ export function pageMetadata(options: {
       description: options.description,
       url: absoluteUrl(options.path, options.locale),
       locale: HTML_LANG[options.locale].replace("-", "_"),
-      ...(options.image && { images: [{ url: options.image }] }),
+      images: [options.image ? { url: image } : { url: image, width: 1200, height: 630 }],
     },
-    twitter: { card: options.image ? "summary_large_image" : "summary" },
+    twitter: { card: "summary_large_image", images: [image] },
     ...(options.noIndex && { robots: { index: false, follow: false } }),
   };
 }

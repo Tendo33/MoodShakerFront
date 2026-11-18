@@ -62,7 +62,7 @@ export function DrinkSheet({
             <dl className="enter mt-10 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4 [--i:3]">
               {facts.map(([term, value]) => (
                 <div key={term}>
-                  <dt className="text-small text-ink/65">{term}</dt>
+                  <dt className="text-small text-ink/70">{term}</dt>
                   <dd className="mt-1 font-medium">{value}</dd>
                 </div>
               ))}

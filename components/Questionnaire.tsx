@@ -70,16 +70,24 @@ interface Props {
 /**
  * Resumes an unfinished questionnaire after a refresh. The server renders a
  * fresh form; once hydrated, a saved draft remounts it with that state. A mood
- * handed over in the URL wins over the draft and skips the first question.
+ * handed over in the URL skips the first question and replaces a draft begun
+ * for another mood; a draft already continuing from that mood is kept, so a
+ * refresh part-way does not lose the answers.
  */
 export function Questionnaire(props: Props) {
   const raw = useSyncExternalStore(noSubscription, readDraft, () => null);
   const [initial] = useState(() => parseDraft(raw));
-  const restored = useMemo(() => {
-    if (props.initialMood) return { step: 1, draft: { ...EMPTY_DRAFT, mood: props.initialMood } };
-    return initial ?? parseDraft(raw);
-  }, [initial, raw, props.initialMood]);
-  return <QuestionnaireForm key={restored ? "restored" : "fresh"} initial={restored} {...props} />;
+  const { initialMood } = props;
+  const saved = useMemo(() => {
+    const draft = initial ?? parseDraft(raw);
+    if (!initialMood) return draft;
+    return draft?.draft.mood === initialMood ? { ...draft, step: Math.max(draft.step, 1) } : null;
+  }, [initial, raw, initialMood]);
+  const handed = useMemo(
+    () => (initialMood ? { step: 1, draft: { ...EMPTY_DRAFT, mood: initialMood } } : null),
+    [initialMood],
+  );
+  return <QuestionnaireForm key={saved ? "restored" : "fresh"} initial={saved ?? handed} {...props} />;
 }
 
 function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { initial: SavedDraft | null }) {
@@ -99,13 +107,31 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
     document.getElementById("question-title")?.focus({ preventScroll: false });
   }, [step]);
 
+  // Saved on change only: writing on mount would replace the stored draft with
+  // an empty one before the refreshed page has had the chance to restore it.
+  const persisted = useRef({ step, draft });
   useEffect(() => {
+    if (persisted.current.step === step && persisted.current.draft === draft) return;
+    persisted.current = { step, draft };
     try {
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ step, draft }));
     } catch {
       // Not being able to resume after a refresh is acceptable.
     }
   }, [step, draft]);
+
+  // The form and the waiting screen swap in place, so the page is brought back
+  // to the top for the wait, and a refused order is brought into view.
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (pouring) window.scrollTo({ top: 0 });
+  }, [pouring]);
+  useEffect(() => {
+    if (!error) return;
+    // Focus as well: the button that was pressed is gone, and keyboard users would restart at the top.
+    errorRef.current?.focus({ preventScroll: true });
+    errorRef.current?.scrollIntoView({ block: "center" });
+  }, [error]);
 
   const current = STEPS[step];
   const canContinue =
@@ -157,7 +183,11 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
 
     const { drink, editToken } = result.data;
     saveDrink({ id: drink.id, editToken, name: drink.recipe.name, createdAt: new Date().toISOString() });
-    sessionStorage.removeItem(DRAFT_KEY);
+    try {
+      sessionStorage.removeItem(DRAFT_KEY);
+    } catch {
+      // The drink is poured either way; a stale draft only pre-fills the next order.
+    }
     router.push(localizePath(`/drink/${drink.id}`, locale));
   }
 
@@ -211,7 +241,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                         <span className="text-lead font-medium">{dict.options.moods[mood].label}</span>
                         <span aria-hidden className="size-3 shrink-0 bg-ink opacity-0 transition-opacity group-has-checked:opacity-100" />
                       </span>
-                      <span className="block text-small text-muted">{dict.options.moods[mood].note}</span>
+                      <span className="block text-small text-ink/70">{dict.options.moods[mood].note}</span>
                     </label>
                   ))}
                 </div>
@@ -302,7 +332,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                     <label htmlFor="notes" className="text-lead font-medium">
                       {t.style.notes}
                     </label>
-                    <span className="num text-small text-muted">
+                    <span className="num text-small text-ink/70">
                       {format(t.style.notesCount, { n: draft.notes.length, max: MAX_NOTES_LENGTH })}
                     </span>
                   </div>
@@ -313,14 +343,14 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                     value={draft.notes}
                     onChange={(event) => update({ notes: event.target.value })}
                     placeholder={t.style.notesPlaceholder}
-                    className="mt-4 w-full resize-y bg-bone/70 px-5 py-4 text-lead placeholder:text-muted focus:bg-bone focus:outline-3 focus:outline-ink"
+                    className="mt-4 w-full resize-y bg-bone/70 px-5 py-4 text-lead placeholder:text-ink/70 focus:bg-bone focus:outline-3 focus:outline-ink"
                   />
                 </div>
               </Question>
             )}
 
             {error && (
-              <p role="alert" className="mt-10 bg-ink px-5 py-4 text-bone">
+              <p ref={errorRef} role="alert" tabIndex={-1} className="mt-10 bg-ink px-5 py-4 text-bone">
                 {error}
               </p>
             )}
@@ -336,17 +366,17 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
             <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-6">
                 {step > 0 && (
-                  <button type="button" className="link text-lead" onClick={() => setStep(step - 1)}>
+                  <button type="button" className="link py-2 text-lead" onClick={() => setStep(step - 1)}>
                     ← {t.back}
                   </button>
                 )}
-                <p aria-live="polite" className="text-muted">
+                <p aria-live="polite" className="text-ink/70">
                   {format(t.progress, { n: step + 1, total: STEPS.length })}
                 </p>
                 {step > 0 && (
                   <button
                     type="button"
-                    className="link text-muted"
+                    className="link py-2 text-ink/70"
                     onClick={() => {
                       setDraft(EMPTY_DRAFT);
                       setStep(0);
@@ -356,9 +386,21 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                   </button>
                 )}
               </div>
-              <button type="submit" className="btn btn-primary max-sm:order-first max-sm:w-full" disabled={!canContinue}>
-                {current === "style" ? t.submit : t.next} <span aria-hidden>→</span>
-              </button>
+              <div className="flex flex-wrap items-center justify-end gap-x-5 gap-y-3 max-sm:order-first max-sm:w-full">
+                {!canContinue && (
+                  <p id="next-hint" className="text-ink/70 max-sm:order-last max-sm:w-full">
+                    {current === "bar" ? t.bar.choose : t.choose}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  className="btn btn-primary max-sm:w-full"
+                  disabled={!canContinue}
+                  aria-describedby={canContinue ? undefined : "next-hint"}
+                >
+                  {current === "style" ? t.submit : t.next} <span aria-hidden>→</span>
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -412,7 +454,7 @@ function Choice({
       {children}
       <span>
         <span className="block text-lead font-medium">{label}</span>
-        <span className="mt-1 block text-muted group-has-checked:text-bone/70">{note}</span>
+        <span className="mt-1 block text-ink/70 group-has-checked:text-bone/70">{note}</span>
       </span>
     </label>
   );
@@ -430,6 +472,9 @@ function Glass({ fill }: { fill: number }) {
   );
 }
 
+/** Seconds before each line of the order is read back, spread over the minute a pour takes. */
+const LINE_DELAYS = [0, 6, 16, 30];
+
 /** While the bartender works: the mood's drinks pass on the plinth and the order is read back line by line. */
 function Shaking({ dict, images }: { dict: Labels["questions"]["shaking"]; images: string[] }) {
   const [tick, setTick] = useState(0);
@@ -445,12 +490,12 @@ function Shaking({ dict, images }: { dict: Labels["questions"]["shaking"]; image
         <h1 className="text-head motion-safe:animate-pulse">{dict.title}…</h1>
         <ul className="mt-10 space-y-3 text-lead">
           {dict.lines.map((line, index) => (
-            <li key={line} className="enter" style={{ animationDelay: `${index * 2.2}s` }}>
+            <li key={line} className="enter" style={{ animationDelay: `${LINE_DELAYS[index] ?? index * 12}s` }}>
               {line}
             </li>
           ))}
         </ul>
-        <p className="mt-10 text-muted">{dict.note}</p>
+        <p className="mt-10 text-ink/70">{dict.note}</p>
       </div>
       <div className="relative aspect-square lg:col-span-6 lg:col-start-7">
         {images.map((src, index) => (

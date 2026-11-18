@@ -12,7 +12,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <>
       <SiteHeader locale={lang} dict={dict} />
-      <main>{children}</main>
+      <main id="main">{children}</main>
       <Reveals />
       <SiteFooter locale={lang} dict={dict} />
     </>

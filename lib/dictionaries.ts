@@ -29,7 +29,7 @@ export interface Dictionary {
     | "drinkTitle",
     string
   >;
-  nav: Record<"shake" | "menu" | "switchTo" | "switchLabel" | "home", string>;
+  nav: Record<"shake" | "menu" | "switchTo" | "switchLabel" | "home" | "skip", string>;
   home: {
     lede: string;
     moodPrompt: string;
@@ -55,9 +55,10 @@ export interface Dictionary {
     next: string;
     submit: string;
     restart: string;
+    choose: string;
     mood: { title: string; hint: string };
     strength: { title: string; hint: string };
-    bar: { title: string; hint: string; spirits: string; skill: string };
+    bar: { title: string; hint: string; spirits: string; skill: string; choose: string };
     style: { title: string; hint: string; notes: string; notesPlaceholder: string; notesCount: string };
     shaking: { title: string; lines: string[]; note: string };
     errors: Record<"generic" | "rateLimited" | "unavailable", string>;
@@ -100,6 +101,8 @@ export interface Dictionary {
     | "publishedNote"
     | "viewPublic"
     | "withdraw"
+    | "withdrawing"
+    | "publishNeedsPhoto"
     | "share"
     | "sharing"
     | "again"
