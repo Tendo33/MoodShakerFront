@@ -48,6 +48,19 @@ Rules the code holds to:
 
 `pnpm test:e2e` starts `pnpm dev` itself, so it needs a reachable `DATABASE_URL`; set `E2E_BASE_URL` to test an already running server instead.
 
+## Image provider
+
+`IMAGE_PROVIDER=siliconflow` is the default, and it keeps the Qwen-Image request. `IMAGE_PROVIDER=openai` calls an OpenAI-compatible Images API. For c2a:
+
+```bash
+IMAGE_PROVIDER=openai
+IMAGE_API_URL="https://c2a.apimux.cc/v1/images/generations"
+IMAGE_API_KEY=""
+IMAGE_MODEL="gpt-image-2.6-sunburst"
+```
+
+The body is `model`, `prompt`, `size` (`1024x1024`), `quality` (`high`) and `n` (`1`). Generation often takes 20–60 seconds, so the client waits 120 seconds and retries a 429 or a 5xx twice. Timeouts are not retried. A `b64_json` payload is stored in R2 through the same WebP path as a temporary image URL. A returned URL is downloaded only from the host of `IMAGE_API_URL`, the built-in SiliconFlow hosts, or `IMAGE_FETCH_HOST_ALLOWLIST`.
+
 ## Deploying
 
 CI publishes the image to `ghcr.io/tendo33/moodshaker` (`linux/amd64`, `linux/arm64`); the server only pulls it:

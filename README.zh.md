@@ -47,6 +47,19 @@ drizzle/                 版本化 SQL 迁移
 
 `pnpm test:e2e` 会自己启动 `pnpm dev`，所以需要可连接的 `DATABASE_URL`；如果要测已在运行的服务，设置 `E2E_BASE_URL`。
 
+## 生图供应商
+
+`IMAGE_PROVIDER` 默认是 `siliconflow`，请求体仍是 Qwen-Image。设为 `openai` 时调用 OpenAI Images 兼容接口。c2a 的配置：
+
+```bash
+IMAGE_PROVIDER=openai
+IMAGE_API_URL="https://c2a.apimux.cc/v1/images/generations"
+IMAGE_API_KEY=""
+IMAGE_MODEL="gpt-image-2.6-sunburst"
+```
+
+请求体包含 `model`、`prompt`、`size`（`1024x1024`）、`quality`（`high`）和 `n`（`1`）。生图常常要 20 到 60 秒，客户端等待 120 秒，遇到 429 或 5xx 会再试两次；超时不重试。返回 `b64_json` 时，走和临时图片 URL 相同的 WebP / R2 存储。返回 URL 时，只从 `IMAGE_API_URL` 的主机、内置的硅基流动主机，或 `IMAGE_FETCH_HOST_ALLOWLIST` 里的主机下载。
+
 ## 部署
 
 镜像由 CI 推到 `ghcr.io/tendo33/moodshaker`（`linux/amd64`、`linux/arm64`），服务器只拉镜像：
