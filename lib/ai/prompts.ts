@@ -247,20 +247,31 @@ Return the corrected JSON object only. Keep what was valid and fix the listed pr
 
 /**
  * Image prompt, built on the server from the stored recipe — never from caller
- * input. Every drink is shot the same way, alone on white, so the site can set
- * each one on its mood's colour like a specimen plate.
+ * input. The site multiplies the photograph onto the mood colour
+ * (`mix-blend-mode: multiply`, and the share card does the same), so the
+ * backdrop has to be pure white with no shadow and no surface: anything short
+ * of white prints on the field. The angle and the light on the glass are free,
+ * so the drink can still look like a campaign still.
  */
 export function buildImagePrompt(
   recipe: Pick<Recipe, "name" | "servingGlass" | "ingredients"> & { appearance?: string | null },
 ): string {
+  const appearance = recipe.appearance?.trim();
   const look =
-    recipe.appearance ??
+    appearance ||
     `made with ${recipe.ingredients
       .slice(0, 5)
       .map((item) => item.name.en)
       .join(", ")}`;
 
-  // The backdrop comes first and is said several ways: diffusion models drift to a grey
-  // sweep with a table line and a cast shadow, and any of those shows on the mood field.
-  return `Product packshot of one cocktail, isolated on a pure white (#FFFFFF) background: "${recipe.name.en}", in a ${recipe.servingGlass.en}. ${look}. Show exactly what is described: no ice unless ice is mentioned, no garnish that is not listed. The whole glass is in frame, centred, seen straight on at eye level, small enough to leave a wide empty margin on every side: it takes up no more than three quarters of the frame's height. The background is flat, seamless white from edge to edge, evenly lit, like a cut-out on a white page: no table, no surface line, no horizon, no gradient, no vignette, no cast shadow, no reflection under the glass. Bright, soft, even studio light, crisp focus, true colours. No props, no hands, no text.`;
+  // The white field is said more than once on purpose. Models drift to a grey
+  // sweep, a table line and a cast shadow, and under multiply each of those
+  // shows. lib/image-levels.ts only lifts near-white; it cannot erase a shadow.
+  return `Premium beverage photograph of a single "${recipe.name.en}" in a ${recipe.servingGlass.en}, lit like a high-end advertising shot, on a pure white (#FFFFFF) background. ${look}.
+
+Slightly elevated three-quarter view, whole glass centred and in sharp focus, with a modest white margin on every side so nothing touches the edge. Colour is true to that description and saturated enough to look appetizing, translucent where the liquid is clear, with depth and a bright glint through the glass. Crisp specular catchlights and a fine rim light define the bowl; the rim and the base read as glass, with no halo in the background. A cold drink or a glass with ice has a faint condensation on the glass only; a hot drink is dry, with a faint wisp of steam. If a garnish is listed, it is fresh and deliberately placed.
+
+Follow that description exactly. Ice only when it calls for ice, and then only the ice it describes, clear and crystalline; if it says no ice, the glass has none. No garnish that is not listed, and none at all when none is listed. No invented ingredient.
+
+Seamless pure white from edge to edge, a cut-out on a white page: no table, no surface, no horizon, no gradient, no vignette, no cast shadow, no reflection under the glass. No props, no hands, no text.`;
 }
