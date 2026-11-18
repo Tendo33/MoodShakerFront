@@ -11,12 +11,14 @@ describe("buildImagePrompt", () => {
     assert.match(prompt, /Highball glass/);
     assert.match(prompt, /Clear, sparkling, lots of ice, lime wheel/);
     assert.doesNotMatch(prompt, /made with/);
-    assert.match(prompt, /high-end advertising shot/);
+    assert.match(prompt, /luxury drinks campaign/);
+    assert.match(prompt, /100mm lens at f\/8/);
     assert.match(prompt, /three-quarter view/);
-    assert.match(prompt, /specular catchlights/);
-    assert.match(prompt, /rim light/);
+    assert.match(prompt, /jewel-like/);
+    assert.match(prompt, /caustic ribbons caught inside the glass and nowhere else/);
+    assert.match(prompt, /food stylist's care/);
     assert.match(prompt, /Unless the description says otherwise/);
-    assert.match(prompt, /faint condensation on the glass only/);
+    assert.match(prompt, /wears a faint condensation/);
     assert.match(prompt, /no more than four fifths of the frame's height/);
     assert.match(prompt, /Ice only when it calls for ice/);
     assert.match(prompt, /if it says no ice, the glass has none/);
@@ -30,7 +32,7 @@ describe("buildImagePrompt", () => {
 
     assert.match(prompt, /pure white \(#FFFFFF\) background/);
     assert.match(prompt, /Seamless pure white from edge to edge/);
-    assert.match(prompt, /no table, no surface, no horizon, no gradient, no vignette, no cast shadow, no reflection under the glass/);
+    assert.match(prompt, /no table, no surface, no horizon, no gradient, no vignette, no cast shadow, no reflection under the glass, no halo/);
     assert.match(prompt, /No props, no hands, no text/);
     assert.doesNotMatch(prompt, /eye level/);
     assert.doesNotMatch(prompt, /even studio light/);

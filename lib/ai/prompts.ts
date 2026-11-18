@@ -250,8 +250,8 @@ Return the corrected JSON object only. Keep what was valid and fix the listed pr
  * input. The site multiplies the photograph onto the mood colour
  * (`mix-blend-mode: multiply`, and the share card does the same), so the
  * backdrop has to be pure white with no shadow and no surface: anything short
- * of white prints on the field. The angle and the light on the glass are free,
- * so the drink can still look like a campaign still.
+ * of white prints on the field. Light may glow inside the glass. It may not
+ * leave it.
  */
 export function buildImagePrompt(
   recipe: Pick<Recipe, "name" | "servingGlass" | "ingredients"> & { appearance?: string | null },
@@ -269,11 +269,11 @@ export function buildImagePrompt(
   // shows. lib/image-levels.ts only lifts near-white; it cannot erase a shadow.
   // The outer 6% of the stored picture is faded to white, so the glass stays
   // inside four fifths of the frame and clear of that band.
-  return `Premium beverage photograph of a single "${recipe.name.en}" in a ${recipe.servingGlass.en}, lit like a high-end advertising shot, on a pure white (#FFFFFF) background. ${look}.
+  return `Editorial photograph of a single "${recipe.name.en}" in a ${recipe.servingGlass.en}, lit like a luxury drinks campaign, on a seamless pure white (#FFFFFF) background. ${look}.
 
-Slightly elevated three-quarter view, whole glass centred and in sharp focus, taking up no more than four fifths of the frame's height, with a white margin on every side so nothing touches the edge. Colour is true to that description and saturated enough to look appetizing, translucent where the liquid is clear, with depth and a bright glint through the glass. Crisp specular catchlights and a fine rim light define the bowl; the rim and the base read as glass, with no halo in the background. Unless the description says otherwise, a cold drink or a glass with ice has a faint condensation on the glass only, and a hot drink is dry with a faint wisp of steam. If a garnish is listed, it is fresh and deliberately placed.
+Shot on a 100mm lens at f/8, the whole glass tack-sharp. A slightly elevated three-quarter view, the bowl turned just enough to show the rim's ellipse, centred and taking up no more than four fifths of the frame's height, white margin on every side. The liquid is the hero: luminous, jewel-like, true to that colour, backlit so it glows from within, refraction and caustic ribbons caught inside the glass and nowhere else. The vessel is fine barware, thin and polished where it is glass, rim and base drawn by one crisp bright edge. If a garnish is listed, it is placed with a food stylist's care, fresh and exact. Only the texture this drink has: a bead of bubbles if it sparkles, a fine foam if it has a head. Unless the description says otherwise, a cold glass or one with ice wears a faint condensation, and a hot drink is dry with a faint wisp of steam.
 
 Follow that description exactly. Ice only when it calls for ice, and then only the ice it describes; if it says no ice, the glass has none. When it does not describe the ice's finish, the ice is clear and crystalline. No garnish that is not listed, and none at all when none is listed. No invented ingredient.
 
-Seamless pure white from edge to edge, a cut-out on a white page: no table, no surface, no horizon, no gradient, no vignette, no cast shadow, no reflection under the glass. No props, no hands, no text.`;
+Seamless pure white from edge to edge, a cut-out on a white page: no table, no surface, no horizon, no gradient, no vignette, no cast shadow, no reflection under the glass, no halo. No props, no hands, no text.`;
 }
