@@ -202,3 +202,19 @@ describe("the classics card", () => {
     assert.doesNotMatch(buildUserPrompt({ ...order, style: "creative" }), /# The card/);
   });
 });
+
+describe("draftJsonSchema strict mode", () => {
+  it("closes every object and lists every property as required", () => {
+    const walk = (node: Record<string, unknown>): void => {
+      if (node.type === "object") {
+        assert.equal(node.additionalProperties, false);
+        assert.deepEqual(node.required, Object.keys(node.properties as object));
+        for (const child of Object.values(node.properties as Record<string, Record<string, unknown>>)) walk(child);
+      }
+      if (node.items) walk(node.items as Record<string, unknown>);
+    };
+    const schema = draftJsonSchema();
+    assert.equal("$schema" in schema, false);
+    walk(schema);
+  });
+});

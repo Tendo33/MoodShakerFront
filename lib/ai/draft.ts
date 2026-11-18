@@ -183,8 +183,30 @@ export function toRecipe(draft: Draft): Recipe {
 
 /** JSON Schema for structured-output mode. Strict modes reject `$ref`, so refs are inlined. */
 export function draftJsonSchema(): Record<string, unknown> {
-  return z.toJSONSchema(draftSchema, { io: "input", target: "draft-7", reused: "inline" }) as Record<
+  const schema = z.toJSONSchema(draftSchema, { io: "input", target: "draft-7", reused: "inline" }) as Record<
     string,
     unknown
   >;
+  delete schema.$schema;
+  return toStrictSchema(schema);
+}
+
+/**
+ * OpenAI strict structured outputs require every object to set
+ * `additionalProperties: false` and list every property as required. Optional
+ * fields in the draft are already nullable, so marking them required only means
+ * the model sends `null` instead of leaving them out.
+ */
+function toStrictSchema(node: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...node };
+  if (out.type === "object" && out.properties && typeof out.properties === "object") {
+    const props = out.properties as Record<string, Record<string, unknown>>;
+    out.properties = Object.fromEntries(Object.entries(props).map(([key, value]) => [key, toStrictSchema(value)]));
+    out.required = Object.keys(props);
+    out.additionalProperties = false;
+  }
+  if (out.items && typeof out.items === "object" && !Array.isArray(out.items)) {
+    out.items = toStrictSchema(out.items as Record<string, unknown>);
+  }
+  return out;
 }
