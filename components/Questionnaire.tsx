@@ -212,7 +212,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
           >
             {current === "mood" && (
               <Question title={t.mood.title} hint={t.mood.hint}>
-                <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+                <div className="grid grid-cols-2 gap-2 lg:grid-cols-6">
                   {MOODS.map((mood, index) => (
                     <label
                       key={mood}
@@ -228,12 +228,12 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                         onChange={() => update({ mood })}
                       />
                       <span
-                        className="relative block aspect-[5/4] overflow-hidden transition-transform duration-500 ease-out group-hover:scale-[0.98] group-has-checked:scale-[0.96]"
+                        className="relative block aspect-[5/4] overflow-hidden lg:aspect-[3/4] transition-transform duration-500 ease-out group-hover:scale-[0.98] group-has-checked:scale-[0.96]"
                         style={{ backgroundColor: MOOD_COLORS[mood] }}
                       >
                         {moodImages[mood]?.[0] && (
                           <span className="absolute inset-[10%]">
-                            <Image src={moodImages[mood][0]} alt="" fill sizes="(min-width: 1024px) 30vw, 50vw" className="specimen" />
+                            <Image src={moodImages[mood][0]} alt="" fill sizes="(min-width: 1024px) 16vw, 50vw" className="specimen" />
                           </span>
                         )}
                       </span>
@@ -415,7 +415,7 @@ function Question({ title, hint, children }: { title: string; hint: string; chil
       <h1
         id="question-title"
         tabIndex={-1}
-        className="enter text-[clamp(2.5rem,1rem+5vw,6rem)] leading-[0.92] tracking-[-0.05em] focus:outline-none"
+        className="title enter focus:outline-none"
       >
         {title}
       </h1>
@@ -501,7 +501,7 @@ function Shaking({ dict, images }: { dict: Labels["questions"]["shaking"]; image
         {images.map((src, index) => (
           <div
             key={src}
-            className="absolute inset-[6%] transition-opacity duration-1000 ease-in-out"
+            className="absolute inset-[6%] mix-blend-multiply transition-opacity duration-1000 ease-in-out"
             style={{ opacity: index === tick % images.length ? 1 : 0 }}
           >
             <Image src={src} alt="" fill sizes="45vw" className="specimen" />

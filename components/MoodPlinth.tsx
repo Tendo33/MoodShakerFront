@@ -81,7 +81,11 @@ export function MoodPlinth({
                   className="flex min-h-12 items-center gap-3 bg-surface px-4 transition-[background-color,transform] duration-300 ease-out hover:-translate-y-0.5 active:scale-[0.97] aria-pressed:text-ink"
                   style={selected ? { backgroundColor: MOOD_COLORS[code] } : undefined}
                 >
-                  <span aria-hidden className="size-3.5" style={{ backgroundColor: MOOD_COLORS[code] }} />
+                  <span
+                    aria-hidden
+                    className="size-3.5 transition-colors duration-300"
+                    style={{ backgroundColor: selected ? "var(--color-ink)" : MOOD_COLORS[code] }}
+                  />
                   {dict.options.moods[code].label}
                 </button>
               );
@@ -107,7 +111,9 @@ export function MoodPlinth({
               href={localizePath(`/cocktail/${drink.slug}`, locale)}
               tabIndex={drink === active ? 0 : -1}
               aria-hidden={drink !== active}
-              className="absolute inset-[8%] transition-opacity duration-[1600ms] ease-in-out"
+              // Blended here, where the opacity is: a fading layer is composited on its own,
+              // and a photograph multiplied only inside it would cross the field as a white square.
+              className="absolute inset-[8%] mix-blend-multiply transition-opacity duration-[1600ms] ease-in-out"
               style={{ opacity: drink === active ? 1 : 0, pointerEvents: drink === active ? "auto" : "none" }}
             >
               <Image

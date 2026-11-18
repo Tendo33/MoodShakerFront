@@ -76,7 +76,7 @@ export function DrinkSheet({
       </section>
 
       <div className="frame mt-[clamp(80px,12vh,160px)] grid gap-x-8 gap-y-20 lg:grid-cols-12">
-        <section className="order-2 lg:order-none lg:col-span-5" aria-labelledby="why-heading">
+        <section className="order-2 lg:sticky lg:top-10 lg:order-none lg:col-span-5 lg:self-start" aria-labelledby="why-heading">
           <h2 id="why-heading" className="reveal text-lead text-muted">
             {t.why}
           </h2>
