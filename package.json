@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "node --import tsx --test \"tests/**/*.test.ts\"",
+    "test": "node --conditions=react-server --import tsx --test \"tests/**/*.test.ts\"",
     "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",

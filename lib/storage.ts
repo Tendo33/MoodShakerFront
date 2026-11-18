@@ -6,8 +6,10 @@ import sharp from "sharp";
 import { whitenBackground } from "@/lib/image-levels";
 
 /**
- * Generated images are downloaded from the provider's short-lived URL,
- * transcoded to WebP and stored in R2. Keys are content-addressed, which is what
+ * Generated images are transcoded to WebP and stored in R2. SiliconFlow hands
+ * back a short-lived URL. An OpenAI-compatible provider may hand back that kind
+ * of URL or base64, which `generateImage` turns into a data URL and this module
+ * reads without a second request. Keys are content-addressed, which is what
  * makes the immutable Cache-Control safe: a regenerated image gets a new URL.
  */
 
@@ -91,7 +93,22 @@ function isAllowedSourceUrl(raw: string): boolean {
   }
 }
 
+/** `generateImage` builds this when the provider returns `b64_json` instead of a URL. */
+const DATA_IMAGE_URL = /^data:image\/(?:png|jpeg|jpg|webp);base64,([A-Za-z0-9+/]+={0,2})$/;
+
+function decodeDataImage(url: string): Buffer | null {
+  if (!url.startsWith("data:")) return null;
+  const match = DATA_IMAGE_URL.exec(url);
+  if (!match) throw new StorageError("fetch", "Image data URL is not a supported base64 image.");
+  const buffer = Buffer.from(match[1], "base64");
+  if (buffer.byteLength === 0) throw new StorageError("fetch", "Image data URL is empty.");
+  if (buffer.byteLength > MAX_SOURCE_BYTES) throw new StorageError("fetch", "Image too large.");
+  return buffer;
+}
+
 async function download(url: string): Promise<Buffer> {
+  const inline = decodeDataImage(url);
+  if (inline) return inline;
   if (!isAllowedSourceUrl(url)) throw new StorageError("fetch", `Image host not allowed: ${url}`);
 
   let response: Response;
