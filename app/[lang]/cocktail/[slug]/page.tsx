@@ -72,7 +72,7 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
               <h2 id="more-heading" className="reveal text-head">
                 {mood ? format(dict.detail.moreForMood, { mood: dict.options.moods[mood].label }) : dict.detail.more}
               </h2>
-              <Link href={localizePath("/gallery", locale)} className="link text-lead">
+              <Link href={localizePath("/gallery", locale)} className="link py-2 text-lead">
                 {dict.detail.back} →
               </Link>
             </div>

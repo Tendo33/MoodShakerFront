@@ -79,6 +79,12 @@ export async function setDrinkImage(id: string, imageUrl: string, thumbnailUrl: 
 
 const UNIQUE_VIOLATION = "23505";
 
+/** Drizzle wraps the driver's error, so the Postgres code sits on `cause`. */
+function isUniqueViolation(error: unknown): boolean {
+  const code = (value: unknown) => (value as { code?: string } | null)?.code;
+  return code(error) === UNIQUE_VIOLATION || code((error as { cause?: unknown } | null)?.cause) === UNIQUE_VIOLATION;
+}
+
 /** Publishes an owned drink, keeping its slug if it was published before. */
 export async function publishDrink(row: DrinkRow): Promise<string> {
   const db = getDb();
@@ -95,7 +101,7 @@ export async function publishDrink(row: DrinkRow): Promise<string> {
       await db.update(drinks).set({ slug, publishedAt: new Date() }).where(eq(drinks.id, row.id));
       return slug;
     } catch (error) {
-      if ((error as { code?: string }).code !== UNIQUE_VIOLATION) throw error;
+      if (!isUniqueViolation(error)) throw error;
     }
   }
   throw new Error(`No free slug for drink ${row.id}.`);

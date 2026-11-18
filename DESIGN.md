@@ -23,13 +23,14 @@ Type: Hanken Grotesk (Latin) with Noto Sans SC (Chinese), weights 400 and 500 on
 - A drink is always a specimen: its photograph on its mood's field, nothing else in the tile. Name and facts sit outside the tile.
 - One accent, on the primary action. One button shape, square corners.
 - No eyebrow labels, monospace, index numbers (`01`), hairline rules, outlined boxes, gradients or resting shadows. Separate with space and tone.
-- Running text is full ink, 16px or more. Grey is for notes.
+- Running text is full ink, 16px or more. Grey is for notes, and only on bone: on a mood field `muted` falls below 4.5:1, so notes there are `text-ink/70`.
 - Headlines two lines at most. Statements set large stay at three lines or fewer.
 - Every page closes with the block wordmark (`BlockMark` in `SiteChrome.tsx`).
-- Motion: the slow crossfade on the home plinth is the one signature move; sections enter once as they scroll in (`Reveals.tsx`); everything respects `prefers-reduced-motion`, and nothing is hidden without script.
+- Motion: the slow crossfade on the home plinth is the one signature move (a fading layer carries `mix-blend-multiply` itself, or its photograph crosses the field as a white square); sections enter once as they scroll in (`Reveals.tsx`); everything respects `prefers-reduced-motion`, and nothing is hidden without script.
 
 ## Pictures
 
-- Generated drinks are shot by `buildImagePrompt` in `lib/ai/prompts.ts` as studio specimens on pure white, then lifted to clean white by `lib/image-levels.ts` so no grey band shows on the field.
+- Generated drinks are shot by `buildImagePrompt` in `lib/ai/prompts.ts` as studio specimens on pure white, then prepared by `lib/image-levels.ts`: near-white is lifted to white so no grey band shows on the field, and the rim is faded so a shadow running off the picture does not end in a straight line.
+- `public/og.png` is the card for shared links without a drink of their own; `node scripts/build-og.mjs` redraws it.
 - Seed drinks and the two stage pictures live in `public/drinks/` and `public/stages/`; `pnpm seeds:build` regenerates them.
 - The provider stamps a small "AI 生成" mark on every image. It is left in place; the footer also says the photographs are AI-generated.

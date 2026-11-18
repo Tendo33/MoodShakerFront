@@ -64,6 +64,9 @@
   :lang(zh-CN) h3 {
     letter-spacing: -0.02em;
     line-height: 1.08;
+    /* Chinese has no spaces, so a balanced headline would split a word; break at punctuation instead. */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   p {
@@ -126,6 +129,29 @@
   .btn-quiet:hover:not(:disabled) {
     background: var(--color-ink);
     color: var(--color-bone);
+  }
+
+  /* The page title of a question or a dead end: tight in Latin, looser in Chinese, whose glyphs fill the line. */
+  .title {
+    font-size: clamp(2.5rem, 1rem + 5vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+  :lang(zh-CN) .title {
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  /* First stop for keyboard users; out of sight until it has focus. */
+  .skip-link {
+    position: absolute;
+    top: 0.75rem;
+    left: clamp(20px, 3.5vw, 56px);
+    z-index: 10;
+    transform: translateY(-300%);
+  }
+  .skip-link:focus {
+    transform: none;
   }
 
   .link {

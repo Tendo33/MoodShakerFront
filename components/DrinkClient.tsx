@@ -70,10 +70,15 @@ export function DrinkClient({
 
       // One automatic attempt per tab; after that the guest decides.
       const triedKey = `moodshaker:image-tried:${id}`;
-      if (!result.data.imageUrl && !sessionStorage.getItem(triedKey)) {
+      if (result.data.imageUrl) return;
+      try {
+        if (sessionStorage.getItem(triedKey)) return;
         sessionStorage.setItem(triedKey, "1");
-        void requestImage();
+      } catch {
+        // Without session storage the attempt cannot be remembered; the guest asks by hand.
+        return;
       }
+      void requestImage();
     });
 
     return () => {
@@ -163,6 +168,9 @@ export function DrinkClient({
     </div>
   );
 
+  // Only photographed drinks go on the menu; one already there can always come off.
+  const canPublish = drink.published || Boolean(drink.imageUrl);
+
   const actions = (
     <div>
       <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
@@ -172,15 +180,27 @@ export function DrinkClient({
         <button
           type="button"
           className="btn bg-ink/10 hover:bg-ink hover:text-bone"
-          disabled={busy !== null}
+          disabled={busy !== null || !canPublish}
+          aria-describedby={canPublish ? undefined : "publish-hint"}
           onClick={() => void togglePublish()}
         >
-          {busy === "publish" ? t.publishing : drink.published ? t.withdraw : t.publish}
+          {busy === "publish"
+            ? t.publishing
+            : busy === "withdraw"
+              ? t.withdrawing
+              : drink.published
+                ? t.withdraw
+                : t.publish}
         </button>
         <Link href={localizePath("/questions", locale)} className="link col-span-2 py-2 sm:ml-2">
           {t.again} →
         </Link>
       </div>
+      {!canPublish && (
+        <p id="publish-hint" className="mt-5 text-ink/70">
+          {t.publishNeedsPhoto}
+        </p>
+      )}
       {drink.published && drink.slug && (
         <p className="mt-5">
           {t.publishedNote}{" "}

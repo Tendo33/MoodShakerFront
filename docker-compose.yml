@@ -15,6 +15,9 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-moodshaker}
       # One reverse proxy (Caddy/Nginx) in front; see lib/http.ts getClientIp.
       TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-1}
+      # The site sits behind Cloudflare, which carries the visitor's address in
+      # cf-connecting-ip. Set to false when it does not, or anyone can forge it.
+      TRUST_CLOUDFLARE: ${TRUST_CLOUDFLARE:-true}
     ports:
       - "${HOST_PORT:-3000}:3000"
     depends_on: [db]

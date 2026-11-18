@@ -25,15 +25,22 @@ describe("i18n", () => {
 });
 
 describe("getClientIp", () => {
-  it("prefers cf-connecting-ip", () => {
-    assert.equal(getClientIp(request({ "cf-connecting-ip": "1.1.1.1", "x-forwarded-for": "2.2.2.2" })), "1.1.1.1");
+  it("believes cf-connecting-ip only when Cloudflare is trusted", () => {
+    const headers = request({ "cf-connecting-ip": "1.1.1.1", "x-forwarded-for": "2.2.2.2" });
+    assert.equal(getClientIp(headers, 1, true), "1.1.1.1");
+    assert.equal(getClientIp(headers, 1, false), "2.2.2.2");
   });
 
   it("reads x-forwarded-for from the right, ignoring a spoofed first hop", () => {
     const headers = request({ "x-forwarded-for": "6.6.6.6, 9.9.9.9, 10.0.0.1" });
-    assert.equal(getClientIp(headers, 0), "10.0.0.1");
-    assert.equal(getClientIp(headers, 1), "10.0.0.1");
-    assert.equal(getClientIp(headers, 2), "9.9.9.9");
+    assert.equal(getClientIp(headers, 1, false), "10.0.0.1");
+    assert.equal(getClientIp(headers, 2, false), "9.9.9.9");
+  });
+
+  it("puts every caller in one bucket when no proxy is trusted", () => {
+    const forged = request({ "cf-connecting-ip": "1.1.1.1", "x-forwarded-for": "6.6.6.6", "x-real-ip": "7.7.7.7" });
+    assert.equal(getClientIp(forged, 0, false), "direct");
+    assert.equal(getClientIp(request({}), 0, false), "direct");
   });
 });
 

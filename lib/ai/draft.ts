@@ -69,6 +69,15 @@ export const draftSchema = z
         message: `the Chinese version contains English words (${[...latin].slice(0, 8).join(", ")}); write them in Chinese`,
       });
     }
+    // The reverse slip: a Chinese unit left in the English version ("1 片 orange peel").
+    const chinese = new Set(JSON.stringify(draft.en).match(/[\u4e00-\u9fff]+/g));
+    if (chinese.size > 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["en"],
+        message: `the English version contains Chinese (${[...chinese].slice(0, 8).join(", ")}); write it in English`,
+      });
+    }
     for (const list of ["ingredients", "tools", "steps"] as const) {
       if (draft.cn[list].length !== draft.en[list].length) {
         ctx.addIssue({
@@ -124,9 +133,17 @@ function toChineseMeasure(value: string): string {
   return value.replace(/[A-Za-z][A-Za-z ]*[A-Za-z]|[A-Za-z]/g, (word) => CN_MEASURES[word.toLowerCase()] ?? word);
 }
 
+/** "1 large ice cube", "crushed ice": ice the model listed as an ingredient in spite of the prompt. */
+const ICE_ONLY = /^(?:(?:a|one|\d+)\s+)?(?:(?:large|big|clear|crushed|cracked|solid|standard)\s+)*ice(?:\s+(?:cubes?|spheres?|balls?|blocks?))?$/i;
+
 /** Merges the two language versions into the stored shape. */
 export function toRecipe(draft: Draft): Recipe {
-  const { cn, en } = draft;
+  // Ice belongs in the steps. Left in the list it takes a line on the menu card
+  // from a real ingredient. Both versions run in the same order, so one index serves.
+  const kept = draft.en.ingredients.map((item) => !ICE_ONLY.test(item.name));
+  const withoutIce = <T,>(items: T[]) => (kept.filter(Boolean).length >= 2 ? items.filter((_, index) => kept[index]) : items);
+  const cn = { ...draft.cn, ingredients: withoutIce(draft.cn.ingredients) };
+  const en = { ...draft.en, ingredients: withoutIce(draft.en.ingredients) };
   const pair = (a: string, b: string) => ({ cn: a, en: b });
   const optionalPair = (a: string | null, b: string | null) => (a && b ? { cn: a, en: b } : null);
 

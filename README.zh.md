@@ -73,10 +73,12 @@ docker compose pull && docker compose up -d
 
 | 触发 | workflow | 结果 |
 |---|---|---|
-| PR | `ci.yml`、`image.yml` | lint、typecheck、test、build；试构建镜像，不推送 |
+| PR | `ci.yml`、`image.yml` | lint、typecheck、test、build，再用生产构建跑 Playwright 冒烟测试；试构建镜像，不推送 |
 | 推 `main` | `image.yml` | 检查通过后推送 `sha-<7 位>` 和 `latest` |
 | 推 `v*` 标签 | `image.yml`、`release.yml` | 检查通过后推送 `<版本>`、`<主>.<次>`，并创建 GitHub Release |
 
-容器启动时先执行迁移（`pnpm db:migrate`），写入三款经典酒，再启动 Next。数据库不可达时 `/api/health` 返回 503。配置项说明见 `.env.example`。
+容器启动时先执行迁移（`pnpm db:migrate`），写入十二款酒的种子酒单，再启动 Next。数据库不可达时 `/api/health` 返回 503。配置项说明见 `.env.example`。
 
 限流没有内存兜底：缺数据库是部署错误，不会静默降级。
+
+限流按访客计数，而访客地址来自客户端可以伪造的请求头，所以要明确信任哪一层代理：`TRUSTED_PROXY_HOPS` 是应用前面的反向代理层数；站点在 Cloudflare 后面时设 `TRUST_CLOUDFLARE=true`（compose 文件的默认值；其他情况设为 `false`，并且源站只接受 Cloudflare 回源）。两者都没设时，所有访客共用一个限流桶。

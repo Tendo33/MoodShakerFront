@@ -6,16 +6,19 @@ import { MOOD_COLORS } from "@/lib/moods";
 
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
-    <header className="frame flex h-20 items-center justify-between gap-6">
-      <Link href={localizePath("/", locale)} aria-label={dict.nav.home} className="text-lead font-medium tracking-[-0.03em]">
+    <header className="frame flex h-20 items-center justify-between gap-3 sm:gap-6">
+      <a href="#main" className="skip-link btn btn-quiet">
+        {dict.nav.skip}
+      </a>
+      <Link href={localizePath("/", locale)} aria-label={dict.nav.home} className="py-2 text-lead font-medium tracking-[-0.03em]">
         MoodShaker
       </Link>
-      <nav className="flex items-center gap-5 sm:gap-8">
-        <Link href={localizePath("/gallery", locale)} className="link max-sm:hidden">
+      <nav className="flex items-center gap-3 whitespace-nowrap sm:gap-8">
+        <Link href={localizePath("/gallery", locale)} className="link py-2 max-[379px]:hidden">
           {dict.nav.menu}
         </Link>
         <LanguageSwitch locale={locale} label={dict.nav.switchTo} ariaLabel={dict.nav.switchLabel} />
-        <Link href={localizePath("/questions", locale)} className="btn btn-primary min-h-11 px-5">
+        <Link href={localizePath("/questions", locale)} className="btn btn-primary min-h-11 px-4 sm:px-5">
           {dict.nav.shake}
         </Link>
       </nav>
@@ -67,11 +70,11 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
       <div className="frame pt-16 pb-10">
         <BlockMark />
         <div className="mt-14 grid gap-10 sm:grid-cols-12">
-          <nav className="flex flex-col gap-3 sm:col-span-4">
-            <Link href={localizePath("/questions", locale)} className="link w-fit">
+          <nav className="flex flex-col sm:col-span-4">
+            <Link href={localizePath("/questions", locale)} className="link w-fit py-1.5">
               {dict.nav.shake}
             </Link>
-            <Link href={localizePath("/gallery", locale)} className="link w-fit">
+            <Link href={localizePath("/gallery", locale)} className="link w-fit py-1.5">
               {dict.nav.menu}
             </Link>
           </nav>

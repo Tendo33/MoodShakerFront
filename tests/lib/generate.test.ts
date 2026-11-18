@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { generateRecipe, MAX_CALLS, parseCompletion, RecipeValidationError } from "@/lib/ai/generate";
 import type { ChatRequest } from "@/lib/ai/provider";
-import { buildUserPrompt } from "@/lib/ai/prompts";
+import { buildUserPrompt, classicsFor } from "@/lib/ai/prompts";
 import type { Order } from "@/lib/domain/order";
 import { draftJsonSchema, parseDraft, toRecipe } from "@/lib/ai/draft";
 import { sampleDraft } from "../fixtures/recipe";
@@ -102,6 +102,48 @@ describe("draft", () => {
     assert.match(!result.ok ? result.issues : "", /steps/);
   });
 
+  it("takes ice out of the ingredients, and leaves iced tea alone", () => {
+    const withIce = {
+      ...sampleDraft,
+      cn: {
+        ...sampleDraft.cn,
+        ingredients: [
+          ...sampleDraft.cn.ingredients,
+          { name: "大方冰", amount: 1, unit: null, substitute: null },
+          { name: "冰红茶", amount: 30, unit: "ml", substitute: null },
+        ],
+      },
+      en: {
+        ...sampleDraft.en,
+        ingredients: [
+          ...sampleDraft.en.ingredients,
+          { name: "Large ice cube", amount: "1", unit: null, substitute: null },
+          { name: "Iced tea", amount: "30", unit: "ml", substitute: null },
+        ],
+      },
+    };
+    const result = parseDraft(withIce);
+    assert.ok(result.ok);
+    assert.deepEqual(
+      toRecipe(result.draft).ingredients.map((item) => item.name),
+      [
+        { cn: "金酒", en: "Gin" },
+        { cn: "汤力水", en: "Tonic water" },
+        { cn: "冰红茶", en: "Iced tea" },
+      ],
+    );
+  });
+
+  it("flags Chinese left in the English version", () => {
+    const slipped = {
+      ...sampleDraft,
+      en: { ...sampleDraft.en, ingredients: [{ ...sampleDraft.en.ingredients[0], unit: "片" }, sampleDraft.en.ingredients[1]] },
+    };
+    const result = parseDraft(slipped);
+    assert.equal(result.ok, false);
+    assert.match(!result.ok ? result.issues : "", /English version contains Chinese \(片\)/);
+  });
+
   it("emits a JSON Schema without $ref for strict providers", () => {
     assert.doesNotMatch(JSON.stringify(draftJsonSchema()), /\$ref/);
   });
@@ -136,5 +178,27 @@ describe("Chinese measures", () => {
     const recipe = toRecipe(result.draft);
     assert.equal(recipe.ingredients[1].amount.cn, "加满");
     assert.deepEqual(recipe.ingredients[0].unit, { cn: "滴", en: "ml" });
+  });
+});
+
+describe("the classics card", () => {
+  it("has a line for every strength of every spirit a guest can own", () => {
+    for (const strength of ["light", "medium", "strong"] as const) {
+      for (const spirit of ["gin", "vodka", "rum", "tequila", "whiskey", "brandy"] as const) {
+        assert.ok(classicsFor({ strength, spirits: [spirit] }).length > 0, `${strength} ${spirit}`);
+      }
+    }
+    assert.ok(classicsFor({ strength: "none", spirits: ["gin"] }).length >= 4);
+  });
+
+  it("offers only what the guest can pour", () => {
+    const lines = classicsFor({ strength: "strong", spirits: ["whiskey"] });
+    assert.ok(lines.every((line) => line.base === "whiskey" && line.level === "high"));
+    assert.ok(lines.some((line) => line.en === "Sazerac"));
+
+    const prompt = buildUserPrompt({ ...order, style: "classic", strength: "strong", spirits: ["whiskey"] });
+    assert.match(prompt, /Sazerac \| 萨泽拉克/);
+    assert.doesNotMatch(prompt, /Negroni/);
+    assert.doesNotMatch(buildUserPrompt({ ...order, style: "creative" }), /# The card/);
   });
 });

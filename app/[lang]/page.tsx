@@ -74,7 +74,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
 
       {s0 && (
         <section className="frame py-[clamp(96px,18vh,220px)]" aria-label={dict.home.stepsTitle}>
-          <p className="reveal mx-auto max-w-[34ch] text-[clamp(1.5rem,1rem+2vw,2.25rem)] leading-[1.3] font-medium tracking-[-0.025em] lg:text-center">
+          <p className="reveal mx-auto max-w-[34ch] text-[clamp(1.5rem,1rem+2vw,2.25rem)] leading-[1.3] font-medium tracking-[-0.025em] md:text-center">
             {dict.home.statement[0]} <Thumb drink={s0} />
             {dict.home.statement[1]} <Thumb drink={s1} />
             {dict.home.statement[2]} <Thumb drink={s2} />
@@ -84,8 +84,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       )}
 
       <section className="frame" aria-labelledby="steps-title">
-        <div className="grid gap-x-2.5 gap-y-12 lg:grid-cols-12">
-          <h2 id="steps-title" className="reveal text-head lg:col-span-7 lg:row-start-1">
+        <div className="grid gap-x-2.5 gap-y-12 md:max-lg:grid-cols-3 lg:grid-cols-12">
+          <h2 id="steps-title" className="reveal text-head md:max-lg:col-span-3 lg:col-span-7 lg:row-start-1">
             {dict.home.stepsTitle}
           </h2>
           {STAGES.map((stage, index) => {
@@ -125,7 +125,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             </h2>
             <div className="reveal lg:col-span-5 lg:col-start-8 [--i:1]">
               <p className="text-lead">{dict.home.menuStatement}</p>
-              <Link href={localizePath("/gallery", locale)} className="link mt-5 inline-block">
+              <Link href={localizePath("/gallery", locale)} className="link mt-3 inline-block py-2">
                 {dict.home.viewMenu} →
               </Link>
             </div>

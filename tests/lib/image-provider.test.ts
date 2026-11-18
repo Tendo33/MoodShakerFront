@@ -93,7 +93,9 @@ async function tinyPng(): Promise<Buffer> {
 const siliconflowBody = {
   model: "Qwen/Qwen-Image",
   prompt: "a clear gin drink",
-  negative_prompt: "low quality, blurry, distorted, text, watermark",
+  negative_prompt:
+    "grey background, gray background, gradient background, vignette, table, surface, floor, horizon line, " +
+    "cast shadow, drop shadow, reflection, low quality, blurry, distorted, text, watermark",
   image_size: "1024x1024",
   batch_size: 1,
   num_inference_steps: 20,

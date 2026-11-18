@@ -97,7 +97,8 @@ export async function renderShareCard(
   ctx.textBaseline = "alphabetic";
   ctx.font = `500 92px ${sans}`;
   ctx.letterSpacing = "-3px";
-  let y = 840;
+  // Without a photograph the words move up to hold the card on their own.
+  let y = image ? 840 : 600;
   for (const line of wrap(ctx, recipe.name, WIDTH - MARGIN * 2, 2)) {
     ctx.fillText(line, MARGIN, y);
     y += 92;

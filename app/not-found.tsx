@@ -19,7 +19,7 @@ export default async function NotFound() {
   return (
     <>
       <SiteHeader locale={locale} dict={dict} />
-      <main>
+      <main id="main">
         <EmptyState
           title={dict.notFound.title}
           body={dict.notFound.body}

@@ -48,7 +48,7 @@ export function DrinkSheet({
             mood={mood}
             priority
             sizes="(min-width: 1024px) 45vw, 100vw"
-            className="enter order-2 aspect-square lg:order-none lg:col-span-6 lg:row-span-2 lg:aspect-[4/5]"
+            className="enter order-2 aspect-square md:max-lg:aspect-[16/10] lg:order-none lg:col-span-6 lg:row-span-2 lg:aspect-[4/5]"
             inset="4%"
           >
             {photoFallback}
@@ -62,7 +62,7 @@ export function DrinkSheet({
             <dl className="enter mt-10 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4 [--i:3]">
               {facts.map(([term, value]) => (
                 <div key={term}>
-                  <dt className="text-small text-ink/65">{term}</dt>
+                  <dt className="text-small text-ink/70">{term}</dt>
                   <dd className="mt-1 font-medium">{value}</dd>
                 </div>
               ))}
@@ -76,7 +76,7 @@ export function DrinkSheet({
       </section>
 
       <div className="frame mt-[clamp(80px,12vh,160px)] grid gap-x-8 gap-y-20 lg:grid-cols-12">
-        <section className="order-2 lg:order-none lg:col-span-5" aria-labelledby="why-heading">
+        <section className="order-2 lg:sticky lg:top-10 lg:order-none lg:col-span-5 lg:self-start" aria-labelledby="why-heading">
           <h2 id="why-heading" className="reveal text-lead text-muted">
             {t.why}
           </h2>

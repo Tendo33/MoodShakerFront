@@ -20,6 +20,13 @@ const CHAT_TIMEOUT_MS = 150_000;
 const SILICONFLOW_IMAGE_TIMEOUT_MS = 60_000;
 /** c2a / gpt-image commonly takes 20–60s to answer. */
 const OPENAI_IMAGE_TIMEOUT_MS = 120_000;
+/**
+ * What a diffusion model adds to a product shot unasked. Each of these shows
+ * once the picture is laid on a coloured field (see DESIGN.md, Pictures).
+ */
+const SILICONFLOW_NEGATIVE_PROMPT =
+  "grey background, gray background, gradient background, vignette, table, surface, floor, horizon line, " +
+  "cast shadow, drop shadow, reflection, low quality, blurry, distorted, text, watermark";
 /** One try plus two retries. A timeout still does not consume a retry. */
 const OPENAI_IMAGE_ATTEMPTS = 3;
 /** Same ceiling as lib/storage.ts. A larger payload is rejected before it is stored. */
@@ -215,7 +222,7 @@ export async function generateImage(prompt: string): Promise<string> {
       : {
           model: imageModel(provider),
           prompt,
-          negative_prompt: "low quality, blurry, distorted, text, watermark",
+          negative_prompt: SILICONFLOW_NEGATIVE_PROMPT,
           image_size: "1024x1024",
           batch_size: 1,
           num_inference_steps: 20,
