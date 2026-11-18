@@ -15,9 +15,12 @@ describe("buildImagePrompt", () => {
     assert.match(prompt, /three-quarter view/);
     assert.match(prompt, /specular catchlights/);
     assert.match(prompt, /rim light/);
-    assert.match(prompt, /condensation on the glass only/);
+    assert.match(prompt, /Unless the description says otherwise/);
+    assert.match(prompt, /faint condensation on the glass only/);
+    assert.match(prompt, /no more than four fifths of the frame's height/);
     assert.match(prompt, /Ice only when it calls for ice/);
     assert.match(prompt, /if it says no ice, the glass has none/);
+    assert.match(prompt, /When it does not describe the ice's finish, the ice is clear and crystalline/);
     assert.match(prompt, /No garnish that is not listed, and none at all when none is listed/);
     assert.match(prompt, /No invented ingredient/);
   });
@@ -34,19 +37,31 @@ describe("buildImagePrompt", () => {
   });
 
   it("falls back to the first five ingredients when appearance is missing or blank", () => {
-    const named = (en: string) => ({
-      name: { cn: en, en },
+    const named = (cn: string, en: string) => ({
+      name: { cn, en },
       amount: { cn: "1", en: "1" },
       unit: null,
       substitute: null,
     });
-    const ingredients = ["Gin", "Lime juice", "Soda", "Mint", "Sugar", "Bitters"].map(named);
+    const ingredients = [
+      named("金酒", "Gin"),
+      named("青柠汁", "Lime juice"),
+      named("苏打水", "Soda"),
+      named("薄荷", "Mint"),
+      named("糖", "Sugar"),
+      named("苦精", "Bitters"),
+    ];
+    const omitted = buildImagePrompt({
+      name: sampleRecipe.name,
+      servingGlass: sampleRecipe.servingGlass,
+      ingredients,
+    });
     const missing = buildImagePrompt({ ...sampleRecipe, appearance: null, ingredients });
     const blank = buildImagePrompt({ ...sampleRecipe, appearance: "  \n", ingredients });
 
-    for (const prompt of [missing, blank]) {
+    for (const prompt of [omitted, missing, blank]) {
       assert.match(prompt, /made with Gin, Lime juice, Soda, Mint, Sugar\./);
-      assert.doesNotMatch(prompt, /Bitters/);
+      assert.doesNotMatch(prompt, /Bitters|苦精|金酒/);
       assert.doesNotMatch(prompt, /lime wheel/);
     }
   });

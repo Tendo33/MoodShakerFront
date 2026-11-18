@@ -267,11 +267,13 @@ export function buildImagePrompt(
   // The white field is said more than once on purpose. Models drift to a grey
   // sweep, a table line and a cast shadow, and under multiply each of those
   // shows. lib/image-levels.ts only lifts near-white; it cannot erase a shadow.
+  // The outer 6% of the stored picture is faded to white, so the glass stays
+  // inside four fifths of the frame and clear of that band.
   return `Premium beverage photograph of a single "${recipe.name.en}" in a ${recipe.servingGlass.en}, lit like a high-end advertising shot, on a pure white (#FFFFFF) background. ${look}.
 
-Slightly elevated three-quarter view, whole glass centred and in sharp focus, with a modest white margin on every side so nothing touches the edge. Colour is true to that description and saturated enough to look appetizing, translucent where the liquid is clear, with depth and a bright glint through the glass. Crisp specular catchlights and a fine rim light define the bowl; the rim and the base read as glass, with no halo in the background. A cold drink or a glass with ice has a faint condensation on the glass only; a hot drink is dry, with a faint wisp of steam. If a garnish is listed, it is fresh and deliberately placed.
+Slightly elevated three-quarter view, whole glass centred and in sharp focus, taking up no more than four fifths of the frame's height, with a white margin on every side so nothing touches the edge. Colour is true to that description and saturated enough to look appetizing, translucent where the liquid is clear, with depth and a bright glint through the glass. Crisp specular catchlights and a fine rim light define the bowl; the rim and the base read as glass, with no halo in the background. Unless the description says otherwise, a cold drink or a glass with ice has a faint condensation on the glass only, and a hot drink is dry with a faint wisp of steam. If a garnish is listed, it is fresh and deliberately placed.
 
-Follow that description exactly. Ice only when it calls for ice, and then only the ice it describes, clear and crystalline; if it says no ice, the glass has none. No garnish that is not listed, and none at all when none is listed. No invented ingredient.
+Follow that description exactly. Ice only when it calls for ice, and then only the ice it describes; if it says no ice, the glass has none. When it does not describe the ice's finish, the ice is clear and crystalline. No garnish that is not listed, and none at all when none is listed. No invented ingredient.
 
 Seamless pure white from edge to edge, a cut-out on a white page: no table, no surface, no horizon, no gradient, no vignette, no cast shadow, no reflection under the glass. No props, no hands, no text.`;
 }
