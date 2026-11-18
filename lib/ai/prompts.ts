@@ -247,20 +247,33 @@ Return the corrected JSON object only. Keep what was valid and fix the listed pr
 
 /**
  * Image prompt, built on the server from the stored recipe — never from caller
- * input. Every drink is shot the same way, alone on white, so the site can set
- * each one on its mood's colour like a specimen plate.
+ * input. The site multiplies the photograph onto the mood colour
+ * (`mix-blend-mode: multiply`, and the share card does the same), so the
+ * backdrop has to be pure white with no shadow and no surface: anything short
+ * of white prints on the field. Light may glow inside the glass. It may not
+ * leave it.
  */
 export function buildImagePrompt(
   recipe: Pick<Recipe, "name" | "servingGlass" | "ingredients"> & { appearance?: string | null },
 ): string {
+  const appearance = recipe.appearance?.trim();
   const look =
-    recipe.appearance ??
+    appearance ||
     `made with ${recipe.ingredients
       .slice(0, 5)
       .map((item) => item.name.en)
       .join(", ")}`;
 
-  // The backdrop comes first and is said several ways: diffusion models drift to a grey
-  // sweep with a table line and a cast shadow, and any of those shows on the mood field.
-  return `Product packshot of one cocktail, isolated on a pure white (#FFFFFF) background: "${recipe.name.en}", in a ${recipe.servingGlass.en}. ${look}. Show exactly what is described: no ice unless ice is mentioned, no garnish that is not listed. The whole glass is in frame, centred, seen straight on at eye level, small enough to leave a wide empty margin on every side: it takes up no more than three quarters of the frame's height. The background is flat, seamless white from edge to edge, evenly lit, like a cut-out on a white page: no table, no surface line, no horizon, no gradient, no vignette, no cast shadow, no reflection under the glass. Bright, soft, even studio light, crisp focus, true colours. No props, no hands, no text.`;
+  // The white field is said more than once on purpose. Models drift to a grey
+  // sweep, a table line and a cast shadow, and under multiply each of those
+  // shows. lib/image-levels.ts only lifts near-white; it cannot erase a shadow.
+  // The outer 6% of the stored picture is faded to white, so the glass stays
+  // inside four fifths of the frame and clear of that band.
+  return `Editorial photograph of a single "${recipe.name.en}" in a ${recipe.servingGlass.en}, lit like a luxury drinks campaign, on a seamless pure white (#FFFFFF) background. ${look}.
+
+Shot on a 100mm lens at f/8, the whole glass tack-sharp. A slightly elevated three-quarter view, the bowl turned just enough to show the rim's ellipse, centred and taking up no more than four fifths of the frame's height, white margin on every side. The liquid is the hero: luminous, jewel-like, true to that colour, backlit so it glows from within, refraction and caustic ribbons caught inside the glass and nowhere else. The vessel is fine barware, thin and polished where it is glass, rim and base drawn by one crisp bright edge. If a garnish is listed, it is placed with a food stylist's care, fresh and exact. Only the texture this drink has: a bead of bubbles if it sparkles, a fine foam if it has a head. Unless the description says otherwise, a cold glass or one with ice wears a faint condensation, and a hot drink is dry with a faint wisp of steam.
+
+Follow that description exactly. Ice only when it calls for ice, and then only the ice it describes; if it says no ice, the glass has none. When it does not describe the ice's finish, the ice is clear and crystalline. No garnish that is not listed, and none at all when none is listed. No invented ingredient.
+
+Seamless pure white from edge to edge, a cut-out on a white page: no table, no surface, no horizon, no gradient, no vignette, no cast shadow, no reflection under the glass, no halo. No props, no hands, no text.`;
 }
