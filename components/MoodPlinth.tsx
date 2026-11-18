@@ -59,45 +59,52 @@ export function MoodPlinth({
   const moodLabel = dict.options.moods[mood].label;
 
   return (
-    <div className="grid gap-10 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-8 lg:gap-y-12">
-      <p className="enter max-w-[30ch] text-[clamp(1.375rem,1rem+1.2vw,2.125rem)] leading-[1.3] tracking-[-0.015em] [--i:1] lg:col-span-5">
-        {dict.home.lede}
-      </p>
-      <div className="order-3 lg:order-none lg:col-span-5 lg:row-start-2 lg:self-end">
-        <fieldset className="enter [--i:2]">
-          <legend className="text-lead font-medium">{dict.home.moodPrompt}</legend>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {MOODS.map((code) => {
-              const selected = code === mood;
-              return (
-                <button
-                  key={code}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => {
-                    setPicked(code);
-                    setTick(0);
-                  }}
-                  className="flex min-h-12 items-center gap-3 bg-surface px-4 transition-[background-color,transform] duration-300 ease-out hover:-translate-y-0.5 active:scale-[0.97] aria-pressed:text-ink"
-                  style={selected ? { backgroundColor: MOOD_COLORS[code] } : undefined}
-                >
-                  <span
-                    aria-hidden
-                    className="size-3.5 transition-colors duration-300"
-                    style={{ backgroundColor: selected ? "var(--color-ink)" : MOOD_COLORS[code] }}
-                  />
-                  {dict.options.moods[code].label}
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
-        <Link
-          href={`${localizePath("/questions", locale)}?mood=${mood}`}
-          className="btn btn-primary enter mt-10 [--i:3]"
-        >
-          {format(dict.home.ctaForMood, { mood: moodLabel })} <span aria-hidden>→</span>
-        </Link>
+    <div className="grid gap-10 lg:grid-cols-12 lg:gap-x-8 lg:gap-y-12">
+      {/* One column that spans both rows and centres itself against the plinth:
+          `contents` on small screens keeps the mobile order lede, drink, picker. */}
+      <div className="max-lg:contents lg:col-span-5 lg:row-span-2 lg:flex lg:flex-col lg:justify-center">
+        <p className="enter order-1 max-w-[30ch] text-[clamp(1.375rem,1rem+1.2vw,2.125rem)] leading-[1.3] tracking-[-0.015em] [--i:1]">
+          {dict.home.lede}
+        </p>
+        <div className="order-3 mt-10 lg:mt-16">
+          <fieldset className="enter [--i:2]">
+            <legend className="text-lead font-medium">{dict.home.moodPrompt}</legend>
+            <div className="mt-5 grid grid-cols-3 gap-2">
+              {MOODS.map((code) => {
+                const selected = code === mood;
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => {
+                      setPicked(code);
+                      setTick(0);
+                    }}
+                    className="flex min-h-12 items-center gap-2.5 bg-surface px-4 transition-[background-color,transform] duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.97] aria-pressed:text-ink"
+                    style={selected ? { backgroundColor: MOOD_COLORS[code] } : undefined}
+                  >
+                    <span
+                      aria-hidden
+                      className="size-3.5 shrink-0 transition-[background-color,transform] duration-200"
+                      style={{
+                        backgroundColor: selected ? "var(--color-ink)" : MOOD_COLORS[code],
+                        transform: selected ? "scale(1.3)" : "scale(1)",
+                      }}
+                    />
+                    {dict.options.moods[code].label}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+          <Link
+            href={`${localizePath("/questions", locale)}?mood=${mood}`}
+            className="btn btn-primary enter mt-8 [--i:3]"
+          >
+            {format(dict.home.ctaForMood, { mood: moodLabel })} <span aria-hidden>→</span>
+          </Link>
+        </div>
       </div>
 
       <figure className="enter order-2 lg:order-none lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 [--i:1]">

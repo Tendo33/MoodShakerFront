@@ -49,3 +49,6 @@ test-results/
 playwright-report/
 eval-output/
 .taste-skill/
+
+# Local screenshot and image experiments
+.shots/

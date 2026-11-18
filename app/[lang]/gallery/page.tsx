@@ -48,7 +48,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
         <p className="enter max-w-[36ch] text-lead [--i:1] lg:col-span-5 lg:justify-self-end lg:pb-3">{dict.gallery.lede}</p>
       </header>
 
-      <nav aria-label={dict.recipe.spirit} className="enter mt-12 flex flex-wrap gap-2 [--i:2]">
+      <nav aria-label={dict.recipe.spirit} className="enter mt-12 flex flex-wrap gap-x-1 gap-y-1 [--i:2]">
         {[undefined, ...FILTERS].map((code) => {
           const active = code === spirit;
           return (
@@ -90,12 +90,10 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
                     alt={drink.name}
                     mood={drink.mood}
                     sizes={feature ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"}
-                    className="reveal-picture aspect-[4/5] transition-transform duration-500 ease-out group-hover:scale-[0.985]"
+                    className="reveal-picture aspect-[4/5] transition-transform duration-300 ease-out group-hover:scale-[0.985]"
                   />
-                  <p className={`mt-3 font-medium ${feature ? "text-lead" : ""}`}>{drink.name}</p>
-                  <p className="text-small text-muted">
-                    {dict.vocab.spirits[drink.baseSpirit]} · {dict.vocab.alcohol[drink.alcoholLevel]}
-                  </p>
+                  <p className={`mt-3 font-medium transition-opacity duration-200 group-hover:opacity-60 ${feature ? "text-lead" : ""}`}>{drink.name}</p>
+                  <p className="text-small text-muted">{dict.vocab.spirits[drink.baseSpirit]} · {dict.vocab.alcohol[drink.alcoholLevel]}</p>
                 </Link>
               </li>
             );
@@ -106,7 +104,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
       {(page.nextCursor || cursor) && (
         <div className="mt-20 flex items-center justify-between">
           {cursor ? (
-            <Link href={href({ spirit })} className="link">
+            <Link href={href({ spirit })} className="link py-2">
               ← {dict.gallery.first}
             </Link>
           ) : (

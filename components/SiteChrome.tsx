@@ -1,20 +1,29 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import type { Dictionary } from "@/lib/dictionaries";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS } from "@/lib/moods";
 
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+  const pathname = usePathname();
+  const onGallery = pathname === localizePath("/gallery", locale);
   return (
     <header className="frame flex h-20 items-center justify-between gap-3 sm:gap-6">
       <a href="#main" className="skip-link btn btn-quiet">
         {dict.nav.skip}
       </a>
-      <Link href={localizePath("/", locale)} aria-label={dict.nav.home} className="py-2 text-lead font-medium tracking-[-0.03em]">
+      <Link href={localizePath("/", locale)} aria-label={dict.nav.home} className="py-2 text-lead font-medium tracking-[-0.03em] transition-opacity duration-150 hover:opacity-60">
         MoodShaker
       </Link>
       <nav className="flex items-center gap-3 whitespace-nowrap sm:gap-8">
-        <Link href={localizePath("/gallery", locale)} className="link py-2 max-[379px]:hidden">
+        <Link
+          href={localizePath("/gallery", locale)}
+          aria-current={onGallery ? "page" : undefined}
+          className={`link py-2 max-[379px]:hidden ${onGallery ? "font-medium text-ink" : "text-muted"}`}
+        >
           {dict.nav.menu}
         </Link>
         <LanguageSwitch locale={locale} label={dict.nav.switchTo} ariaLabel={dict.nav.switchLabel} />
@@ -68,9 +77,11 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
   return (
     <footer className="mt-32 bg-night text-bone">
       <div className="frame pt-16 pb-10">
-        <BlockMark />
+        <div className="reveal">
+          <BlockMark />
+        </div>
         <div className="mt-14 grid gap-10 sm:grid-cols-12">
-          <nav className="flex flex-col sm:col-span-4">
+          <nav className="reveal flex flex-col sm:col-span-4">
             <Link href={localizePath("/questions", locale)} className="link w-fit py-1.5">
               {dict.nav.shake}
             </Link>
@@ -78,12 +89,12 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
               {dict.nav.menu}
             </Link>
           </nav>
-          <div className="space-y-3 text-bone/75 sm:col-span-6 sm:col-start-7">
+          <div className="reveal space-y-3 text-bone/75 sm:col-span-6 sm:col-start-7 [--i:1]">
             <p>{dict.footer.credit}</p>
             <p>{dict.footer.disclaimer}</p>
           </div>
         </div>
-        <p className="mt-14 text-small text-bone/60">© {new Date().getFullYear()} MoodShaker</p>
+        <p className="reveal mt-14 text-small text-bone/60 [--i:2]">© {new Date().getFullYear()} MoodShaker</p>
       </div>
     </footer>
   );

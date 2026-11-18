@@ -228,7 +228,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                         onChange={() => update({ mood })}
                       />
                       <span
-                        className="relative block aspect-[5/4] overflow-hidden lg:aspect-[3/4] transition-transform duration-500 ease-out group-hover:scale-[0.98] group-has-checked:scale-[0.96]"
+                        className="relative block aspect-[5/4] overflow-hidden lg:aspect-[3/4] transition-transform duration-300 ease-out group-hover:scale-[0.98] group-has-checked:scale-[0.96]"
                         style={{ backgroundColor: MOOD_COLORS[mood] }}
                       >
                         {moodImages[mood]?.[0] && (
@@ -239,7 +239,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                       </span>
                       <span className="mt-3 flex items-baseline justify-between gap-3">
                         <span className="text-lead font-medium">{dict.options.moods[mood].label}</span>
-                        <span aria-hidden className="size-3 shrink-0 bg-ink opacity-0 transition-opacity group-has-checked:opacity-100" />
+                        <span aria-hidden className="size-3 shrink-0 bg-ink opacity-0 transition-opacity duration-200 group-has-checked:opacity-100" />
                       </span>
                       <span className="block text-small text-ink/70">{dict.options.moods[mood].note}</span>
                     </label>
@@ -343,7 +343,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                     value={draft.notes}
                     onChange={(event) => update({ notes: event.target.value })}
                     placeholder={t.style.notesPlaceholder}
-                    className="mt-4 w-full resize-y bg-bone/70 px-5 py-4 text-lead placeholder:text-ink/70 focus:bg-bone focus:outline-3 focus:outline-ink"
+                    className="mt-4 w-full resize-y bg-bone/70 px-5 py-4 text-lead transition-colors duration-200 placeholder:text-ink/70 focus:bg-bone focus:outline-3 focus:outline-ink"
                   />
                 </div>
               </Question>
@@ -447,7 +447,7 @@ function Choice({
   return (
     <label
       onClick={onClick}
-      className="group enter flex cursor-pointer flex-col justify-between gap-6 bg-bone/70 p-5 transition-[background-color,transform] duration-300 ease-out hover:bg-bone active:scale-[0.98] has-checked:bg-ink has-checked:text-bone has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
+      className="group enter flex cursor-pointer flex-col justify-between gap-6 bg-bone/70 p-5 transition-[background-color,transform] duration-200 ease-out hover:bg-bone active:scale-[0.98] has-checked:bg-ink has-checked:text-bone has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
       style={{ ["--i" as string]: index }}
     >
       <input type="radio" name={name} className="sr-only" checked={checked} onChange={onChange} />
@@ -487,7 +487,7 @@ function Shaking({ dict, images }: { dict: Labels["questions"]["shaking"]; image
   return (
     <div className="frame grid gap-10 pt-12 pb-24 lg:grid-cols-12 lg:items-center" role="status" aria-live="polite">
       <div className="lg:col-span-5">
-        <h1 className="text-head motion-safe:animate-pulse">{dict.title}…</h1>
+        <h1 className="text-head motion-safe:animate-[breathe_3s_ease-in-out_infinite]">{dict.title}…</h1>
         <ul className="mt-10 space-y-3 text-lead">
           {dict.lines.map((line, index) => (
             <li key={line} className="enter" style={{ animationDelay: `${LINE_DELAYS[index] ?? index * 12}s` }}>
@@ -501,7 +501,7 @@ function Shaking({ dict, images }: { dict: Labels["questions"]["shaking"]; image
         {images.map((src, index) => (
           <div
             key={src}
-            className="absolute inset-[6%] mix-blend-multiply transition-opacity duration-1000 ease-in-out"
+            className="absolute inset-[6%] mix-blend-multiply transition-opacity duration-[1600ms] ease-in-out"
             style={{ opacity: index === tick % images.length ? 1 : 0 }}
           >
             <Image src={src} alt="" fill sizes="45vw" className="specimen" />

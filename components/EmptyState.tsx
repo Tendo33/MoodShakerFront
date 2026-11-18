@@ -59,9 +59,9 @@ export function EmptyState({
                     alt={drink.name}
                     mood={drink.mood}
                     sizes="(min-width: 1024px) 25vw, 50vw"
-                    className="aspect-[4/5] transition-transform duration-500 ease-out group-hover:scale-[0.985]"
+                    className="aspect-[4/5] transition-transform duration-300 ease-out group-hover:scale-[0.985]"
                   />
-                  <p className="mt-3 font-medium">{drink.name}</p>
+                  <p className="mt-3 font-medium transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
                 </Link>
               </li>
             ))}

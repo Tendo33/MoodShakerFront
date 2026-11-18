@@ -49,7 +49,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
     mood: drink.mood,
   }));
   const pick = (index: number) => pictured[index % Math.max(pictured.length, 1)];
-  const [s0, s1, s2] = [pick(0), pick(3), pick(6)];
+  const s0 = pick(0);
+  const s2 = pick(6);
   const finale = pick(4);
 
   return (
@@ -75,10 +76,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       {s0 && (
         <section className="frame py-[clamp(96px,18vh,220px)]" aria-label={dict.home.stepsTitle}>
           <p className="reveal mx-auto max-w-[34ch] text-[clamp(1.5rem,1rem+2vw,2.25rem)] leading-[1.3] font-medium tracking-[-0.025em] md:text-center">
-            {dict.home.statement[0]} <Thumb drink={s0} />
-            {dict.home.statement[1]} <Thumb drink={s1} />
-            {dict.home.statement[2]} <Thumb drink={s2} />
-            {dict.home.statement[3]}
+            {dict.home.statement[0]}{dict.home.statement[1]}{dict.home.statement[2]}{dict.home.statement[3]}
           </p>
         </section>
       )}
@@ -95,11 +93,10 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
               <div
                 key={step.title}
                 className={`${stage.span} lg:self-end ${index < 2 ? "lg:row-start-2" : "lg:col-start-8 lg:row-span-2 lg:row-start-1"}`}
-                style={{ ["--i" as string]: index }}
               >
                 <div
                   className={`reveal-picture relative w-full max-lg:aspect-[4/3] ${stage.height} max-lg:h-auto`}
-                  style={{ backgroundColor: stage.field }}
+                  style={{ backgroundColor: stage.field, ["--i" as string]: index }}
                 >
                   {image && (
                     <div className="absolute inset-[10%]">
@@ -107,8 +104,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                     </div>
                   )}
                 </div>
-                <h3 className="reveal mt-5 text-lead">{step.title}</h3>
-                <p className="reveal mt-2 max-w-[34ch]">{step.body}</p>
+                <h3 className="reveal mt-5 text-lead" style={{ ["--i" as string]: index }}>{step.title}</h3>
+                <p className="reveal mt-2 max-w-[34ch]" style={{ ["--i" as string]: index + 0.5 }}>{step.body}</p>
               </div>
             );
           })}
@@ -139,10 +136,10 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                     alt={drink.name}
                     mood={drink.mood}
                     sizes="(min-width: 1024px) 17vw, (min-width: 640px) 33vw, 50vw"
-                    className={`reveal-picture ${TILE_SHAPES[index % TILE_SHAPES.length]} transition-transform duration-500 ease-out group-hover:scale-[0.98]`}
+                    className={`reveal-picture ${TILE_SHAPES[index % TILE_SHAPES.length]} transition-transform duration-300 ease-out group-hover:scale-[0.98]`}
                   />
-                  <p className="mt-2 text-small">
-                    {drink.name}, {dict.vocab.spirits[drink.baseSpirit]}
+                  <p className="mt-2 text-small transition-opacity duration-200 group-hover:opacity-60">
+                    {drink.name} · {dict.vocab.spirits[drink.baseSpirit]}
                   </p>
                 </Link>
               </li>
@@ -176,19 +173,5 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         </section>
       )}
     </>
-  );
-}
-
-/** A small picture set into the line of the statement, the size of a capital letter. */
-function Thumb({ drink }: { drink: { imageUrl: string | null; mood: keyof typeof MOOD_COLORS | null } | undefined }) {
-  if (!drink?.imageUrl) return null;
-  return (
-    <span
-      aria-hidden
-      className="relative mx-[0.1em] inline-block h-[1.05em] w-[1.5em] overflow-hidden align-[-0.18em]"
-      style={{ backgroundColor: MOOD_COLORS[drink.mood ?? "reflect"] }}
-    >
-      <Image src={drink.imageUrl} alt="" fill sizes="96px" className="specimen scale-[1.5] object-cover" />
-    </span>
   );
 }

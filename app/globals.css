@@ -36,6 +36,7 @@
   html {
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -82,6 +83,17 @@
     outline: 3px solid var(--color-ink);
     outline-offset: 3px;
   }
+
+  /* The caret and scrollbar take the ink, so every input surface stays in the palette. */
+  textarea,
+  input {
+    caret-color: var(--color-ink);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-ink) 25%, transparent) transparent;
+  }
 }
 
 @layer components {
@@ -103,16 +115,22 @@
     font-size: var(--text-body);
     font-weight: 500;
     transition:
-      background-color 200ms ease,
-      color 200ms ease,
-      transform 300ms var(--ease-out);
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms var(--ease-out);
   }
   .btn:active:not(:disabled) {
     transform: scale(0.97);
   }
+  /* A disabled button stays in the palette: it drops to the quiet surface and a
+     muted label. Transparency would let the accent bleed through as pink. */
   .btn:disabled {
-    opacity: 0.45;
     cursor: not-allowed;
+  }
+  .btn-primary:disabled,
+  .btn-quiet:disabled {
+    background: var(--color-surface);
+    color: var(--color-muted);
   }
   .btn-primary {
     background: var(--color-accent);
@@ -149,6 +167,7 @@
     left: clamp(20px, 3.5vw, 56px);
     z-index: 10;
     transform: translateY(-300%);
+    transition: transform 160ms var(--ease-out);
   }
   .skip-link:focus {
     transform: none;
@@ -183,13 +202,7 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(24px);
-  }
-}
-@keyframes settle {
-  from {
-    opacity: 0;
-    transform: scale(1.06);
+    transform: translateY(20px);
   }
 }
 @keyframes fade-in {
@@ -198,33 +211,41 @@
   }
 }
 
+/* Loading skeleton pulse: gentler than the browser default, stays in the palette. */
+@keyframes skeleton {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
 .enter {
-  animation: rise 900ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 80ms);
+  animation: rise 620ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
 }
 
 .reveals .reveal:not(.is-in) {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(20px);
 }
 .reveals .reveal-picture:not(.is-in) {
   opacity: 0;
-  transform: scale(1.06);
+  transform: scale(1.04);
 }
 .reveals .reveal,
 .reveals .reveal-picture {
   transition:
-    opacity 700ms var(--ease-out),
-    transform 900ms var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 80ms);
+    opacity 520ms var(--ease-out),
+    transform 620ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 60ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -241,4 +262,10 @@ main:has([data-bleed-end]) ~ footer {
   to {
     transform: translateY(-1.5%) scale(1.025);
   }
+}
+
+/* Shaking screen: the title breathes instead of generic pulse. */
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }

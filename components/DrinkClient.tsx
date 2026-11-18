@@ -116,9 +116,18 @@ export function DrinkClient({
 
   if (phase === "loading") {
     return (
-      <p className="frame py-40 text-lead text-muted" role="status">
-        {t.loading}
-      </p>
+      <div className="frame py-10 lg:py-14" role="status" aria-live="polite">
+        <div className="grid gap-x-8 gap-y-6 lg:grid-cols-12">
+          <div className="aspect-square motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] bg-surface lg:col-span-6 lg:aspect-[4/5]" />
+          <div className="flex flex-col gap-4 lg:col-span-6 lg:col-start-7 lg:self-end lg:pl-6">
+            <div className="motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] h-8 w-2/3 bg-surface [animation-delay:80ms]" />
+            <div className="motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] h-5 w-1/2 bg-surface/70 [animation-delay:160ms]" />
+            <div className="motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] mt-6 h-4 w-full bg-surface/60 [animation-delay:240ms]" />
+            <div className="motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] h-4 w-5/6 bg-surface/60 [animation-delay:320ms]" />
+          </div>
+        </div>
+        <span className="sr-only">{t.loading}</span>
+      </div>
     );
   }
 
@@ -154,7 +163,7 @@ export function DrinkClient({
   const photoFallback = (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 p-8 text-center">
       {imageState === "pending" ? (
-        <p className="text-lead motion-safe:animate-pulse" role="status">
+        <p className="text-lead motion-safe:animate-[breathe_3s_ease-in-out_infinite]" role="status">
           {t.imagePending}…
         </p>
       ) : (
@@ -179,7 +188,7 @@ export function DrinkClient({
         </button>
         <button
           type="button"
-          className="btn bg-ink/10 hover:bg-ink hover:text-bone"
+          className="btn bg-ink/10 transition-[background-color,color] duration-150 hover:bg-ink hover:text-bone"
           disabled={busy !== null || !canPublish}
           aria-describedby={canPublish ? undefined : "publish-hint"}
           onClick={() => void togglePublish()}

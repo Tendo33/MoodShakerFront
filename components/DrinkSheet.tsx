@@ -55,11 +55,11 @@ export function DrinkSheet({
           </Specimen>
           <div className="order-1 lg:order-none lg:col-span-6 lg:col-start-7 lg:self-end lg:pl-6">
             <h1 className="enter text-head [--i:1]">{recipe.name}</h1>
-            <p className="enter mt-3 text-lead text-ink/70 [--i:1]">{recipe.altName}</p>
+            <p className="enter mt-3 text-lead text-ink/70 [--i:2]">{recipe.altName}</p>
           </div>
           <div className="order-3 lg:order-none lg:col-span-6 lg:col-start-7 lg:pl-6">
-            <p className="enter max-w-[44ch] text-lead [--i:2]">{recipe.description}</p>
-            <dl className="enter mt-10 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4 [--i:3]">
+            <p className="enter max-w-[44ch] text-lead [--i:3]">{recipe.description}</p>
+            <dl className="enter mt-10 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4 [--i:4]">
               {facts.map(([term, value]) => (
                 <div key={term}>
                   <dt className="text-small text-ink/70">{term}</dt>
@@ -67,10 +67,10 @@ export function DrinkSheet({
                 </div>
               ))}
             </dl>
-            <p className="enter mt-6 text-ink/70 [--i:3]">
+            <p className="enter mt-6 text-ink/70 [--i:4]">
               {recipe.flavorProfiles.map((flavor) => vocab.flavors[flavor]).join(" · ")}
             </p>
-            {actions && <div className="enter mt-10 [--i:4]">{actions}</div>}
+            {actions && <div className="enter mt-10 [--i:5]">{actions}</div>}
           </div>
         </div>
       </section>
@@ -80,7 +80,7 @@ export function DrinkSheet({
           <h2 id="why-heading" className="reveal text-lead text-muted">
             {t.why}
           </h2>
-          <blockquote className="reveal mt-4 text-lead leading-[1.4] font-medium [--i:1]">
+          <blockquote className="reveal mt-4 text-[clamp(1.375rem,1rem+1.5vw,2rem)] leading-[1.3] tracking-[-0.025em] font-medium [--i:2]">
             {recipe.matchReason}
           </blockquote>
           {recipe.tools.length > 0 && (
