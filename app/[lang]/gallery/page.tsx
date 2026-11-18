@@ -79,7 +79,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
           </div>
         </div>
       ) : (
-        <ul className="mt-10 grid grid-flow-dense grid-cols-2 gap-x-2 gap-y-8 lg:grid-cols-4">
+        <ul className="mt-10 grid grid-flow-dense grid-cols-2 gap-x-2 gap-y-8 md:grid-cols-4">
           {drinks.map((drink, index) => {
             const feature = features.has(index);
             return (
@@ -89,7 +89,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
                     src={feature ? drink.imageUrl : drink.thumbnailUrl}
                     alt={drink.name}
                     mood={drink.mood}
-                    sizes={feature ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 25vw, 50vw"}
+                    sizes={feature ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"}
                     className="reveal-picture aspect-[4/5] transition-transform duration-500 ease-out group-hover:scale-[0.985]"
                   />
                   <p className={`mt-3 font-medium ${feature ? "text-lead" : ""}`}>{drink.name}</p>

@@ -14,7 +14,7 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
         MoodShaker
       </Link>
       <nav className="flex items-center gap-3 whitespace-nowrap sm:gap-8">
-        <Link href={localizePath("/gallery", locale)} className="link py-2 max-sm:hidden">
+        <Link href={localizePath("/gallery", locale)} className="link py-2 max-[379px]:hidden">
           {dict.nav.menu}
         </Link>
         <LanguageSwitch locale={locale} label={dict.nav.switchTo} ariaLabel={dict.nav.switchLabel} />

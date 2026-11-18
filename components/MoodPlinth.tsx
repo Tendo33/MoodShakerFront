@@ -102,7 +102,7 @@ export function MoodPlinth({
 
       <figure className="enter order-2 lg:order-none lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 [--i:1]">
         <div
-          className="relative aspect-square w-full overflow-hidden transition-colors duration-700 ease-out lg:aspect-[4/3]"
+          className="relative aspect-square w-full overflow-hidden transition-colors duration-700 ease-out sm:aspect-[4/3]"
           style={{ backgroundColor: MOOD_COLORS[mood] }}
         >
           {shown.map((drink, index) => (

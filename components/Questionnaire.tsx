@@ -212,7 +212,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
           >
             {current === "mood" && (
               <Question title={t.mood.title} hint={t.mood.hint}>
-                <div className="grid grid-cols-2 gap-2 lg:grid-cols-6">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
                   {MOODS.map((mood, index) => (
                     <label
                       key={mood}
@@ -233,7 +233,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                       >
                         {moodImages[mood]?.[0] && (
                           <span className="absolute inset-[10%]">
-                            <Image src={moodImages[mood][0]} alt="" fill sizes="(min-width: 1024px) 16vw, 50vw" className="specimen" />
+                            <Image src={moodImages[mood][0]} alt="" fill sizes="(min-width: 1024px) 16vw, (min-width: 640px) 33vw, 50vw" className="specimen" />
                           </span>
                         )}
                       </span>
