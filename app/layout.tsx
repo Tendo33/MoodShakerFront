@@ -22,7 +22,12 @@ const notoSansSC = Noto_Sans_SC({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "MoodShaker", template: "%s · MoodShaker" },
-  icons: { icon: "/favicon.ico" },
+  // The supplied ico stores RGB PNG frames. `app/favicon.ico` fails the build
+  // on those, so the tab and Apple icons stay public files and are linked here.
+  icons: {
+    icon: { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+    apple: { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+  },
 };
 
 export const viewport: Viewport = {
