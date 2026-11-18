@@ -58,7 +58,7 @@ IMAGE_API_KEY=""
 IMAGE_MODEL="gpt-image-2.6-sunburst"
 ```
 
-The body is `model`, `prompt`, `size` (`1024x1024`), `quality` (`auto`) and `n` (`1`). Generation often takes 20–60 seconds, so the client waits 120 seconds and retries a 429 or a 5xx twice. Timeouts are not retried. A `b64_json` payload is stored in R2 through the same WebP path as a temporary image URL. A returned URL is downloaded only from the host of `IMAGE_API_URL`, the built-in SiliconFlow hosts, or `IMAGE_FETCH_HOST_ALLOWLIST`.
+The body is `model`, `prompt`, `size` (`1024x1024`), `quality` (`high`) and `n` (`1`). Generation often takes 20–60 seconds, so the client waits 120 seconds and retries a 429 or a 5xx twice. Timeouts are not retried. A `b64_json` payload is stored in R2 through the same WebP path as a temporary image URL. A returned URL is downloaded only from the host of `IMAGE_API_URL`, the built-in SiliconFlow hosts, or `IMAGE_FETCH_HOST_ALLOWLIST`.
 
 ## Deploying
 

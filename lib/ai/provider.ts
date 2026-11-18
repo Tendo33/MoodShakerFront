@@ -209,7 +209,7 @@ export async function generateImage(prompt: string): Promise<string> {
           model: imageModel(provider),
           prompt,
           size: "1024x1024",
-          quality: "auto",
+          quality: "high",
           n: 1,
         }
       : {

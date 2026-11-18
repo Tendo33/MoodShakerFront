@@ -58,7 +58,7 @@ IMAGE_API_KEY=""
 IMAGE_MODEL="gpt-image-2.6-sunburst"
 ```
 
-请求体包含 `model`、`prompt`、`size`（`1024x1024`）、`quality`（`auto`）和 `n`（`1`）。生图常常要 20 到 60 秒，客户端等待 120 秒，遇到 429 或 5xx 会再试两次；超时不重试。返回 `b64_json` 时，走和临时图片 URL 相同的 WebP / R2 存储。返回 URL 时，只从 `IMAGE_API_URL` 的主机、内置的硅基流动主机，或 `IMAGE_FETCH_HOST_ALLOWLIST` 里的主机下载。
+请求体包含 `model`、`prompt`、`size`（`1024x1024`）、`quality`（`high`）和 `n`（`1`）。生图常常要 20 到 60 秒，客户端等待 120 秒，遇到 429 或 5xx 会再试两次；超时不重试。返回 `b64_json` 时，走和临时图片 URL 相同的 WebP / R2 存储。返回 URL 时，只从 `IMAGE_API_URL` 的主机、内置的硅基流动主机，或 `IMAGE_FETCH_HOST_ALLOWLIST` 里的主机下载。
 
 ## 部署
 

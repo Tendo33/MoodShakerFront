@@ -137,7 +137,7 @@ describe("generateImage", () => {
       model: "gpt-image-2.6-sunburst",
       prompt: "a clear gin drink",
       size: "1024x1024",
-      quality: "auto",
+      quality: "high",
       n: 1,
     });
   });
