@@ -14,6 +14,9 @@ export async function POST(request: Request, { params }: Context) {
     if (!auth.ok) return auth.response;
     requestId = auth.requestId;
 
+    // The menu is a catalogue of photographs; a drink without one would be an empty tile.
+    if (!auth.row.imageUrl) return fail("IMAGE_REQUIRED", 409, requestId);
+
     const limit = await consumeRateLimit(`publish:${getClientIp(request)}`, 10, 60 * 60_000);
     const headers = rateLimitHeaders(limit);
     if (!limit.allowed) return fail("RATE_LIMITED", 429, requestId, headers);

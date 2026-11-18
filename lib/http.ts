@@ -14,6 +14,7 @@ type ApiErrorCode =
   | "PROVIDER_FAILED"
   | "RECIPE_INVALID"
   | "IMAGE_FAILED"
+  | "IMAGE_REQUIRED"
   | "SERVICE_UNAVAILABLE"
   | "INTERNAL";
 
@@ -54,23 +55,36 @@ interface HeaderCarrier {
 }
 
 /**
- * Client IP for rate limiting. `x-forwarded-for` is read from the right,
- * skipping only the hops we put there ourselves (TRUSTED_PROXY_HOPS); the
- * left-most entry is whatever the client chose to send.
+ * Client IP for rate limiting. Every header here can be written by the client,
+ * so each is believed only when the deployment says a proxy of ours set it:
+ *
+ * - `cf-connecting-ip` only with TRUST_CLOUDFLARE=true (the origin must then
+ *   accept traffic from Cloudflare alone, or the header can still be forged).
+ * - `x-forwarded-for` only with TRUSTED_PROXY_HOPS > 0, read from the right and
+ *   skipping just the hops we put there; the left-most entry is whatever the
+ *   client chose to send.
+ *
+ * With neither, there is no trustworthy address and every caller shares one
+ * bucket: a strict limit rather than one anybody can step around.
  */
-export function getClientIp(request: HeaderCarrier, hops = Number(process.env.TRUSTED_PROXY_HOPS ?? 0)): string {
-  const cloudflare = request.headers.get("cf-connecting-ip")?.trim();
-  if (cloudflare) return cloudflare;
+export function getClientIp(
+  request: HeaderCarrier,
+  hops = Number(process.env.TRUSTED_PROXY_HOPS ?? 0),
+  trustCloudflare = process.env.TRUST_CLOUDFLARE === "true",
+): string {
+  if (trustCloudflare) {
+    const cloudflare = request.headers.get("cf-connecting-ip")?.trim();
+    if (cloudflare) return cloudflare;
+  }
+
+  if (!Number.isFinite(hops) || hops <= 0) return "direct";
 
   const chain = (request.headers.get("x-forwarded-for") ?? "")
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
 
-  if (chain.length > 0) {
-    const trusted = Number.isFinite(hops) && hops > 0 ? hops : 1;
-    return chain[Math.max(0, chain.length - trusted)];
-  }
+  if (chain.length > 0) return chain[Math.max(0, chain.length - hops)];
   return request.headers.get("x-real-ip")?.trim() || "unknown";
 }
 
