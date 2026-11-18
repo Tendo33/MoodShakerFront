@@ -42,6 +42,7 @@ Rules the code holds to:
 
 - **One recipe definition.** `lib/domain/recipe.ts` is the stored shape, every text field in both languages. The model writes the recipe twice, once per language (`lib/ai/draft.ts`); the server checks the two line up, that the Chinese has no stray English, that the base spirit is one the guest owns and that a mocktail has no alcohol, then merges them.
 - **Bounded cost.** One generation plus at most one repair call per request. Pours are rate limited per IP, images per drink and per IP, all in Postgres so every instance shares the budget.
+- **A menu of photographs.** Only a drink that has its photograph can be published.
 - **Private by default.** A new drink is reachable only with its edit token, which is returned once, stored hashed, kept in the browser's localStorage, and only ever sent in a POST body.
 - **Server-built prompts.** The image prompt comes from the stored recipe, never from the request.
 
@@ -60,10 +61,12 @@ That runs the published image plus Postgres. Pin or roll back with `IMAGE_TAG=sh
 
 | Trigger | Workflow | Result |
 |---|---|---|
-| Pull request | `ci.yml`, `image.yml` | lint, typecheck, test, build; image built but not pushed |
+| Pull request | `ci.yml`, `image.yml` | lint, typecheck, test, build, then the Playwright smoke test against the production build; image built but not pushed |
 | Push to `main` | `image.yml` | after the checks pass, pushes `sha-<7 chars>` and `latest` |
 | Push a `v*` tag | `image.yml`, `release.yml` | after the checks pass, pushes `<version>` and `<major>.<minor>`, and creates the GitHub release |
 
-On start the container applies migrations (`pnpm db:migrate`), seeds three classics, and starts Next. `/api/health` returns 503 while the database is unreachable. Configuration is described in `.env.example`.
+On start the container applies migrations (`pnpm db:migrate`), seeds the twelve-drink menu, and starts Next. `/api/health` returns 503 while the database is unreachable. Configuration is described in `.env.example`.
 
 The rate limiter has no in-memory fallback, so a missing database is a deployment error, not a silent downgrade.
+
+Rate limits are per visitor, and the visitor's address comes from a header a client could forge, so say which proxy to believe: `TRUSTED_PROXY_HOPS` for the reverse proxies in front of the app, `TRUST_CLOUDFLARE=true` when the site is behind Cloudflare (the compose file's default; set it to `false` anywhere else, and keep the origin closed to non-Cloudflare traffic). With neither set, every visitor shares one bucket.
