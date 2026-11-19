@@ -59,7 +59,7 @@ export interface Dictionary {
     strength: { title: string; hint: string };
     bar: { title: string; hint: string; spirits: string; skill: string; choose: string };
     style: { title: string; hint: string; notes: string; notesPlaceholder: string; notesCount: string };
-    shaking: { title: string; lines: string[]; note: string };
+    shaking: { title: string; done: string; lines: string[]; note: string };
     errors: Record<"generic" | "rateLimited" | "unavailable", string>;
   };
   options: {

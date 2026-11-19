@@ -66,6 +66,7 @@ export const cn: Dictionary = {
     },
     shaking: {
       title: "正在调制",
+      done: "调好了",
       lines: ["读你的心情", "挑基酒", "量配比", "写配方"],
       note: "通常需要一分钟左右，请先别关掉这个页面。",
     },

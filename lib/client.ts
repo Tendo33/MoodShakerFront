@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
+import type { Mood } from "@/lib/domain/vocabulary";
 import type { LocalizedText } from "@/lib/i18n";
 
 /**
@@ -12,6 +13,8 @@ interface SavedDrink {
   editToken: string;
   name: LocalizedText;
   createdAt: string;
+  /** Lets the drink's page open on its colour before the recipe has been fetched. */
+  mood?: Mood | null;
 }
 
 const KEY = "moodshaker:drinks";

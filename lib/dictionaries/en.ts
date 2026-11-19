@@ -66,6 +66,7 @@ export const en: Dictionary = {
     },
     shaking: {
       title: "Shaking",
+      done: "Poured",
       lines: ["Reading the mood", "Picking the spirit", "Measuring", "Writing it down"],
       note: "This usually takes about a minute. Keep this page open.",
     },

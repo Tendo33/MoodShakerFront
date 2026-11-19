@@ -28,6 +28,11 @@ export type MoodImages = Partial<Record<Mood, string[]>>;
 const DRAFT_KEY = "moodshaker:draft";
 const STEPS = ["mood", "strength", "bar", "style"] as const;
 const EMPTY_DRAFT: Draft = { spirits: [], notes: "" };
+type Direction = "forward" | "back";
+/** How long a step takes to leave. Matches `.step` in globals.css. */
+const LEAVE_MS = 170;
+/** The finished wait is shown for a moment before the drink's page opens. */
+const POURED_MS = 650;
 /** How full the drawn glass is for each strength. */
 const FILL: Record<Order["strength"], number> = { none: 0, light: 0.3, medium: 0.55, strong: 0.85 };
 
@@ -96,7 +101,13 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
   const [step, setStep] = useState(initial?.step ?? 0);
   const [draft, setDraft] = useState<Draft>(initial?.draft ?? EMPTY_DRAFT);
   const [pouring, setPouring] = useState(false);
+  const [poured, setPoured] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Which way the guest is moving through the questions; the step leaves and arrives that way.
+  const [direction, setDirection] = useState<Direction | null>(null);
+  const [leaving, setLeaving] = useState<Direction | null>(null);
+  const turning = useRef<number | null>(null);
+  useEffect(() => () => window.clearTimeout(turning.current ?? undefined), []);
 
   // On a new question, move focus to its heading so keyboard and screen-reader
   // users start there instead of back at the top of the page. Not on first load.
@@ -145,13 +156,27 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
     setError(null);
   }
 
-  // Pointer users move on as soon as they pick; keyboard users (event.detail === 0,
-  // including arrow keys inside a radio group) stay put and press Next. A label
-  // click arrives twice (label, then input), so the target step is fixed rather
-  // than incremented.
+  // The current step fades out the way it is leaving, then the next one is mounted.
+  // One turn at a time: a second request while the page is turning is dropped.
+  function go(next: number) {
+    if (next === step || turning.current !== null) return;
+    const way: Direction = next > step ? "forward" : "back";
+    setLeaving(way);
+    turning.current = window.setTimeout(() => {
+      turning.current = null;
+      setDirection(way);
+      setLeaving(null);
+      setStep(next);
+    }, LEAVE_MS);
+  }
+
+  // Pointer users move on as soon as they pick, after a beat in which the choice
+  // is seen to take; keyboard users (event.detail === 0, including arrow keys
+  // inside a radio group) stay put and press Next. A label click arrives twice
+  // (label, then input), so the target step is fixed rather than incremented.
   function advanceOnPointer(event: React.MouseEvent) {
     const next = Math.min(step + 1, STEPS.length - 1);
-    if (event.detail > 0) window.setTimeout(() => setStep(next), 220);
+    if (event.detail > 0) window.setTimeout(() => go(next), 200);
   }
 
   async function submit() {
@@ -182,13 +207,20 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
     }
 
     const { drink, editToken } = result.data;
-    saveDrink({ id: drink.id, editToken, name: drink.recipe.name, createdAt: new Date().toISOString() });
+    saveDrink({
+      id: drink.id,
+      editToken,
+      name: drink.recipe.name,
+      createdAt: new Date().toISOString(),
+      mood: drink.mood,
+    });
     try {
       sessionStorage.removeItem(DRAFT_KEY);
     } catch {
       // The drink is poured either way; a stale draft only pre-fills the next order.
     }
-    router.push(localizePath(`/drink/${drink.id}`, locale));
+    setPoured(true);
+    window.setTimeout(() => router.push(localizePath(`/drink/${drink.id}`, locale)), POURED_MS);
   }
 
   // Once a mood is chosen the whole page takes its colour.
@@ -197,17 +229,22 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
   return (
     <div data-bleed-end className="transition-colors duration-700 ease-out" style={{ backgroundColor: field }}>
       {pouring && draft.mood ? (
-        <Shaking dict={t.shaking} images={moodImages[draft.mood] ?? []} />
+        <Shaking dict={t.shaking} done={poured} />
       ) : (
-        <div className="frame pt-8 pb-24">
+        // A full screen for every question, with the bar and the controls at its foot:
+        // they hold their place while the questions above them change length.
+        <div className="frame flex min-h-[calc(100svh-5rem)] flex-col pt-8 pb-10">
           <form
             key={current}
-            className="mt-6 lg:mt-10"
+            id="questionnaire"
+            className="step mt-4 lg:mt-8"
+            data-dir={direction ?? undefined}
+            data-leaving={leaving ?? undefined}
             onSubmit={(event) => {
               event.preventDefault();
               if (!canContinue) return;
               if (current === "style") void submit();
-              else setStep(step + 1);
+              else go(step + 1);
             }}
           >
             {current === "mood" && (
@@ -355,18 +392,24 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
               </p>
             )}
 
-            <div className="mt-14 grid grid-cols-4 gap-1" aria-hidden>
+          </form>
+
+          {/* Outside the keyed form, so the bar and the controls stay put while the question turns. */}
+          <div className="mt-auto pt-10">
+            <div className="grid grid-cols-4 gap-1" aria-hidden>
               {STEPS.map((name, index) => (
-                <span
-                  key={name}
-                  className={`h-1 transition-colors duration-500 ${index <= step ? "bg-ink" : "bg-ink/15"}`}
-                />
+                <span key={name} className="h-1 overflow-hidden bg-ink/15">
+                  <span
+                    className="block h-full origin-left bg-ink transition-transform duration-500 ease-out"
+                    style={{ transform: `scaleX(${index <= step ? 1 : 0})` }}
+                  />
+                </span>
               ))}
             </div>
             <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-6">
                 {step > 0 && (
-                  <button type="button" className="link py-2 text-lead" onClick={() => setStep(step - 1)}>
+                  <button type="button" className="link py-2 text-lead" onClick={() => go(step - 1)}>
                     ← {t.back}
                   </button>
                 )}
@@ -379,7 +422,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                     className="link py-2 text-ink/70"
                     onClick={() => {
                       setDraft(EMPTY_DRAFT);
-                      setStep(0);
+                      go(0);
                     }}
                   >
                     {t.restart}
@@ -394,6 +437,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                 )}
                 <button
                   type="submit"
+                  form="questionnaire"
                   className="btn btn-primary max-sm:w-full"
                   disabled={!canContinue}
                   aria-describedby={canContinue ? undefined : "next-hint"}
@@ -402,7 +446,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                 </button>
               </div>
             </div>
-          </form>
+          </div>
         </div>
       )}
     </div>
@@ -465,48 +509,88 @@ function Glass({ fill }: { fill: number }) {
   return (
     <span aria-hidden className="relative block h-28 w-16 bg-ink/10 group-has-checked:bg-bone/20">
       <span
-        className="absolute inset-x-0 bottom-0 bg-accent transition-[height] duration-500 ease-out"
+        className="absolute inset-x-0 bottom-0 bg-accent transition-[height] duration-500 ease-out motion-safe:animate-[fill-up_800ms_var(--ease-out)_both] motion-safe:[animation-delay:260ms]"
         style={{ height: `${fill * 100}%` }}
       />
     </span>
   );
 }
 
-/** Seconds before each line of the order is read back, spread over the minute a pour takes. */
-const LINE_DELAYS = [0, 6, 16, 30];
+/** Seconds into the wait at which each line of the work begins, spread over the minute a pour takes. */
+const LINE_STARTS = [0, 6, 16, 30];
 
-/** While the bartender works: the mood's drinks pass on the plinth and the order is read back line by line. */
-function Shaking({ dict, images }: { dict: Labels["questions"]["shaking"]; images: string[] }) {
-  const [tick, setTick] = useState(0);
+const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+
+/**
+ * While the bartender works: the shaker shakes, the work is ticked off line by
+ * line, and a bar and a clock show the wait is alive. The bar slows as it goes
+ * and only closes when the drink is really there.
+ */
+function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: boolean }) {
+  const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
-    if (images.length < 2) return;
-    const timer = window.setInterval(() => setTick((value) => value + 1), 2400);
+    if (done) return;
+    const timer = window.setInterval(() => setElapsed((value) => value + 1), 1000);
     return () => window.clearInterval(timer);
-  }, [images.length]);
+  }, [done]);
+
+  const active = done ? dict.lines.length : LINE_STARTS.filter((start) => start <= elapsed).length - 1;
 
   return (
-    <div className="frame grid gap-10 pt-12 pb-24 lg:grid-cols-12 lg:items-center" role="status" aria-live="polite">
+    <div
+      className="frame grid min-h-[calc(100svh-5rem)] content-center gap-10 pt-12 pb-24 lg:grid-cols-12 lg:items-center"
+      role="status"
+    >
       <div className="lg:col-span-5">
-        <h1 className="text-head motion-safe:animate-[breathe_3s_ease-in-out_infinite]">{dict.title}…</h1>
+        <h1 key={done ? "done" : "working"} className="enter text-head" aria-live="polite">
+          {done ? dict.done : `${dict.title}…`}
+        </h1>
         <ul className="mt-10 space-y-3 text-lead">
-          {dict.lines.map((line, index) => (
-            <li key={line} className="enter" style={{ animationDelay: `${LINE_DELAYS[index] ?? index * 12}s` }}>
-              {line}
-            </li>
-          ))}
+          {dict.lines.map((line, index) => {
+            const state = index < active ? "done" : index === active ? "active" : "waiting";
+            return (
+              <li
+                key={line}
+                className={`flex items-center gap-4 transition-opacity duration-500 ${state === "waiting" ? "opacity-35" : ""}`}
+              >
+                <span
+                  aria-hidden
+                  className={`size-2.5 shrink-0 bg-ink transition-transform duration-500 ease-out ${
+                    state === "waiting"
+                      ? "scale-50"
+                      : state === "active"
+                        ? "motion-safe:animate-[breathe_1.6s_ease-in-out_infinite]"
+                        : ""
+                  }`}
+                />
+                <span className={state === "active" ? "font-medium" : ""}>{line}</span>
+              </li>
+            );
+          })}
         </ul>
-        <p className="mt-10 text-ink/70">{dict.note}</p>
+        <div className="mt-10 flex items-center gap-4" aria-hidden>
+          <span className="h-1 flex-1 overflow-hidden bg-ink/15">
+            <span
+              className={`block h-full origin-left bg-ink ${
+                done ? "" : "animate-[pour_120s_cubic-bezier(0.25,0.6,0.5,1)_both]"
+              }`}
+            />
+          </span>
+          <span className="num w-10 text-right text-ink/70">{clock(elapsed)}</span>
+        </div>
+        <p className="mt-6 text-ink/70">{dict.note}</p>
       </div>
-      <div className="relative aspect-square lg:col-span-6 lg:col-start-7">
-        {images.map((src, index) => (
-          <div
-            key={src}
-            className="absolute inset-[6%] mix-blend-multiply transition-opacity duration-[1600ms] ease-in-out"
-            style={{ opacity: index === tick % images.length ? 1 : 0 }}
-          >
-            <Image src={src} alt="" fill sizes="45vw" className="specimen" />
-          </div>
-        ))}
+      <div className="relative mx-auto aspect-square w-full max-w-[560px] max-lg:max-w-[320px] lg:col-span-6 lg:col-start-7">
+        {/* The animation sits on the photograph itself: a moving wrapper would be
+            composited on its own, and the white backdrop would cross the field as a square. */}
+        <Image
+          src="/stages/shaker.webp"
+          alt=""
+          fill
+          priority
+          sizes="(min-width: 1024px) 40vw, 320px"
+          className={`specimen ${done ? "" : "motion-safe:animate-[shake_2.6s_ease-in-out_infinite]"}`}
+        />
       </div>
     </div>
   );

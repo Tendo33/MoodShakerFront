@@ -17,6 +17,7 @@ export function DrinkSheet({
   dict,
   actions,
   photoFallback,
+  develop,
   more,
 }: {
   recipe: RecipeView;
@@ -27,6 +28,8 @@ export function DrinkSheet({
   actions?: React.ReactNode;
   /** Shown in the picture's place while there is no photograph. */
   photoFallback?: React.ReactNode;
+  /** The photograph arrives after the page (a private drink): fade it in when it loads. */
+  develop?: boolean;
   /** Closes the page, e.g. other drinks poured for the same mood. */
   more?: React.ReactNode;
 }) {
@@ -47,6 +50,7 @@ export function DrinkSheet({
             alt={recipe.name}
             mood={mood}
             priority
+            develop={develop}
             sizes="(min-width: 1024px) 45vw, 100vw"
             className="enter order-2 aspect-square md:max-lg:aspect-[16/10] lg:order-none lg:col-span-6 lg:row-span-2 lg:aspect-[4/5]"
             inset="4%"

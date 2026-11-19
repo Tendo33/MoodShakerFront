@@ -26,7 +26,13 @@ Type: Hanken Grotesk (Latin) with Noto Sans SC (Chinese), weights 400 and 500 on
 - Running text is full ink, 16px or more. Grey is for notes, and only on bone: on a mood field `muted` falls below 4.5:1, so notes there are `text-ink/70`.
 - Headlines two lines at most. Statements set large stay at three lines or fewer.
 - Every page closes with the block wordmark (`BlockMark` in `SiteChrome.tsx`).
-- Motion: the slow crossfade on the home plinth is the one signature move (a fading layer carries `mix-blend-multiply` itself, or its photograph crosses the field as a white square); sections enter once as they scroll in (`Reveals.tsx`); everything respects `prefers-reduced-motion`, and nothing is hidden without script.
+- Motion says where the guest is, and is never decoration.
+  - The home plinth's slow crossfade is the signature move (a fading layer carries `mix-blend-multiply` itself, or its photograph crosses the field as a white square; the same holds for anything that moves or fades a photograph).
+  - A page arrives with one short fade (`app/[lang]/template.tsx`), then its parts enter once (`.enter`, and `Reveals.tsx` as sections scroll in).
+  - The questionnaire is one screen per question. A step leaves and the next arrives in the direction of travel (`.step`); the progress bar and the controls sit at the foot of the screen and do not move.
+  - The wait is alive and honest: the shaker works in bursts, the lines of work are ticked off, a clock counts, and the bar slows without ever pretending to finish. It closes only when the drink is there, and the page holds on "poured" for a beat.
+  - The drink's page opens on the mood's colour it was ordered in, the recipe settles into the outline, and the photograph comes up when it has loaded (`DevelopedImage`).
+  - Durations: 160-220ms for feedback, 500-620ms for entrances, longer only for the crossfade and the photograph. Everything respects `prefers-reduced-motion`, and nothing is hidden without script.
 
 ## Pictures
 

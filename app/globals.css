@@ -122,6 +122,14 @@
   .btn:active:not(:disabled) {
     transform: scale(0.97);
   }
+  /* The arrow leans the way the button goes. */
+  .btn > span[aria-hidden] {
+    display: inline-block;
+    transition: transform 220ms var(--ease-out);
+  }
+  .btn:hover:not(:disabled) > span[aria-hidden] {
+    transform: translateX(4px);
+  }
   /* A disabled button stays in the palette: it drops to the quiet surface and a
      muted label. Transparency would let the accent bleed through as pink. */
   .btn:disabled {
@@ -268,4 +276,81 @@ main:has([data-bleed-end]) ~ footer {
 @keyframes breathe {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+
+/*
+ * The flow from question to glass. A step leaves and the next arrives in the
+ * direction the guest is going; going back reverses it.
+ */
+@keyframes step-forward {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+@keyframes step-back {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+.step {
+  transition:
+    opacity 170ms ease,
+    transform 170ms ease;
+}
+.step[data-dir="forward"] .enter {
+  animation-name: step-forward;
+}
+.step[data-dir="back"] .enter {
+  animation-name: step-back;
+}
+.step[data-leaving="forward"] {
+  opacity: 0;
+  transform: translateX(-18px);
+}
+.step[data-leaving="back"] {
+  opacity: 0;
+  transform: translateX(18px);
+}
+
+/* A new page arrives as one piece before its parts make their own entrances. */
+.page-enter {
+  animation: fade-in 260ms ease both;
+}
+
+/* The strength glasses fill as the question arrives. */
+@keyframes fill-up {
+  from {
+    height: 0;
+  }
+}
+
+/* The wait: the shaker works in bursts, then rests. */
+@keyframes shake {
+  0%,
+  62%,
+  100% {
+    transform: rotate(0deg) translate(0, 0);
+  }
+  8%,
+  24%,
+  40% {
+    transform: rotate(-17deg) translate(-4%, -6%);
+  }
+  16%,
+  32%,
+  48% {
+    transform: rotate(-5deg) translate(4%, 5%);
+  }
+}
+
+/* Runs fast, then slows, and never quite arrives: the real end is the answer. */
+@keyframes pour {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(0.94);
+  }
 }
