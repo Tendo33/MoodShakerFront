@@ -90,7 +90,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
                     alt={drink.name}
                     mood={drink.mood}
                     sizes={feature ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"}
-                    className="reveal-picture aspect-[4/5] transition-transform duration-300 ease-out group-hover:scale-[0.985]"
+                    className="reveal-picture aspect-[4/5]"
                   />
                   <p className={`mt-3 font-medium transition-opacity duration-200 group-hover:opacity-60 ${feature ? "text-lead" : ""}`}>{drink.name}</p>
                   <p className="text-small text-muted">{dict.vocab.spirits[drink.baseSpirit]} · {dict.vocab.alcohol[drink.alcoholLevel]}</p>

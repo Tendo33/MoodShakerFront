@@ -120,7 +120,7 @@ export function MoodPlinth({
               aria-hidden={drink !== active}
               // Blended here, where the opacity is: a fading layer is composited on its own,
               // and a photograph multiplied only inside it would cross the field as a white square.
-              className="absolute inset-[8%] mix-blend-multiply transition-opacity duration-[1600ms] ease-in-out"
+              className="absolute inset-[2%] mix-blend-multiply transition-opacity duration-[1600ms] ease-in-out"
               style={{ opacity: drink === active ? 1 : 0, pointerEvents: drink === active ? "auto" : "none" }}
             >
               <Image

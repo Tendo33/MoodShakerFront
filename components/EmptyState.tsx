@@ -40,7 +40,7 @@ export function EmptyState({
           className="enter relative aspect-square lg:col-span-6 lg:aspect-[5/4] [--i:1]"
           style={{ backgroundColor: MOOD_COLORS.blue }}
         >
-          <div className="absolute inset-[8%]">
+          <div className="absolute inset-[4%]">
             <Image src="/stages/shaker.webp" alt="" fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="specimen" />
           </div>
         </div>
@@ -59,7 +59,7 @@ export function EmptyState({
                     alt={drink.name}
                     mood={drink.mood}
                     sizes="(min-width: 1024px) 25vw, 50vw"
-                    className="aspect-[4/5] transition-transform duration-300 ease-out group-hover:scale-[0.985]"
+                    className="aspect-[4/5]"
                   />
                   <p className="mt-3 font-medium transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
                 </Link>

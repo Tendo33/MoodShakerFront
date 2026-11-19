@@ -90,7 +90,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                   style={{ backgroundColor: stage.field, ["--i" as string]: index }}
                 >
                   {image && (
-                    <div className="absolute inset-[10%]">
+                    <div className="absolute inset-[4%]">
                       <Image src={image} alt="" fill sizes="(min-width: 1024px) 40vw, 100vw" className="specimen" />
                     </div>
                   )}
@@ -127,7 +127,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                     alt={drink.name}
                     mood={drink.mood}
                     sizes="(min-width: 1024px) 17vw, (min-width: 640px) 33vw, 50vw"
-                    className={`reveal-picture ${TILE_SHAPES[index % TILE_SHAPES.length]} transition-transform duration-300 ease-out group-hover:scale-[0.98]`}
+                    className={`reveal-picture ${TILE_SHAPES[index % TILE_SHAPES.length]}`}
                   />
                   <p className="mt-2 text-small transition-opacity duration-200 group-hover:opacity-60">
                     {drink.name} · {dict.vocab.spirits[drink.baseSpirit]}

@@ -5,7 +5,10 @@ import { moodColor } from "@/lib/moods";
 
 /**
  * A drink photographed on white, set on the colour of the mood it was poured
- * for. `multiply` drops the white backdrop into the field.
+ * for. `multiply` drops the white backdrop into the field. The photograph is
+ * already framed with its own margin (lib/image-levels.ts), so the field adds
+ * little. Inside a link (`group`), the glass comes forward on hover while the
+ * field stays where it is.
  */
 export function Specimen({
   src,
@@ -15,7 +18,7 @@ export function Specimen({
   priority,
   develop,
   className = "aspect-[4/5]",
-  inset = "10%",
+  inset = "2%",
   children,
 }: {
   src: string | null;
@@ -35,9 +38,9 @@ export function Specimen({
       {src ? (
         <div className="absolute" style={{ inset }}>
           {develop ? (
-            <DevelopedImage src={src} alt={alt} fill sizes={sizes} priority={priority} className="specimen" />
+            <DevelopedImage src={src} alt={alt} fill sizes={sizes} priority={priority} className="specimen transition-transform duration-500 ease-out group-hover:scale-[1.06]" />
           ) : (
-            <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="specimen" />
+            <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="specimen transition-transform duration-500 ease-out group-hover:scale-[1.06]" />
           )}
         </div>
       ) : (

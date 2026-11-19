@@ -53,7 +53,7 @@ export function DrinkSheet({
             develop={develop}
             sizes="(min-width: 1024px) 45vw, 100vw"
             className="enter order-2 aspect-square md:max-lg:aspect-[16/10] lg:order-none lg:col-span-6 lg:row-span-2 lg:aspect-[4/5]"
-            inset="4%"
+            inset="0%"
           >
             {photoFallback}
           </Specimen>

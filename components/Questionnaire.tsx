@@ -265,12 +265,12 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                         onChange={() => update({ mood })}
                       />
                       <span
-                        className="relative block aspect-[5/4] overflow-hidden lg:aspect-[3/4] transition-transform duration-300 ease-out group-hover:scale-[0.98] group-has-checked:scale-[0.96]"
+                        className="relative block aspect-[5/4] overflow-hidden lg:aspect-[3/4] transition-transform duration-300 ease-out group-has-checked:scale-[0.96]"
                         style={{ backgroundColor: MOOD_COLORS[mood] }}
                       >
                         {moodImages[mood]?.[0] && (
-                          <span className="absolute inset-[10%]">
-                            <Image src={moodImages[mood][0]} alt="" fill sizes="(min-width: 1024px) 16vw, (min-width: 640px) 33vw, 50vw" className="specimen" />
+                          <span className="absolute inset-[2%]">
+                            <Image src={moodImages[mood][0]} alt="" fill sizes="(min-width: 1024px) 16vw, (min-width: 640px) 33vw, 50vw" className="specimen transition-transform duration-500 ease-out group-hover:scale-[1.06]" />
                           </span>
                         )}
                       </span>
