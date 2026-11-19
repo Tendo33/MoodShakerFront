@@ -22,7 +22,7 @@ pnpm dev
 Two scripts call the real models and cost a little money each run:
 
 - `pnpm eval:recipes [n …]` pours eight contrasting orders and prints the recipes side by side, with timing and any repair turn. Run it after every change to `lib/ai/prompts.ts` or the model.
-- `pnpm seeds:build [n …]` regenerates the seed menu (recipes and photographs) into `scripts/seed-data.ts` and `public/drinks/`.
+- `pnpm seeds:build [n …]` regenerates the seed menu (recipes and photographs) into `scripts/seed-data.ts` and `public/drinks/`. `pnpm seeds:build stages` reshoots the two still lifes on the home page; `pnpm seeds:build reframe` prepares the stored photographs again without calling a model.
 
 ## How it fits together
 
@@ -78,7 +78,7 @@ That runs the published image plus Postgres. Pin or roll back with `IMAGE_TAG=sh
 | Push to `main` | `image.yml` | after the checks pass, pushes `sha-<7 chars>` and `latest` |
 | Push a `v*` tag | `image.yml`, `release.yml` | after the checks pass, pushes `<version>` and `<major>.<minor>`, and creates the GitHub release |
 
-On start the container applies migrations (`pnpm db:migrate`), seeds the twelve-drink menu, and starts Next. `/api/health` returns 503 while the database is unreachable. Configuration is described in `.env.example`.
+On start the container applies migrations (`pnpm db:migrate`), seeds the menu (and keeps it in step with `scripts/seed-data.ts`: changed seeds are rewritten, retired ones removed), and starts Next. `/api/health` returns 503 while the database is unreachable. Configuration is described in `.env.example`.
 
 The rate limiter has no in-memory fallback, so a missing database is a deployment error, not a silent downgrade.
 

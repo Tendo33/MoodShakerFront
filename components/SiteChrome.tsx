@@ -17,7 +17,7 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
         className="group flex items-center gap-3 py-2 text-lead font-medium tracking-[-0.03em]"
       >
         {/* The footer's block wordmark, in three blocks. */}
-        <span aria-hidden className="flex items-end gap-[3px]">
+        <span aria-hidden className="flex items-end gap-[3px] max-[419px]:hidden">
           <span className="h-3.5 w-2 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-125" style={{ backgroundColor: MOOD_COLORS.unwind }} />
           <span className="h-5 w-2 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-75" style={{ backgroundColor: MOOD_COLORS.celebrate }} />
           <span className="h-3 w-2 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-150" style={{ backgroundColor: MOOD_COLORS.romantic }} />
