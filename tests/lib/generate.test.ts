@@ -152,14 +152,28 @@ describe("draft", () => {
     assert.equal(recipe.tools[0].name.en, "Bar spoon");
   });
 
-  it("flags Chinese left in the English version", () => {
+  it("translates a Chinese measure left in the English version instead of asking again", () => {
+    const [gin, tonic] = sampleDraft.en.ingredients;
     const slipped = {
       ...sampleDraft,
-      en: { ...sampleDraft.en, ingredients: [{ ...sampleDraft.en.ingredients[0], unit: "片" }, sampleDraft.en.ingredients[1]] },
+      en: { ...sampleDraft.en, ingredients: [{ ...gin, unit: "片" }, { ...tonic, amount: "加满", unit: "个" }] },
+    };
+    const result = parseDraft(slipped);
+    assert.ok(result.ok);
+    const recipe = toRecipe(result.draft);
+    assert.equal(recipe.ingredients[0].unit?.en, "slice");
+    assert.equal(recipe.ingredients[1].amount.en, "to top");
+    assert.equal(recipe.ingredients[1].unit, null, "a bare counter has no English unit");
+  });
+
+  it("flags Chinese left in the English prose", () => {
+    const slipped = {
+      ...sampleDraft,
+      en: { ...sampleDraft.en, ingredients: [{ ...sampleDraft.en.ingredients[0], name: "金酒" }, sampleDraft.en.ingredients[1]] },
     };
     const result = parseDraft(slipped);
     assert.equal(result.ok, false);
-    assert.match(!result.ok ? result.issues : "", /English version contains Chinese \(片\)/);
+    assert.match(!result.ok ? result.issues : "", /English version contains Chinese \(金酒\)/);
   });
 
   it("emits a JSON Schema without $ref for strict providers", () => {

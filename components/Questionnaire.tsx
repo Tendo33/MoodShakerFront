@@ -572,7 +572,9 @@ function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: b
           <span className="h-1 flex-1 overflow-hidden bg-ink/15">
             <span
               className={`block h-full origin-left bg-ink ${
-                done ? "" : "animate-[pour_120s_cubic-bezier(0.25,0.6,0.5,1)_both]"
+                // Reduced motion clamps every animation to an instant, which would park the bar
+                // at its end and read as "nearly done"; there the track stays empty and the clock speaks.
+                done ? "" : "motion-safe:animate-[pour_120s_cubic-bezier(0.25,0.6,0.5,1)_both] motion-reduce:hidden"
               }`}
             />
           </span>
@@ -580,7 +582,7 @@ function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: b
         </div>
         <p className="mt-6 text-ink/70">{dict.note}</p>
       </div>
-      <div className="relative mx-auto aspect-square w-full max-w-[560px] max-lg:max-w-[320px] lg:col-span-6 lg:col-start-7">
+      <div className="relative mx-auto aspect-square w-full max-w-[560px] max-lg:max-w-[240px] lg:col-span-6 lg:col-start-7">
         {/* The animation sits on the photograph itself: a moving wrapper would be
             composited on its own, and the white backdrop would cross the field as a square. */}
         <Image

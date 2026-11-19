@@ -16,6 +16,8 @@ export function DevelopedImage({ className = "", alt, ...props }: ImageProps) {
       {...props}
       alt={alt}
       onLoad={() => setLoaded(true)}
+      // A picture that fails must not stay invisible: show whatever the browser shows.
+      onError={() => setLoaded(true)}
       className={`${className} transition-[opacity,transform] duration-[900ms] ease-out motion-reduce:transition-none ${
         loaded ? "scale-100 opacity-100" : "scale-[1.04] opacity-0"
       }`}

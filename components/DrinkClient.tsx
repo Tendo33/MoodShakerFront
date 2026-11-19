@@ -176,7 +176,7 @@ export function DrinkClient({
         <div role="status" className="w-full max-w-[18rem]">
           <p className="text-lead">{t.imagePending}…</p>
           <span aria-hidden className="mt-5 block h-1 overflow-hidden bg-ink/15">
-            <span className="block h-full origin-left animate-[pour_80s_cubic-bezier(0.25,0.6,0.5,1)_both] bg-ink" />
+            <span className="block h-full origin-left bg-ink motion-safe:animate-[pour_80s_cubic-bezier(0.25,0.6,0.5,1)_both] motion-reduce:hidden" />
           </span>
         </div>
       ) : (
