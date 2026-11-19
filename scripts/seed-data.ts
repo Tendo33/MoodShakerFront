@@ -162,8 +162,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/gin-tonic-f1bf010e.webp",
-    "thumbnailUrl": "/drinks/gin-tonic-f1bf010e-thumb.webp"
+    "imageUrl": "/drinks/gin-tonic-8e17ad09.webp",
+    "thumbnailUrl": "/drinks/gin-tonic-8e17ad09-thumb.webp"
   },
   {
     "slug": "coconut-breeze",
@@ -410,8 +410,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/coconut-breeze-6baca058.webp",
-    "thumbnailUrl": "/drinks/coconut-breeze-6baca058-thumb.webp"
+    "imageUrl": "/drinks/coconut-breeze-b15b7bf4.webp",
+    "thumbnailUrl": "/drinks/coconut-breeze-b15b7bf4-thumb.webp"
   },
   {
     "slug": "ruby-grapefruit-fizz",
@@ -632,8 +632,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/ruby-grapefruit-fizz-cddd43ec.webp",
-    "thumbnailUrl": "/drinks/ruby-grapefruit-fizz-cddd43ec-thumb.webp"
+    "imageUrl": "/drinks/ruby-grapefruit-fizz-8b20b66a.webp",
+    "thumbnailUrl": "/drinks/ruby-grapefruit-fizz-8b20b66a-thumb.webp"
   },
   {
     "slug": "french-75",
@@ -828,8 +828,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/french-75-5ebc98b6.webp",
-    "thumbnailUrl": "/drinks/french-75-5ebc98b6-thumb.webp"
+    "imageUrl": "/drinks/french-75-18c400c5.webp",
+    "thumbnailUrl": "/drinks/french-75-18c400c5-thumb.webp"
   },
   {
     "slug": "hot-toddy",
@@ -1027,8 +1027,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/hot-toddy-94b607f9.webp",
-    "thumbnailUrl": "/drinks/hot-toddy-94b607f9-thumb.webp"
+    "imageUrl": "/drinks/hot-toddy-7d474130.webp",
+    "thumbnailUrl": "/drinks/hot-toddy-7d474130-thumb.webp"
   },
   {
     "slug": "iced-tea-comfort",
@@ -1241,8 +1241,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/iced-tea-comfort-a4a10271.webp",
-    "thumbnailUrl": "/drinks/iced-tea-comfort-a4a10271-thumb.webp"
+    "imageUrl": "/drinks/iced-tea-comfort-364e2cfb.webp",
+    "thumbnailUrl": "/drinks/iced-tea-comfort-364e2cfb-thumb.webp"
   },
   {
     "slug": "dusk-berries",
@@ -1481,8 +1481,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/dusk-berries-734d0b40.webp",
-    "thumbnailUrl": "/drinks/dusk-berries-734d0b40-thumb.webp"
+    "imageUrl": "/drinks/dusk-berries-ae0a8b17.webp",
+    "thumbnailUrl": "/drinks/dusk-berries-ae0a8b17-thumb.webp"
   },
   {
     "slug": "tequila-sunrise",
@@ -1672,8 +1672,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/tequila-sunrise-4f40d62b.webp",
-    "thumbnailUrl": "/drinks/tequila-sunrise-4f40d62b-thumb.webp"
+    "imageUrl": "/drinks/tequila-sunrise-5ce4b10a.webp",
+    "thumbnailUrl": "/drinks/tequila-sunrise-5ce4b10a-thumb.webp"
   },
   {
     "slug": "ginger-spark",
@@ -1860,8 +1860,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/ginger-spark-a32849cf.webp",
-    "thumbnailUrl": "/drinks/ginger-spark-a32849cf-thumb.webp"
+    "imageUrl": "/drinks/ginger-spark-2c86d1a2.webp",
+    "thumbnailUrl": "/drinks/ginger-spark-2c86d1a2-thumb.webp"
   },
   {
     "slug": "moscow-mule",
@@ -2037,8 +2037,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/moscow-mule-4371dcca.webp",
-    "thumbnailUrl": "/drinks/moscow-mule-4371dcca-thumb.webp"
+    "imageUrl": "/drinks/moscow-mule-9286d812.webp",
+    "thumbnailUrl": "/drinks/moscow-mule-9286d812-thumb.webp"
   },
   {
     "slug": "boulevardier",
@@ -2227,8 +2227,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/boulevardier-8f160c97.webp",
-    "thumbnailUrl": "/drinks/boulevardier-8f160c97-thumb.webp"
+    "imageUrl": "/drinks/boulevardier-7f67b971.webp",
+    "thumbnailUrl": "/drinks/boulevardier-7f67b971-thumb.webp"
   },
   {
     "slug": "night-passage",
@@ -2455,8 +2455,8 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/night-passage-0ced01cc.webp",
-    "thumbnailUrl": "/drinks/night-passage-0ced01cc-thumb.webp"
+    "imageUrl": "/drinks/night-passage-f25a1ac6.webp",
+    "thumbnailUrl": "/drinks/night-passage-f25a1ac6-thumb.webp"
   },
   {
     "slug": "sidecar",
@@ -2648,7 +2648,7 @@ export const seedDrinks: SeedDrink[] = [
         }
       ]
     },
-    "imageUrl": "/drinks/sidecar-6bb0664f.webp",
-    "thumbnailUrl": "/drinks/sidecar-6bb0664f-thumb.webp"
+    "imageUrl": "/drinks/sidecar-bece2d72.webp",
+    "thumbnailUrl": "/drinks/sidecar-bece2d72-thumb.webp"
   }
 ];
