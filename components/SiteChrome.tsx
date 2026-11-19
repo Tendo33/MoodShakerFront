@@ -1,15 +1,11 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { MenuLink } from "@/components/MenuLink";
 import type { Dictionary } from "@/lib/dictionaries";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS } from "@/lib/moods";
 
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
-  const pathname = usePathname();
-  const onGallery = pathname === localizePath("/gallery", locale);
   return (
     <header className="frame flex h-20 items-center justify-between gap-3 sm:gap-6">
       <a href="#main" className="skip-link btn btn-quiet">
@@ -19,13 +15,7 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
         MoodShaker
       </Link>
       <nav className="flex items-center gap-3 whitespace-nowrap sm:gap-8">
-        <Link
-          href={localizePath("/gallery", locale)}
-          aria-current={onGallery ? "page" : undefined}
-          className={`link py-2 max-[379px]:hidden ${onGallery ? "font-medium text-ink" : "text-muted"}`}
-        >
-          {dict.nav.menu}
-        </Link>
+        <MenuLink href={localizePath("/gallery", locale)}>{dict.nav.menu}</MenuLink>
         <LanguageSwitch locale={locale} label={dict.nav.switchTo} ariaLabel={dict.nav.switchLabel} />
         <Link href={localizePath("/questions", locale)} className="btn btn-primary min-h-11 px-4 sm:px-5">
           {dict.nav.shake}

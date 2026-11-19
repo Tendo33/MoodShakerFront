@@ -20,9 +20,9 @@ test("redirects to a locale and carries the mood into the questionnaire", async 
 test("menu lists the seeded drinks and opens a detail page", async ({ page }) => {
   await page.goto("/en/gallery");
   await expect(page.getByRole("heading", { level: 1, name: "The Menu" })).toBeVisible();
-  await page.getByRole("link", { name: /Sazerac/ }).first().click();
-  await expect(page).toHaveURL(/\/en\/cocktail\/sazerac$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Sazerac" })).toBeVisible();
+  await page.getByRole("link", { name: /Boulevardier/ }).first().click();
+  await expect(page).toHaveURL(/\/en\/cocktail\/boulevardier$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Boulevardier" })).toBeVisible();
   await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
 });
 
@@ -55,12 +55,12 @@ test("a private drink goes on the menu once photographed, and comes off again", 
     // A private copy of a seed, without its photograph.
     await sql`
       insert into drinks (id, edit_token_hash, "order", recipe, base_spirit)
-      select ${id}, ${hash}, "order", recipe, base_spirit from drinks where id = 'seed-sazerac'`;
+      select ${id}, ${hash}, "order", recipe, base_spirit from drinks where id = 'seed-boulevardier'`;
     await sql`delete from rate_limits where key like 'publish:%'`;
 
     await page.addInitScript(
       (saved) => localStorage.setItem("moodshaker:drinks", JSON.stringify([saved])),
-      { id, editToken, name: { cn: "萨泽拉克", en: "Sazerac" }, createdAt: new Date().toISOString() },
+      { id, editToken, name: { cn: "花花公子", en: "Boulevardier" }, createdAt: new Date().toISOString() },
     );
     // The page asks for a photograph by itself; never let that reach the image model.
     await page.route(`**/api/drinks/${id}/image`, (route) =>
@@ -68,19 +68,21 @@ test("a private drink goes on the menu once photographed, and comes off again", 
     );
 
     await page.goto(`/en/drink/${id}`);
-    await expect(page.getByRole("heading", { level: 1, name: "Sazerac" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Boulevardier" })).toBeVisible();
     await expect(page.getByText("The photo didn't come out.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Add to the public menu" })).toBeDisabled();
     await expect(page.getByText("A drink goes on the menu once it has its photograph.")).toBeVisible();
 
-    await sql`update drinks set image_url = '/drinks/sazerac.webp', thumbnail_url = '/drinks/sazerac-thumb.webp' where id = ${id}`;
+    await sql`
+      update drinks set image_url = seed.image_url, thumbnail_url = seed.thumbnail_url
+      from drinks seed where seed.id = 'seed-boulevardier' and drinks.id = ${id}`;
     await page.reload();
     await page.getByRole("button", { name: "Add to the public menu" }).click();
     await expect(page.getByText("On the public menu.")).toBeVisible();
 
-    // The seed already owns /cocktail/sazerac, so this copy gets a suffixed address.
+    // The seed already owns /cocktail/boulevardier, so this copy gets a suffixed address.
     const publicPath = await page.getByRole("link", { name: "View public page" }).getAttribute("href");
-    expect(publicPath).toMatch(/\/en\/cocktail\/sazerac-.+/);
+    expect(publicPath).toMatch(/\/en\/cocktail\/boulevardier-.+/);
     expect((await page.request.get(publicPath!)).status()).toBe(200);
 
     await page.getByRole("button", { name: "Take it off the menu" }).click();

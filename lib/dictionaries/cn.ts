@@ -24,7 +24,6 @@ export const cn: Dictionary = {
     moodPrompt: "今晚的心情",
     ctaForMood: "为「{mood}」调一杯",
     pouredFor: "为「{mood}」而调",
-    statement: ["说说今晚的心情", "、家里有什么酒", "，就为你调一杯，连照片一起", "。"],
     stepsTitle: "从心情到一杯酒",
     steps: [
       { title: "说", body: "四个问题：心情、想喝多烈、家里有什么酒、经典还是创意。" },

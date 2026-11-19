@@ -24,7 +24,6 @@ export const en: Dictionary = {
     moodPrompt: "Tonight's mood",
     ctaForMood: "Shake one for {mood}",
     pouredFor: "Poured for “{mood}”",
-    statement: ["Say how tonight feels", " and what's on your shelf.", " Get one drink, with its photograph", "."],
     stepsTitle: "From mood to glass",
     steps: [
       { title: "Tell", body: "Four questions: your mood, how strong, what you have, classic or new." },

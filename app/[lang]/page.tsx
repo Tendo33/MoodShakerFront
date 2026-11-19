@@ -49,7 +49,6 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
     mood: drink.mood,
   }));
   const pick = (index: number) => pictured[index % Math.max(pictured.length, 1)];
-  const s0 = pick(0);
   const s2 = pick(6);
   const finale = pick(4);
 
@@ -73,15 +72,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         </div>
       </section>
 
-      {s0 && (
-        <section className="frame py-[clamp(96px,18vh,220px)]" aria-label={dict.home.stepsTitle}>
-          <p className="reveal mx-auto max-w-[34ch] text-[clamp(1.5rem,1rem+2vw,2.25rem)] leading-[1.3] font-medium tracking-[-0.025em] md:text-center">
-            {dict.home.statement[0]}{dict.home.statement[1]}{dict.home.statement[2]}{dict.home.statement[3]}
-          </p>
-        </section>
-      )}
-
-      <section className="frame" aria-labelledby="steps-title">
+      <section className="frame mt-[clamp(88px,14vh,180px)]" aria-labelledby="steps-title">
         <div className="grid gap-x-2.5 gap-y-12 md:max-lg:grid-cols-3 lg:grid-cols-12">
           <h2 id="steps-title" className="reveal text-head md:max-lg:col-span-3 lg:col-span-7 lg:row-start-1">
             {dict.home.stepsTitle}

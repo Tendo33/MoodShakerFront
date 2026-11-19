@@ -32,5 +32,5 @@ Type: Hanken Grotesk (Latin) with Noto Sans SC (Chinese), weights 400 and 500 on
 
 - Generated drinks are shot by `buildImagePrompt` in `lib/ai/prompts.ts` as studio specimens on pure white, then prepared by `lib/image-levels.ts`: near-white is lifted to white so no grey band shows on the field, and the rim is faded so a shadow running off the picture does not end in a straight line.
 - `public/og.png` is the card for shared links without a drink of their own; `node scripts/build-og.mjs` redraws it.
-- Seed drinks and the two stage pictures live in `public/drinks/` and `public/stages/`; `pnpm seeds:build` regenerates them.
+- Seed drinks live in `public/drinks/`, named by slug and a hash of the picture so a re-poured drink is never served from a cache; `pnpm seeds:build` re-pours them and removes the photographs it replaced. The two stage pictures on the home page live in `public/stages/`; `pnpm seeds:build stages` reshoots them in the same light.
 - The provider stamps a small "AI 生成" mark on every image. It is left in place; the footer also says the photographs are AI-generated.

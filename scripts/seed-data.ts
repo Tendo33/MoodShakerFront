@@ -30,34 +30,34 @@ export const seedDrinks: SeedDrink[] = [
         "en": "Gin & Tonic"
       },
       "description": {
-        "cn": "杜松子的清冽与汤力水的微苦在气泡中舒展，柠檬的酸香让收尾干净利落。",
-        "en": "Juniper sharpness and tonic's gentle quinine bitterness loosen into soft bubbles; a squeeze of lemon keeps the finish clean."
+        "cn": "金酒中的植物气息与奎宁水的微苦气泡融合，带来直接、清爽的口感。",
+        "en": "The botanical notes of gin meet the bitter effervescence of tonic water for a straightforward, refreshing drink."
       },
       "matchReason": {
-        "cn": "今晚你需要的是一杯不用想的酒。冰块慢慢化，气泡缓缓升，你只管握着杯子发呆就行。",
-        "en": "Tonight you need a drink that asks nothing of you. The ice melts slowly, the bubbles rise on their own, and you just hold the glass and breathe."
+        "cn": "这杯酒冰凉且气泡绵密，你可以慢慢喝上好一会儿，让身体逐渐放松下来。",
+        "en": "It's long, cold, and gently sparkling, something you can sip slowly to let the day unwind."
       },
       "servingGlass": {
-        "cn": "高球杯",
-        "en": "Highball glass"
+        "cn": "海波杯",
+        "en": "highball glass"
       },
       "timeRequired": {
         "cn": "3 分钟",
         "en": "3 min"
       },
-      "appearance": "Pale straw with a faint green tint, tall column of clear ice, lemon wheel rising through the bubbles",
+      "appearance": "The drink is clear and pale straw-yellow, filled with large, clear ice cubes that reach to the brim of the tall glass, and a bright green lime wedge is perched on the rim.",
       "baseSpirit": "gin",
       "alcoholLevel": "low",
       "flavorProfiles": [
-        "herbal",
         "refreshing",
-        "bitter"
+        "bitter",
+        "herbal"
       ],
       "ingredients": [
         {
           "name": {
-            "cn": "干金酒",
-            "en": "London dry gin"
+            "cn": "金酒",
+            "en": "gin"
           },
           "amount": {
             "cn": "30",
@@ -72,31 +72,25 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "汤力水",
-            "en": "Tonic water"
+            "en": "tonic water"
           },
           "amount": {
             "cn": "加满",
             "en": "to top"
           },
           "unit": null,
-          "substitute": {
-            "cn": "苏打水",
-            "en": "Soda water"
-          }
+          "substitute": null
         },
         {
           "name": {
-            "cn": "柠檬片",
-            "en": "Lemon wheel"
+            "cn": "青柠角",
+            "en": "lime wedge"
           },
           "amount": {
             "cn": "1",
             "en": "1"
           },
-          "unit": {
-            "cn": "片",
-            "en": "slice"
-          },
+          "unit": null,
           "substitute": null
         }
       ],
@@ -104,17 +98,14 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "长勺",
-            "en": "Long spoon"
+            "en": "long spoon"
           },
-          "alternative": {
-            "cn": "筷子",
-            "en": "Chopstick"
-          }
+          "alternative": null
         },
         {
           "name": {
-            "cn": "高球杯",
-            "en": "Highball glass"
+            "cn": "刀",
+            "en": "knife"
           },
           "alternative": null
         }
@@ -123,62 +114,59 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "高球杯加满冰块。",
-            "en": "Fill the highball glass with ice to the rim."
+            "cn": "海波杯中装满冰块。",
+            "en": "Fill a highball glass with ice."
           },
           "tips": {
-            "cn": "冰块装到杯口，让酒保持冰冷。",
-            "en": "Ice should stack to the top so the drink stays cold."
+            "cn": "用大块的冰块融化得慢，可以保持饮品冰爽。",
+            "en": "Large cubes melt slower, keeping the drink cold."
           }
         },
         {
           "stepNumber": 2,
           "description": {
-            "cn": "倒入 30 ml 干金酒。",
-            "en": "Pour 30 ml London dry gin over the ice."
+            "cn": "将金酒（约两大勺）倒入杯中。",
+            "en": "Pour in the gin (about two tablespoons)."
           },
           "tips": null
         },
         {
           "stepNumber": 3,
           "description": {
-            "cn": "汤力水加满至杯沿。",
-            "en": "Top with tonic water to the brim."
+            "cn": "缓缓倒入汤力水至杯满。",
+            "en": "Slowly top up with tonic water."
           },
           "tips": {
-            "cn": "杯子倾斜，让汤力水顺着杯壁滑下去，保住气泡。",
-            "en": "Tilt the glass and pour down the inside wall to keep the carbonation."
+            "cn": "沿着杯壁或勺背倒，可以保留更多气泡。",
+            "en": "Pouring down the side of the glass or over a spoon preserves the bubbles."
           }
         },
         {
           "stepNumber": 4,
           "description": {
-            "cn": "长勺轻轻提起再放下，让酒和水融合两次即可。",
-            "en": "Dip the long spoon in, lift and lower once to marry the liquids."
+            "cn": "用长勺轻轻提拉搅拌一下。",
+            "en": "Give it a gentle lift-stir with the long spoon."
           },
-          "tips": {
-            "cn": "别搅太久，气泡会跑光。",
-            "en": "Do not stir hard or long; you will flatten the bubbles."
-          }
+          "tips": null
         },
         {
           "stepNumber": 5,
           "description": {
-            "cn": "放入柠檬片。",
-            "en": "Add the lemon wheel."
+            "cn": "切一片青柠角，挤汁后放入杯中作装饰。",
+            "en": "Cut a lime wedge, squeeze it over the drink, and drop it in as garnish."
           },
           "tips": {
-            "cn": "挤一下再放进去，香气更明显。",
-            "en": "Squeeze it over the drink first to release the oils, then drop it in."
+            "cn": "挤汁可以增加一点清新的酸度。",
+            "en": "Squeezing adds a touch of bright acidity."
           }
         }
       ]
     },
-    "imageUrl": "/drinks/gin-tonic.webp",
-    "thumbnailUrl": "/drinks/gin-tonic-thumb.webp"
+    "imageUrl": "/drinks/gin-tonic-f1bf010e.webp",
+    "thumbnailUrl": "/drinks/gin-tonic-f1bf010e-thumb.webp"
   },
   {
-    "slug": "cold-pillow",
+    "slug": "coconut-breeze",
     "order": {
       "locale": "en",
       "mood": "unwind",
@@ -188,42 +176,42 @@ export const seedDrinks: SeedDrink[] = [
       ],
       "skill": "intermediate",
       "style": "creative",
-      "notes": ""
+      "notes": "I love coconut"
     },
     "recipe": {
       "name": {
-        "cn": "凉枕",
-        "en": "Cold Pillow"
+        "cn": "椰林微风",
+        "en": "Coconut Breeze"
       },
       "description": {
-        "cn": "白朗姆的柔和酒体托住青柠与荔枝，茉莉花茶在尾韵散开，像把头埋进晒过太阳的凉枕头。",
-        "en": "Soft white rum carries lime and lychee; cold-brewed jasmine unfurls at the finish like late-afternoon light through linen."
+        "cn": "这是一杯长饮，白朗姆的轻柔甜美遇到椰奶的圆润，菠萝汁带来热带果味，苏打水让它清爽易饮。",
+        "en": "A long, tropical highball. Light white rum meets the round, creamy texture of coconut milk, with pineapple for fruitiness and soda for a gentle, refreshing lift."
       },
       "matchReason": {
-        "cn": "你今天需要一杯不需要你照顾的酒。它冰得彻底，喝得慢，茉莉香气会自己飘上来，你只需要呼气。",
-        "en": "Tonight you need a drink that asks nothing of you. It's built cold and slow, with jasmine drifting up on its own while you exhale."
+        "cn": "这杯酒温和又绵长，椰奶的质地让口感很柔软，大量的苏打水带来放松的、持续的气泡，让你可以慢慢啜饮，不费心思。",
+        "en": "This is a soft, slow drink. The coconut milk makes it smooth and soothing, while the soda gives it a long, relaxing fizz you can sip on without thinking."
       },
       "servingGlass": {
         "cn": "高球杯",
-        "en": "Highball"
+        "en": "Highball glass"
       },
       "timeRequired": {
         "cn": "5 分钟",
         "en": "5 min"
       },
-      "appearance": "Pale milky jade, hazy from shaking, single large cube barely visible, lime wheel half-submerged.",
+      "appearance": "A pale, milky-yellow liquid, slightly opaque from the coconut milk, served over a large, clear ice cube and garnished with a thin lime wheel placed on the rim.",
       "baseSpirit": "rum",
       "alcoholLevel": "medium",
       "flavorProfiles": [
-        "sour",
         "fruity",
         "refreshing",
-        "herbal"
+        "creamy",
+        "sweet"
       ],
       "ingredients": [
         {
           "name": {
-            "cn": "白朗姆",
+            "cn": "白朗姆酒",
             "en": "White rum"
           },
           "amount": {
@@ -238,41 +226,26 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "青柠汁",
-            "en": "Lime juice"
+            "cn": "菠萝汁",
+            "en": "Pineapple juice"
           },
           "amount": {
-            "cn": "20",
-            "en": "20"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "荔枝糖浆",
-            "en": "Lychee syrup"
-          },
-          "amount": {
-            "cn": "15",
-            "en": "15"
+            "cn": "45",
+            "en": "45"
           },
           "unit": {
             "cn": "ml",
             "en": "ml"
           },
           "substitute": {
-            "cn": "15 ml 简单糖浆 + 2 滴荔枝香精",
-            "en": "15 ml simple syrup + 2 drops lychee essence"
+            "cn": "白葡萄汁",
+            "en": "White grape juice"
           }
         },
         {
           "name": {
-            "cn": "茉莉花茶（冷泡浓汁）",
-            "en": "Jasmine tea, cold-brewed strong"
+            "cn": "椰奶",
+            "en": "Coconut milk"
           },
           "amount": {
             "cn": "30",
@@ -286,32 +259,59 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "冰块",
-            "en": "Ice"
+            "cn": "青柠汁",
+            "en": "Lime juice"
           },
           "amount": {
-            "cn": "1",
-            "en": "1"
+            "cn": "15",
+            "en": "15"
           },
           "unit": {
-            "cn": "片",
-            "en": "cube"
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": {
+            "cn": "柠檬汁",
+            "en": "Lemon juice"
+          }
+        },
+        {
+          "name": {
+            "cn": "单糖浆",
+            "en": "Simple syrup"
+          },
+          "amount": {
+            "cn": "5",
+            "en": "5"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
           },
           "substitute": null
         },
         {
           "name": {
-            "cn": "青柠片",
+            "cn": "苏打水",
+            "en": "Soda water"
+          },
+          "amount": {
+            "cn": "加满",
+            "en": "to top"
+          },
+          "unit": null,
+          "substitute": null
+        },
+        {
+          "name": {
+            "cn": "青柠轮",
             "en": "Lime wheel"
           },
           "amount": {
             "cn": "1",
             "en": "1"
           },
-          "unit": {
-            "cn": "片",
-            "en": "slice"
-          },
+          "unit": null,
           "substitute": null
         }
       ],
@@ -319,18 +319,21 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "摇酒壶",
-            "en": "Shaker"
+            "en": "Cocktail shaker"
           },
-          "alternative": null
+          "alternative": {
+            "cn": "带盖的玻璃罐",
+            "en": "Lidded jar"
+          }
         },
         {
           "name": {
-            "cn": "盎司器",
+            "cn": "量酒器",
             "en": "Jigger"
           },
           "alternative": {
-            "cn": "厨房量勺",
-            "en": "Measuring spoons"
+            "cn": "有刻度的量杯",
+            "en": "Measuring cup"
           }
         },
         {
@@ -348,64 +351,70 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "摇酒壶加 3-4 块冰块预冷，倒掉化水。",
-            "en": "Chill the shaker with 3-4 ice cubes, then discard the meltwater."
+            "cn": "在高球杯中放入一块大方冰。",
+            "en": "Place one large ice cube in a highball glass."
           },
-          "tips": null
+          "tips": {
+            "cn": "确保冰块干燥，这样它融化得慢一些。",
+            "en": "Use a dry cube so it melts slower."
+          }
         },
         {
           "stepNumber": 2,
           "description": {
-            "cn": "加入白朗姆、青柠汁、荔枝糖浆、茉莉花茶。",
-            "en": "Add white rum, lime juice, lychee syrup, and jasmine tea."
+            "cn": "在摇酒壶中加入白朗姆酒、菠萝汁、椰奶、青柠汁和单糖浆。",
+            "en": "Add the white rum, pineapple juice, coconut milk, lime juice, and simple syrup to your shaker."
           },
           "tips": {
-            "cn": "冷泡花茶：1 个茶包泡 100 ml 冷水，冷藏 2 小时，取浓汁。",
-            "en": "Cold-brew: 1 tea bag in 100 ml cold water, refrigerate 2 hours."
+            "cn": "使用前摇晃一下椰奶罐，让乳脂均匀。",
+            "en": "Shake the coconut milk can first to emulsify the cream."
           }
         },
         {
           "stepNumber": 3,
           "description": {
-            "cn": "加冰，摇匀 10 秒至壶壁结霜。",
-            "en": "Add ice and shake hard for 10 seconds until the tin frosts."
+            "cn": "加冰摇匀，摇到壶身结霜，大约12秒。",
+            "en": "Add ice and shake hard until the shaker is frosty, about 12 seconds."
           },
-          "tips": null
+          "tips": {
+            "cn": "摇得充分些，让椰奶和其他液体完全融合。",
+            "en": "Shake well to fully integrate the coconut milk."
+          }
         },
         {
           "stepNumber": 4,
           "description": {
-            "cn": "高球杯放入 1 块大方冰。",
-            "en": "Place 1 large ice cube in the highball glass."
-          },
-          "tips": {
-            "cn": "用冰箱冰格冻的方块即可，化得慢。",
-            "en": "A standard freezer tray cube works; it melts slowly."
-          }
-        },
-        {
-          "stepNumber": 5,
-          "description": {
-            "cn": "双重滤入酒液。",
-            "en": "Double-strain the liquid over the ice."
+            "cn": "将摇好的酒液通过滤网直接倒入装有冰块的杯中。",
+            "en": "Strain the shaken mixture directly into the prepared glass over the ice."
           },
           "tips": null
         },
         {
+          "stepNumber": 5,
+          "description": {
+            "cn": "用吧勺引流，缓缓加满苏打水。",
+            "en": "Using the bar spoon as a guide, gently top up with soda water."
+          },
+          "tips": {
+            "cn": "沿着杯壁或勺子背面倒入，以保留更多气泡。",
+            "en": "Pour down the side of the glass or over the spoon to preserve bubbles."
+          }
+        },
+        {
           "stepNumber": 6,
           "description": {
-            "cn": "青柠片贴杯壁放入。",
-            "en": "Slide the lime wheel down the inside wall of the glass."
+            "cn": "将青柠轮卡在杯口作为装饰，插入一支吸管。",
+            "en": "Garnish by resting the lime wheel on the rim and add a straw."
           },
           "tips": null
         }
       ]
     },
-    "imageUrl": "/drinks/cold-pillow.webp",
-    "thumbnailUrl": "/drinks/cold-pillow-thumb.webp"
+    "imageUrl": "/drinks/coconut-breeze-6baca058.webp",
+    "thumbnailUrl": "/drinks/coconut-breeze-6baca058-thumb.webp"
   },
   {
-    "slug": "pink-klieg",
+    "slug": "ruby-grapefruit-fizz",
     "order": {
       "locale": "cn",
       "mood": "celebrate",
@@ -419,33 +428,32 @@ export const seedDrinks: SeedDrink[] = [
     },
     "recipe": {
       "name": {
-        "cn": "粉汽灯",
-        "en": "Pink Klieg"
+        "cn": "宝石粉柚",
+        "en": "Ruby Grapefruit Fizz"
       },
       "description": {
-        "cn": "柠檬的酸劲托着伏特加的干净，蔓越莓染上一层浅粉，茉莉花茶让尾韵飘着温热香气。",
-        "en": "Clean vodka under sharp lemon, cranberry blushes the glass pale pink, jasmine tea syrup leaves a warm floral tail on the finish."
+        "cn": "伏特加和西柚的明亮酸度，被少许蜂蜜柔化，最后用苏打水的气泡感提亮。西柚皮油释放出清新的香气。",
+        "en": "Bright grapefruit and vodka sourness, softened with a touch of honey, lifted by soda bubbles. A twist of grapefruit peel releases a fresh, zesty aroma."
       },
       "matchReason": {
-        "cn": "庆祝就该有气泡往上窜，粉汽灯的茉莉香气像刚打开的礼盒丝带，你慢慢喝，气泡和花香一层层起来，不赶时间。",
-        "en": "A celebration needs bubbles that keep rising. The jasmine in this one opens like ribbon pulled off a gift box, and you drink it slow while the fizz and perfume keep building."
+        "cn": "庆祝的时刻需要一点闪耀和活力。这杯酒有丰富的气泡和明亮的果酸，喝起来清爽提神，让开心的感觉持续更久。",
+        "en": "A celebration calls for something sparkling and vibrant. This drink’s lively bubbles and bright citrus keep things refreshing and lift your spirits."
       },
       "servingGlass": {
-        "cn": "高球杯",
-        "en": "Highball"
+        "cn": "海波杯",
+        "en": "Highball glass"
       },
       "timeRequired": {
         "cn": "5 分钟",
         "en": "5 min"
       },
-      "appearance": "Pale rose gold, crystal clear. Tall column of ice. Sparkling water lifts fine bubbles. Lemon wheel and cherry float at top.",
+      "appearance": "The drink is a pale, hazy pink-orange from the grapefruit juice, served in a highball glass over large, clear ice cubes, topped with a fine mousse of soda bubbles, and garnished with a vibrant pink grapefruit half-wheel.",
       "baseSpirit": "vodka",
       "alcoholLevel": "medium",
       "flavorProfiles": [
-        "sour",
-        "fruity",
         "refreshing",
-        "floral"
+        "fruity",
+        "sour"
       ],
       "ingredients": [
         {
@@ -465,50 +473,38 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "柠檬汁",
-            "en": "Lemon juice"
+            "cn": "红西柚汁（鲜榨）",
+            "en": "Red grapefruit juice (fresh)"
           },
           "amount": {
-            "cn": "25",
-            "en": "25"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "蔓越莓汁",
-            "en": "Cranberry juice"
-          },
-          "amount": {
-            "cn": "15",
-            "en": "15"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "茉莉花茶糖浆",
-            "en": "Jasmine tea syrup"
-          },
-          "amount": {
-            "cn": "15",
-            "en": "15"
+            "cn": "30",
+            "en": "30"
           },
           "unit": {
             "cn": "ml",
             "en": "ml"
           },
           "substitute": {
-            "cn": "15 ml 普通糖浆 + 1 滴茉莉香精",
-            "en": "15 ml plain syrup + 1 drop jasmine extract"
+            "cn": "瓶装纯西柚汁",
+            "en": "Bottled pure grapefruit juice"
+          }
+        },
+        {
+          "name": {
+            "cn": "蜂蜜糖浆",
+            "en": "Honey syrup"
+          },
+          "amount": {
+            "cn": "10",
+            "en": "10"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": {
+            "cn": "普通糖浆",
+            "en": "Simple syrup"
           }
         },
         {
@@ -525,44 +521,26 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "柠檬片",
-            "en": "Lemon wheel"
+            "cn": "红西柚半轮（装饰）",
+            "en": "Red grapefruit half-wheel (garnish)"
           },
           "amount": {
             "cn": "1",
             "en": "1"
           },
-          "unit": {
-            "cn": "片",
-            "en": "slice"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "酒渍樱桃",
-            "en": "Maraschino cherry"
-          },
-          "amount": {
-            "cn": "1",
-            "en": "1"
-          },
-          "unit": {
-            "cn": "片",
-            "en": "piece"
-          },
+          "unit": null,
           "substitute": null
         }
       ],
       "tools": [
         {
           "name": {
-            "cn": "摇酒壶",
-            "en": "Shaker"
+            "cn": "摇酒器",
+            "en": "Cocktail shaker"
           },
           "alternative": {
-            "cn": "带密封盖的广口瓶",
-            "en": "Mason jar with tight lid"
+            "cn": "带盖的密封罐",
+            "en": "A lidded jar"
           }
         },
         {
@@ -571,16 +549,9 @@ export const seedDrinks: SeedDrink[] = [
             "en": "Jigger"
           },
           "alternative": {
-            "cn": "厨房量勺",
+            "cn": "有刻度的量勺",
             "en": "Measuring spoons"
           }
-        },
-        {
-          "name": {
-            "cn": "滤冰器",
-            "en": "Hawthorne strainer"
-          },
-          "alternative": null
         },
         {
           "name": {
@@ -588,8 +559,18 @@ export const seedDrinks: SeedDrink[] = [
             "en": "Bar spoon"
           },
           "alternative": {
-            "cn": "长柄勺",
-            "en": "Long spoon"
+            "cn": "长柄勺子",
+            "en": "A long spoon"
+          }
+        },
+        {
+          "name": {
+            "cn": "榨汁器",
+            "en": "Juicer"
+          },
+          "alternative": {
+            "cn": "用手挤压",
+            "en": "Squeeze by hand"
           }
         }
       ],
@@ -597,56 +578,65 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "摇酒壶中加入伏特加、柠檬汁、蔓越莓汁和茉莉花茶糖浆。",
-            "en": "Add vodka, lemon juice, cranberry juice and jasmine tea syrup to shaker."
+            "cn": "在海波杯中放入一大块方冰。",
+            "en": "Place one large ice cube in a highball glass."
           },
           "tips": {
-            "cn": "糖浆提前用等量热水化开白砂糖，泡入一个茉莉花茶包十分钟，放凉。",
-            "en": "Make syrup by dissolving sugar in equal hot water, steep one jasmine tea bag 10 min, chill."
+            "cn": "使用透明的大冰块，化水慢，看起来更漂亮。",
+            "en": "A large, clear ice cube melts slowly and looks impressive."
           }
         },
         {
           "stepNumber": 2,
           "description": {
-            "cn": "加满冰块，盖紧摇酒壶，硬摇 12 秒。",
-            "en": "Fill with ice, seal shaker, shake hard for 12 seconds."
+            "cn": "在摇酒器中加入伏特加、西柚汁和蜂蜜糖浆，不加冰，快速摇匀10秒使其融合。",
+            "en": "Add vodka, grapefruit juice, and honey syrup to a shaker. Shake hard without ice for 10 seconds to combine."
           },
-          "tips": null
+          "tips": {
+            "cn": "干摇能让果汁和烈酒更好地结合，产生一点泡沫。",
+            "en": "Dry shaking helps integrate the juice and spirit, creating a little froth."
+          }
         },
         {
           "stepNumber": 3,
           "description": {
-            "cn": "高球杯中放入冰块至八分满，倒入摇好的酒液。",
-            "en": "Fill highball with ice to 2 cm below rim, strain in shaken liquid."
+            "cn": "将摇好的酒液通过弹簧滤网倒入杯中。",
+            "en": "Strain the mixture through a Hawthorne strainer into the glass."
           },
-          "tips": null
+          "tips": {
+            "cn": "如果冰块太大，可以稍微倾斜杯子让酒液沿杯壁流下。",
+            "en": "If the ice cube is large, tilt the glass to pour the liquid down the side."
+          }
         },
         {
           "stepNumber": 4,
           "description": {
-            "cn": "苏打水加满，用吧勺轻轻提拉混合。",
-            "en": "Top with soda water, lift gently with bar spoon to combine."
+            "cn": "用吧勺引导，将苏打水加满杯子。",
+            "en": "Top up with soda water, using a bar spoon to guide the pour."
           },
           "tips": {
-            "cn": "别搅太猛，气泡会跑。",
-            "en": "Stir lightly—too much kills the bubble."
+            "cn": "沿着吧勺背部缓慢倒入，可以保留更多气泡。",
+            "en": "Pour slowly down the back of the spoon to preserve more bubbles."
           }
         },
         {
           "stepNumber": 5,
           "description": {
-            "cn": "柠檬片和樱桃放液面，让樱桃沉在中间，柠檬片贴杯壁。",
-            "en": "Float lemon wheel and cherry, letting cherry sink mid-glass, wheel ride the edge."
+            "cn": "轻轻提拉西柚皮以释放香气，然后将西柚半轮卡在杯沿作为装饰。",
+            "en": "Express the grapefruit peel over the drink to release its oils, then place the half-wheel on the rim as garnish."
           },
-          "tips": null
+          "tips": {
+            "cn": "装饰前可以对着杯口挤一下西柚皮，让皮油香气落在酒液表面。",
+            "en": "Give the peel a quick squeeze over the glass before garnishing to deposit the aromatic oils on the surface."
+          }
         }
       ]
     },
-    "imageUrl": "/drinks/pink-klieg.webp",
-    "thumbnailUrl": "/drinks/pink-klieg-thumb.webp"
+    "imageUrl": "/drinks/ruby-grapefruit-fizz-cddd43ec.webp",
+    "thumbnailUrl": "/drinks/ruby-grapefruit-fizz-cddd43ec-thumb.webp"
   },
   {
-    "slug": "clover-club",
+    "slug": "french-75",
     "order": {
       "locale": "en",
       "mood": "celebrate",
@@ -660,38 +650,37 @@ export const seedDrinks: SeedDrink[] = [
     },
     "recipe": {
       "name": {
-        "cn": "三叶草俱乐部",
-        "en": "Clover Club"
+        "cn": "法兰西75",
+        "en": "French 75"
       },
       "description": {
-        "cn": "琴酒基底带着新鲜柠檬与覆盆子的酸甜，泡沫绵密，颜色像傍晚的天空。",
-        "en": "Dry gin shaken with sharp lemon and raspberry syrup, capped with a foamy crown. Tart, bright, and soft on the swallow from the egg white."
+        "cn": "这款酒以杜松子酒为底，加入柠檬汁和糖浆，最后用起泡酒加满。它清爽，果味中带点刺激感，气泡丰盈。",
+        "en": "This cocktail starts with gin, lemon juice, and syrup, topped with sparkling wine. It's crisp, slightly tart with a lively effervescence."
       },
       "matchReason": {
-        "cn": "今晚值得一点仪式感，这杯摇出来的粉红色泡沫和气泡感，刚好配得上你的好心情。小口慢慢喝，气泡会一直在杯里往上冒。",
-        "en": "You want something that feels like an occasion—this one's pink, foamy, and the bubbles keep rising while you sip slowly. It looks like a celebration in a glass."
+        "cn": "庆祝时，你需要一杯同样闪耀的酒。它冰凉清爽的气泡在杯中不停升起，就像今晚的好心情，每一口都明亮又充满活力。",
+        "en": "For a celebration, you want a drink that shines. Its constant stream of icy bubbles in the glass mirrors a bright, lively mood with every sip."
       },
       "servingGlass": {
-        "cn": "高球杯",
-        "en": "Highball glass"
+        "cn": "笛形杯",
+        "en": "Champagne flute"
       },
       "timeRequired": {
         "cn": "5 分钟",
         "en": "5 min"
       },
-      "appearance": "Pale coral, slightly hazy from shaken citrus and raspberry. Tall column of cracked ice, berries and mint rising above the rim.",
+      "appearance": "A pale yellow, slightly cloudy liquid fills a chilled flute, crowned with a steady stream of fine bubbles rising from the bottom and a thin lemon twist floating at the rim.",
       "baseSpirit": "gin",
       "alcoholLevel": "low",
       "flavorProfiles": [
-        "sweet",
-        "sour",
+        "refreshing",
         "fruity",
-        "refreshing"
+        "herbal"
       ],
       "ingredients": [
         {
           "name": {
-            "cn": "琴酒",
+            "cn": "金酒",
             "en": "gin"
           },
           "amount": {
@@ -706,23 +695,8 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "新鲜柠檬汁",
-            "en": "fresh lemon juice"
-          },
-          "amount": {
-            "cn": "22.5",
-            "en": "22.5"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "覆盆子糖浆",
-            "en": "raspberry syrup"
+            "cn": "柠檬汁",
+            "en": "lemon juice"
           },
           "amount": {
             "cn": "15",
@@ -736,169 +710,126 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "蛋白",
-            "en": "egg white"
+            "cn": "单糖浆",
+            "en": "simple syrup"
           },
           "amount": {
-            "cn": "15",
-            "en": "15"
+            "cn": "10",
+            "en": "10"
           },
           "unit": {
             "cn": "ml",
             "en": "ml"
           },
-          "substitute": {
-            "cn": "鹰嘴豆水 15 毫升",
-            "en": "aquafaba 15 ml"
-          }
+          "substitute": null
         },
         {
           "name": {
-            "cn": "苏打水",
-            "en": "soda water"
+            "cn": "起泡酒",
+            "en": "sparkling wine"
           },
           "amount": {
             "cn": "加满",
             "en": "to top"
           },
           "unit": null,
-          "substitute": null
+          "substitute": {
+            "cn": "干型普洛赛克或卡瓦",
+            "en": "dry Prosecco or Cava"
+          }
         },
         {
           "name": {
-            "cn": "新鲜覆盆子",
-            "en": "fresh raspberries"
-          },
-          "amount": {
-            "cn": "3",
-            "en": "3"
-          },
-          "unit": {
-            "cn": "片",
-            "en": "slice"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "薄荷叶",
-            "en": "mint sprig"
+            "cn": "柠檬皮扭花",
+            "en": "lemon twist"
           },
           "amount": {
             "cn": "1",
             "en": "1"
           },
-          "unit": {
-            "cn": "枝",
-            "en": "sprig"
-          },
+          "unit": null,
           "substitute": null
         }
       ],
       "tools": [
         {
           "name": {
-            "cn": "摇酒壶",
+            "cn": "摇酒器",
             "en": "cocktail shaker"
           },
-          "alternative": {
-            "cn": "带密封盖的保温杯",
-            "en": "sealed travel mug"
-          }
+          "alternative": null
         },
         {
           "name": {
             "cn": "量酒器",
             "en": "jigger"
           },
-          "alternative": {
-            "cn": "厨房量勺",
-            "en": "measuring spoons"
-          }
+          "alternative": null
         },
         {
           "name": {
-            "cn": "滤冰器",
-            "en": "Hawthorne strainer"
+            "cn": "过滤器",
+            "en": "strainer"
           },
-          "alternative": {
-            "cn": "小滤网",
-            "en": "small fine-mesh sieve"
-          }
+          "alternative": null
         },
         {
           "name": {
             "cn": "吧勺",
             "en": "bar spoon"
           },
-          "alternative": {
-            "cn": "长柄勺",
-            "en": "long-handled spoon"
-          }
+          "alternative": null
         }
       ],
       "steps": [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "将琴酒、柠檬汁、覆盆子糖浆和蛋白倒入摇酒壶，不加冰干摇 10 秒。",
-            "en": "Add gin, lemon juice, raspberry syrup, and egg white to the shaker; shake without ice for 10 seconds."
+            "cn": "将金酒、柠檬汁和单糖浆倒入摇酒器，加入冰块，摇匀至充分冷却，大约12秒。",
+            "en": "Pour the gin, lemon juice, and simple syrup into your shaker. Add ice and shake hard until well-chilled, about 12 seconds."
           },
           "tips": {
-            "cn": "让蛋白先起泡，成品泡沫更绵密",
-            "en": "Dry shake first for a thicker foam head"
+            "cn": "如果你的单糖浆是自制的，确保糖和水完全溶解并冷却后再使用。",
+            "en": "If you made the simple syrup yourself, ensure the sugar is fully dissolved and the syrup is cool before using."
           }
         },
         {
           "stepNumber": 2,
           "description": {
-            "cn": "加入冰块，用力摇 12 秒。",
-            "en": "Add ice and shake hard for 12 seconds."
+            "cn": "将摇匀的酒液过滤到冰镇的笛形杯中。",
+            "en": "Strain the shaken mixture into a chilled Champagne flute."
           },
-          "tips": null
+          "tips": {
+            "cn": "预先将笛形杯放入冰箱或装满冰水冷却，能让酒保持更久的低温。",
+            "en": "Chill the flute in the fridge or with ice water first to keep the drink colder longer."
+          }
         },
         {
           "stepNumber": 3,
           "description": {
-            "cn": "打开摇酒壶，用滤冰器将酒液滤入加满冰块的高球杯。",
-            "en": "Strain into an ice-filled highball glass."
+            "cn": "用吧勺引流，缓慢倒入起泡酒至杯口附近。",
+            "en": "Using the bar spoon as a guide, slowly top up the glass with sparkling wine."
           },
           "tips": {
-            "cn": "保留细腻泡沫",
-            "en": "Preserve the foam layer"
+            "cn": "沿着吧勺或杯壁倒入，可以减少气泡的损失。",
+            "en": "Pouring along the spoon or the side of the glass helps preserve the bubbles."
           }
         },
         {
           "stepNumber": 4,
           "description": {
-            "cn": "加满苏打水。",
-            "en": "Top with soda water."
+            "cn": "用柠檬皮在杯口拧转，挤出芳香油脂，然后将皮扭花放入酒中作为装饰。",
+            "en": "Express a lemon twist over the drink by twisting it to release its oils, then drop it into the glass as garnish."
           },
           "tips": {
-            "cn": "沿杯壁缓慢倒入，保持泡沫层",
-            "en": "Pour gently down the inside wall to protect the foam"
+            "cn": "只取黄色的柠檬皮部分，避免白色的瓤，否则会带来苦味。",
+            "en": "Use only the yellow zest of the lemon, avoiding the white pith which can be bitter."
           }
-        },
-        {
-          "stepNumber": 5,
-          "description": {
-            "cn": "用吧勺轻轻提拉一两下，让气泡均匀上升。",
-            "en": "Give one slow lift with the bar spoon to let the bubbles rise evenly."
-          },
-          "tips": null
-        },
-        {
-          "stepNumber": 6,
-          "description": {
-            "cn": "放入覆盆子和薄荷叶。",
-            "en": "Garnish with raspberries and a mint sprig."
-          },
-          "tips": null
         }
       ]
     },
-    "imageUrl": "/drinks/clover-club.webp",
-    "thumbnailUrl": "/drinks/clover-club-thumb.webp"
+    "imageUrl": "/drinks/french-75-5ebc98b6.webp",
+    "thumbnailUrl": "/drinks/french-75-5ebc98b6-thumb.webp"
   },
   {
     "slug": "hot-toddy",
@@ -915,42 +846,41 @@ export const seedDrinks: SeedDrink[] = [
     },
     "recipe": {
       "name": {
-        "cn": "威士忌托蒂",
+        "cn": "热托蒂",
         "en": "Hot Toddy"
       },
       "description": {
-        "cn": "热威士忌加蜂蜜、柠檬和丁香，甜中带酸，温热的草本气息包裹舌尖。",
-        "en": "Warm whiskey, honey and lemon with clove. Sweet, gently tart, softly spiced."
+        "cn": "这是一杯热饮，威士忌的暖意与蜜香、柠檬的果酸融合在热水里，肉桂的香气随之缓缓升起。",
+        "en": "A hot drink where the warmth of whiskey merges with honey and lemon, with the aroma of cinnamon rising from the steam."
       },
       "matchReason": {
-        "cn": "这杯要双手捧住，慢慢喝。热酒和蜂蜜的甜不会劝你开心，只是让今晚松一松。",
-        "en": "This is built to wrap around both hands and sip slowly. The heat and honey won't ask you to feel better—just softer for a while."
+        "cn": "这种温度让人能握在手里，慢慢喝下去。蜂蜜的甜味很柔和，不会太张扬，肉桂和柠檬的香气让整杯酒闻起来很舒服。",
+        "en": "It's made to be held in your hands and sipped slowly. The honey is gentle, not cloying, and the scent of cinnamon and lemon makes the whole thing feel comforting."
       },
       "servingGlass": {
-        "cn": "耐热马克杯或爱尔兰咖啡杯",
-        "en": "Heatproof mug or Irish coffee glass"
+        "cn": "耐热马克杯",
+        "en": "Heatproof mug"
       },
       "timeRequired": {
         "cn": "5 分钟",
         "en": "5 min"
       },
-      "appearance": "Deep amber with a slight haze, one large ice cube, lemon peel oils glistening on the surface.",
+      "appearance": "A transparent, light-amber liquid is held in a simple mug, topped with a thin lemon slice and a short cinnamon stick, with no ice in sight.",
       "baseSpirit": "whiskey",
       "alcoholLevel": "medium",
       "flavorProfiles": [
         "sweet",
-        "herbal",
-        "refreshing"
+        "herbal"
       ],
       "ingredients": [
         {
           "name": {
-            "cn": "波本威士忌",
-            "en": "Bourbon whiskey"
+            "cn": "威士忌",
+            "en": "Whiskey"
           },
           "amount": {
-            "cn": "50",
-            "en": "50"
+            "cn": "45",
+            "en": "45"
           },
           "unit": {
             "cn": "ml",
@@ -971,7 +901,10 @@ export const seedDrinks: SeedDrink[] = [
             "cn": "ml",
             "en": "ml"
           },
-          "substitute": null
+          "substitute": {
+            "cn": "细砂糖",
+            "en": "White sugar"
+          }
         },
         {
           "name": {
@@ -994,8 +927,8 @@ export const seedDrinks: SeedDrink[] = [
             "en": "Hot water"
           },
           "amount": {
-            "cn": "60",
-            "en": "60"
+            "cn": "120",
+            "en": "120"
           },
           "unit": {
             "cn": "ml",
@@ -1005,20 +938,8 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "丁香",
-            "en": "Cloves"
-          },
-          "amount": {
-            "cn": "2",
-            "en": "2"
-          },
-          "unit": null,
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "柠檬皮",
-            "en": "Lemon peel"
+            "cn": "柠檬片",
+            "en": "Lemon slice"
           },
           "amount": {
             "cn": "1",
@@ -1029,139 +950,163 @@ export const seedDrinks: SeedDrink[] = [
             "en": "slice"
           },
           "substitute": null
+        },
+        {
+          "name": {
+            "cn": "肉桂棒",
+            "en": "Cinnamon stick"
+          },
+          "amount": {
+            "cn": "1",
+            "en": "1"
+          },
+          "unit": null,
+          "substitute": null
         }
       ],
       "tools": [
         {
           "name": {
-            "cn": "勺子",
-            "en": "Spoon"
+            "cn": "长柄勺",
+            "en": "Long spoon"
           },
           "alternative": null
         },
         {
           "name": {
-            "cn": "开水壶",
-            "en": "Kettle"
+            "cn": "带盖的小罐或玻璃瓶",
+            "en": "Lidded jar or small glass"
           },
-          "alternative": null
+          "alternative": {
+            "cn": "带盖的密封罐",
+            "en": "Lidded mason jar"
+          }
         }
       ],
       "steps": [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "蜂蜜和柠檬汁先放进马克杯，用勺子搅匀。",
-            "en": "Put honey and lemon juice in the mug; stir to combine."
+            "cn": "向耐热马克杯中倒入45毫升威士忌、15毫升蜂蜜和15毫升柠檬汁。",
+            "en": "Add 45 ml whiskey, 15 ml honey, and 15 ml lemon juice to the heatproof mug."
           },
-          "tips": null
+          "tips": {
+            "cn": "用汤匙量取蜂蜜，大约是一汤匙。蜂蜜如果太稠，可以先用少量热水化开。",
+            "en": "Measure the honey with a tablespoon. If it's too thick, you can loosen it with a little hot water first."
+          }
         },
         {
           "stepNumber": 2,
           "description": {
-            "cn": "倒入威士忌。",
-            "en": "Add the whiskey."
+            "cn": "用长柄勺轻轻搅拌杯中的液体，直到蜂蜜基本溶解。",
+            "en": "Stir the contents of the mug gently with the long spoon until the honey is mostly dissolved."
           },
           "tips": null
         },
         {
           "stepNumber": 3,
           "description": {
-            "cn": "插上两颗丁香，柠檬皮扭一下丢进去。",
-            "en": "Press two cloves into the lemon peel, twist it over the mug, and drop it in."
+            "cn": "向杯中缓缓倒入约120毫升滚烫的热水，边倒边用长柄勺搅拌，让所有原料融合。",
+            "en": "Slowly pour about 120 ml of very hot water into the mug, stirring with the long spoon as you pour to combine everything."
           },
           "tips": {
-            "cn": "皮面朝下扭，把油挤进酒里。",
-            "en": "Twist peel-side down to express the oils into the drink."
+            "cn": "水的温度要高，这样肉桂棒的香气才能更好地散发出来。",
+            "en": "Use water that's just off the boil so the cinnamon stick will release its aroma."
           }
         },
         {
           "stepNumber": 4,
           "description": {
-            "cn": "加满热水，轻轻搅两圈。",
-            "en": "Top with hot water and stir gently once or twice."
+            "cn": "放入一片柠檬和一根肉桂棒作为装饰，即可饮用。",
+            "en": "Add a lemon slice and a cinnamon stick. The drink is ready to serve."
           },
           "tips": {
-            "cn": "水温不用滚沸，八十度左右刚好。",
-            "en": "Water just off the boil, around 80°C, keeps the aromatics intact."
+            "cn": "可以用手轻轻拧一下柠檬片，让表面的精油香气散发到酒里。",
+            "en": "You can give the lemon slice a light twist over the drink to release its oils."
           }
         }
       ]
     },
-    "imageUrl": "/drinks/hot-toddy.webp",
-    "thumbnailUrl": "/drinks/hot-toddy-thumb.webp"
+    "imageUrl": "/drinks/hot-toddy-94b607f9.webp",
+    "thumbnailUrl": "/drinks/hot-toddy-94b607f9-thumb.webp"
   },
   {
-    "slug": "heavy-fleece",
+    "slug": "iced-tea-comfort",
     "order": {
-      "locale": "en",
+      "locale": "cn",
       "mood": "blue",
       "strength": "none",
       "spirits": [],
       "skill": "beginner",
       "style": "creative",
-      "notes": ""
+      "notes": "想喝冰的，喜欢茶"
     },
     "recipe": {
       "name": {
-        "cn": "厚绒",
-        "en": "Heavy Fleece"
+        "cn": "冰柠暖茶",
+        "en": "Iced Tea Comfort"
       },
       "description": {
-        "cn": "伯爵茶的佛手柑香裹着燕麦奶的绵密，蜂蜜只给柔和的甜，像一件旧毛衣裹住舌头。",
-        "en": "Earl Grey's bergamot wraps around oat milk's soft weight. Honey sweetens gently. Like an old sweater for your tongue."
+        "cn": "红茶为底，调入鲜柠檬汁和蜂蜜，带出柔和的甜味与熟悉的茶香，是一杯能抚慰心情的冰凉饮品。",
+        "en": "A blend of strong black tea, fresh lemon juice, and honey, offering a gentle sweetness and familiar tea depth in a cool, comforting drink."
       },
       "matchReason": {
-        "cn": "这杯不需要你振作起来。双手捧住温热的杯壁，慢慢喝，让佛手柑的香气替你喘口气。",
-        "en": "This doesn't ask you to feel better. Wrap both hands around the warm glass. Drink it slow. Let the bergamot do the breathing."
+        "cn": "这杯茶饮很冰爽，能让你静下来慢慢喝。茶味是熟悉的，甜味是轻柔的，柠檬带来一点点明亮感，不会太甜也不会太闹。",
+        "en": "This is served ice-cold to slow you down. The tea is familiar, the sweetness is soft, and the lemon brings just a touch of brightness—it's not too sweet and not too loud."
       },
       "servingGlass": {
-        "cn": "厚底矮杯或马克杯",
-        "en": "thick-walled tumbler or mug"
+        "cn": "老式杯",
+        "en": "rocks glass"
       },
       "timeRequired": {
         "cn": "5 分钟",
         "en": "5 min"
       },
-      "appearance": "Opaque warm amber, thick foam cap, large cube glowing through the glass, orange twist curled on top.",
+      "appearance": "A pale, honeyed amber liquid, cloudy from the lemon juice, served over a large sphere of clear ice with a thin slice of lemon floating on top.",
       "baseSpirit": "none",
       "alcoholLevel": "none",
       "flavorProfiles": [
         "sweet",
-        "creamy",
+        "fruity",
         "herbal",
         "refreshing"
       ],
       "ingredients": [
         {
           "name": {
-            "cn": "燕麦奶",
-            "en": "oat milk"
+            "cn": "热浓红茶",
+            "en": "strong hot black tea"
           },
           "amount": {
-            "cn": "90",
-            "en": "90"
+            "cn": "120",
+            "en": "120"
           },
           "unit": {
             "cn": "ml",
             "en": "ml"
           },
-          "substitute": null
+          "substitute": {
+            "cn": "任意你喜欢的红茶",
+            "en": "any black tea you like"
+          }
         },
         {
           "name": {
-            "cn": "现泡伯爵茶（浓）",
-            "en": "strong brewed Earl Grey"
+            "cn": "鲜柠檬汁",
+            "en": "fresh lemon juice"
           },
           "amount": {
-            "cn": "60",
-            "en": "60"
+            "cn": "25",
+            "en": "25"
           },
           "unit": {
             "cn": "ml",
             "en": "ml"
           },
-          "substitute": null
+          "substitute": {
+            "cn": "青柠汁",
+            "en": "lime juice"
+          }
         },
         {
           "name": {
@@ -1176,16 +1121,19 @@ export const seedDrinks: SeedDrink[] = [
             "cn": "ml",
             "en": "ml"
           },
-          "substitute": null
+          "substitute": {
+            "cn": "砂糖糖浆",
+            "en": "simple syrup"
+          }
         },
         {
           "name": {
-            "cn": "柠檬汁",
-            "en": "lemon juice"
+            "cn": "纯净水（可选）",
+            "en": "still water (optional)"
           },
           "amount": {
-            "cn": "7.5",
-            "en": "7.5"
+            "cn": "30",
+            "en": "30"
           },
           "unit": {
             "cn": "ml",
@@ -1195,8 +1143,8 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "橙皮",
-            "en": "orange peel"
+            "cn": "柠檬片",
+            "en": "lemon slice"
           },
           "amount": {
             "cn": "1",
@@ -1212,8 +1160,8 @@ export const seedDrinks: SeedDrink[] = [
       "tools": [
         {
           "name": {
-            "cn": "微波炉或奶锅",
-            "en": "microwave or small saucepan"
+            "cn": "长柄勺",
+            "en": "long spoon"
           },
           "alternative": null
         },
@@ -1223,14 +1171,14 @@ export const seedDrinks: SeedDrink[] = [
             "en": "lidded jar"
           },
           "alternative": {
-            "cn": "密封饭盒",
-            "en": "sealed food container"
+            "cn": "任何带盖的结实杯子",
+            "en": "any sturdy lidded cup"
           }
         },
         {
           "name": {
-            "cn": "长柄勺",
-            "en": "long spoon"
+            "cn": "厨房刀",
+            "en": "kitchen knife"
           },
           "alternative": null
         }
@@ -1239,67 +1187,65 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "燕麦奶微波加热至烫手但不沸腾，约 60 秒。",
-            "en": "Heat oat milk until hot to touch but not boiling, about 60 seconds."
+            "cn": "将热浓红茶、柠檬汁（25毫升，约5茶匙）和蜂蜜（15毫升，约1汤匙）倒入带盖的玻璃罐中。",
+            "en": "Combine the strong hot black tea, lemon juice (25 ml, about 5 teaspoons), and honey (15 ml, about 1 tablespoon) in a lidded jar."
           },
           "tips": {
-            "cn": "小火奶锅也行，边缘冒小泡就离火。",
-            "en": "Small saucepan on low works; pull when tiny bubbles form at edges."
+            "cn": "确保红茶足够浓，这样加冰后味道才不会被冲淡。",
+            "en": "Make sure the tea is strong enough so the flavor holds up when diluted with ice."
           }
         },
         {
           "stepNumber": 2,
           "description": {
-            "cn": "热燕麦奶、伯爵茶、蜂蜜、柠檬汁倒入玻璃罐。",
-            "en": "Pour hot oat milk, Earl Grey, honey, and lemon juice into the jar."
+            "cn": "盖紧罐子，轻轻摇晃约10秒，直到蜂蜜完全溶解，混合物变得温凉。",
+            "en": "Seal the jar and shake gently for about 10 seconds until the honey is fully dissolved and the mixture is lukewarm."
           },
-          "tips": null
+          "tips": {
+            "cn": "如果觉得太甜或太浓，可以加入30毫升纯净水再摇匀。",
+            "en": "If it tastes too sweet or strong, add 30 ml of still water and shake again."
+          }
         },
         {
           "stepNumber": 3,
           "description": {
-            "cn": "盖紧盖子，用力摇 15 秒，摇出绵密泡沫。",
-            "en": "Seal tight and shake hard for 15 seconds to build thick foam."
+            "cn": "在老式杯中放入一个大冰球。",
+            "en": "Place a large ice sphere in a rocks glass."
           },
           "tips": {
-            "cn": "垫条毛巾防滑烫。",
-            "en": "Wrap a towel around the jar for grip and heat."
+            "cn": "大冰球融化得慢，能更好地保持饮料的浓度。",
+            "en": "A large ice sphere melts slowly, helping to keep the drink from becoming too diluted."
           }
         },
         {
           "stepNumber": 4,
           "description": {
-            "cn": "厚底矮杯放入一块大方冰。",
-            "en": "Drop one large ice cube into the thick-walled tumbler."
+            "cn": "将罐中混合好的茶饮通过滤网（或直接小心地）倒入杯中。",
+            "en": "Strain (or carefully pour) the mixed tea from the jar into the glass."
           },
-          "tips": null
+          "tips": {
+            "cn": "倒入时尽量沿着杯壁，避免溅出。",
+            "en": "Pour along the side of the glass to avoid splashing."
+          }
         },
         {
           "stepNumber": 5,
           "description": {
-            "cn": "隔着勺背缓缓倒入罐中液体，让泡沫浮在表面。",
-            "en": "Pour slowly over the back of the spoon to float the foam on top."
-          },
-          "tips": null
-        },
-        {
-          "stepNumber": 6,
-          "description": {
-            "cn": "橙皮拧出油雾，搭在杯口。",
-            "en": "Twist orange peel to spray its oils, then rest it on the rim."
+            "cn": "放上一片柠檬片作为装饰。",
+            "en": "Garnish with a lemon slice."
           },
           "tips": {
-            "cn": "先闻一下再喝。",
-            "en": "Inhale before the first sip."
+            "cn": "用柠檬片在杯口抹一下，能带出更多香气。",
+            "en": "Run the lemon slice around the rim of the glass to release more aroma."
           }
         }
       ]
     },
-    "imageUrl": "/drinks/heavy-fleece.webp",
-    "thumbnailUrl": "/drinks/heavy-fleece-thumb.webp"
+    "imageUrl": "/drinks/iced-tea-comfort-a4a10271.webp",
+    "thumbnailUrl": "/drinks/iced-tea-comfort-a4a10271-thumb.webp"
   },
   {
-    "slug": "rose-aperol",
+    "slug": "dusk-berries",
     "order": {
       "locale": "cn",
       "mood": "romantic",
@@ -1310,43 +1256,43 @@ export const seedDrinks: SeedDrink[] = [
       ],
       "skill": "intermediate",
       "style": "creative",
-      "notes": "不要太甜，喜欢花香"
+      "notes": "不要太甜，喜欢花香，家里有起泡酒"
     },
     "recipe": {
       "name": {
-        "cn": "绯罗",
-        "en": "Rose Aperol"
+        "cn": "暮色浆果",
+        "en": "Dusk Berries"
       },
       "description": {
-        "cn": "玫瑰与西柚的淡苦花香，金酒只给一点骨架，汤力承托着所有气味往上走。",
-        "en": "Rose and grapefruit bittersweet florals, gin just for backbone, tonic lifting everything upward."
+        "cn": "琴酒的草本气息与覆盆子和桃子的果香交织，干型起泡酒带来轻柔气泡和清爽收尾。",
+        "en": "The herbal notes of gin mingle with raspberry and peach fruitiness, finished with the light bubbles and crisp, dry lift of sparkling wine."
       },
       "matchReason": {
-        "cn": "今晚适合慢慢喝、慢慢聊。这杯颜色像晚霞，花香明显但不甜，气泡细密，每一口都在杯口留住玫瑰气息，刚好衬你们的气氛。",
-        "en": "Tonight calls for slow sipping and slow conversation. The colour catches like sunset, the bitterness keeps it dry, and the rose oil stays on the rim so every sip smells like flowers—right for two people taking their time."
+        "cn": "优雅的低酒精饮品，粉色调适合分享，气泡营造一种轻盈浪漫的氛围。",
+        "en": "This elegant, low-proof serves a beautiful blush colour, and the gentle bubbles make it feel celebratory and romantic."
       },
       "servingGlass": {
-        "cn": "高脚杯",
-        "en": "Stemmed balloon glass"
+        "cn": "葡萄酒杯",
+        "en": "Wine glass"
       },
       "timeRequired": {
         "cn": "5 分钟",
         "en": "5 min"
       },
-      "appearance": "Pale rose with a copper rim, crystal-clear, a single large ice sphere, grapefruit twist suspended.",
+      "appearance": "A pale blush-pink liquid, clear and sparkling, in a wine glass with no ice, garnished with a single raspberry speared on a cocktail pick.",
       "baseSpirit": "gin",
       "alcoholLevel": "low",
       "flavorProfiles": [
-        "floral",
         "fruity",
-        "bitter",
-        "refreshing"
+        "floral",
+        "refreshing",
+        "herbal"
       ],
       "ingredients": [
         {
           "name": {
-            "cn": "干金酒",
-            "en": "Dry gin"
+            "cn": "金酒",
+            "en": "Gin"
           },
           "amount": {
             "cn": "20",
@@ -1360,8 +1306,26 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "阿佩罗",
-            "en": "Aperol"
+            "cn": "覆盆子糖浆",
+            "en": "Raspberry syrup"
+          },
+          "amount": {
+            "cn": "10",
+            "en": "10"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": {
+            "cn": "简单糖浆加少许冷冻覆盆子捣碎",
+            "en": "Simple syrup muddled with a few frozen raspberries"
+          }
+        },
+        {
+          "name": {
+            "cn": "桃子利口酒",
+            "en": "Peach liqueur"
           },
           "amount": {
             "cn": "15",
@@ -1375,8 +1339,8 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "玫瑰糖浆",
-            "en": "Rose syrup"
+            "cn": "新鲜柠檬汁",
+            "en": "Fresh lemon juice"
           },
           "amount": {
             "cn": "10",
@@ -1390,59 +1354,57 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "鲜榨西柚汁",
-            "en": "Fresh pink grapefruit juice"
-          },
-          "amount": {
-            "cn": "30",
-            "en": "30"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "汤力水",
-            "en": "Tonic water"
+            "cn": "干型起泡酒",
+            "en": "Dry sparkling wine"
           },
           "amount": {
             "cn": "加满",
             "en": "to top"
           },
           "unit": null,
-          "substitute": null
+          "substitute": {
+            "cn": "普洛赛克或卡瓦",
+            "en": "Prosecco or Cava"
+          }
         },
         {
           "name": {
-            "cn": "葡萄柚皮",
-            "en": "Grapefruit peel"
+            "cn": "覆盆子",
+            "en": "Raspberry"
           },
           "amount": {
             "cn": "1",
             "en": "1"
           },
-          "unit": {
-            "cn": "片",
-            "en": "slice"
-          },
+          "unit": null,
           "substitute": null
         }
       ],
       "tools": [
         {
           "name": {
-            "cn": "摇酒壶",
-            "en": "Shaker"
+            "cn": "量酒器",
+            "en": "Jigger"
           },
-          "alternative": null
+          "alternative": {
+            "cn": "有刻度的量杯",
+            "en": "Measuring cup with ml markings"
+          }
         },
         {
           "name": {
-            "cn": "量酒器",
-            "en": "Jigger"
+            "cn": "调酒壶",
+            "en": "Cocktail shaker"
+          },
+          "alternative": {
+            "cn": "带盖的梅森罐",
+            "en": "Lidded mason jar"
+          }
+        },
+        {
+          "name": {
+            "cn": "细滤网",
+            "en": "Fine strainer"
           },
           "alternative": null
         },
@@ -1452,14 +1414,14 @@ export const seedDrinks: SeedDrink[] = [
             "en": "Bar spoon"
           },
           "alternative": {
-            "cn": "长柄勺",
-            "en": "Long spoon"
+            "cn": "长柄勺子",
+            "en": "Long-handled spoon"
           }
         },
         {
           "name": {
-            "cn": "滤冰器",
-            "en": "Hawthorne strainer"
+            "cn": "鸡尾酒签",
+            "en": "Cocktail pick"
           },
           "alternative": null
         }
@@ -1468,61 +1430,62 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "摇酒壶中加入干金酒、阿佩罗、玫瑰糖浆、西柚汁。",
-            "en": "Add gin, Aperol, rose syrup, and grapefruit juice to the shaker."
+            "cn": "在调酒壶中，加入金酒、覆盆子糖浆、桃子利口酒和新鲜柠檬汁。",
+            "en": "Into your cocktail shaker, add the gin, raspberry syrup, peach liqueur, and fresh lemon juice."
           },
-          "tips": null
+          "tips": {
+            "cn": "使用冷藏的利口酒和果汁，这样成品温度更低。",
+            "en": "Use chilled liqueur and juice for a colder drink to start."
+          }
         },
         {
           "stepNumber": 2,
           "description": {
-            "cn": "加碎冰，摇匀 10 秒。",
-            "en": "Fill with cracked ice and shake hard for 10 seconds."
+            "cn": "调酒壶中加入大量冰块，盖紧，用力摇晃约10秒。",
+            "en": "Fill the shaker with plenty of ice, seal tightly, and shake hard for about 10 seconds."
           },
-          "tips": null
+          "tips": {
+            "cn": "摇晃要充分，使所有成分充分融合并快速冷却。",
+            "en": "Shake vigorously to fully combine and chill the mixture quickly."
+          }
         },
         {
           "stepNumber": 3,
           "description": {
-            "cn": "高脚杯中放入一颗大冰球。",
-            "en": "Place one large ice sphere in the stemmed glass."
+            "cn": "通过细滤网将酒液滤入冰镇过的葡萄酒杯中。",
+            "en": "Fine strain the liquid into a chilled wine glass."
           },
           "tips": {
-            "cn": "提前冰杯更佳",
-            "en": "Chill the glass first if you have time"
+            "cn": "提前将酒杯放入冰箱冷藏几分钟。",
+            "en": "Chill the glass in the freezer for a few minutes first."
           }
         },
         {
           "stepNumber": 4,
           "description": {
-            "cn": "隔冰滤入酒液。",
-            "en": "Double strain over the ice sphere."
+            "cn": "用吧勺引导，将冰镇过的干型起泡酒缓缓加满酒杯。",
+            "en": "Using the bar spoon as a guide, slowly top up the glass with the chilled dry sparkling wine."
           },
-          "tips": null
+          "tips": {
+            "cn": "沿着杯壁或勺背倒入，可以更好地保留气泡。",
+            "en": "Pouring down the side of the glass or over the back of the spoon helps preserve the bubbles."
+          }
         },
         {
           "stepNumber": 5,
           "description": {
-            "cn": "加满汤力水，轻轻搅拌一圈。",
-            "en": "Top with tonic water and give one gentle stir."
-          },
-          "tips": null
-        },
-        {
-          "stepNumber": 6,
-          "description": {
-            "cn": "杯口挤出葡萄柚皮油，皮面朝上搭在杯沿。",
-            "en": "Express the grapefruit peel over the rim, pith side up, and perch it on the glass."
+            "cn": "用鸡尾酒签串起一颗覆盆子，轻放在杯口作为装饰。",
+            "en": "Skewer a single raspberry on a cocktail pick and rest it on the rim of the glass."
           },
           "tips": null
         }
       ]
     },
-    "imageUrl": "/drinks/rose-aperol.webp",
-    "thumbnailUrl": "/drinks/rose-aperol-thumb.webp"
+    "imageUrl": "/drinks/dusk-berries-734d0b40.webp",
+    "thumbnailUrl": "/drinks/dusk-berries-734d0b40-thumb.webp"
   },
   {
-    "slug": "paloma",
+    "slug": "tequila-sunrise",
     "order": {
       "locale": "en",
       "mood": "romantic",
@@ -1536,39 +1499,38 @@ export const seedDrinks: SeedDrink[] = [
     },
     "recipe": {
       "name": {
-        "cn": "帕洛玛",
-        "en": "Paloma"
+        "cn": "龙舌兰日出",
+        "en": "Tequila Sunrise"
       },
       "description": {
-        "cn": "咸鲜的海盐边带来张力，葡萄柚的明亮酸度和龙舌兰的草本感交织，气泡托着香气上升。",
-        "en": "A salted rim gives edge; bright grapefruit and earthy tequila lift each other, while slow bubbles carry the aroma up."
+        "cn": "龙舌兰的植物香气与橙汁的清甜相融，底部的红石榴糖浆像日出时分的朝霞缓缓升起。",
+        "en": "The agave notes of tequila blend with the bright sweetness of orange juice, while grenadine sinks to create a sunset gradient."
       },
       "matchReason": {
-        "cn": "今晚上是两个人的时间，帕洛玛的淡粉色和红酒浮层在杯里慢慢晕开，像一支可以慢慢看的花；气泡细而持续，让举杯的节奏自然放慢。",
-        "en": "Tonight is for two, and this pale coral glass holds a slow bleed of red wine like a flower unfurling in time; the fine, steady bubbles set a pace that lets the evening stretch."
+        "cn": "这杯酒的渐变色很美，从橙黄过渡到暖红，像把晚霞装进了杯子里。慢慢喝，看着颜色变化，气氛就来了。",
+        "en": "The layered color in the glass shifts from orange to red, like a sunset. It's a drink to sip slowly and watch the light change."
       },
       "servingGlass": {
-        "cn": "高球杯",
+        "cn": "海波杯",
         "en": "Highball glass"
       },
       "timeRequired": {
         "cn": "5 分钟",
         "en": "5 min"
       },
-      "appearance": "Pale coral-pink, slightly hazy from grapefruit oils. Large clear ice cube. Deep red wine float bleeding slowly downward.",
+      "appearance": "A hazy, soft coral-pink liquid fills a highball glass packed with ice, topped with a bright orange slice.",
       "baseSpirit": "tequila",
       "alcoholLevel": "medium",
       "flavorProfiles": [
-        "floral",
-        "fruity",
         "sour",
+        "fruity",
         "refreshing"
       ],
       "ingredients": [
         {
           "name": {
-            "cn": "龙舌兰",
-            "en": "tequila"
+            "cn": "银标龙舌兰",
+            "en": "Blanco tequila"
           },
           "amount": {
             "cn": "45",
@@ -1582,12 +1544,375 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "新鲜葡萄柚汁",
-            "en": "fresh grapefruit juice"
+            "cn": "橙汁",
+            "en": "Orange juice"
+          },
+          "amount": {
+            "cn": "90",
+            "en": "90"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": null
+        },
+        {
+          "name": {
+            "cn": "红石榴糖浆",
+            "en": "Grenadine"
+          },
+          "amount": {
+            "cn": "15",
+            "en": "15"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": {
+            "cn": "覆盆子糖浆",
+            "en": "Raspberry syrup"
+          }
+        },
+        {
+          "name": {
+            "cn": "橙片",
+            "en": "Orange slice"
+          },
+          "amount": {
+            "cn": "1",
+            "en": "1"
+          },
+          "unit": null,
+          "substitute": null
+        }
+      ],
+      "tools": [
+        {
+          "name": {
+            "cn": "量酒器",
+            "en": "Jigger"
+          },
+          "alternative": {
+            "cn": "量勺",
+            "en": "Measuring spoons"
+          }
+        },
+        {
+          "name": {
+            "cn": "吧勺",
+            "en": "Bar spoon"
+          },
+          "alternative": {
+            "cn": "长柄勺子",
+            "en": "Long spoon"
+          }
+        },
+        {
+          "name": {
+            "cn": "冰块夹",
+            "en": "Ice tongs"
+          },
+          "alternative": {
+            "cn": "勺子",
+            "en": "Spoon"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "stepNumber": 1,
+          "description": {
+            "cn": "在海波杯里装满冰块。",
+            "en": "Fill a highball glass with ice."
+          },
+          "tips": {
+            "cn": "用大块方冰融化得慢，能保持风味更久。",
+            "en": "Use large cubes for slower dilution and a longer-lasting drink."
+          }
+        },
+        {
+          "stepNumber": 2,
+          "description": {
+            "cn": "用量酒器倒入龙舌兰和橙汁。",
+            "en": "Pour the tequila and orange juice into the glass using the jigger."
+          },
+          "tips": null
+        },
+        {
+          "stepNumber": 3,
+          "description": {
+            "cn": "用吧勺轻轻搅拌几次，让酒和果汁混合。",
+            "en": "Stir gently a few times with the bar spoon to mix."
+          },
+          "tips": {
+            "cn": "不要搅得太厉害，避免产生太多气泡。",
+            "en": "Avoid vigorous stirring to prevent excess bubbles."
+          }
+        },
+        {
+          "stepNumber": 4,
+          "description": {
+            "cn": "沿着杯壁或吧勺背，慢慢倒入红石榴糖浆，让它沉入杯底。",
+            "en": "Slowly pour the grenadine down the inside of the glass or over the back of a spoon so it sinks to the bottom."
+          },
+          "tips": {
+            "cn": "倒得越慢，分层效果越明显。",
+            "en": "Pouring slowly creates a cleaner layered effect."
+          }
+        },
+        {
+          "stepNumber": 5,
+          "description": {
+            "cn": "最后放上橙片作为装饰。",
+            "en": "Garnish with the orange slice."
+          },
+          "tips": null
+        }
+      ]
+    },
+    "imageUrl": "/drinks/tequila-sunrise-4f40d62b.webp",
+    "thumbnailUrl": "/drinks/tequila-sunrise-4f40d62b-thumb.webp"
+  },
+  {
+    "slug": "ginger-spark",
+    "order": {
+      "locale": "cn",
+      "mood": "spark",
+      "strength": "none",
+      "spirits": [],
+      "skill": "beginner",
+      "style": "creative",
+      "notes": ""
+    },
+    "recipe": {
+      "name": {
+        "cn": "姜柠气泡",
+        "en": "Ginger Spark"
+      },
+      "description": {
+        "cn": "姜的辛辣感与青柠汁的明亮酸度交融，被冰凉的气泡苏打水托起，一口下去就能让人振作起来。",
+        "en": "The spicy kick of fresh ginger meets the bright acidity of lime, lifted by icy sparkling soda for an instantly invigorating sip."
+      },
+      "matchReason": {
+        "cn": "这一杯从头到尾都是冰的，气泡持续地刺激着舌尖，姜的味道会微微发热。它能帮你迅速摆脱困倦，让你精神起来。",
+        "en": "It’s ice-cold from start to finish, with bubbles that tingle on the tongue and a ginger warmth that builds. This drink will cut through the fog and wake you up fast."
+      },
+      "servingGlass": {
+        "cn": "高球杯",
+        "en": "highball glass"
+      },
+      "timeRequired": {
+        "cn": "3 分钟",
+        "en": "3 min"
+      },
+      "appearance": "A pale, slightly cloudy yellow liquid over a layer of crushed ice, with a thin slice of fresh ginger floating on the surface.",
+      "baseSpirit": "none",
+      "alcoholLevel": "none",
+      "flavorProfiles": [
+        "sour",
+        "spicy",
+        "refreshing"
+      ],
+      "ingredients": [
+        {
+          "name": {
+            "cn": "鲜榨青柠汁",
+            "en": "Fresh lime juice"
           },
           "amount": {
             "cn": "30",
             "en": "30"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": null
+        },
+        {
+          "name": {
+            "cn": "蜂蜜",
+            "en": "Honey"
+          },
+          "amount": {
+            "cn": "10",
+            "en": "10"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": {
+            "cn": "细砂糖 1 茶匙",
+            "en": "1 tsp granulated sugar"
+          }
+        },
+        {
+          "name": {
+            "cn": "鲜姜",
+            "en": "Fresh ginger"
+          },
+          "amount": {
+            "cn": "2",
+            "en": "2"
+          },
+          "unit": {
+            "cn": "片",
+            "en": "slice"
+          },
+          "substitute": null
+        },
+        {
+          "name": {
+            "cn": "苏打水（冰镇）",
+            "en": "Soda water (chilled)"
+          },
+          "amount": {
+            "cn": "加满",
+            "en": "to top"
+          },
+          "unit": null,
+          "substitute": {
+            "cn": "汤力水",
+            "en": "tonic water"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "name": {
+            "cn": "厨房刀",
+            "en": "Kitchen knife"
+          },
+          "alternative": null
+        },
+        {
+          "name": {
+            "cn": "茶匙",
+            "en": "Teaspoon"
+          },
+          "alternative": null
+        },
+        {
+          "name": {
+            "cn": "带盖玻璃罐",
+            "en": "Lidded jar"
+          },
+          "alternative": null
+        },
+        {
+          "name": {
+            "cn": "长柄勺",
+            "en": "Long spoon"
+          },
+          "alternative": {
+            "cn": "筷子",
+            "en": "chopsticks"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "stepNumber": 1,
+          "description": {
+            "cn": "将两片鲜姜和蜂蜜放入玻璃罐中，用长柄勺的柄部或茶匙背面用力捣压 10-15 秒，直到姜汁渗出。",
+            "en": "Place the ginger slices and honey in the jar and muddle firmly for 10-15 seconds with the back of the spoon until the ginger is juicy."
+          },
+          "tips": {
+            "cn": "把姜片切得薄一点更容易捣出味道。",
+            "en": "Slice the ginger thinly to release more flavor."
+          }
+        },
+        {
+          "stepNumber": 2,
+          "description": {
+            "cn": "向罐中加入青柠汁（约两茶匙的量）和四五块冰块，盖上盖子，用力摇晃 8-10 秒。",
+            "en": "Add the lime juice (about two teaspoons' worth) and 4-5 ice cubes to the jar, seal the lid, and shake hard for 8-10 seconds."
+          },
+          "tips": {
+            "cn": "摇晃到罐子外面感觉冰凉即可。",
+            "en": "Shake until the outside of the jar feels cold."
+          }
+        },
+        {
+          "stepNumber": 3,
+          "description": {
+            "cn": "在高球杯中装满碎冰或小冰块，将罐中所有液体和姜片一起滤入杯中。",
+            "en": "Fill a highball glass with crushed ice or small cubes, then strain the entire contents of the jar into the glass."
+          },
+          "tips": {
+            "cn": "冰块填满杯子能保持饮料的低温。",
+            "en": "Packing the glass with ice keeps the drink cold longer."
+          }
+        },
+        {
+          "stepNumber": 4,
+          "description": {
+            "cn": "用冰镇苏打水加满杯子，用长柄勺轻轻提拉搅拌两三次。",
+            "en": "Top up with chilled soda water and stir gently 2-3 times with the long spoon using a lifting motion."
+          },
+          "tips": {
+            "cn": "轻轻搅拌能让味道融合，同时保留气泡。",
+            "en": "A gentle stir mixes the flavors while preserving the bubbles."
+          }
+        }
+      ]
+    },
+    "imageUrl": "/drinks/ginger-spark-a32849cf.webp",
+    "thumbnailUrl": "/drinks/ginger-spark-a32849cf-thumb.webp"
+  },
+  {
+    "slug": "moscow-mule",
+    "order": {
+      "locale": "en",
+      "mood": "spark",
+      "strength": "medium",
+      "spirits": [
+        "vodka"
+      ],
+      "skill": "intermediate",
+      "style": "classic",
+      "notes": ""
+    },
+    "recipe": {
+      "name": {
+        "cn": "莫斯科骡子",
+        "en": "Moscow Mule"
+      },
+      "description": {
+        "cn": "伏特加的干净利落遇上鲜姜啤酒的辛辣气泡，青柠汁带来清爽的酸度。",
+        "en": "Clean vodka meets the spicy kick and lively bubbles of ginger beer, brightened by fresh lime juice."
+      },
+      "matchReason": {
+        "cn": "这款酒冰凉刺激，气泡感十足，一口下去能立刻唤醒感官，很适合需要提神的夜晚。",
+        "en": "It's ice-cold and full of fizz, a sharp and bracing drink that wakes you up with the first sip."
+      },
+      "servingGlass": {
+        "cn": "铜杯或海波杯",
+        "en": "copper mug or highball glass"
+      },
+      "timeRequired": {
+        "cn": "3 分钟",
+        "en": "3 min"
+      },
+      "appearance": "A pale straw liquid with a steady stream of bubbles, served over a full mug of ice and garnished with a fresh wedge of lime.",
+      "baseSpirit": "vodka",
+      "alcoholLevel": "medium",
+      "flavorProfiles": [
+        "refreshing",
+        "spicy"
+      ],
+      "ingredients": [
+        {
+          "name": {
+            "cn": "伏特加",
+            "en": "vodka"
+          },
+          "amount": {
+            "cn": "45",
+            "en": "45"
           },
           "unit": {
             "cn": "ml",
@@ -1612,88 +1937,36 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "龙舌兰糖浆",
-            "en": "agave syrup"
+            "cn": "姜汁啤酒",
+            "en": "ginger beer"
           },
           "amount": {
-            "cn": "15",
-            "en": "15"
+            "cn": "120",
+            "en": "120"
           },
           "unit": {
             "cn": "ml",
             "en": "ml"
           },
           "substitute": {
-            "cn": "白砂糖加等量热水搅匀放凉",
-            "en": "white sugar dissolved in equal hot water, cooled"
+            "cn": "干姜汽水",
+            "en": "ginger ale"
           }
         },
         {
           "name": {
-            "cn": "盐",
-            "en": "salt"
+            "cn": "青柠角",
+            "en": "lime wedge"
           },
           "amount": {
             "cn": "1",
             "en": "1"
           },
           "unit": null,
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "苏打水",
-            "en": "soda water"
-          },
-          "amount": {
-            "cn": "加满",
-            "en": "to top"
-          },
-          "unit": null,
-          "substitute": {
-            "cn": "汤力水",
-            "en": "tonic water"
-          }
-        },
-        {
-          "name": {
-            "cn": "干红葡萄酒",
-            "en": "dry red wine"
-          },
-          "amount": {
-            "cn": "15",
-            "en": "15"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "葡萄柚皮",
-            "en": "grapefruit peel"
-          },
-          "amount": {
-            "cn": "1",
-            "en": "1"
-          },
-          "unit": {
-            "cn": "片",
-            "en": "slice"
-          },
           "substitute": null
         }
       ],
       "tools": [
-        {
-          "name": {
-            "cn": "摇酒壶",
-            "en": "shaker"
-          },
-          "alternative": null
-        },
         {
           "name": {
             "cn": "量酒器",
@@ -1707,249 +1980,8 @@ export const seedDrinks: SeedDrink[] = [
             "en": "bar spoon"
           },
           "alternative": {
-            "cn": "长柄勺",
-            "en": "long spoon"
-          }
-        },
-        {
-          "name": {
-            "cn": "餐盘",
-            "en": "small plate"
-          },
-          "alternative": null
-        }
-      ],
-      "steps": [
-        {
-          "stepNumber": 1,
-          "description": {
-            "cn": "杯口用青柠角润湿一圈，倒扣在盐盘上轻转，沾一圈细盐边。",
-            "en": "Run a lime wedge around the outside rim of the glass, then dip it in salt to coat."
-          },
-          "tips": {
-            "cn": "盐只沾杯口外侧，不要沾到内侧，喝时才有一口咸鲜的触发，不干扰酒体。",
-            "en": "Salt only the outer rim; the first sip should catch salinity, not the whole drink."
-          }
-        },
-        {
-          "stepNumber": 2,
-          "description": {
-            "cn": "摇酒壶中加入龙舌兰、葡萄柚汁、青柠汁、龙舌兰糖浆，加冰块，摇匀 10 秒。",
-            "en": "Add tequila, grapefruit juice, lime juice, and agave syrup to a shaker with ice. Shake for 10 seconds."
-          },
-          "tips": {
-            "cn": "葡萄柚汁用鲜榨，白色皮膜会带来微苦，正好托住龙舌兰的草本。",
-            "en": "Fresh-squeezed grapefruit carries slight bitterness from the pith that anchors the tequila's earthiness."
-          }
-        },
-        {
-          "stepNumber": 3,
-          "description": {
-            "cn": "高球杯中加入一块大方冰，将摇好的酒液隔冰滤入。",
-            "en": "Strain into the highball glass over one large ice cube."
-          },
-          "tips": null
-        },
-        {
-          "stepNumber": 4,
-          "description": {
-            "cn": "苏打水沿杯壁缓慢注入，液面留出约两指宽。",
-            "en": "Pour soda water slowly down the inside wall, leaving two fingers of space at the top."
-          },
-          "tips": {
-            "cn": "慢注才能保住气泡，酒体会有自然的渐变分层。",
-            "en": "A gentle pour preserves carbonation and creates a natural gradient."
-          }
-        },
-        {
-          "stepNumber": 5,
-          "description": {
-            "cn": "吧勺背抵住液面内侧，干红葡萄酒沿勺背缓缓倒入，沉底后自下而上晕出一道红丝。",
-            "en": "Rest the back of a bar spoon just inside the liquid surface, then slowly pour red wine over it so it sinks and threads upward."
-          },
-          "tips": {
-            "cn": "倒得越慢，红线越细，像花瓣的脉络；喝前不要搅拌，让颜色在杯里继续变化。",
-            "en": "The slower the pour, the finer the red vein; do not stir, let the color keep shifting as you drink."
-          }
-        },
-        {
-          "stepNumber": 6,
-          "description": {
-            "cn": "杯口搭一片扭过的葡萄柚皮，精油朝杯内。",
-            "en": "Express a twisted grapefruit peel over the drink, oils inward, and perch it on the rim."
-          },
-          "tips": {
-            "cn": "扭皮时喷出的精油落在液面，第一口先闻到花香和龙舌兰的辛香。",
-            "en": "The burst of oils lands on the surface; the first hit is floral and agave-sharp."
-          }
-        }
-      ]
-    },
-    "imageUrl": "/drinks/paloma.webp",
-    "thumbnailUrl": "/drinks/paloma-thumb.webp"
-  },
-  {
-    "slug": "cold-snap",
-    "order": {
-      "locale": "cn",
-      "mood": "spark",
-      "strength": "none",
-      "spirits": [],
-      "skill": "beginner",
-      "style": "creative",
-      "notes": ""
-    },
-    "recipe": {
-      "name": {
-        "cn": "醒姜",
-        "en": "Cold Snap"
-      },
-      "description": {
-        "cn": "青柠的酸劲先冲上来，接着是姜汁啤酒的辛辣气泡，最后留一点葡萄柚的苦香。像冷水泼脸，一口就醒。",
-        "en": "Lime hits first, then ginger beer's prickly heat, finishing with grapefruit's quiet bitterness. Like a splash of cold water to the face."
-      },
-      "matchReason": {
-        "cn": "今晚你需要被拍醒而不是被哄睡。这杯直接装在杯里搅，冰块堆高，气泡裹着姜和酸往上窜，喝的时候得大口，来不及犯困。",
-        "en": "Tonight you need a jolt, not a lullaby. Built right in the glass over a mountain of crushed ice, bubbles carry the ginger and sharp citrus straight up. Drink it fast while the frost still bites."
-      },
-      "servingGlass": {
-        "cn": "高球杯",
-        "en": "Highball glass"
-      },
-      "timeRequired": {
-        "cn": "3 分钟",
-        "en": "3 min"
-      },
-      "appearance": "Pale amber, slightly cloudy from muddled fruit. Crushed ice stacked high, lime wheel and ginger slice perched on top.",
-      "baseSpirit": "none",
-      "alcoholLevel": "none",
-      "flavorProfiles": [
-        "sour",
-        "spicy",
-        "refreshing",
-        "fruity"
-      ],
-      "ingredients": [
-        {
-          "name": {
-            "cn": "青柠汁",
-            "en": "Lime juice"
-          },
-          "amount": {
-            "cn": "30",
-            "en": "30"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "葡萄柚汁",
-            "en": "Grapefruit juice"
-          },
-          "amount": {
-            "cn": "45",
-            "en": "45"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": {
-            "cn": "西柚汁",
-            "en": "Bottled pink grapefruit juice"
-          }
-        },
-        {
-          "name": {
-            "cn": "蜂蜜",
-            "en": "Honey"
-          },
-          "amount": {
-            "cn": "15",
-            "en": "15"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": {
-            "cn": "龙舌兰糖浆",
-            "en": "Agave syrup"
-          }
-        },
-        {
-          "name": {
-            "cn": "姜汁啤酒",
-            "en": "Ginger beer"
-          },
-          "amount": {
-            "cn": "加满",
-            "en": "to top"
-          },
-          "unit": null,
-          "substitute": {
-            "cn": "干姜水",
-            "en": "Spicy ginger ale"
-          }
-        },
-        {
-          "name": {
-            "cn": "青柠角",
-            "en": "Lime wheel"
-          },
-          "amount": {
-            "cn": "1",
-            "en": "1"
-          },
-          "unit": null,
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "生姜薄片",
-            "en": "Ginger slice"
-          },
-          "amount": {
-            "cn": "2",
-            "en": "2"
-          },
-          "unit": null,
-          "substitute": null
-        }
-      ],
-      "tools": [
-        {
-          "name": {
-            "cn": "高球杯",
-            "en": "Highball glass"
-          },
-          "alternative": {
-            "cn": "任意高玻璃杯",
-            "en": "Any tall glass"
-          }
-        },
-        {
-          "name": {
-            "cn": "吧勺",
-            "en": "Bar spoon"
-          },
-          "alternative": {
-            "cn": "长柄勺或筷子",
-            "en": "Long spoon or chopstick"
-          }
-        },
-        {
-          "name": {
-            "cn": "捣棒",
-            "en": "Muddler"
-          },
-          "alternative": {
-            "cn": "擀面杖头或勺子背面",
-            "en": "Back of a wooden spoon"
+            "cn": "长柄勺子",
+            "en": "long-handled spoon"
           }
         }
       ],
@@ -1957,245 +1989,59 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "青柠角和1片生姜放入杯中，用捣棒轻压5下出汁出香。",
-            "en": "Drop the lime wheel and 1 ginger slice into the glass. Press gently 5 times to release oils and juice."
-          },
-          "tips": {
-            "cn": "别捣烂皮，会发苦。",
-            "en": "Don't shred the lime peel—bitterness follows."
-          }
-        },
-        {
-          "stepNumber": 2,
-          "description": {
-            "cn": "加入青柠汁、葡萄柚汁、蜂蜜，放入碎冰至八分满。",
-            "en": "Add lime juice, grapefruit juice, and honey. Fill with crushed ice to 2 cm below the rim."
-          },
-          "tips": {
-            "cn": "便利店袋装碎冰直接用；在家用毛巾包冰块敲碎。",
-            "en": "Bagged ice from a corner store works; wrap cubes in a towel and smash for home."
-          }
-        },
-        {
-          "stepNumber": 3,
-          "description": {
-            "cn": "用吧勺搅拌15圈，让蜂蜜化开。",
-            "en": "Stir 15 turns with the spoon to dissolve the honey."
-          },
-          "tips": {
-            "cn": "触底搅，别溅出来。",
-            "en": "Dig to the bottom so nothing pools there."
-          }
-        },
-        {
-          "stepNumber": 4,
-          "description": {
-            "cn": "加满姜汁啤酒，轻轻提拉两下。",
-            "en": "Top with ginger beer. Lift the spoon through twice, no more."
-          },
-          "tips": {
-            "cn": "别大力搅，跑了气就蔫了。",
-            "en": "Easy does it—aggressive stirring kills the fizz."
-          }
-        },
-        {
-          "stepNumber": 5,
-          "description": {
-            "cn": "顶上再补碎冰成小山，插剩余生姜薄片。",
-            "en": "Add more crushed ice to form a peak. Slap the remaining ginger slice to wake its aroma, then perch it on top."
-          },
-          "tips": {
-            "cn": "姜片拍一下再插，香气会散出来。",
-            "en": "The slap releases ginger oils that hit your nose before the first sip."
-          }
-        }
-      ]
-    },
-    "imageUrl": "/drinks/cold-snap.webp",
-    "thumbnailUrl": "/drinks/cold-snap-thumb.webp"
-  },
-  {
-    "slug": "vodka-sour",
-    "order": {
-      "locale": "en",
-      "mood": "spark",
-      "strength": "medium",
-      "spirits": [
-        "vodka"
-      ],
-      "skill": "intermediate",
-      "style": "classic",
-      "notes": ""
-    },
-    "recipe": {
-      "name": {
-        "cn": "伏特加酸酒",
-        "en": "Vodka Sour"
-      },
-      "description": {
-        "cn": "伏特加的干净骨架托住鲜榨柠檬的锐利酸劲，糖浆只给一点圆润。冷冽、利落、一口醒神。",
-        "en": "Clean vodka carries sharp fresh lemon, with just enough syrup to round the edges. Cold, brisk, and over fast."
-      },
-      "matchReason": {
-        "cn": "你需要被拍醒。这杯冰到透，柠檬的酸直接冲上来，没有拖沓的甜味，三口喝完，精神会回来。",
-        "en": "You need a jolt. This is ice-cold, the lemon hits straight with no lingering sweetness, gone in three sips, and you're back."
-      },
-      "servingGlass": {
-        "cn": "碟形杯或小型高脚杯",
-        "en": "Coupe or small chilled stem glass"
-      },
-      "timeRequired": {
-        "cn": "5 分钟",
-        "en": "5 min"
-      },
-      "appearance": "Pale gold, clear, served up. No ice. Thin lemon twist rests across the rim.",
-      "baseSpirit": "vodka",
-      "alcoholLevel": "medium",
-      "flavorProfiles": [
-        "sour",
-        "refreshing",
-        "fruity"
-      ],
-      "ingredients": [
-        {
-          "name": {
-            "cn": "伏特加",
-            "en": "vodka"
-          },
-          "amount": {
-            "cn": "45",
-            "en": "45"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "鲜榨柠檬汁",
-            "en": "fresh lemon juice"
-          },
-          "amount": {
-            "cn": "25",
-            "en": "25"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "单糖浆",
-            "en": "simple syrup"
-          },
-          "amount": {
-            "cn": "15",
-            "en": "15"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "柠檬皮卷",
-            "en": "lemon twist"
-          },
-          "amount": {
-            "cn": "1",
-            "en": "1"
-          },
-          "unit": null,
-          "substitute": null
-        }
-      ],
-      "tools": [
-        {
-          "name": {
-            "cn": "摇酒壶",
-            "en": "shaker"
-          },
-          "alternative": null
-        },
-        {
-          "name": {
-            "cn": "量酒器",
-            "en": "jigger"
-          },
-          "alternative": null
-        },
-        {
-          "name": {
-            "cn": "滤网",
-            "en": "fine strainer"
-          },
-          "alternative": null
-        },
-        {
-          "name": {
-            "cn": "榨汁器",
-            "en": "citrus juicer"
-          },
-          "alternative": null
-        }
-      ],
-      "steps": [
-        {
-          "stepNumber": 1,
-          "description": {
-            "cn": "碟形杯加冰块，倒水，静置冷藏。",
-            "en": "Fill coupe with ice and water; chill while you build."
-          },
-          "tips": {
-            "cn": "最后一步才倒掉冰水。",
-            "en": "Dump just before straining."
-          }
-        },
-        {
-          "stepNumber": 2,
-          "description": {
-            "cn": "摇酒壶加入伏特加、柠檬汁、单糖浆。",
-            "en": "Add vodka, lemon juice, and simple syrup to shaker."
+            "cn": "在铜杯或海波杯中装满冰块。",
+            "en": "Fill a copper mug or highball glass with ice."
           },
           "tips": null
         },
         {
+          "stepNumber": 2,
+          "description": {
+            "cn": "用量酒器依次将伏特加和青柠汁倒入杯中。",
+            "en": "Using the jigger, pour the vodka and then the lime juice into the glass."
+          },
+          "tips": {
+            "cn": "先加入度数高的酒，再放果汁。",
+            "en": "Add the higher-proof spirit first."
+          }
+        },
+        {
           "stepNumber": 3,
           "description": {
-            "cn": "摇酒壶加满冰块，大力摇荡 12 秒至壶身结霜。",
-            "en": "Fill shaker with ice; shake hard for 12 seconds until frosted."
+            "cn": "用吧勺轻轻搅拌几次，让酒液和冰块混合。",
+            "en": "Stir gently a few times with the bar spoon to mix the spirits with the ice."
           },
           "tips": null
         },
         {
           "stepNumber": 4,
           "description": {
-            "cn": "倒掉碟形杯的冰水，滤网隔冰将酒液倒入杯中。",
-            "en": "Dump ice water from coupe; double strain drink into glass."
+            "cn": "将姜汁啤酒加满杯子。",
+            "en": "Top up the glass with ginger beer."
           },
-          "tips": null
+          "tips": {
+            "cn": "沿着杯壁或勺子背缓慢倒入，可以保留更多气泡。",
+            "en": "Pour slowly down the side or over the back of a spoon to preserve the bubbles."
+          }
         },
         {
           "stepNumber": 5,
           "description": {
-            "cn": "杯口捏挤柠檬皮卷，喷出皮油后横放杯沿。",
-            "en": "Express lemon twist over surface, then rest across rim."
+            "cn": "将青柠角卡在杯沿作为装饰。",
+            "en": "Place the lime wedge on the rim of the glass as garnish."
           },
-          "tips": null
+          "tips": {
+            "cn": "上桌前可以轻轻挤一下青柠角，让香气释放。",
+            "en": "Give it a light squeeze over the drink before serving to release its aroma."
+          }
         }
       ]
     },
-    "imageUrl": "/drinks/vodka-sour.webp",
-    "thumbnailUrl": "/drinks/vodka-sour-thumb.webp"
+    "imageUrl": "/drinks/moscow-mule-4371dcca.webp",
+    "thumbnailUrl": "/drinks/moscow-mule-4371dcca-thumb.webp"
   },
   {
-    "slug": "sazerac",
+    "slug": "boulevardier",
     "order": {
       "locale": "cn",
       "mood": "reflect",
@@ -2209,258 +2055,38 @@ export const seedDrinks: SeedDrink[] = [
     },
     "recipe": {
       "name": {
-        "cn": "萨泽拉克",
-        "en": "Sazerac"
+        "cn": "花花公子",
+        "en": "Boulevardier"
       },
       "description": {
-        "cn": "黑麦威士忌的辛辣被苦艾酒的草本苦味包裹，糖只给一丝回甘，入口烈而干，留下八角与茴香的余韵。",
-        "en": "Rye whiskey sharpened by Peychaud's bitter brightness, sweetened just barely, with absinthe's anise haunting the glass. Dry, bold, herbal."
+        "cn": "苦味突出的草本鸡尾酒，金巴利的药草苦甜与威士忌的醇厚、味美思的甘润在冰上缓慢融合。",
+        "en": "A bitter-forward herbal cocktail where Campari's complex bittersweetness slowly melds with the richness of whiskey and the sweetness of vermouth over ice."
       },
       "matchReason": {
-        "cn": "这杯酒不加冰在杯里，全靠大冰块慢慢化水，每一口都比上一口柔一点；苦艾洗杯的凉香陪你慢慢想事情，正好配一个安静的晚上。",
-        "en": "This one evolves in your hands—no ice in the glass, just that big cube slowly giving a little water, each sip softer than the last. The absinthe-rinsed chill and licorice scent hang in the air while you sit with your thoughts."
+        "cn": "这一杯需要慢慢品味。金巴利的苦和甜随着冰块化开而层层展开，像一本书，适合安静的夜晚一页一页地读。",
+        "en": "This is a drink to take your time with. The layered bitterness and sweetness unfold as the ice melts, like turning pages in a quiet book for a solitary evening."
       },
       "servingGlass": {
-        "cn": "冰镇过的老式杯",
-        "en": "Chilled old-fashioned glass"
+        "cn": "古典杯",
+        "en": "rocks glass"
       },
       "timeRequired": {
         "cn": "5 分钟",
         "en": "5 min"
       },
-      "appearance": "Deep amber, crystal clear over a single large cube; a wide orange peel spirals above the surface, oils glistening.",
+      "appearance": "A deep amber-red liquid rests in a rocks glass over a single large ice cube, topped with a long, curled orange peel.",
       "baseSpirit": "whiskey",
       "alcoholLevel": "high",
       "flavorProfiles": [
         "bitter",
         "herbal",
-        "smoky",
         "sweet"
       ],
       "ingredients": [
         {
           "name": {
-            "cn": "黑麦威士忌",
-            "en": "rye whiskey"
-          },
-          "amount": {
-            "cn": "60",
-            "en": "60"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "德梅拉拉糖浆",
-            "en": "demerara syrup"
-          },
-          "amount": {
-            "cn": "7.5",
-            "en": "7.5"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "佩乔苦精",
-            "en": "Peychaud's bitters"
-          },
-          "amount": {
-            "cn": "3",
-            "en": "3"
-          },
-          "unit": {
-            "cn": "滴",
-            "en": "dash"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "苦艾酒",
-            "en": "absinthe"
-          },
-          "amount": {
-            "cn": "5",
-            "en": "5"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": {
-            "cn": "其他苦艾风味利口酒",
-            "en": "pastis or absinthe substitute"
-          }
-        },
-        {
-          "name": {
-            "cn": "柠檬皮",
-            "en": "lemon peel"
-          },
-          "amount": {
-            "cn": "1",
-            "en": "1"
-          },
-          "unit": {
-            "cn": "片",
-            "en": "slice"
-          },
-          "substitute": null
-        }
-      ],
-      "tools": [
-        {
-          "name": {
-            "cn": "调酒杯",
-            "en": "mixing glass"
-          },
-          "alternative": null
-        },
-        {
-          "name": {
-            "cn": "吧勺",
-            "en": "bar spoon"
-          },
-          "alternative": null
-        },
-        {
-          "name": {
-            "cn": "朱利普滤冰器",
-            "en": "Julep strainer"
-          },
-          "alternative": null
-        },
-        {
-          "name": {
-            "cn": "细滤网",
-            "en": "fine mesh strainer"
-          },
-          "alternative": {
-            "cn": "小号茶滤",
-            "en": "small tea strainer"
-          }
-        },
-        {
-          "name": {
-            "cn": "冰块夹",
-            "en": "ice tongs"
-          },
-          "alternative": null
-        }
-      ],
-      "steps": [
-        {
-          "stepNumber": 1,
-          "description": {
-            "cn": "冰镇老式杯：杯里倒冰块放一边。",
-            "en": "Chill the old-fashioned glass with ice and set aside."
-          },
-          "tips": null
-        },
-        {
-          "stepNumber": 2,
-          "description": {
-            "cn": "调酒杯加冰块，倒入黑麦威士忌、德梅拉拉糖浆和佩乔苦精。",
-            "en": "Fill the mixing glass with ice, add rye whiskey, demerara syrup, and Peychaud's bitters."
-          },
-          "tips": null
-        },
-        {
-          "stepNumber": 3,
-          "description": {
-            "cn": "搅拌 30 秒至充分降温稀释。",
-            "en": "Stir for 30 seconds until well chilled and diluted."
-          },
-          "tips": null
-        },
-        {
-          "stepNumber": 4,
-          "description": {
-            "cn": "倒掉冰镇杯里的冰块，倒入苦艾酒转一圈润湿杯壁后倒掉多余。",
-            "en": "Discard the ice from the chilled glass, add absinthe, swirl to coat the inside, and pour out any excess."
-          },
-          "tips": {
-            "cn": "只留下薄薄一层香气在杯壁，不要残留液体。",
-            "en": "Only a thin film of aroma should remain; no pooled liquid."
-          }
-        },
-        {
-          "stepNumber": 5,
-          "description": {
-            "cn": "双重过滤酒液入杯。",
-            "en": "Double-strain the stirred drink into the prepared glass."
-          },
-          "tips": null
-        },
-        {
-          "stepNumber": 6,
-          "description": {
-            "cn": "柠檬皮扭出精油抹杯口，皮面朝上放入杯中。",
-            "en": "Express the lemon peel over the surface, rub the rim, and place it oils-up in the glass."
-          },
-          "tips": null
-        }
-      ]
-    },
-    "imageUrl": "/drinks/sazerac.webp",
-    "thumbnailUrl": "/drinks/sazerac-thumb.webp"
-  },
-  {
-    "slug": "night-flight",
-    "order": {
-      "locale": "en",
-      "mood": "reflect",
-      "strength": "medium",
-      "spirits": [
-        "rum"
-      ],
-      "skill": "intermediate",
-      "style": "creative",
-      "notes": "I love coffee"
-    },
-    "recipe": {
-      "name": {
-        "cn": "夜航",
-        "en": "Night Flight"
-      },
-      "description": {
-        "cn": "朗姆的焦糖和葡萄柚的苦味在冰中慢慢化开，咖啡香气像暗号一样在杯口徘徊。",
-        "en": "Dark rum and grapefruit bitters slow-dilute over one large cube, while a cold-brew coffee syrup lingers as aroma rather than sweetness."
-      },
-      "matchReason": {
-        "cn": "这杯酒要慢慢喝。冰一点点化，苦味一层层退，咖啡香悄悄浮上来，像你今晚让自己慢慢沉下去的那种节奏。",
-        "en": "This one is built to shift as it sits. The ice gradually unlocks the coffee and grapefruit in stages, so each sip is slightly different—something to keep you company without demanding attention."
-      },
-      "servingGlass": {
-        "cn": "洛克杯",
-        "en": "Rocks glass"
-      },
-      "timeRequired": {
-        "cn": "5 分钟",
-        "en": "5 min"
-      },
-      "appearance": "Deep mahogany with a copper rim, clear and viscous. One large ice cube slowly diluting. Express twist of orange oil pooling on the surface.",
-      "baseSpirit": "rum",
-      "alcoholLevel": "medium",
-      "flavorProfiles": [
-        "bitter",
-        "fruity",
-        "refreshing"
-      ],
-      "ingredients": [
-        {
-          "name": {
-            "cn": "黑朗姆",
-            "en": "dark rum"
+            "cn": "波本威士忌",
+            "en": "bourbon whiskey"
           },
           "amount": {
             "cn": "45",
@@ -2470,12 +2096,15 @@ export const seedDrinks: SeedDrink[] = [
             "cn": "ml",
             "en": "ml"
           },
-          "substitute": null
+          "substitute": {
+            "cn": "黑麦威士忌",
+            "en": "rye whiskey"
+          }
         },
         {
           "name": {
-            "cn": "新鲜葡萄柚汁",
-            "en": "fresh grapefruit juice"
+            "cn": "金巴利",
+            "en": "Campari"
           },
           "amount": {
             "cn": "30",
@@ -2489,62 +2118,17 @@ export const seedDrinks: SeedDrink[] = [
         },
         {
           "name": {
-            "cn": "冷萃咖啡糖浆",
-            "en": "cold brew coffee syrup"
+            "cn": "甜味美思",
+            "en": "sweet vermouth"
           },
           "amount": {
-            "cn": "15",
-            "en": "15"
+            "cn": "30",
+            "en": "30"
           },
           "unit": {
             "cn": "ml",
             "en": "ml"
           },
-          "substitute": {
-            "cn": "速溶黑咖啡粉 5 ml + 简单糖浆 10 ml",
-            "en": "5 ml instant espresso + 10 ml simple syrup"
-          }
-        },
-        {
-          "name": {
-            "cn": "金巴利",
-            "en": "Campari"
-          },
-          "amount": {
-            "cn": "15",
-            "en": "15"
-          },
-          "unit": {
-            "cn": "ml",
-            "en": "ml"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "安格斯特拉苦精",
-            "en": "Angostura bitters"
-          },
-          "amount": {
-            "cn": "2",
-            "en": "2"
-          },
-          "unit": {
-            "cn": "滴",
-            "en": "dash"
-          },
-          "substitute": null
-        },
-        {
-          "name": {
-            "cn": "大冰块",
-            "en": "large ice cube"
-          },
-          "amount": {
-            "cn": "1",
-            "en": "1"
-          },
-          "unit": null,
           "substitute": null
         },
         {
@@ -2563,68 +2147,315 @@ export const seedDrinks: SeedDrink[] = [
       "tools": [
         {
           "name": {
-            "cn": "摇酒壶",
-            "en": "shaker"
+            "cn": "搅拌杯",
+            "en": "mixing glass"
+          },
+          "alternative": {
+            "cn": "任何一个容量合适的玻璃杯",
+            "en": "any suitably sized glass"
+          }
+        },
+        {
+          "name": {
+            "cn": "吧勺",
+            "en": "bar spoon"
+          },
+          "alternative": {
+            "cn": "长柄茶匙",
+            "en": "long-handled teaspoon"
+          }
+        },
+        {
+          "name": {
+            "cn": "搅拌滤冰器",
+            "en": "strainer"
           },
           "alternative": null
         },
         {
           "name": {
-            "cn": "量酒器",
-            "en": "jigger"
+            "cn": "削皮刀",
+            "en": "paring knife"
           },
-          "alternative": null
-        },
-        {
-          "name": {
-            "cn": "滤冰器",
-            "en": "Hawthorne strainer"
-          },
-          "alternative": null
+          "alternative": {
+            "cn": "锋利的小刀",
+            "en": "sharp small knife"
+          }
         }
       ],
       "steps": [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "将黑朗姆、葡萄柚汁、冷萃咖啡糖浆、金巴利和苦精倒入摇酒壶。",
-            "en": "Add dark rum, grapefruit juice, cold brew coffee syrup, Campari and bitters to the shaker."
+            "cn": "搅拌杯里加入大块方冰，倒入波本威士忌、金巴利和甜味美思。",
+            "en": "Add a large ice cube to a mixing glass, then pour in the bourbon, Campari, and sweet vermouth."
           },
-          "tips": null
+          "tips": {
+            "cn": "用大冰块搅拌，融化更慢，酒体更冷冽。",
+            "en": "A large cube melts slower, chilling the drink more effectively."
+          }
         },
         {
           "stepNumber": 2,
           "description": {
-            "cn": "加三块小方冰，摇荡 10 秒。",
-            "en": "Add three small ice cubes and shake hard for 10 seconds."
+            "cn": "用吧勺快速有力地搅拌约30秒，直到酒液充分冰镇。",
+            "en": "Stir vigorously with the bar spoon for about 30 seconds, until the drink is well-chilled."
           },
           "tips": {
-            "cn": "不用摇太久，这杯要保留一点重量感。",
-            "en": "Keep it brief; the drink needs some body."
+            "cn": "搅拌时让酒液在冰块表面充分接触，快速降温，轻微稀释。",
+            "en": "Stir so the liquid washes over the ice surface for rapid cooling and slight dilution."
           }
         },
         {
           "stepNumber": 3,
           "description": {
-            "cn": "洛克杯放入大冰块，滤入酒液。",
-            "en": "Place the large ice cube in the rocks glass and strain over it."
+            "cn": "古典杯里放入一块新的大方冰，用搅拌滤冰器将酒液滤入杯中。",
+            "en": "Place a fresh large ice cube in a rocks glass and strain the drink into the glass using the strainer."
           },
           "tips": null
         },
         {
           "stepNumber": 4,
           "description": {
-            "cn": "橙皮对折，挤出油雾在杯口，皮面朝下放入杯中。",
-            "en": "Fold the orange peel to express oils over the surface, pith-side down into the drink."
+            "cn": "用削皮刀取一块宽橙皮，在杯口上方拧拧，让皮油喷在酒面上，再把橙皮放入杯中作装饰。",
+            "en": "Express a wide strip of orange peel over the drink to mist the surface with oils, then drop the peel into the glass as garnish."
           },
           "tips": {
-            "cn": "皮面朝下让橙油慢慢渗进酒里。",
-            "en": "Pith-down lets the oils slowly bleed into the liquid as it sits."
+            "cn": "拧橙皮时，皮油会带着香气雾化洒落，先闻后喝。",
+            "en": "Expressing the peel releases its aromatic oils into the air above the drink—smell first, then sip."
           }
         }
       ]
     },
-    "imageUrl": "/drinks/night-flight.webp",
-    "thumbnailUrl": "/drinks/night-flight-thumb.webp"
+    "imageUrl": "/drinks/boulevardier-8f160c97.webp",
+    "thumbnailUrl": "/drinks/boulevardier-8f160c97-thumb.webp"
+  },
+  {
+    "slug": "night-passage",
+    "order": {
+      "locale": "en",
+      "mood": "reflect",
+      "strength": "medium",
+      "spirits": [
+        "rum"
+      ],
+      "skill": "intermediate",
+      "style": "creative",
+      "notes": "I love coffee. No ice in the glass, please."
+    },
+    "recipe": {
+      "name": {
+        "cn": "夜航",
+        "en": "Night Passage"
+      },
+      "description": {
+        "cn": "冷萃咖啡的苦香融入了黑朗姆的焦糖甜，一点橙味苦精带来柔和的草本气息。它浓厚而顺滑，适合慢慢喝。",
+        "en": "The roasted bitterness of cold brew coffee blends with dark rum's caramel sweetness, softened by a dash of orange bitters. It's rich, smooth, and layered for slow sipping."
+      },
+      "matchReason": {
+        "cn": "这杯酒浓郁又沉稳，温度刚好握在手里。它的层次会随着你一小口一小口地喝慢慢展开，陪你享受独处的安静。",
+        "en": "This drink is served cool without ice, so you can hold it. Its complex flavors unfold gradually, keeping you company on a quiet night."
+      },
+      "servingGlass": {
+        "cn": "冰镇过的马天尼杯",
+        "en": "Chilled coupe"
+      },
+      "timeRequired": {
+        "cn": "7 分钟",
+        "en": "7 min"
+      },
+      "appearance": "A deep, clear mahogany liquid sits in a chilled coupe, catching the light, with a thin strip of orange peel curled on its surface and no ice.",
+      "baseSpirit": "rum",
+      "alcoholLevel": "medium",
+      "flavorProfiles": [
+        "bitter",
+        "sweet",
+        "herbal"
+      ],
+      "ingredients": [
+        {
+          "name": {
+            "cn": "黑朗姆",
+            "en": "Dark rum"
+          },
+          "amount": {
+            "cn": "45",
+            "en": "45"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": null
+        },
+        {
+          "name": {
+            "cn": "冷萃咖啡浓缩液",
+            "en": "Cold brew coffee concentrate"
+          },
+          "amount": {
+            "cn": "30",
+            "en": "30"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": {
+            "cn": "浓缩咖啡液（冷却后使用）",
+            "en": "Espresso, cooled"
+          }
+        },
+        {
+          "name": {
+            "cn": "橙味苦精",
+            "en": "Orange bitters"
+          },
+          "amount": {
+            "cn": "1",
+            "en": "1"
+          },
+          "unit": {
+            "cn": "滴",
+            "en": "dash"
+          },
+          "substitute": {
+            "cn": "安高天娜苦精",
+            "en": "Angostura bitters"
+          }
+        },
+        {
+          "name": {
+            "cn": "简单糖浆",
+            "en": "Simple syrup"
+          },
+          "amount": {
+            "cn": "10",
+            "en": "10"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": null
+        },
+        {
+          "name": {
+            "cn": "橙皮",
+            "en": "Orange peel"
+          },
+          "amount": {
+            "cn": "1",
+            "en": "1"
+          },
+          "unit": {
+            "cn": "片",
+            "en": "strip"
+          },
+          "substitute": null
+        }
+      ],
+      "tools": [
+        {
+          "name": {
+            "cn": "调酒杯",
+            "en": "Mixing glass"
+          },
+          "alternative": {
+            "cn": "一个大的玻璃杯或摇壶内胆",
+            "en": "A large glass or the tin of your shaker"
+          }
+        },
+        {
+          "name": {
+            "cn": "吧勺",
+            "en": "Bar spoon"
+          },
+          "alternative": {
+            "cn": "长柄茶匙",
+            "en": "Long-handled teaspoon"
+          }
+        },
+        {
+          "name": {
+            "cn": "量酒器",
+            "en": "Jigger"
+          },
+          "alternative": {
+            "cn": "有刻度的量杯",
+            "en": "Measuring cup with ml markings"
+          }
+        },
+        {
+          "name": {
+            "cn": "滤冰器",
+            "en": "Hawthorne strainer"
+          },
+          "alternative": {
+            "cn": "细网筛",
+            "en": "Fine mesh sieve"
+          }
+        }
+      ],
+      "steps": [
+        {
+          "stepNumber": 1,
+          "description": {
+            "cn": "提前将马天尼杯放入冰箱冷冻室，或装满冰块和水，放在一边冰镇。",
+            "en": "Place your coupe glass in the freezer, or fill it with ice and water, to chill ahead of time."
+          },
+          "tips": {
+            "cn": "杯子够冷，酒液表面才会有清爽的触感。",
+            "en": "A well-chilled glass gives the drink a crisp surface."
+          }
+        },
+        {
+          "stepNumber": 2,
+          "description": {
+            "cn": "在调酒杯中加入所有液体材料：黑朗姆、冷萃咖啡浓缩液、橙味苦精和简单糖浆。",
+            "en": "Add all the liquid ingredients to the mixing glass: dark rum, cold brew coffee concentrate, orange bitters, and simple syrup."
+          },
+          "tips": {
+            "cn": "确保咖啡是冷的，不然会融化冰块太快。",
+            "en": "Make sure the coffee is cold to avoid over-diluting the drink."
+          }
+        },
+        {
+          "stepNumber": 3,
+          "description": {
+            "cn": "加入一大块方冰或4-5块大方冰到调酒杯中。用吧勺平稳地搅拌约45秒，直到酒液充分冷却。",
+            "en": "Add one large ice cube or 4-5 large ice cubes to the mixing glass. Stir steadily with the bar spoon for about 45 seconds until well-chilled."
+          },
+          "tips": {
+            "cn": "搅拌要慢而稳，让酒液充分融合和降温，但不过度稀释。",
+            "en": "Stir slowly to properly combine and chill the drink without over-dilution."
+          }
+        },
+        {
+          "stepNumber": 4,
+          "description": {
+            "cn": "倒掉冰镇杯中用于冰镇的水和冰块。通过滤冰器，将混合好的酒液滤入冰镇过的马天尼杯中。",
+            "en": "Discard the ice and water from the chilling glass. Using the strainer, strain the mixed drink into the chilled coupe glass."
+          },
+          "tips": {
+            "cn": "滤冰器能挡住融化的碎冰，保证酒液清澈。",
+            "en": "The strainer catches any small ice chips, leaving the drink clear."
+          }
+        },
+        {
+          "stepNumber": 5,
+          "description": {
+            "cn": "在杯口挤压橙皮，使其油脂喷在酒液表面，然后将橙皮放入杯中作为装饰。",
+            "en": "Express the orange peel over the surface of the drink to release its oils, then drop it into the glass as garnish."
+          },
+          "tips": {
+            "cn": "挤压时橙皮的内侧对着杯口，能释放更多香气。",
+            "en": "Aim the inside of the peel towards the drink to direct the aroma."
+          }
+        }
+      ]
+    },
+    "imageUrl": "/drinks/night-passage-0ced01cc.webp",
+    "thumbnailUrl": "/drinks/night-passage-0ced01cc-thumb.webp"
   }
 ];

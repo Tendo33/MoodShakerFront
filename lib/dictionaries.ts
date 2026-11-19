@@ -36,7 +36,6 @@ export interface Dictionary {
     ctaForMood: string;
     pouredFor: string;
     /** Statement split where the inline pictures go. */
-    statement: [string, string, string, string];
     stepsTitle: string;
     steps: { title: string; body: string }[];
     menuTitle: string;
