@@ -31,12 +31,14 @@ export interface Dictionary {
   >;
   nav: Record<"shake" | "menu" | "switchTo" | "switchLabel" | "home" | "skip", string>;
   home: {
+    headline: [string, string];
     lede: string;
+    ctaNote: string;
+    ticket: Record<"title" | "mood" | "strength" | "spirits" | "skill" | "style" | "anySpirit" | "read", string>;
     moodPrompt: string;
     ctaForMood: string;
     pouredFor: string;
     /** Statement split where the inline pictures go. */
-    statement: [string, string, string, string];
     stepsTitle: string;
     steps: { title: string; body: string }[];
     menuTitle: string;
@@ -51,6 +53,7 @@ export interface Dictionary {
   };
   questions: {
     progress: string;
+    order: string;
     back: string;
     next: string;
     submit: string;
@@ -60,7 +63,7 @@ export interface Dictionary {
     strength: { title: string; hint: string };
     bar: { title: string; hint: string; spirits: string; skill: string; choose: string };
     style: { title: string; hint: string; notes: string; notesPlaceholder: string; notesCount: string };
-    shaking: { title: string; lines: string[]; note: string };
+    shaking: { title: string; done: string; lines: string[]; note: string };
     errors: Record<"generic" | "rateLimited" | "unavailable", string>;
   };
   options: {

@@ -20,11 +20,22 @@ export const cn: Dictionary = {
     skip: "跳到正文",
   },
   home: {
+    headline: ["今晚的心情，", "调成一杯酒。"],
+    ctaNote: "四个问题，约一分钟",
+    ticket: {
+      title: "一位客人是这样说的",
+      mood: "心情",
+      strength: "想喝多烈",
+      spirits: "手边的基酒",
+      skill: "手艺",
+      style: "风格",
+      anySpirit: "没说",
+      read: "看这杯的配方",
+    },
     lede: "说出今晚的心情，AI 调酒师为你写一杯酒：配方、做法，还有它的照片。",
     moodPrompt: "今晚的心情",
     ctaForMood: "为「{mood}」调一杯",
     pouredFor: "为「{mood}」而调",
-    statement: ["说说今晚的心情", "、家里有什么酒", "，就为你调一杯，连照片一起", "。"],
     stepsTitle: "从心情到一杯酒",
     steps: [
       { title: "说", body: "四个问题：心情、想喝多烈、家里有什么酒、经典还是创意。" },
@@ -44,6 +55,7 @@ export const cn: Dictionary = {
 
   questions: {
     progress: "第 {n} 问，共 {total} 问",
+    order: "你的点单",
     back: "上一步",
     next: "下一步",
     submit: "交给调酒师",
@@ -67,6 +79,7 @@ export const cn: Dictionary = {
     },
     shaking: {
       title: "正在调制",
+      done: "调好了",
       lines: ["读你的心情", "挑基酒", "量配比", "写配方"],
       note: "通常需要一分钟左右，请先别关掉这个页面。",
     },
@@ -181,6 +194,7 @@ export const cn: Dictionary = {
     credit: "酒的照片由 AI 生成。",
     disclaimer: "配方由 AI 生成，未必完全准确。请理性饮酒，未成年人请勿饮酒。",
   },
-  notFound: { title: "这一页不在酒单上", body: "可能已被撤下，或者地址有误。", home: "回到首页" },
+  // \u200b: where the title may turn when it does not fit on one line.
+  notFound: { title: "这一页\u200b不在酒单上", body: "可能已被撤下，或者地址有误。", home: "回到首页" },
   error: { title: "吧台出了点状况", body: "再试一次；还不行的话，刷新页面。", retry: "重试" },
 };

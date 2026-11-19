@@ -38,14 +38,18 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
   const recipe = localize(row.recipe, locale);
   const mood = row.order?.mood;
 
-  // Same mood first, then anything else, so the closing row is always full.
+  // The closing row is always full. With enough drinks poured for the same mood it
+  // shows only those and says so; otherwise it is a mixed row under a plain title,
+  // never drinks from other moods under this mood's name.
   const pool = await orEmpty(
     listPublishedDrinks({ limit: 24 }).then((page) =>
       page.drinks.filter((other) => other.id !== row.id).map((other) => summarize(other, locale)),
     ),
     "cocktail",
   );
-  const others = [...pool.filter((other) => other.mood === mood), ...pool.filter((other) => other.mood !== mood)].slice(0, 4);
+  const sameMood = pool.filter((other) => other.mood === mood);
+  const onlySameMood = Boolean(mood) && sameMood.length >= 4;
+  const others = (onlySameMood ? sameMood : [...sameMood, ...pool.filter((other) => other.mood !== mood)]).slice(0, 4);
 
   return (
     <>
@@ -70,7 +74,9 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
           <section className="frame mt-[clamp(120px,18vh,220px)]" aria-labelledby="more-heading">
             <div className="flex flex-wrap items-baseline justify-between gap-4">
               <h2 id="more-heading" className="reveal text-head">
-                {mood ? format(dict.detail.moreForMood, { mood: dict.options.moods[mood].label }) : dict.detail.more}
+                {mood && onlySameMood
+                  ? format(dict.detail.moreForMood, { mood: dict.options.moods[mood].label })
+                  : dict.detail.more}
               </h2>
               <Link href={localizePath("/gallery", locale)} className="link py-2 text-lead">
                 {dict.detail.back} →
@@ -85,9 +91,9 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
                       alt={other.name}
                       mood={other.mood}
                       sizes="(min-width: 1024px) 25vw, 50vw"
-                      className="aspect-[4/5] transition-transform duration-300 ease-out group-hover:scale-[0.985]"
+                      className="aspect-[4/5]"
                     />
-                    <p className="mt-3 font-medium transition-opacity duration-200 group-hover:opacity-60">{other.name}</p>
+                    <p className="mt-3 font-display text-lead leading-snug transition-opacity duration-200 group-hover:opacity-60">{other.name}</p>
                     <p className="text-small text-muted">{dict.vocab.spirits[other.baseSpirit]}</p>
                   </Link>
                 </li>

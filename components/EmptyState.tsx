@@ -32,7 +32,7 @@ export function EmptyState({
     <div className="frame py-12 lg:py-16">
       <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
         <div className="lg:col-span-6">
-          <h1 className="title enter max-w-[14ch]">{title}</h1>
+          <h1 className="title title-measure enter">{title}</h1>
           {body && <p className="enter mt-6 max-w-[40ch] text-lead [--i:1]">{body}</p>}
           <div className="enter mt-10 flex flex-wrap gap-2 [--i:2]">{children}</div>
         </div>
@@ -40,7 +40,7 @@ export function EmptyState({
           className="enter relative aspect-square lg:col-span-6 lg:aspect-[5/4] [--i:1]"
           style={{ backgroundColor: MOOD_COLORS.blue }}
         >
-          <div className="absolute inset-[8%]">
+          <div className="absolute inset-[4%]">
             <Image src="/stages/shaker.webp" alt="" fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="specimen" />
           </div>
         </div>
@@ -59,9 +59,9 @@ export function EmptyState({
                     alt={drink.name}
                     mood={drink.mood}
                     sizes="(min-width: 1024px) 25vw, 50vw"
-                    className="aspect-[4/5] transition-transform duration-300 ease-out group-hover:scale-[0.985]"
+                    className="aspect-[4/5]"
                   />
-                  <p className="mt-3 font-medium transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
+                  <p className="mt-3 font-display text-lead leading-snug transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
                 </Link>
               </li>
             ))}

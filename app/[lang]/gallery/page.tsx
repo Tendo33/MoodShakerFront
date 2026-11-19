@@ -44,11 +44,11 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
   return (
     <div className="frame">
       <header className="grid gap-6 pt-6 lg:grid-cols-12 lg:items-end">
-        <h1 className="enter text-display leading-[0.88] tracking-[-0.055em] lg:col-span-7">{dict.gallery.title}</h1>
+        <h1 className="enter text-display leading-[0.95] lg:col-span-7">{dict.gallery.title}</h1>
         <p className="enter max-w-[36ch] text-lead [--i:1] lg:col-span-5 lg:justify-self-end lg:pb-3">{dict.gallery.lede}</p>
       </header>
 
-      <nav aria-label={dict.recipe.spirit} className="enter mt-12 flex flex-wrap gap-x-1 gap-y-1 [--i:2]">
+      <nav aria-label={dict.recipe.spirit} className="enter mt-12 flex flex-wrap gap-x-7 gap-y-2 text-lead [--i:2]">
         {[undefined, ...FILTERS].map((code) => {
           const active = code === spirit;
           return (
@@ -56,7 +56,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
               key={code ?? "all"}
               href={href({ spirit: code })}
               aria-current={active ? "page" : undefined}
-              className={`px-4 py-2.5 transition-colors duration-200 ${active ? "bg-ink text-bone" : "bg-surface hover:bg-ink hover:text-bone"}`}
+              className={`nav-link py-1.5 ${active ? "font-medium" : "text-muted hover:text-ink"}`}
             >
               {code ? dict.vocab.spirits[code] : dict.gallery.all}
             </Link>
@@ -90,10 +90,19 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
                     alt={drink.name}
                     mood={drink.mood}
                     sizes={feature ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"}
-                    className="reveal-picture aspect-[4/5] transition-transform duration-300 ease-out group-hover:scale-[0.985]"
+                    className="reveal-picture aspect-[4/5]"
                   />
-                  <p className={`mt-3 font-medium transition-opacity duration-200 group-hover:opacity-60 ${feature ? "text-lead" : ""}`}>{drink.name}</p>
-                  <p className="text-small text-muted">{dict.vocab.spirits[drink.baseSpirit]} · {dict.vocab.alcohol[drink.alcoholLevel]}</p>
+                  <p
+                    className={`mt-3 font-display transition-opacity duration-200 group-hover:opacity-60 ${
+                      feature ? "text-[clamp(1.5rem,1.2rem+1vw,2.125rem)] leading-tight" : "text-lead leading-snug"
+                    }`}
+                  >
+                    {drink.name}
+                  </p>
+                  <p className="mt-1 text-small text-muted">
+                    {dict.vocab.spirits[drink.baseSpirit]} · {dict.vocab.alcohol[drink.alcoholLevel]}
+                    {drink.mood && ` · ${dict.options.moods[drink.mood].label}`}
+                  </p>
                 </Link>
               </li>
             );

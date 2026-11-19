@@ -22,7 +22,7 @@ pnpm dev
 有两个脚本会真的调用模型，每次运行都有少量费用：
 
 - `pnpm eval:recipes [n …]`：用八个差异很大的点单跑一遍，并排打印配方、耗时和是否触发修复。改 `lib/ai/prompts.ts` 或换模型后都要跑。
-- `pnpm seeds:build [n …]`：重新生成示例酒单（配方和照片），写入 `scripts/seed-data.ts` 和 `public/drinks/`。
+- `pnpm seeds:build [n …]`：重新生成示例酒单（配方和照片），写入 `scripts/seed-data.ts` 和 `public/drinks/`。`pnpm seeds:build stages` 重拍首页的两张静物图；`pnpm seeds:build reframe` 不调用模型，只把已有照片按当前规则重新处理。
 
 ## 结构
 
@@ -77,7 +77,7 @@ docker compose pull && docker compose up -d
 | 推 `main` | `image.yml` | 检查通过后推送 `sha-<7 位>` 和 `latest` |
 | 推 `v*` 标签 | `image.yml`、`release.yml` | 检查通过后推送 `<版本>`、`<主>.<次>`，并创建 GitHub Release |
 
-容器启动时先执行迁移（`pnpm db:migrate`），写入十二款酒的种子酒单，再启动 Next。数据库不可达时 `/api/health` 返回 503。配置项说明见 `.env.example`。
+容器启动时先执行迁移（`pnpm db:migrate`），写入种子酒单（并与 `scripts/seed-data.ts` 保持一致：有变化的种子会被更新，已移除的会被删掉），再启动 Next。数据库不可达时 `/api/health` 返回 503。配置项说明见 `.env.example`。
 
 限流没有内存兜底：缺数据库是部署错误，不会静默降级。
 
