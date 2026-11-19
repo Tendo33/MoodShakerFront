@@ -190,7 +190,7 @@ RECIPE = {
   "name": the drink's name,
   "description": one or two sentences on what it tastes like and what makes it this drink (Chinese at most 50 characters, English at most 35 words),
   "matchReason": one or two sentences to the guest on why this drink suits how they feel tonight. Point to one thing that is true of this exact drink (served hot or ice-cold, its bitterness, its bubbles, an aroma, how long it takes to drink) and say what that does for them, in your own words. Do not repeat their answers back to them,
-  "servingGlass": one glass, by its usual name,
+  "servingGlass": one glass by its usual name alone, the same glass in both versions: 高球杯 / Highball glass, 古典杯 / Rocks glass, 碟形杯 / Coupe, 笛形杯 / Flute, 马天尼杯 / Martini glass, 葡萄酒杯 / Wine glass, 马克杯 / Mug, 铜杯 / Copper mug. No "chilled", no "or", no second choice,
   "timeRequired": e.g. "5 分钟" / "5 min",
   "ingredients": 2-8 of { "name": string, "amount": "50" | "1" | "to top" | "加满", "unit": "ml" | "dash" | "滴" | "片" | null, "substitute": string or null },
   "tools": 0-6 of { "name": string, "alternative": a household stand-in or null },

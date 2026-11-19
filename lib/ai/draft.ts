@@ -145,13 +145,15 @@ export function toRecipe(draft: Draft): Recipe {
   const cn = { ...draft.cn, ingredients: withoutIce(draft.cn.ingredients) };
   const en = { ...draft.en, ingredients: withoutIce(draft.en.ingredients) };
   const pair = (a: string, b: string) => ({ cn: a, en: b });
+  // Names head a line on the page; the model writes "gin" in one recipe and "Gin" in the next.
+  const named = (a: string, b: string) => pair(a, b.charAt(0).toUpperCase() + b.slice(1));
   const optionalPair = (a: string | null, b: string | null) => (a && b ? { cn: a, en: b } : null);
 
   return {
     name: pair(cn.name, en.name),
     description: pair(cn.description, en.description),
     matchReason: pair(cn.matchReason, en.matchReason),
-    servingGlass: pair(cn.servingGlass, en.servingGlass),
+    servingGlass: named(cn.servingGlass, en.servingGlass),
     timeRequired: pair(cn.timeRequired, en.timeRequired),
     appearance: draft.appearance,
     baseSpirit: draft.baseSpirit,
@@ -163,14 +165,14 @@ export function toRecipe(draft: Draft): Recipe {
       const unit = (side: { amount: string; unit: string | null }) => (side.unit === side.amount ? null : side.unit);
       const cnUnit = unit(item);
       return {
-        name: pair(item.name, other.name),
+        name: named(item.name, other.name),
         amount: pair(toChineseMeasure(item.amount), other.amount),
         unit: optionalPair(cnUnit && toChineseMeasure(cnUnit), unit(other)),
         substitute: optionalPair(item.substitute, other.substitute),
       };
     }),
     tools: cn.tools.map((tool, index) => ({
-      name: pair(tool.name, en.tools[index].name),
+      name: named(tool.name, en.tools[index].name),
       alternative: optionalPair(tool.alternative, en.tools[index].alternative),
     })),
     steps: cn.steps.map((step, index) => ({

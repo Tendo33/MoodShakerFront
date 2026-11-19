@@ -38,8 +38,8 @@ export const seedDrinks: SeedDrink[] = [
         "en": "It's long, cold, and gently sparkling, something you can sip slowly to let the day unwind."
       },
       "servingGlass": {
-        "cn": "海波杯",
-        "en": "highball glass"
+        "cn": "高球杯",
+        "en": "Highball glass"
       },
       "timeRequired": {
         "cn": "3 分钟",
@@ -57,7 +57,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "金酒",
-            "en": "gin"
+            "en": "Gin"
           },
           "amount": {
             "cn": "30",
@@ -72,7 +72,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "汤力水",
-            "en": "tonic water"
+            "en": "Tonic water"
           },
           "amount": {
             "cn": "加满",
@@ -84,7 +84,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "青柠角",
-            "en": "lime wedge"
+            "en": "Lime wedge"
           },
           "amount": {
             "cn": "1",
@@ -98,14 +98,14 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "长勺",
-            "en": "long spoon"
+            "en": "Long spoon"
           },
           "alternative": null
         },
         {
           "name": {
             "cn": "刀",
-            "en": "knife"
+            "en": "Knife"
           },
           "alternative": null
         }
@@ -114,7 +114,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "海波杯中装满冰块。",
+            "cn": "高球杯中装满冰块。",
             "en": "Fill a highball glass with ice."
           },
           "tips": {
@@ -440,7 +440,7 @@ export const seedDrinks: SeedDrink[] = [
         "en": "A celebration calls for something sparkling and vibrant. This drink’s lively bubbles and bright citrus keep things refreshing and lift your spirits."
       },
       "servingGlass": {
-        "cn": "海波杯",
+        "cn": "高球杯",
         "en": "Highball glass"
       },
       "timeRequired": {
@@ -578,7 +578,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "在海波杯中放入一大块方冰。",
+            "cn": "在高球杯中放入一大块方冰。",
             "en": "Place one large ice cube in a highball glass."
           },
           "tips": {
@@ -663,7 +663,7 @@ export const seedDrinks: SeedDrink[] = [
       },
       "servingGlass": {
         "cn": "笛形杯",
-        "en": "Champagne flute"
+        "en": "Flute"
       },
       "timeRequired": {
         "cn": "5 分钟",
@@ -681,7 +681,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "金酒",
-            "en": "gin"
+            "en": "Gin"
           },
           "amount": {
             "cn": "30",
@@ -696,7 +696,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "柠檬汁",
-            "en": "lemon juice"
+            "en": "Lemon juice"
           },
           "amount": {
             "cn": "15",
@@ -711,7 +711,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "单糖浆",
-            "en": "simple syrup"
+            "en": "Simple syrup"
           },
           "amount": {
             "cn": "10",
@@ -726,7 +726,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "起泡酒",
-            "en": "sparkling wine"
+            "en": "Sparkling wine"
           },
           "amount": {
             "cn": "加满",
@@ -741,7 +741,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "柠檬皮扭花",
-            "en": "lemon twist"
+            "en": "Lemon twist"
           },
           "amount": {
             "cn": "1",
@@ -755,28 +755,28 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "摇酒器",
-            "en": "cocktail shaker"
+            "en": "Cocktail shaker"
           },
           "alternative": null
         },
         {
           "name": {
             "cn": "量酒器",
-            "en": "jigger"
+            "en": "Jigger"
           },
           "alternative": null
         },
         {
           "name": {
             "cn": "过滤器",
-            "en": "strainer"
+            "en": "Strainer"
           },
           "alternative": null
         },
         {
           "name": {
             "cn": "吧勺",
-            "en": "bar spoon"
+            "en": "Bar spoon"
           },
           "alternative": null
         }
@@ -858,8 +858,8 @@ export const seedDrinks: SeedDrink[] = [
         "en": "It's made to be held in your hands and sipped slowly. The honey is gentle, not cloying, and the scent of cinnamon and lemon makes the whole thing feel comforting."
       },
       "servingGlass": {
-        "cn": "耐热马克杯",
-        "en": "Heatproof mug"
+        "cn": "马克杯",
+        "en": "Mug"
       },
       "timeRequired": {
         "cn": "5 分钟",
@@ -987,7 +987,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "向耐热马克杯中倒入45毫升威士忌、15毫升蜂蜜和15毫升柠檬汁。",
+            "cn": "向马克杯中倒入45毫升威士忌、15毫升蜂蜜和15毫升柠檬汁。",
             "en": "Add 45 ml whiskey, 15 ml honey, and 15 ml lemon juice to the heatproof mug."
           },
           "tips": {
@@ -1055,8 +1055,8 @@ export const seedDrinks: SeedDrink[] = [
         "en": "This is served ice-cold to slow you down. The tea is familiar, the sweetness is soft, and the lemon brings just a touch of brightness—it's not too sweet and not too loud."
       },
       "servingGlass": {
-        "cn": "老式杯",
-        "en": "rocks glass"
+        "cn": "古典杯",
+        "en": "Rocks glass"
       },
       "timeRequired": {
         "cn": "5 分钟",
@@ -1075,7 +1075,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "热浓红茶",
-            "en": "strong hot black tea"
+            "en": "Strong hot black tea"
           },
           "amount": {
             "cn": "120",
@@ -1093,7 +1093,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "鲜柠檬汁",
-            "en": "fresh lemon juice"
+            "en": "Fresh lemon juice"
           },
           "amount": {
             "cn": "25",
@@ -1111,7 +1111,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "蜂蜜",
-            "en": "honey"
+            "en": "Honey"
           },
           "amount": {
             "cn": "15",
@@ -1129,7 +1129,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "纯净水（可选）",
-            "en": "still water (optional)"
+            "en": "Still water (optional)"
           },
           "amount": {
             "cn": "30",
@@ -1144,7 +1144,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "柠檬片",
-            "en": "lemon slice"
+            "en": "Lemon slice"
           },
           "amount": {
             "cn": "1",
@@ -1161,14 +1161,14 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "长柄勺",
-            "en": "long spoon"
+            "en": "Long spoon"
           },
           "alternative": null
         },
         {
           "name": {
             "cn": "带盖玻璃罐",
-            "en": "lidded jar"
+            "en": "Lidded jar"
           },
           "alternative": {
             "cn": "任何带盖的结实杯子",
@@ -1178,7 +1178,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "厨房刀",
-            "en": "kitchen knife"
+            "en": "Kitchen knife"
           },
           "alternative": null
         }
@@ -1209,7 +1209,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 3,
           "description": {
-            "cn": "在老式杯中放入一个大冰球。",
+            "cn": "在古典杯中放入一个大冰球。",
             "en": "Place a large ice sphere in a rocks glass."
           },
           "tips": {
@@ -1511,7 +1511,7 @@ export const seedDrinks: SeedDrink[] = [
         "en": "The layered color in the glass shifts from orange to red, like a sunset. It's a drink to sip slowly and watch the light change."
       },
       "servingGlass": {
-        "cn": "海波杯",
+        "cn": "高球杯",
         "en": "Highball glass"
       },
       "timeRequired": {
@@ -1624,7 +1624,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "在海波杯里装满冰块。",
+            "cn": "在高球杯里装满冰块。",
             "en": "Fill a highball glass with ice."
           },
           "tips": {
@@ -1701,7 +1701,7 @@ export const seedDrinks: SeedDrink[] = [
       },
       "servingGlass": {
         "cn": "高球杯",
-        "en": "highball glass"
+        "en": "Highball glass"
       },
       "timeRequired": {
         "cn": "3 分钟",
@@ -1890,8 +1890,8 @@ export const seedDrinks: SeedDrink[] = [
         "en": "It's ice-cold and full of fizz, a sharp and bracing drink that wakes you up with the first sip."
       },
       "servingGlass": {
-        "cn": "铜杯或海波杯",
-        "en": "copper mug or highball glass"
+        "cn": "铜杯",
+        "en": "Copper mug"
       },
       "timeRequired": {
         "cn": "3 分钟",
@@ -1908,7 +1908,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "伏特加",
-            "en": "vodka"
+            "en": "Vodka"
           },
           "amount": {
             "cn": "45",
@@ -1923,7 +1923,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "青柠汁",
-            "en": "lime juice"
+            "en": "Lime juice"
           },
           "amount": {
             "cn": "15",
@@ -1938,7 +1938,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "姜汁啤酒",
-            "en": "ginger beer"
+            "en": "Ginger beer"
           },
           "amount": {
             "cn": "120",
@@ -1956,7 +1956,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "青柠角",
-            "en": "lime wedge"
+            "en": "Lime wedge"
           },
           "amount": {
             "cn": "1",
@@ -1970,14 +1970,14 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "量酒器",
-            "en": "jigger"
+            "en": "Jigger"
           },
           "alternative": null
         },
         {
           "name": {
             "cn": "吧勺",
-            "en": "bar spoon"
+            "en": "Bar spoon"
           },
           "alternative": {
             "cn": "长柄勺子",
@@ -1989,8 +1989,8 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "在铜杯或海波杯中装满冰块。",
-            "en": "Fill a copper mug or highball glass with ice."
+            "cn": "在铜杯中装满冰块。",
+            "en": "Fill a copper mug with ice."
           },
           "tips": null
         },
@@ -2068,7 +2068,7 @@ export const seedDrinks: SeedDrink[] = [
       },
       "servingGlass": {
         "cn": "古典杯",
-        "en": "rocks glass"
+        "en": "Rocks glass"
       },
       "timeRequired": {
         "cn": "5 分钟",
@@ -2086,7 +2086,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "波本威士忌",
-            "en": "bourbon whiskey"
+            "en": "Bourbon whiskey"
           },
           "amount": {
             "cn": "45",
@@ -2119,7 +2119,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "甜味美思",
-            "en": "sweet vermouth"
+            "en": "Sweet vermouth"
           },
           "amount": {
             "cn": "30",
@@ -2134,7 +2134,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "橙皮",
-            "en": "orange peel"
+            "en": "Orange peel"
           },
           "amount": {
             "cn": "1",
@@ -2148,7 +2148,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "搅拌杯",
-            "en": "mixing glass"
+            "en": "Mixing glass"
           },
           "alternative": {
             "cn": "任何一个容量合适的玻璃杯",
@@ -2158,7 +2158,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "吧勺",
-            "en": "bar spoon"
+            "en": "Bar spoon"
           },
           "alternative": {
             "cn": "长柄茶匙",
@@ -2168,14 +2168,14 @@ export const seedDrinks: SeedDrink[] = [
         {
           "name": {
             "cn": "搅拌滤冰器",
-            "en": "strainer"
+            "en": "Strainer"
           },
           "alternative": null
         },
         {
           "name": {
             "cn": "削皮刀",
-            "en": "paring knife"
+            "en": "Paring knife"
           },
           "alternative": {
             "cn": "锋利的小刀",
@@ -2257,8 +2257,8 @@ export const seedDrinks: SeedDrink[] = [
         "en": "This drink is served cool without ice, so you can hold it. Its complex flavors unfold gradually, keeping you company on a quiet night."
       },
       "servingGlass": {
-        "cn": "冰镇过的马天尼杯",
-        "en": "Chilled coupe"
+        "cn": "碟形杯",
+        "en": "Coupe"
       },
       "timeRequired": {
         "cn": "7 分钟",
@@ -2401,7 +2401,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 1,
           "description": {
-            "cn": "提前将马天尼杯放入冰箱冷冻室，或装满冰块和水，放在一边冰镇。",
+            "cn": "提前将碟形杯放入冰箱冷冻室，或装满冰块和水，放在一边冰镇。",
             "en": "Place your coupe glass in the freezer, or fill it with ice and water, to chill ahead of time."
           },
           "tips": {
@@ -2434,7 +2434,7 @@ export const seedDrinks: SeedDrink[] = [
         {
           "stepNumber": 4,
           "description": {
-            "cn": "倒掉冰镇杯中用于冰镇的水和冰块。通过滤冰器，将混合好的酒液滤入冰镇过的马天尼杯中。",
+            "cn": "倒掉冰镇杯中用于冰镇的水和冰块。通过滤冰器，将混合好的酒液滤入冰镇过的碟形杯中。",
             "en": "Discard the ice and water from the chilling glass. Using the strainer, strain the mixed drink into the chilled coupe glass."
           },
           "tips": {

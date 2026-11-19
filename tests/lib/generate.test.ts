@@ -134,6 +134,24 @@ describe("draft", () => {
     );
   });
 
+  it("starts English names with a capital, whatever case the model wrote", () => {
+    const lower = {
+      ...sampleDraft,
+      en: {
+        ...sampleDraft.en,
+        servingGlass: "highball glass",
+        ingredients: sampleDraft.en.ingredients.map((item) => ({ ...item, name: item.name.toLowerCase() })),
+        tools: sampleDraft.en.tools.map((tool) => ({ ...tool, name: tool.name.toLowerCase() })),
+      },
+    };
+    const result = parseDraft(lower);
+    assert.ok(result.ok);
+    const recipe = toRecipe(result.draft);
+    assert.equal(recipe.servingGlass.en, "Highball glass");
+    assert.deepEqual(recipe.ingredients.map((item) => item.name.en), ["Gin", "Tonic water"]);
+    assert.equal(recipe.tools[0].name.en, "Bar spoon");
+  });
+
   it("flags Chinese left in the English version", () => {
     const slipped = {
       ...sampleDraft,
