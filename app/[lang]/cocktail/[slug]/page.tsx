@@ -93,7 +93,7 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
                       sizes="(min-width: 1024px) 25vw, 50vw"
                       className="aspect-[4/5]"
                     />
-                    <p className="mt-3 font-medium transition-opacity duration-200 group-hover:opacity-60">{other.name}</p>
+                    <p className="mt-3 font-display text-lead leading-snug transition-opacity duration-200 group-hover:opacity-60">{other.name}</p>
                     <p className="text-small text-muted">{dict.vocab.spirits[other.baseSpirit]}</p>
                   </Link>
                 </li>

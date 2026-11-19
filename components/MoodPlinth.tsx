@@ -165,7 +165,7 @@ export function MoodPlinth({
             className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1"
             aria-live="polite"
           >
-            <span className="text-lead font-medium">{active.name}</span>
+            <span className="font-display text-[clamp(1.375rem,1.1rem+0.8vw,1.75rem)]">{active.name}</span>
             <span className="text-muted">
               {format(dict.home.pouredFor, {
                 mood: dict.options.moods[active.mood ?? mood].label,

@@ -53,6 +53,7 @@ export interface Dictionary {
   };
   questions: {
     progress: string;
+    order: string;
     back: string;
     next: string;
     submit: string;

@@ -190,9 +190,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                     sizes="(min-width: 1024px) 17vw, (min-width: 640px) 33vw, 50vw"
                     className={`reveal-picture ${TILE_SHAPES[index % TILE_SHAPES.length]}`}
                   />
-                  <p className="mt-2 text-small transition-opacity duration-200 group-hover:opacity-60">
-                    {drink.name} · {dict.vocab.spirits[drink.baseSpirit]}
-                  </p>
+                  <p className="mt-2.5 font-display leading-snug transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
+                  <p className="text-small text-muted">{dict.vocab.spirits[drink.baseSpirit]}</p>
                 </Link>
               </li>
             ))}

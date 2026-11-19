@@ -55,6 +55,7 @@ export const en: Dictionary = {
 
   questions: {
     progress: "Question {n} of {total}",
+    order: "Your order",
     back: "Back",
     next: "Next",
     submit: "Ask the bartender",

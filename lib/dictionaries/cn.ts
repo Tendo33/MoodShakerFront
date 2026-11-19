@@ -55,6 +55,7 @@ export const cn: Dictionary = {
 
   questions: {
     progress: "第 {n} 问，共 {total} 问",
+    order: "你的点单",
     back: "上一步",
     next: "下一步",
     submit: "交给调酒师",

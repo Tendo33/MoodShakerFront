@@ -223,6 +223,19 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
     window.setTimeout(() => router.push(localizePath(`/drink/${drink.id}`, locale)), POURED_MS);
   }
 
+  // The order so far, for the questions already passed: each answer leads back to its question.
+  const answers: [number, string | null][] = [
+    [0, draft.mood ? dict.options.moods[draft.mood].label : null],
+    [1, draft.strength ? dict.options.strengths[draft.strength].label : null],
+    [
+      2,
+      draft.skill
+        ? [...draft.spirits.map((spirit) => dict.vocab.spirits[spirit]), dict.options.skills[draft.skill].label].join(" · ")
+        : null,
+    ],
+  ];
+  const answered = answers.filter((entry): entry is [number, string] => entry[0] < step && entry[1] !== null);
+
   // Once a mood is chosen the whole page takes its colour.
   const field = draft.mood ? MOOD_COLORS[draft.mood] : undefined;
 
@@ -396,6 +409,22 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
 
           {/* Outside the keyed form, so the bar and the controls stay put while the question turns. */}
           <div className="mt-auto pt-10">
+            {answered.length > 0 && (
+              <ul className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-2" aria-label={t.order}>
+                <li className="mr-1 text-ink/70">{t.order}</li>
+                {answered.map(([index, label]) => (
+                  <li key={index}>
+                    <button
+                      type="button"
+                      onClick={() => go(index)}
+                      className="bg-bone/70 px-3 py-1.5 font-medium transition-colors duration-200 hover:bg-ink hover:text-bone"
+                    >
+                      {label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="grid grid-cols-4 gap-1" aria-hidden>
               {STEPS.map((name, index) => (
                 <span key={name} className="h-1 overflow-hidden bg-ink/15">
