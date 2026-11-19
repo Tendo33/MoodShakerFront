@@ -20,6 +20,18 @@ export const en: Dictionary = {
     skip: "Skip to content",
   },
   home: {
+    headline: ["Tell us the mood.", "We\u2019ll pour the drink."],
+    ctaNote: "Four questions, about a minute",
+    ticket: {
+      title: "What one guest said",
+      mood: "Mood",
+      strength: "Strength",
+      spirits: "Spirits at home",
+      skill: "Skill",
+      style: "Style",
+      anySpirit: "Not said",
+      read: "See the recipe",
+    },
     lede: "Tell us how tonight feels. An AI bartender writes you one cocktail, with the recipe and a photograph.",
     moodPrompt: "Tonight's mood",
     ctaForMood: "Shake one for {mood}",

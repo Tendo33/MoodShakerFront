@@ -20,6 +20,18 @@ export const cn: Dictionary = {
     skip: "跳到正文",
   },
   home: {
+    headline: ["今晚的心情，", "调成一杯酒。"],
+    ctaNote: "四个问题，约一分钟",
+    ticket: {
+      title: "一位客人是这样说的",
+      mood: "心情",
+      strength: "想喝多烈",
+      spirits: "手边的基酒",
+      skill: "手艺",
+      style: "风格",
+      anySpirit: "没说",
+      read: "看这杯的配方",
+    },
     lede: "说出今晚的心情，AI 调酒师为你写一杯酒：配方、做法，还有它的照片。",
     moodPrompt: "今晚的心情",
     ctaForMood: "为「{mood}」调一杯",

@@ -16,10 +16,13 @@ MoodShaker is a specimen catalogue: every drink stands alone, photographed on wh
 
 Mood fields are mid-light on purpose: drinks are laid on them with `mix-blend-mode: multiply` (`.specimen`), and a saturated field would muddy the drink.
 
-Type: Hanken Grotesk (Latin) with Noto Sans SC (Chinese), weights 400 and 500 only. Five sizes: `small`, `body`, `lead`, `head`, `display`.
+Type: two voices. Headlines, drink names and the bartender's reason are set in a serif (`font-display`: Fraunces with Noto Serif SC), the way a menu is. Everything that is read at length or pressed is in the grotesk (Hanken Grotesk with Noto Sans SC, weights 400 and 500). A heading that is only a label takes `.label` and stays in the grotesk. Five sizes: `small`, `body`, `lead`, `head`, `display`.
 
 ## Rules
 
+- The home page opens on the promise, not the name: the name is in the header. The mood picker is the palette, each mood a block of its own colour.
+- Show the product with its own content. "From mood to glass" is one guest's real order and the drink it became, not three captions.
+- Navigation is plain text that underlines when pointed at or current (`.nav-link`); underlined links (`.link`) are for prose.
 - A drink is always a specimen: its photograph on its mood's field, nothing else in the tile. Name and facts sit outside the tile.
 - One accent, on the primary action. One button shape, square corners.
 - No eyebrow labels, monospace, index numbers (`01`), hairline rules, outlined boxes, gradients or resting shadows. Separate with space and tone.

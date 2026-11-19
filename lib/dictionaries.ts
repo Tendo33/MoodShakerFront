@@ -31,7 +31,10 @@ export interface Dictionary {
   >;
   nav: Record<"shake" | "menu" | "switchTo" | "switchLabel" | "home" | "skip", string>;
   home: {
+    headline: [string, string];
     lede: string;
+    ctaNote: string;
+    ticket: Record<"title" | "mood" | "strength" | "spirits" | "skill" | "style" | "anySpirit" | "read", string>;
     moodPrompt: string;
     ctaForMood: string;
     pouredFor: string;

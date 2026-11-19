@@ -44,7 +44,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
   return (
     <div className="frame">
       <header className="grid gap-6 pt-6 lg:grid-cols-12 lg:items-end">
-        <h1 className="enter text-display leading-[0.88] tracking-[-0.055em] lg:col-span-7">{dict.gallery.title}</h1>
+        <h1 className="enter text-display leading-[0.95] lg:col-span-7">{dict.gallery.title}</h1>
         <p className="enter max-w-[36ch] text-lead [--i:1] lg:col-span-5 lg:justify-self-end lg:pb-3">{dict.gallery.lede}</p>
       </header>
 

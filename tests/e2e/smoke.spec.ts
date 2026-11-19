@@ -7,7 +7,7 @@ test("redirects to a locale and carries the mood into the questionnaire", async 
   await expect(page).toHaveURL(/\/(cn|en)$/);
 
   await page.goto("/en");
-  await expect(page.getByRole("heading", { level: 1, name: "MoodShaker" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: /Tell us the mood/ })).toBeVisible();
   await page.getByRole("button", { name: "Quiet night" }).click();
   await page.getByRole("link", { name: /Shake one for Quiet night/ }).click();
 

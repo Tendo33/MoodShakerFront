@@ -14,7 +14,7 @@ export function MenuLink({ href, children }: { href: string; children: React.Rea
     <Link
       href={href}
       aria-current={current ? "page" : undefined}
-      className={`link py-2 max-[379px]:hidden ${current ? "font-medium text-ink" : "text-muted"}`}
+      className={`nav-link py-2 max-[379px]:hidden ${current ? "font-medium" : ""}`}
     >
       {children}
     </Link>

@@ -81,15 +81,15 @@ export function DrinkSheet({
 
       <div className="frame mt-[clamp(80px,12vh,160px)] grid gap-x-8 gap-y-20 lg:grid-cols-12">
         <section className="order-2 lg:sticky lg:top-10 lg:order-none lg:col-span-5 lg:self-start" aria-labelledby="why-heading">
-          <h2 id="why-heading" className="reveal text-lead text-muted">
+          <h2 id="why-heading" className="label reveal text-lead text-muted">
             {t.why}
           </h2>
-          <blockquote className="reveal mt-4 text-[clamp(1.375rem,1rem+1.5vw,2rem)] leading-[1.3] tracking-[-0.025em] font-medium [--i:2]">
+          <blockquote className="reveal mt-4 font-display text-[clamp(1.5rem,1rem+1.8vw,2.375rem)] leading-[1.28] tracking-[-0.01em] [--i:2]">
             {recipe.matchReason}
           </blockquote>
           {recipe.tools.length > 0 && (
             <>
-              <h2 className="reveal mt-16 text-lead text-muted">{t.tools}</h2>
+              <h2 className="label reveal mt-16 text-lead text-muted">{t.tools}</h2>
               <ul className="mt-4 space-y-2">
                 {recipe.tools.map((tool, index) => (
                   <li key={index} className="reveal" style={{ ["--i" as string]: index }}>
