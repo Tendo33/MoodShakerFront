@@ -16,21 +16,30 @@ MoodShaker is a specimen catalogue: every drink stands alone, photographed on wh
 
 Mood fields are mid-light on purpose: drinks are laid on them with `mix-blend-mode: multiply` (`.specimen`), and a saturated field would muddy the drink.
 
-Type: Hanken Grotesk (Latin) with Noto Sans SC (Chinese), weights 400 and 500 only. Five sizes: `small`, `body`, `lead`, `head`, `display`.
+Type: two voices. Headlines, drink names and the bartender's reason are set in a serif (`font-display`: Fraunces with Noto Serif SC), the way a menu is. Everything that is read at length or pressed is in the grotesk (Hanken Grotesk with Noto Sans SC, weights 400 and 500). A heading that is only a label takes `.label` and stays in the grotesk. Five sizes: `small`, `body`, `lead`, `head`, `display`.
 
 ## Rules
 
+- The home page opens on the promise, not the name: the name is in the header. The mood picker is the palette, each mood a block of its own colour.
+- Show the product with its own content. "From mood to glass" is one guest's real order and the drink it became, not three captions.
+- Navigation is plain text that underlines when pointed at or current (`.nav-link`); underlined links (`.link`) are for prose.
 - A drink is always a specimen: its photograph on its mood's field, nothing else in the tile. Name and facts sit outside the tile.
 - One accent, on the primary action. One button shape, square corners.
 - No eyebrow labels, monospace, index numbers (`01`), hairline rules, outlined boxes, gradients or resting shadows. Separate with space and tone.
 - Running text is full ink, 16px or more. Grey is for notes, and only on bone: on a mood field `muted` falls below 4.5:1, so notes there are `text-ink/70`.
 - Headlines two lines at most. Statements set large stay at three lines or fewer.
 - Every page closes with the block wordmark (`BlockMark` in `SiteChrome.tsx`).
-- Motion: the slow crossfade on the home plinth is the one signature move (a fading layer carries `mix-blend-multiply` itself, or its photograph crosses the field as a white square); sections enter once as they scroll in (`Reveals.tsx`); everything respects `prefers-reduced-motion`, and nothing is hidden without script.
+- Motion says where the guest is, and is never decoration.
+  - The home plinth's slow crossfade is the signature move (a fading layer carries `mix-blend-multiply` itself, or its photograph crosses the field as a white square; the same holds for anything that moves or fades a photograph).
+  - A page arrives with one short fade (`app/[lang]/template.tsx`), then its parts enter once (`.enter`, and `Reveals.tsx` as sections scroll in).
+  - The questionnaire is one screen per question. A step leaves and the next arrives in the direction of travel (`.step`); the progress bar and the controls sit at the foot of the screen and do not move.
+  - The wait is alive and honest: the shaker works in bursts, the lines of work are ticked off, a clock counts, and the bar slows without ever pretending to finish. It closes only when the drink is there, and the page holds on "poured" for a beat.
+  - The drink's page opens on the mood's colour it was ordered in, the recipe settles into the outline, and the photograph comes up when it has loaded (`DevelopedImage`).
+  - Durations: 160-220ms for feedback, 500-620ms for entrances, longer only for the crossfade and the photograph. Everything respects `prefers-reduced-motion`, and nothing is hidden without script.
 
 ## Pictures
 
 - Generated drinks are shot by `buildImagePrompt` in `lib/ai/prompts.ts` as studio specimens on pure white, then prepared by `lib/image-levels.ts`: near-white is lifted to white so no grey band shows on the field, and the rim is faded so a shadow running off the picture does not end in a straight line.
 - `public/og.png` is the card for shared links without a drink of their own; `node scripts/build-og.mjs` redraws it.
-- Seed drinks and the two stage pictures live in `public/drinks/` and `public/stages/`; `pnpm seeds:build` regenerates them.
+- Seed drinks live in `public/drinks/`, named by slug and a hash of the picture so a re-poured drink is never served from a cache; `pnpm seeds:build` re-pours them and removes the photographs it replaced. The two stage pictures on the home page live in `public/stages/`; `pnpm seeds:build stages` reshoots them in the same light.
 - The provider stamps a small "AI 生成" mark on every image. It is left in place; the footer also says the photographs are AI-generated.

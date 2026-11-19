@@ -9,6 +9,7 @@ import type { DrinkView } from "@/lib/db/drinks";
 import type { Dictionary } from "@/lib/dictionaries";
 import { localize } from "@/lib/domain/recipe";
 import { localizePath, type Locale } from "@/lib/i18n";
+import { moodColor } from "@/lib/moods";
 import { deliverCard, renderShareCard } from "@/lib/share-card";
 
 type Labels = Pick<Dictionary, "drink" | "recipe" | "vocab">;
@@ -32,6 +33,7 @@ export function DrinkClient({
   const t = dict.drink;
   const savedDrinks = useSavedDrinks();
   const token = savedDrinks?.find((item) => item.id === id)?.editToken ?? null;
+  const savedMood = savedDrinks?.find((item) => item.id === id)?.mood ?? null;
 
   const [fetchPhase, setFetchPhase] = useState<Phase>("loading");
   const [attempt, setAttempt] = useState(0);
@@ -116,9 +118,26 @@ export function DrinkClient({
 
   if (phase === "loading") {
     return (
-      <p className="frame py-40 text-lead text-muted" role="status">
-        {t.loading}
-      </p>
+      // The same field and the same grid as the page that follows, in the mood's
+      // colour when this browser poured the drink: arriving from the questionnaire,
+      // the colour never changes and the recipe settles into the outline.
+      <div
+        className="transition-colors duration-500"
+        style={{ backgroundColor: savedMood ? moodColor(savedMood) : undefined }}
+        role="status"
+        aria-live="polite"
+      >
+        <div className="frame grid gap-x-8 gap-y-6 py-8 lg:grid-cols-12 lg:py-12">
+          <div className="order-2 aspect-square md:max-lg:aspect-[16/10] lg:order-none lg:col-span-6 lg:aspect-[4/5]" />
+          <div className="order-1 flex flex-col gap-4 lg:order-none lg:col-span-6 lg:col-start-7 lg:self-end lg:pb-40 lg:pl-6">
+            <div className="h-10 w-2/3 bg-ink/10 motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite]" />
+            <div className="h-5 w-1/3 bg-ink/10 motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] [animation-delay:80ms]" />
+            <div className="mt-6 h-4 w-full bg-ink/10 motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] [animation-delay:160ms]" />
+            <div className="h-4 w-5/6 bg-ink/10 motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] [animation-delay:240ms]" />
+          </div>
+        </div>
+        <span className="sr-only">{t.loading}</span>
+      </div>
     );
   }
 
@@ -154,9 +173,12 @@ export function DrinkClient({
   const photoFallback = (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 p-8 text-center">
       {imageState === "pending" ? (
-        <p className="text-lead motion-safe:animate-pulse" role="status">
-          {t.imagePending}…
-        </p>
+        <div role="status" className="w-full max-w-[18rem]">
+          <p className="text-lead">{t.imagePending}…</p>
+          <span aria-hidden className="mt-5 block h-1 overflow-hidden bg-ink/15">
+            <span className="block h-full origin-left bg-ink motion-safe:animate-[pour_80s_cubic-bezier(0.25,0.6,0.5,1)_both] motion-reduce:hidden" />
+          </span>
+        </div>
       ) : (
         <>
           {imageState === "failed" && <p className="text-lead">{t.imageFailed}</p>}
@@ -179,7 +201,7 @@ export function DrinkClient({
         </button>
         <button
           type="button"
-          className="btn bg-ink/10 hover:bg-ink hover:text-bone"
+          className="btn bg-ink/10 transition-[background-color,color] duration-150 hover:bg-ink hover:text-bone"
           disabled={busy !== null || !canPublish}
           aria-describedby={canPublish ? undefined : "publish-hint"}
           onClick={() => void togglePublish()}
@@ -225,6 +247,7 @@ export function DrinkClient({
       dict={dict}
       actions={actions}
       photoFallback={photoFallback}
+      develop
     />
   );
 }

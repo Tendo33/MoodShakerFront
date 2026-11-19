@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { MenuLink } from "@/components/MenuLink";
 import type { Dictionary } from "@/lib/dictionaries";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS } from "@/lib/moods";
@@ -10,13 +11,21 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
       <a href="#main" className="skip-link btn btn-quiet">
         {dict.nav.skip}
       </a>
-      <Link href={localizePath("/", locale)} aria-label={dict.nav.home} className="py-2 text-lead font-medium tracking-[-0.03em]">
+      <Link
+        href={localizePath("/", locale)}
+        aria-label={dict.nav.home}
+        className="group flex items-center gap-3 py-2 text-lead font-medium tracking-[-0.03em]"
+      >
+        {/* The footer's block wordmark, in three blocks. */}
+        <span aria-hidden className="flex items-end gap-[3px] max-[419px]:hidden">
+          <span className="h-3.5 w-2 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-125" style={{ backgroundColor: MOOD_COLORS.unwind }} />
+          <span className="h-5 w-2 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-75" style={{ backgroundColor: MOOD_COLORS.celebrate }} />
+          <span className="h-3 w-2 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-150" style={{ backgroundColor: MOOD_COLORS.romantic }} />
+        </span>
         MoodShaker
       </Link>
       <nav className="flex items-center gap-3 whitespace-nowrap sm:gap-8">
-        <Link href={localizePath("/gallery", locale)} className="link py-2 max-[379px]:hidden">
-          {dict.nav.menu}
-        </Link>
+        <MenuLink href={localizePath("/gallery", locale)}>{dict.nav.menu}</MenuLink>
         <LanguageSwitch locale={locale} label={dict.nav.switchTo} ariaLabel={dict.nav.switchLabel} />
         <Link href={localizePath("/questions", locale)} className="btn btn-primary min-h-11 px-4 sm:px-5">
           {dict.nav.shake}
@@ -68,9 +77,11 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
   return (
     <footer className="mt-32 bg-night text-bone">
       <div className="frame pt-16 pb-10">
-        <BlockMark />
+        <div className="reveal">
+          <BlockMark />
+        </div>
         <div className="mt-14 grid gap-10 sm:grid-cols-12">
-          <nav className="flex flex-col sm:col-span-4">
+          <nav className="reveal flex flex-col sm:col-span-4">
             <Link href={localizePath("/questions", locale)} className="link w-fit py-1.5">
               {dict.nav.shake}
             </Link>
@@ -78,12 +89,12 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
               {dict.nav.menu}
             </Link>
           </nav>
-          <div className="space-y-3 text-bone/75 sm:col-span-6 sm:col-start-7">
+          <div className="reveal space-y-3 text-bone/75 sm:col-span-6 sm:col-start-7 [--i:1]">
             <p>{dict.footer.credit}</p>
             <p>{dict.footer.disclaimer}</p>
           </div>
         </div>
-        <p className="mt-14 text-small text-bone/60">© {new Date().getFullYear()} MoodShaker</p>
+        <p className="reveal mt-14 text-small text-bone/60 [--i:2]">© {new Date().getFullYear()} MoodShaker</p>
       </div>
     </footer>
   );

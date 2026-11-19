@@ -120,7 +120,7 @@ export async function getPublishedDrink(slug: string): Promise<DrinkRow | null> 
   return row ?? null;
 }
 
-const GALLERY_PAGE_SIZE = 12;
+const GALLERY_PAGE_SIZE = 16;
 
 function encodeCursor(row: DrinkRow): string {
   return Buffer.from(`${row.publishedAt!.toISOString()}|${row.id}`).toString("base64url");

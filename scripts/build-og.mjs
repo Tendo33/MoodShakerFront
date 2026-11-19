@@ -3,6 +3,7 @@
  * shared: the name and the promise on bone, one seed drink on its mood's field.
  * Run with `node scripts/build-og.mjs` after changing the wordmark or the seeds.
  */
+import { readdirSync } from "node:fs";
 import sharp from "sharp";
 
 const WIDTH = 1200;
@@ -12,7 +13,11 @@ const FIELD = 486;
 const BONE = "#e6e0d2";
 const INK = "#1a1a1a";
 const MOODS = ["#a9d3b5", "#f2c94c", "#aebfd6", "#f2aca4", "#d4e157", "#cbbfa8"];
-const DRINK = { file: "public/drinks/rose-aperol.webp", field: "#f2aca4" };
+// Seed photographs carry a content hash in their name, so the drink is found by its slug.
+const SLUG = "dusk-berries";
+const photo = readdirSync("public/drinks").find((name) => name.startsWith(`${SLUG}-`) && !name.endsWith("-thumb.webp"));
+if (!photo) throw new Error(`No photograph for ${SLUG} in public/drinks.`);
+const DRINK = { file: `public/drinks/${photo}`, field: "#f2aca4" };
 
 const font = "font-family=\"Hanken Grotesk, Helvetica Neue, Helvetica, Arial, sans-serif\"";
 const swatches = MOODS.map(

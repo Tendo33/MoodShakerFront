@@ -69,8 +69,18 @@ export const draftSchema = z
         message: `the Chinese version contains English words (${[...latin].slice(0, 8).join(", ")}); write them in Chinese`,
       });
     }
-    // The reverse slip: a Chinese unit left in the English version ("1 片 orange peel").
-    const chinese = new Set(JSON.stringify(draft.en).match(/[\u4e00-\u9fff]+/g));
+    // The reverse slip, Chinese in the English prose. A Chinese measure in an amount or a
+    // unit ("1 片 orange peel") is the common case and not worth a second call: toRecipe
+    // translates the ones it knows, and only the rest are sent back.
+    const englishProse = {
+      ...draft.en,
+      ingredients: draft.en.ingredients.map(({ name, amount, unit, substitute }) => ({
+        name,
+        substitute,
+        measure: toEnglishMeasure(`${amount} ${unit ?? ""}`),
+      })),
+    };
+    const chinese = new Set(JSON.stringify(englishProse).match(/[\u4e00-\u9fff]+/g));
     if (chinese.size > 0) {
       ctx.addIssue({
         code: "custom",
@@ -133,6 +143,31 @@ function toChineseMeasure(value: string): string {
   return value.replace(/[A-Za-z][A-Za-z ]*[A-Za-z]|[A-Za-z]/g, (word) => CN_MEASURES[word.toLowerCase()] ?? word);
 }
 
+/** Chinese measures that turn up in the English version. A bare counter (个, 颗) has no English word. */
+const EN_MEASURES: Record<string, string> = {
+  加满: "to top",
+  适量: "to taste",
+  毫升: "ml",
+  滴: "dash",
+  片: "slice",
+  枝: "sprig",
+  块: "piece",
+  角: "wedge",
+  条: "strip",
+  撮: "pinch",
+  茶匙: "tsp",
+  汤匙: "tbsp",
+  吧勺: "barspoon",
+  个: "",
+  颗: "",
+  只: "",
+  根: "",
+};
+
+function toEnglishMeasure(value: string): string {
+  return value.replace(/[\u4e00-\u9fff]+/g, (word) => EN_MEASURES[word] ?? word).trim();
+}
+
 /** "1 large ice cube", "crushed ice": ice the model listed as an ingredient in spite of the prompt. */
 const ICE_ONLY = /^(?:(?:a|one|\d+)\s+)?(?:(?:large|big|clear|crushed|cracked|solid|standard)\s+)*ice(?:\s+(?:cubes?|spheres?|balls?|blocks?))?$/i;
 
@@ -145,13 +180,15 @@ export function toRecipe(draft: Draft): Recipe {
   const cn = { ...draft.cn, ingredients: withoutIce(draft.cn.ingredients) };
   const en = { ...draft.en, ingredients: withoutIce(draft.en.ingredients) };
   const pair = (a: string, b: string) => ({ cn: a, en: b });
+  // Names head a line on the page; the model writes "gin" in one recipe and "Gin" in the next.
+  const named = (a: string, b: string) => pair(a, b.charAt(0).toUpperCase() + b.slice(1));
   const optionalPair = (a: string | null, b: string | null) => (a && b ? { cn: a, en: b } : null);
 
   return {
     name: pair(cn.name, en.name),
     description: pair(cn.description, en.description),
     matchReason: pair(cn.matchReason, en.matchReason),
-    servingGlass: pair(cn.servingGlass, en.servingGlass),
+    servingGlass: named(cn.servingGlass, en.servingGlass),
     timeRequired: pair(cn.timeRequired, en.timeRequired),
     appearance: draft.appearance,
     baseSpirit: draft.baseSpirit,
@@ -163,14 +200,14 @@ export function toRecipe(draft: Draft): Recipe {
       const unit = (side: { amount: string; unit: string | null }) => (side.unit === side.amount ? null : side.unit);
       const cnUnit = unit(item);
       return {
-        name: pair(item.name, other.name),
-        amount: pair(toChineseMeasure(item.amount), other.amount),
-        unit: optionalPair(cnUnit && toChineseMeasure(cnUnit), unit(other)),
+        name: named(item.name, other.name),
+        amount: pair(toChineseMeasure(item.amount), toEnglishMeasure(other.amount)),
+        unit: optionalPair(cnUnit && toChineseMeasure(cnUnit), toEnglishMeasure(unit(other) ?? "") || null),
         substitute: optionalPair(item.substitute, other.substitute),
       };
     }),
     tools: cn.tools.map((tool, index) => ({
-      name: pair(tool.name, en.tools[index].name),
+      name: named(tool.name, en.tools[index].name),
       alternative: optionalPair(tool.alternative, en.tools[index].alternative),
     })),
     steps: cn.steps.map((step, index) => ({

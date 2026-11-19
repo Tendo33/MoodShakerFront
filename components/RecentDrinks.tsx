@@ -12,14 +12,14 @@ export function RecentDrinks({ locale, title, hint }: { locale: Locale; title: s
   return (
     <section className="frame mt-[clamp(120px,18vh,240px)]" aria-labelledby="yours-heading">
       <div className="flex flex-wrap items-baseline justify-between gap-4">
-        <h2 id="yours-heading" className="text-head">
+        <h2 id="yours-heading" className="reveal text-head">
           {title}
         </h2>
-        <p className="text-muted">{hint}</p>
+        <p className="reveal text-muted [--i:1]">{hint}</p>
       </div>
       <ul className="mt-8 flex flex-wrap gap-2">
-        {drinks.slice(0, 8).map((drink) => (
-          <li key={drink.id}>
+        {drinks.slice(0, 8).map((drink, index) => (
+          <li key={drink.id} className="reveal" style={{ ["--i" as string]: index }}>
             <Link
               href={localizePath(`/drink/${drink.id}`, locale)}
               className="block bg-surface px-5 py-3 text-lead transition-colors duration-200 hover:bg-ink hover:text-bone"

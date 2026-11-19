@@ -20,11 +20,22 @@ export const en: Dictionary = {
     skip: "Skip to content",
   },
   home: {
+    headline: ["Tell us the mood.", "We\u2019ll pour the drink."],
+    ctaNote: "Four questions, about a minute",
+    ticket: {
+      title: "What one guest said",
+      mood: "Mood",
+      strength: "Strength",
+      spirits: "Spirits at home",
+      skill: "Skill",
+      style: "Style",
+      anySpirit: "Not said",
+      read: "See the recipe",
+    },
     lede: "Tell us how tonight feels. An AI bartender writes you one cocktail, with the recipe and a photograph.",
     moodPrompt: "Tonight's mood",
     ctaForMood: "Shake one for {mood}",
     pouredFor: "Poured for “{mood}”",
-    statement: ["Say how tonight feels", " and what's on your shelf.", " Get one drink, with its photograph", "."],
     stepsTitle: "From mood to glass",
     steps: [
       { title: "Tell", body: "Four questions: your mood, how strong, what you have, classic or new." },
@@ -44,6 +55,7 @@ export const en: Dictionary = {
 
   questions: {
     progress: "Question {n} of {total}",
+    order: "Your order",
     back: "Back",
     next: "Next",
     submit: "Ask the bartender",
@@ -67,6 +79,7 @@ export const en: Dictionary = {
     },
     shaking: {
       title: "Shaking",
+      done: "Poured",
       lines: ["Reading the mood", "Picking the spirit", "Measuring", "Writing it down"],
       note: "This usually takes about a minute. Keep this page open.",
     },

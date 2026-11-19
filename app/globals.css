@@ -21,6 +21,7 @@
   --color-reflect: #cbbfa8;
 
   --font-sans: var(--font-hanken), var(--font-noto-sans-sc), "PingFang SC", system-ui, sans-serif;
+  --font-display: var(--font-fraunces), var(--font-noto-serif-sc), "Songti SC", "Source Han Serif SC", Georgia, serif;
 
   /* Five sizes do all the work. */
   --text-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
@@ -36,6 +37,7 @@
   html {
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -53,17 +55,19 @@
   h1,
   h2,
   h3 {
-    font-weight: 500;
-    letter-spacing: -0.04em;
-    line-height: 0.95;
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1;
     text-wrap: balance;
   }
 
   :lang(zh-CN) h1,
   :lang(zh-CN) h2,
   :lang(zh-CN) h3 {
-    letter-spacing: -0.02em;
-    line-height: 1.08;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.14;
     /* Chinese has no spaces, so a balanced headline would split a word; break at punctuation instead. */
     word-break: keep-all;
     overflow-wrap: anywhere;
@@ -81,6 +85,17 @@
   :focus-visible {
     outline: 3px solid var(--color-ink);
     outline-offset: 3px;
+  }
+
+  /* The caret and scrollbar take the ink, so every input surface stays in the palette. */
+  textarea,
+  input {
+    caret-color: var(--color-ink);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-ink) 25%, transparent) transparent;
   }
 }
 
@@ -103,16 +118,30 @@
     font-size: var(--text-body);
     font-weight: 500;
     transition:
-      background-color 200ms ease,
-      color 200ms ease,
-      transform 300ms var(--ease-out);
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms var(--ease-out);
   }
   .btn:active:not(:disabled) {
     transform: scale(0.97);
   }
+  /* The arrow leans the way the button goes. */
+  .btn > span[aria-hidden] {
+    display: inline-block;
+    transition: transform 220ms var(--ease-out);
+  }
+  .btn:hover:not(:disabled) > span[aria-hidden] {
+    transform: translateX(4px);
+  }
+  /* A disabled button stays in the palette: it drops to the quiet surface and a
+     muted label. Transparency would let the accent bleed through as pink. */
   .btn:disabled {
-    opacity: 0.45;
     cursor: not-allowed;
+  }
+  .btn-primary:disabled,
+  .btn-quiet:disabled {
+    background: var(--color-surface);
+    color: var(--color-muted);
   }
   .btn-primary {
     background: var(--color-accent);
@@ -134,12 +163,34 @@
   /* The page title of a question or a dead end: tight in Latin, looser in Chinese, whose glyphs fill the line. */
   .title {
     font-size: clamp(2.5rem, 1rem + 5vw, 6rem);
-    line-height: 0.92;
-    letter-spacing: -0.05em;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
   }
   :lang(zh-CN) .title {
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    line-height: 1.14;
+    letter-spacing: 0;
+  }
+  /* The promise on the home page. Chinese is set smaller: its two lines are
+     five characters and a mark each, and must fit the column without the mark
+     falling onto a line of its own. */
+  .headline {
+    font-size: clamp(2.75rem, 1.2rem + 5.6vw, 6.25rem);
+  }
+  :lang(zh-CN) .headline {
+    font-size: clamp(2.5rem, 1rem + 4.2vw, 5rem);
+    white-space: nowrap;
+  }
+
+  /* A short measure for a title beside a picture. `ch` is the width of a digit,
+     half a Chinese character, so Chinese is measured in characters instead.
+     Under `keep-all` a title without punctuation has nowhere to break and drops
+     its last character alone onto a line; such a title carries a zero-width
+     space at the word boundary where it should turn (see `notFound` in cn.ts). */
+  .title-measure {
+    max-width: 14ch;
+  }
+  :lang(zh-CN) .title-measure {
+    max-width: 9em;
   }
 
   /* First stop for keyboard users; out of sight until it has focus. */
@@ -149,9 +200,33 @@
     left: clamp(20px, 3.5vw, 56px);
     z-index: 10;
     transform: translateY(-300%);
+    transition: transform 160ms var(--ease-out);
   }
   .skip-link:focus {
     transform: none;
+  }
+
+  /* A heading that is a label, not a headline: it stays in the grotesk. */
+  .label {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+  }
+
+  /* Navigation: plain until it is pointed at or is the page being read. */
+  .nav-link {
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.35em;
+    text-decoration-color: transparent;
+    transition:
+      text-decoration-color 200ms ease,
+      color 200ms ease;
+  }
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    text-decoration-color: currentColor;
   }
 
   .link {
@@ -183,13 +258,7 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(24px);
-  }
-}
-@keyframes settle {
-  from {
-    opacity: 0;
-    transform: scale(1.06);
+    transform: translateY(20px);
   }
 }
 @keyframes fade-in {
@@ -198,33 +267,41 @@
   }
 }
 
+/* Loading skeleton pulse: gentler than the browser default, stays in the palette. */
+@keyframes skeleton {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
 .enter {
-  animation: rise 900ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 80ms);
+  animation: rise 620ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
 }
 
 .reveals .reveal:not(.is-in) {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(20px);
 }
 .reveals .reveal-picture:not(.is-in) {
   opacity: 0;
-  transform: scale(1.06);
+  transform: scale(1.04);
 }
 .reveals .reveal,
 .reveals .reveal-picture {
   transition:
-    opacity 700ms var(--ease-out),
-    transform 900ms var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 80ms);
+    opacity 520ms var(--ease-out),
+    transform 620ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 60ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -240,5 +317,92 @@ main:has([data-bleed-end]) ~ footer {
   }
   to {
     transform: translateY(-1.5%) scale(1.025);
+  }
+}
+
+/* Shaking screen: the title breathes instead of generic pulse. */
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/*
+ * The flow from question to glass. A step leaves and the next arrives in the
+ * direction the guest is going; going back reverses it.
+ */
+@keyframes step-forward {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+@keyframes step-back {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+.step {
+  transition:
+    opacity 170ms ease,
+    transform 170ms ease;
+}
+.step[data-dir="forward"] .enter {
+  animation-name: step-forward;
+}
+.step[data-dir="back"] .enter {
+  animation-name: step-back;
+}
+.step[data-leaving="forward"] {
+  opacity: 0;
+  transform: translateX(-18px);
+}
+.step[data-leaving="back"] {
+  opacity: 0;
+  transform: translateX(18px);
+}
+
+/* A new page arrives as one piece before its parts make their own entrances. */
+.page-enter {
+  animation: fade-in 260ms ease both;
+}
+
+/* The strength glasses fill as the question arrives. */
+@keyframes fill-up {
+  from {
+    height: 0;
+  }
+}
+
+/* The wait: the shaker works in bursts, then rests. */
+@keyframes shake {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0deg) translate(0, 0);
+  }
+  /* Up over the shoulder and back, five times, then set down. */
+  7%,
+  21%,
+  35%,
+  49%,
+  63% {
+    transform: rotate(-17deg) translate(-4%, -6%);
+  }
+  14%,
+  28%,
+  42%,
+  56% {
+    transform: rotate(-5deg) translate(4%, 5%);
+  }
+}
+
+/* Runs fast, then slows, and never quite arrives: the real end is the answer. */
+@keyframes pour {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(0.94);
   }
 }
