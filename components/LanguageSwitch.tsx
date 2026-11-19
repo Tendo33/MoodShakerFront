@@ -19,7 +19,7 @@ export function LanguageSwitch({ locale, label, ariaLabel }: { locale: Locale; l
         // Keep filters such as ?spirit= across the switch.
         event.currentTarget.href = localizePath(pathname, target) + window.location.search;
       }}
-      className="nav-link py-2"
+      className="nav-link"
     >
       {label}
     </a>

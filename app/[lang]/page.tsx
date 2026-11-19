@@ -156,7 +156,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             <h3 className="label reveal mt-5 text-lead [--i:2]">{dict.home.steps[2].title}</h3>
             <p className="reveal mt-2 max-w-[34ch] [--i:3]">{dict.home.steps[2].body}</p>
             {exampleDrink && (
-              <Link href={localizePath(`/cocktail/${exampleDrink.slug}`, locale)} className="link reveal mt-3 w-fit py-1 [--i:3]">
+              <Link href={localizePath(`/cocktail/${exampleDrink.slug}`, locale)} className="link reveal mt-2 flex min-h-11 w-fit items-center [--i:3]">
                 {exampleDrink.name} · {dict.home.ticket.read} →
               </Link>
             )}

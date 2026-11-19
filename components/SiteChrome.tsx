@@ -7,7 +7,7 @@ import { MOOD_COLORS } from "@/lib/moods";
 
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
-    <header className="frame flex h-20 items-center justify-between gap-3 sm:gap-6">
+    <header className="frame flex h-20 items-center justify-between gap-2 sm:gap-6">
       <a href="#main" className="skip-link btn btn-quiet">
         {dict.nav.skip}
       </a>
@@ -24,10 +24,10 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
         </span>
         MoodShaker
       </Link>
-      <nav className="flex items-center gap-3 whitespace-nowrap sm:gap-8">
+      <nav className="flex items-center gap-1 whitespace-nowrap sm:gap-6">
         <MenuLink href={localizePath("/gallery", locale)}>{dict.nav.menu}</MenuLink>
         <LanguageSwitch locale={locale} label={dict.nav.switchTo} ariaLabel={dict.nav.switchLabel} />
-        <Link href={localizePath("/questions", locale)} className="btn btn-primary min-h-11 px-4 sm:px-5">
+        <Link href={localizePath("/questions", locale)} className="btn btn-primary ml-1.5 min-h-11 px-3.5 sm:ml-2 sm:px-5">
           {dict.nav.shake}
         </Link>
       </nav>
@@ -82,10 +82,10 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
         </div>
         <div className="mt-14 grid gap-10 sm:grid-cols-12">
           <nav className="reveal flex flex-col sm:col-span-4">
-            <Link href={localizePath("/questions", locale)} className="link w-fit py-1.5">
+            <Link href={localizePath("/questions", locale)} className="link flex min-h-11 w-fit items-center">
               {dict.nav.shake}
             </Link>
-            <Link href={localizePath("/gallery", locale)} className="link w-fit py-1.5">
+            <Link href={localizePath("/gallery", locale)} className="link flex min-h-11 w-fit items-center">
               {dict.nav.menu}
             </Link>
           </nav>

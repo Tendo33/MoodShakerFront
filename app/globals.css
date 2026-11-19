@@ -216,6 +216,12 @@
 
   /* Navigation: plain until it is pointed at or is the page being read. */
   .nav-link {
+    /* A finger needs 44px; the text keeps its place and the target grows around it. */
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    justify-content: center;
     text-decoration: underline;
     text-decoration-thickness: 1.5px;
     text-underline-offset: 0.35em;

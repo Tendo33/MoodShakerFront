@@ -48,7 +48,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
         <p className="enter max-w-[36ch] text-lead [--i:1] lg:col-span-5 lg:justify-self-end lg:pb-3">{dict.gallery.lede}</p>
       </header>
 
-      <nav aria-label={dict.recipe.spirit} className="enter mt-12 flex flex-wrap gap-x-7 gap-y-2 text-lead [--i:2]">
+      <nav aria-label={dict.recipe.spirit} className="enter mt-12 flex flex-wrap gap-x-4 gap-y-1 text-lead [--i:2]">
         {[undefined, ...FILTERS].map((code) => {
           const active = code === spirit;
           return (
@@ -56,7 +56,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
               key={code ?? "all"}
               href={href({ spirit: code })}
               aria-current={active ? "page" : undefined}
-              className={`nav-link py-1.5 ${active ? "font-medium" : "text-muted hover:text-ink"}`}
+              className={`nav-link ${active ? "font-medium" : "text-muted hover:text-ink"}`}
             >
               {code ? dict.vocab.spirits[code] : dict.gallery.all}
             </Link>
