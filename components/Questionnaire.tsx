@@ -591,7 +591,7 @@ function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: b
           fill
           priority
           sizes="(min-width: 1024px) 40vw, 320px"
-          className={`specimen ${done ? "" : "motion-safe:animate-[shake_2.6s_ease-in-out_infinite]"}`}
+          className={`specimen ${done ? "" : "motion-safe:animate-[shake_3s_ease-in-out_infinite]"}`}
         />
       </div>
     </div>

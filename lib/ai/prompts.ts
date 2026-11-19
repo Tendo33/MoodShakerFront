@@ -181,7 +181,7 @@ Return one JSON object and nothing else: no prose, no code fences. Write the rec
   "baseSpirit": one of ${BASE_SPIRITS.join(" | ")},
   "alcoholLevel": one of ${ALCOHOL_LEVELS.join(" | ")},
   "flavorProfiles": 1-4 of ${FLAVOR_PROFILES.join(" | ")},
-  "appearance": English, one sentence of 12-25 words for a photographer: the colour and clarity of the liquid these ingredients make (a stirred drink of spirits is clear, never opaque), the ice exactly as the steps leave it or "no ice", and the garnish exactly as listed. Nothing that is not in the recipe,
+  "appearance": English, one sentence of 12-25 words for a photographer: the colour and clarity of the liquid these ingredients make (a stirred drink of spirits is clear, never opaque), the ice exactly as the steps leave it or "no ice", the garnish exactly as listed, and a salt or sugar rim when the steps put one on the glass. Nothing that is not in the recipe,
   "cn": RECIPE,
   "en": RECIPE
 }

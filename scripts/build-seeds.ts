@@ -35,6 +35,8 @@ const ORDERS: Order[] = [
   { locale: "en", mood: "spark", strength: "medium", spirits: ["vodka"], skill: "intermediate", style: "classic", notes: "" },
   { locale: "cn", mood: "reflect", strength: "strong", spirits: ["whiskey"], skill: "advanced", style: "classic", notes: "" },
   { locale: "en", mood: "reflect", strength: "medium", spirits: ["rum"], skill: "intermediate", style: "creative", notes: "I love coffee. No ice in the glass, please." },
+  // Every spirit a guest can filter the menu by has at least one drink on it.
+  { locale: "en", mood: "romantic", strength: "medium", spirits: ["brandy"], skill: "intermediate", style: "classic", notes: "" },
 ];
 
 /**

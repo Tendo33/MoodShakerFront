@@ -167,6 +167,17 @@
     line-height: 1.1;
     letter-spacing: -0.02em;
   }
+  /* A short measure for a title beside a picture. `ch` is the width of a digit,
+     half a Chinese character, so Chinese is measured in characters instead.
+     Under `keep-all` a title without punctuation has nowhere to break and drops
+     its last character alone onto a line; such a title carries a zero-width
+     space at the word boundary where it should turn (see `notFound` in cn.ts). */
+  .title-measure {
+    max-width: 14ch;
+  }
+  :lang(zh-CN) .title-measure {
+    max-width: 9em;
+  }
 
   /* First stop for keyboard users; out of sight until it has focus. */
   .skip-link {
@@ -329,18 +340,22 @@ main:has([data-bleed-end]) ~ footer {
 /* The wait: the shaker works in bursts, then rests. */
 @keyframes shake {
   0%,
-  62%,
+  70%,
   100% {
     transform: rotate(0deg) translate(0, 0);
   }
-  8%,
-  24%,
-  40% {
+  /* Up over the shoulder and back, five times, then set down. */
+  7%,
+  21%,
+  35%,
+  49%,
+  63% {
     transform: rotate(-17deg) translate(-4%, -6%);
   }
-  16%,
-  32%,
-  48% {
+  14%,
+  28%,
+  42%,
+  56% {
     transform: rotate(-5deg) translate(4%, 5%);
   }
 }

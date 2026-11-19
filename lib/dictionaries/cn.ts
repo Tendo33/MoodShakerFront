@@ -181,6 +181,7 @@ export const cn: Dictionary = {
     credit: "酒的照片由 AI 生成。",
     disclaimer: "配方由 AI 生成，未必完全准确。请理性饮酒，未成年人请勿饮酒。",
   },
-  notFound: { title: "这一页不在酒单上", body: "可能已被撤下，或者地址有误。", home: "回到首页" },
+  // \u200b: where the title may turn when it does not fit on one line.
+  notFound: { title: "这一页\u200b不在酒单上", body: "可能已被撤下，或者地址有误。", home: "回到首页" },
   error: { title: "吧台出了点状况", body: "再试一次；还不行的话，刷新页面。", retry: "重试" },
 };

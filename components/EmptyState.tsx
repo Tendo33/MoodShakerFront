@@ -32,7 +32,7 @@ export function EmptyState({
     <div className="frame py-12 lg:py-16">
       <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
         <div className="lg:col-span-6">
-          <h1 className="title enter max-w-[14ch]">{title}</h1>
+          <h1 className="title title-measure enter">{title}</h1>
           {body && <p className="enter mt-6 max-w-[40ch] text-lead [--i:1]">{body}</p>}
           <div className="enter mt-10 flex flex-wrap gap-2 [--i:2]">{children}</div>
         </div>

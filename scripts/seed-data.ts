@@ -2457,5 +2457,198 @@ export const seedDrinks: SeedDrink[] = [
     },
     "imageUrl": "/drinks/night-passage-0ced01cc.webp",
     "thumbnailUrl": "/drinks/night-passage-0ced01cc-thumb.webp"
+  },
+  {
+    "slug": "sidecar",
+    "order": {
+      "locale": "en",
+      "mood": "romantic",
+      "strength": "medium",
+      "spirits": [
+        "brandy"
+      ],
+      "skill": "intermediate",
+      "style": "classic",
+      "notes": ""
+    },
+    "recipe": {
+      "name": {
+        "cn": "边车",
+        "en": "Sidecar"
+      },
+      "description": {
+        "cn": "白兰地的醇香，橙皮利口酒的甜润，与新鲜柠檬的明亮酸度结合。",
+        "en": "Cognac's warmth meets the sweet citrus of triple sec and the bright acidity of fresh lemon juice."
+      },
+      "matchReason": {
+        "cn": "这杯酒很清澈，酸甜平衡，橙皮的香气会留在杯口。适合慢慢喝，让香味和温度一起变化。",
+        "en": "This drink is clear and balanced, with an orange aroma that lingers on the rim. It's one to sip slowly as it changes with the temperature."
+      },
+      "servingGlass": {
+        "cn": "碟形杯",
+        "en": "Coupe"
+      },
+      "timeRequired": {
+        "cn": "5 分钟",
+        "en": "5 min"
+      },
+      "appearance": "A bright amber liquid, clear and crisp, served without ice in a chilled coupe glass, finished with an orange peel twist.",
+      "baseSpirit": "brandy",
+      "alcoholLevel": "medium",
+      "flavorProfiles": [
+        "sweet",
+        "sour",
+        "fruity"
+      ],
+      "ingredients": [
+        {
+          "name": {
+            "cn": "干邑白兰地",
+            "en": "Cognac"
+          },
+          "amount": {
+            "cn": "50",
+            "en": "50"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": {
+            "cn": "其他优质白兰地",
+            "en": "Another fine brandy"
+          }
+        },
+        {
+          "name": {
+            "cn": "橙皮利口酒",
+            "en": "Triple sec"
+          },
+          "amount": {
+            "cn": "20",
+            "en": "20"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": {
+            "cn": "君度",
+            "en": "Cointreau"
+          }
+        },
+        {
+          "name": {
+            "cn": "柠檬汁",
+            "en": "Lemon juice"
+          },
+          "amount": {
+            "cn": "20",
+            "en": "20"
+          },
+          "unit": {
+            "cn": "ml",
+            "en": "ml"
+          },
+          "substitute": null
+        },
+        {
+          "name": {
+            "cn": "橙皮",
+            "en": "Orange peel"
+          },
+          "amount": {
+            "cn": "1",
+            "en": "1"
+          },
+          "unit": {
+            "cn": "片",
+            "en": "slice"
+          },
+          "substitute": null
+        }
+      ],
+      "tools": [
+        {
+          "name": {
+            "cn": "摇酒器",
+            "en": "Cocktail shaker"
+          },
+          "alternative": null
+        },
+        {
+          "name": {
+            "cn": "量酒器",
+            "en": "Jigger"
+          },
+          "alternative": null
+        },
+        {
+          "name": {
+            "cn": "吧勺",
+            "en": "Bar spoon"
+          },
+          "alternative": {
+            "cn": "长柄茶匙",
+            "en": "Long-handled teaspoon"
+          }
+        },
+        {
+          "name": {
+            "cn": "榨汁器",
+            "en": "Juicer"
+          },
+          "alternative": null
+        }
+      ],
+      "steps": [
+        {
+          "stepNumber": 1,
+          "description": {
+            "cn": "将干邑、橙皮利口酒和柠檬汁倒入摇酒器。",
+            "en": "Pour the cognac, triple sec, and lemon juice into your shaker."
+          },
+          "tips": {
+            "cn": "柠檬汁用新鲜的，不要放太久。",
+            "en": "Use fresh lemon juice for a brighter taste."
+          }
+        },
+        {
+          "stepNumber": 2,
+          "description": {
+            "cn": "加入冰块，盖紧摇酒器，用力摇匀约12秒。",
+            "en": "Add ice, seal the shaker, and shake hard for about 12 seconds."
+          },
+          "tips": {
+            "cn": "直到摇酒器外壁结霜。",
+            "en": "Shake until the outside of the shaker is frosty."
+          }
+        },
+        {
+          "stepNumber": 3,
+          "description": {
+            "cn": "将酒液滤入冰镇过的碟形杯中。",
+            "en": "Strain the cocktail into a chilled coupe glass."
+          },
+          "tips": {
+            "cn": "提前把杯子放进冰箱冷冻层几分钟。",
+            "en": "Chill the glass in the freezer for a few minutes first."
+          }
+        },
+        {
+          "stepNumber": 4,
+          "description": {
+            "cn": "取一片橙皮，在杯口上方拧转，挤出皮油，然后放入杯中作装饰。",
+            "en": "Hold a piece of orange peel over the glass, twist it to express the oils, then drop it in as garnish."
+          },
+          "tips": {
+            "cn": "拧转时让皮油喷洒到酒液表面。",
+            "en": "Aim the spray of citrus oil over the surface of the drink."
+          }
+        }
+      ]
+    },
+    "imageUrl": "/drinks/sidecar-6bb0664f.webp",
+    "thumbnailUrl": "/drinks/sidecar-6bb0664f-thumb.webp"
   }
 ];
