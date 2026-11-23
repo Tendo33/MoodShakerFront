@@ -1,45 +1,108 @@
 # Design
 
-MoodShaker is a specimen catalogue: every drink stands alone, photographed on white, laid on the colour of the mood it was poured for. The page is bone, ink and one red; the colour comes from the moods and the drinks.
+MoodShaker is a **printed order ticket**. A guest says how the evening feels; the
+bartender writes it down on paper — term, dot leader, value — and stamps it when
+the drink is poured. The site is that piece of paper on the bar.
+
+This supersedes the "specimen catalogue" contract. Bone ground with a Fraunces
+headline and one brick-red button is the default look of every AI consumer
+product, so the serif is retired and the ticket is the device.
 
 ## Tokens (app/globals.css)
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `bone` | `#e6e0d2` | page ground |
-| `surface` | `#dcd5c5` | quiet buttons, chips, alternate rows |
-| `ink` | `#1a1a1a` | text, selected state |
-| `muted` | `#5f5b52` | secondary notes only, never running text |
-| `accent` | `#ed4b44` | the primary action, nothing else |
-| `night` | `#1a1a1a` | the footer field |
-| mood fields | `lib/moods.ts` | unwind `#a9d3b5`, celebrate `#f2c94c`, blue `#aebfd6`, romantic `#f2aca4`, spark `#d4e157`, reflect `#cbbfa8` |
+| `bone` | `#fbf9f4` | receipt paper, page field, ticket body |
+| `surface` | `#f1eee6` | quiet fills, hover rows |
+| `ink` | `#17161a` | text, selected state, primary fill |
+| `note` | `#6b675f` | secondary notes only, never running text |
+| `brand` | `#c2402f` | the stamp, and the primary action on hover |
+| `desk` | `#ddd7c8` | the surface a ticket sits on; shows through its tear |
+| mood fields | `lib/moods.ts` | unchanged, they are product data |
 
-Mood fields are mid-light on purpose: drinks are laid on them with `mix-blend-mode: multiply` (`.specimen`), and a saturated field would muddy the drink.
+Mood fields stay mid-light: drinks are laid on them with
+`mix-blend-mode: multiply` (`.specimen`).
 
-Type: two voices. Headlines, drink names and the bartender's reason are set in a serif (`font-display`: Fraunces with Noto Serif SC), the way a menu is. Everything that is read at length or pressed is in the grotesk (Hanken Grotesk with Noto Sans SC, weights 400 and 500). A heading that is only a label takes `.label` and stays in the grotesk. Five sizes: `small`, `body`, `lead`, `head`, `display`.
+## Type
+
+Two voices, neither of them a serif.
+
+- **Grotesk** (`--font-sans`, `--font-display`): Hanken Grotesk with Noto Sans
+  SC. Headlines, body, and anything pressed.
+- **Mono** (`--font-mono`, `--font-ticket`): JetBrains Mono. Every line a guest
+  would read on the paper — the ticket header, labels, values, the guest note,
+  the stamp, the total. Latin only; Chinese stays in the grotesk.
+
+Five sizes: `small`, `body`, `lead`, `head`, `display`. Headlines are weight 700
+with tight tracking; the old display serif is gone from `app/layout.tsx`.
+
+## The ticket
+
+Utilities in `app/globals.css`:
+
+- `.ticket` — paper with a hairline shadow; padding `1.5rem 1.25rem 0`.
+- `.ticket-tear` — the perforated foot, punched as a mask so the desk shows
+  through; negative inline margin so it spans the full ticket width.
+- `.leader` — the dotted run between a term and its value (`flex: 1`).
+- `.stamp` — brand-red outline, mono, uppercase, rotated `-9deg`; used once, when
+  the drink exists.
+- `.edge` — the small mono uppercase label used for ticket headers and terms.
+
+A row on the ticket is `term · · · value`: `.edge` label, `.leader`, value at
+`0.95rem`. The header carries the ticket title and `No. 0001`; the foot carries
+the stamp and the tear.
 
 ## Rules
 
-- The home page opens on the promise, not the name: the name is in the header. The mood picker is the palette, each mood a block of its own colour.
-- Show the product with its own content. "From mood to glass" is one guest's real order and the drink it became, not three captions.
-- Navigation is plain text that underlines when pointed at or current (`.nav-link`); underlined links (`.link`) are for prose.
-- A drink is always a specimen: its photograph on its mood's field, nothing else in the tile. Name and facts sit outside the tile.
-- One accent, on the primary action. One button shape, square corners.
-- No eyebrow labels, monospace, index numbers (`01`), hairline rules, outlined boxes, gradients or resting shadows. Separate with space and tone.
-- Running text is full ink, 16px or more. Grey is for notes, and only on bone: on a mood field `muted` falls below 4.5:1, so notes there are `text-ink/70`.
-- Headlines two lines at most. Statements set large stay at three lines or fewer.
-- Every page closes with the block wordmark (`BlockMark` in `SiteChrome.tsx`).
-- Motion says where the guest is, and is never decoration.
-  - The home plinth's slow crossfade is the signature move (a fading layer carries `mix-blend-multiply` itself, or its photograph crosses the field as a white square; the same holds for anything that moves or fades a photograph).
-  - A page arrives with one short fade (`app/[lang]/template.tsx`), then its parts enter once (`.enter`, and `Reveals.tsx` as sections scroll in).
-  - The questionnaire is one screen per question. A step leaves and the next arrives in the direction of travel (`.step`); the progress bar and the controls sit at the foot of the screen and do not move.
-  - The wait is alive and honest: the shaker works in bursts, the lines of work are ticked off, a clock counts, and the bar slows without ever pretending to finish. It closes only when the drink is there, and the page holds on "poured" for a beat.
-  - The drink's page opens on the mood's colour it was ordered in, the recipe settles into the outline, and the photograph comes up when it has loaded (`DevelopedImage`).
-  - Durations: 160-220ms for feedback, 500-620ms for entrances, longer only for the crossfade and the photograph. Everything respects `prefers-reduced-motion`, and nothing is hidden without script.
+- The home page opens on the promise, not the name: the name is in the header.
+  The mood picker is the palette, each mood a block of its own colour.
+- Show the product with its own content. "From mood to glass" is one guest's
+  real order and the drink it became, written on the ticket, not three captions.
+- Navigation is plain text that underlines when pointed at or current; the
+  header action is a coss `Button`.
+- A drink is always a specimen: its photograph on its mood's field, nothing else
+  in the tile. Name and facts sit outside the tile.
+- One accent. It appears as the stamp and on hover of the primary action, never
+  as a resting fill on every control.
+- No eyebrow labels, no gradients, no resting shadows on content, no decorative
+  hairline rules. Separate with space and tone; the ticket's rules are the only
+  lines we draw.
+- Headlines two lines at most. Running text is full ink, 16px or more.
+- Every page closes with the block wordmark in `SiteChrome.tsx`.
+
+## Components
+
+- coss ui (`@coss/ui`, Base UI, MIT) in `components/coss/`. Do not hand-write a
+  primitive the registry ships.
+- `components/action-button.tsx` wraps coss `Button` at its `xl` size — the one
+  product decision about the action. Never add a `text-*` utility inside the
+  wrapper: tailwind-merge drops the registry's `text-primary-foreground` and the
+  label disappears into the fill.
+- The questionnaire is built from the registry: mood tiles, answer cards and the
+  spirits list are coss `Toggle`; steps and the submit are `Button`; the guest
+  note is `Textarea`.
+- No `<input>` or `<button>` is hand-written outside `components/coss/`. The only
+  native elements left are a `type="file"` input and hidden form plumbing.
+
+## Motion
+
+- 160–220ms for feedback, 500–620ms for entrances, longer only for the plinth
+  crossfade and the photograph.
+- The home plinth's slow crossfade is the signature move.
+- The wait is alive and honest: the shaker works in bursts, lines of work tick
+  off, a clock counts, the bar slows without pretending to finish.
+- Everything respects `prefers-reduced-motion`.
 
 ## Pictures
 
-- Generated drinks are shot by `buildImagePrompt` in `lib/ai/prompts.ts` as studio specimens on pure white, then prepared by `lib/image-levels.ts`: near-white is lifted to white so no grey band shows on the field, and the rim is faded so a shadow running off the picture does not end in a straight line.
-- `public/og.png` is the card for shared links without a drink of their own; `node scripts/build-og.mjs` redraws it.
-- Seed drinks live in `public/drinks/`, named by slug and a hash of the picture so a re-poured drink is never served from a cache; `pnpm seeds:build` re-pours them and removes the photographs it replaced. The two stage pictures on the home page live in `public/stages/`; `pnpm seeds:build stages` reshoots them in the same light.
-- The provider stamps a small "AI 生成" mark on every image. It is left in place; the footer also says the photographs are AI-generated.
+- Generated drinks are shot by `buildImagePrompt` as studio specimens on pure
+  white, then prepared by `lib/image-levels.ts`.
+- Seed drinks live in `public/drinks/`, named by slug and a hash of the picture.
+- The provider's "AI 生成" mark is left in place; the footer says the photographs
+  are AI-generated.
+
+## Still to do
+
+Gallery and drink detail pages still use the previous layout and have not been
+restyled to the ticket language. The questionnaire's step chrome (progress bar,
+step counter) is still the old treatment.

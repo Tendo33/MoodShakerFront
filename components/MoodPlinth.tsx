@@ -7,6 +7,9 @@ import { format, type Dictionary } from "@/lib/dictionaries";
 import { MOODS, type Mood } from "@/lib/domain/vocabulary";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS, moodForHour } from "@/lib/moods";
+import { Button } from "@/components/action-button";
+import { Toggle } from "@/components/coss/toggle";
+import { cn } from "@/lib/utils";
 
 export interface PlinthDrink {
   slug: string;
@@ -88,15 +91,17 @@ export function MoodPlinth({
               {MOODS.map((code) => {
                 const selected = code === mood;
                 return (
-                  <button
+                  <Toggle
                     key={code}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => {
+                    pressed={selected}
+                    onPressedChange={() => {
                       setPicked(code);
                       setTick(0);
                     }}
-                    className="flex min-h-14 items-center justify-between gap-2 px-4 text-left font-medium whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-out hover:-translate-y-0.5 active:scale-[0.97] aria-pressed:text-bone"
+                    className={cn(
+                      "flex min-h-14 items-center justify-between gap-2 rounded-none px-4 text-left font-medium whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-out hover:bg-transparent hover:-translate-y-0.5 active:scale-[0.97] data-pressed:bg-transparent sm:text-base",
+                      selected && "text-bone",
+                    )}
                     style={{
                       backgroundColor: selected
                         ? "var(--color-ink)"
@@ -112,20 +117,19 @@ export function MoodPlinth({
                         transform: selected ? "scale(1)" : "scale(0)",
                       }}
                     />
-                  </button>
+                  </Toggle>
                 );
               })}
             </div>
           </fieldset>
           <div className="enter mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 [--i:3]">
-            <Link
-              href={`${localizePath("/questions", locale)}?mood=${mood}`}
-              className="btn btn-primary"
+            <Button
+              render={<Link href={`${localizePath("/questions", locale)}?mood=${mood}`} />}
             >
               {format(dict.home.ctaForMood, { mood: moodLabel })}{" "}
               <span aria-hidden>→</span>
-            </Link>
-            <span className="text-muted">{dict.home.ctaNote}</span>
+            </Button>
+            <span className="text-note">{dict.home.ctaNote}</span>
           </div>
         </div>
       </div>
@@ -166,7 +170,7 @@ export function MoodPlinth({
             aria-live="polite"
           >
             <span className="font-display text-[clamp(1.375rem,1.1rem+0.8vw,1.75rem)]">{active.name}</span>
-            <span className="text-muted">
+            <span className="text-note">
               {format(dict.home.pouredFor, {
                 mood: dict.options.moods[active.mood ?? mood].label,
               })}

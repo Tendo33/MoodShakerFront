@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Hanken_Grotesk, Noto_Sans_SC, Noto_Serif_SC } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono, Noto_Sans_SC } from "next/font/google";
 import { headers } from "next/headers";
 import { DEFAULT_LOCALE, HTML_LANG, isLocale } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/seo";
@@ -19,17 +19,11 @@ const notoSansSC = Noto_Sans_SC({
   variable: "--font-noto-sans-sc",
 });
 
-// The display pair: headlines and drink names are set in a serif, the way a
-// menu is, and everything that is read or pressed stays in the grotesk.
-const fraunces = Fraunces({
+// The ticket's own voice: every line a guest would read on the paper —
+// labels, values, totals, the stamp — is set in mono.
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-fraunces",
-});
-
-const notoSerifSC = Noto_Serif_SC({
-  weight: ["600"],
-  preload: false,
-  variable: "--font-noto-serif-sc",
+  variable: "--font-ticket",
 });
 
 export const metadata: Metadata = {
@@ -58,7 +52,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang={HTML_LANG[isLocale(locale) ? locale : DEFAULT_LOCALE]}
-      className={`${hanken.variable} ${notoSansSC.variable} ${fraunces.variable} ${notoSerifSC.variable}`}
+      className={`${hanken.variable} ${notoSansSC.variable} ${jetbrainsMono.variable}`}
     >
       <body>{children}</body>
     </html>

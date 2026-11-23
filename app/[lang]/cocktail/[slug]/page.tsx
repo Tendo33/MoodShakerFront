@@ -9,6 +9,7 @@ import { format, getDictionary } from "@/lib/dictionaries";
 import { localize } from "@/lib/domain/recipe";
 import { isLocale, localizePath, type Locale } from "@/lib/i18n";
 import { pageMetadata, recipeJsonLd, serializeJsonLd } from "@/lib/seo";
+import { Button } from "@/components/action-button";
 
 // Metadata and the page both need the row; one query per request.
 const loadDrink = cache((slug: string) => getPublishedDrink(slug));
@@ -64,9 +65,9 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
         dict={dict}
         actions={
           <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
-            <Link href={`${localizePath("/questions", locale)}${mood ? `?mood=${mood}` : ""}`} className="btn btn-primary">
+            <Button render={<Link href={`${localizePath("/questions", locale)}${mood ? `?mood=${mood}` : ""}`} />}>
               {dict.detail.shakeYours} <span aria-hidden>→</span>
-            </Link>
+            </Button>
             {mood && <p>{format(dict.detail.pouredFor, { mood: dict.options.moods[mood].label })}</p>}
           </div>
         }
@@ -94,7 +95,7 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
                       className="aspect-[4/5]"
                     />
                     <p className="mt-3 font-display text-lead leading-snug transition-opacity duration-200 group-hover:opacity-60">{other.name}</p>
-                    <p className="text-small text-muted">{dict.vocab.spirits[other.baseSpirit]}</p>
+                    <p className="edge mt-1 text-note">{dict.vocab.spirits[other.baseSpirit]}</p>
                   </Link>
                 </li>
               ))}

@@ -6,12 +6,13 @@
  * red, on the primary action only), and six mood fields. See DESIGN.md.
  */
 @theme {
-  --color-bone: #e6e0d2;
-  --color-surface: #dcd5c5;
-  --color-ink: #1a1a1a;
-  --color-muted: #5f5b52;
-  --color-accent: #ed4b44;
-  --color-night: #1a1a1a;
+  --color-bone: #fbf9f4;
+  --color-surface: #f1eee6;
+  --color-ink: #17161a;
+  --color-note: #6b675f;
+  --color-brand: #c2402f;
+  --color-night: #17161a;
+  --color-desk: #ddd7c8;
 
   --color-unwind: #a9d3b5;
   --color-celebrate: #f2c94c;
@@ -21,7 +22,8 @@
   --color-reflect: #cbbfa8;
 
   --font-sans: var(--font-hanken), var(--font-noto-sans-sc), "PingFang SC", system-ui, sans-serif;
-  --font-display: var(--font-fraunces), var(--font-noto-serif-sc), "Songti SC", "Source Han Serif SC", Georgia, serif;
+  --font-display: var(--font-hanken), var(--font-noto-sans-sc), "PingFang SC", system-ui, sans-serif;
+  --font-mono: var(--font-ticket), ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Five sizes do all the work. */
   --text-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
@@ -31,6 +33,46 @@
   --text-display: clamp(3.25rem, 1rem + 8vw, 8.5rem);
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+/*
+ * Registry tokens. coss ui reads the standard semantic names, so they are
+ * mapped onto the receipt palette here instead of restyling each component.
+ * Square by default: the ticket has no rounded corners.
+ */
+@theme inline {
+  --color-background: var(--color-bone);
+  --color-foreground: var(--color-ink);
+  --color-card: var(--color-bone);
+  --color-card-foreground: var(--color-ink);
+  --color-popover: var(--color-bone);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary: var(--color-ink);
+  --color-primary-foreground: var(--color-bone);
+  --color-secondary: var(--color-surface);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted: var(--color-surface);
+  --color-muted-foreground: var(--color-note);
+  --color-accent: var(--color-surface);
+  --color-accent-foreground: var(--color-ink);
+  --color-destructive: var(--color-brand);
+  --color-destructive-foreground: #ffffff;
+  --color-border: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --color-input: color-mix(in srgb, var(--color-ink) 24%, transparent);
+  --color-ring: var(--color-ink);
+  --color-info: #2f4b7c;
+  --color-info-foreground: #ffffff;
+  --color-success: #2c6b40;
+  --color-success-foreground: #ffffff;
+  --color-warning: #8a5a10;
+  --color-warning-foreground: #ffffff;
+
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 3px;
+  --radius-2xl: 3px;
 }
 
 @layer base {
@@ -56,7 +98,7 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -0.025em;
     line-height: 1;
     text-wrap: balance;
@@ -100,64 +142,57 @@
 }
 
 @layer components {
+  /* A receipt on the desk: paper, a hairline head, a torn foot. */
+  .ticket {
+    position: relative;
+    background: var(--color-bone);
+    padding: 1.5rem 1.25rem 0;
+    box-shadow:
+      0 1px 0 color-mix(in srgb, var(--color-ink) 8%, transparent),
+      0 16px 38px -28px rgb(0 0 0 / 0.55);
+  }
+  .ticket-tear {
+    height: 13px;
+    margin: 1.25rem -1.25rem 0;
+    background-color: var(--color-bone);
+    background-image: radial-gradient(circle at center bottom, var(--color-desk) 6px, transparent 6.5px);
+    background-size: 19px 13px;
+    background-repeat: repeat-x;
+    background-position: center;
+  }
+  /* The dotted run between a term and its value, as on a printed order. */
+  .leader {
+    flex: 1;
+    min-width: 12px;
+    border-bottom: 1px dotted color-mix(in srgb, var(--color-ink) 32%, transparent);
+    margin-bottom: 4px;
+  }
+  .stamp {
+    display: inline-block;
+    border: 2.5px solid var(--color-brand);
+    color: var(--color-brand);
+    padding: 4px 10px;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    transform: rotate(-9deg);
+    opacity: 0.85;
+  }
+  .edge {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
   /* One pair of outer margins for the whole site. */
   .frame {
     width: 100%;
     max-width: 1600px;
     margin-inline: auto;
     padding-inline: clamp(20px, 3.5vw, 56px);
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5em;
-    min-height: 3.25rem;
-    padding: 0 1.75rem;
-    font-size: var(--text-body);
-    font-weight: 500;
-    transition:
-      background-color 160ms ease,
-      color 160ms ease,
-      transform 160ms var(--ease-out);
-  }
-  .btn:active:not(:disabled) {
-    transform: scale(0.97);
-  }
-  /* The arrow leans the way the button goes. */
-  .btn > span[aria-hidden] {
-    display: inline-block;
-    transition: transform 220ms var(--ease-out);
-  }
-  .btn:hover:not(:disabled) > span[aria-hidden] {
-    transform: translateX(4px);
-  }
-  /* A disabled button stays in the palette: it drops to the quiet surface and a
-     muted label. Transparency would let the accent bleed through as pink. */
-  .btn:disabled {
-    cursor: not-allowed;
-  }
-  .btn-primary:disabled,
-  .btn-quiet:disabled {
-    background: var(--color-surface);
-    color: var(--color-muted);
-  }
-  .btn-primary {
-    background: var(--color-accent);
-    color: var(--color-ink);
-  }
-  .btn-primary:hover:not(:disabled) {
-    background: var(--color-ink);
-    color: var(--color-bone);
-  }
-  .btn-quiet {
-    background: var(--color-surface);
-    color: var(--color-ink);
-  }
-  .btn-quiet:hover:not(:disabled) {
-    background: var(--color-ink);
-    color: var(--color-bone);
   }
 
   /* The page title of a question or a dead end: tight in Latin, looser in Chinese, whose glyphs fill the line. */

@@ -1,6 +1,6 @@
 {
   "name": "moodshaker",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "scripts": {
     "build": "next build",
@@ -18,14 +18,19 @@
     "seeds:build": "node --conditions=react-server --env-file=.env --env-file=.env.local --import tsx scripts/build-seeds.ts"
   },
   "dependencies": {
+    "@base-ui/react": "^1.9.0",
     "aws4fetch": "^1.0.20",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.4",
+    "lucide-react": "^1.78.0",
     "next": "16.4.5",
     "postgres": "^3.4.9",
     "react": "^19",
     "react-dom": "^19",
     "server-only": "^0.0.1",
     "sharp": "^0.35.4",
+    "tailwind-merge": "^3.7.1",
     "tsx": "^4.20.6",
     "zod": "^4.6.6"
   },
