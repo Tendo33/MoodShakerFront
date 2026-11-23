@@ -127,7 +127,7 @@ describe("generateImage", () => {
   });
 
   it("sends an OpenAI Images body and returns a URL unchanged", async () => {
-    useEnv({ ...IMAGE_ENV, IMAGE_PROVIDER: "openai", IMAGE_MODEL: "gpt-image-2.6-sunburst" });
+    useEnv({ ...IMAGE_ENV, IMAGE_PROVIDER: "openai", IMAGE_MODEL: "gpt-image-2.6" });
     const calls = useFetch(() =>
       jsonResponse(200, { data: [{ url: "  https://images.example.test/out.png  " }] }),
     );
@@ -136,7 +136,7 @@ describe("generateImage", () => {
 
     assert.equal(url, "https://images.example.test/out.png");
     assert.deepEqual(sentBody(calls[0]), {
-      model: "gpt-image-2.6-sunburst",
+      model: "gpt-image-2.6",
       prompt: "a clear gin drink",
       size: "1024x1024",
       quality: "high",
@@ -150,7 +150,7 @@ describe("generateImage", () => {
 
     await generateImage("a clear gin drink");
 
-    assert.equal(sentBody(calls[0]).model, "gpt-image-2.6-sunburst");
+    assert.equal(sentBody(calls[0]).model, "gpt-image-2.6");
   });
 
   it("keeps Qwen/Qwen-Image as the SiliconFlow default model", async () => {
@@ -165,7 +165,7 @@ describe("generateImage", () => {
   it("turns b64_json into a data URL the R2 path and fetch can both read", async () => {
     const png = await tinyPng();
     const wrapped = png.toString("base64").replace(/(.{12})/g, "$1\n");
-    useEnv({ ...IMAGE_ENV, ...R2_OFF, IMAGE_PROVIDER: "openai", IMAGE_MODEL: "gpt-image-2.6-sunburst" });
+    useEnv({ ...IMAGE_ENV, ...R2_OFF, IMAGE_PROVIDER: "openai", IMAGE_MODEL: "gpt-image-2.6" });
     useFetch(() => jsonResponse(200, { data: [{ b64_json: wrapped, url: "https://evil.example/ignored.png" }] }));
 
     const source = await generateImage("a clear gin drink");
@@ -207,7 +207,7 @@ describe("generateImage", () => {
   });
 
   it("retries openai 429 and 5xx, and does not retry other 4xx or timeouts", async () => {
-    useEnv({ ...IMAGE_ENV, IMAGE_PROVIDER: "openai", IMAGE_MODEL: "gpt-image-2.6-sunburst" });
+    useEnv({ ...IMAGE_ENV, IMAGE_PROVIDER: "openai", IMAGE_MODEL: "gpt-image-2.6" });
 
     const recovered = useFetch((_call, index) =>
       index === 0

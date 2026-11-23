@@ -179,7 +179,7 @@ function imageProvider(): ImageProviderName {
 function imageModel(provider: ImageProviderName): string {
   const configured = process.env.IMAGE_MODEL?.trim();
   if (configured) return configured;
-  return provider === "openai" ? "gpt-image-2.6-sunburst" : "Qwen/Qwen-Image";
+  return provider === "openai" ? "gpt-image-2.6" : "Qwen/Qwen-Image";
 }
 
 /** OpenAI Images `b64_json`, as a data URL `storeImage` already knows how to persist. */
