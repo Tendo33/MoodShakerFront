@@ -6,6 +6,7 @@ import { menuSuggestions } from "@/lib/summaries";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { getDictionary } from "@/lib/dictionaries";
 import { DEFAULT_LOCALE, isLocale, localizePath } from "@/lib/i18n";
+import { Button } from "@/components/action-button";
 
 /**
  * Rendered for any unmatched URL. It sits outside `[lang]`, so it draws its own
@@ -26,9 +27,9 @@ export default async function NotFound() {
           suggestionsTitle={dict.drink.fromMenu}
           suggestions={await menuSuggestions(locale)}
         >
-          <Link href={localizePath("/", locale)} className="btn btn-primary">
+          <Button render={<Link href={localizePath("/", locale)} />}>
             {dict.notFound.home}
-          </Link>
+          </Button>
         </EmptyState>
       </main>
       <SiteFooter locale={locale} dict={dict} />

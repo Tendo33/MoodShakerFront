@@ -19,6 +19,9 @@ import {
 import { callApi, saveDrink } from "@/lib/client";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS } from "@/lib/moods";
+import { Button } from "@/components/action-button";
+import { Textarea } from "@/components/coss/textarea";
+import { Toggle } from "@/components/coss/toggle";
 
 type Labels = Pick<Dictionary, "questions" | "options" | "vocab">;
 type Draft = Partial<Omit<Order, "locale" | "spirits" | "notes">> & { spirits: StockableSpirit[]; notes: string };
@@ -324,24 +327,20 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                   <legend className="text-lead font-medium">{t.bar.spirits}</legend>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {STOCKABLE_SPIRITS.map((spirit) => (
-                      <label
+                      <Toggle
                         key={spirit}
-                        className="cursor-pointer bg-bone/70 px-5 py-3 text-lead transition-colors duration-200 hover:bg-bone has-checked:bg-ink has-checked:text-bone has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
+                        pressed={draft.spirits.includes(spirit)}
+                        onPressedChange={(pressed) =>
+                          update({
+                            spirits: pressed
+                              ? [...draft.spirits, spirit]
+                              : draft.spirits.filter((item) => item !== spirit),
+                          })
+                        }
+                        className="h-auto rounded-none px-5 py-3 data-pressed:bg-ink data-pressed:text-bone sm:text-base"
                       >
-                        <input
-                          type="checkbox"
-                          className="sr-only"
-                          checked={draft.spirits.includes(spirit)}
-                          onChange={(event) =>
-                            update({
-                              spirits: event.target.checked
-                                ? [...draft.spirits, spirit]
-                                : draft.spirits.filter((item) => item !== spirit),
-                            })
-                          }
-                        />
                         {dict.vocab.spirits[spirit]}
-                      </label>
+                      </Toggle>
                     ))}
                   </div>
                 </fieldset>
@@ -386,14 +385,14 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                       {format(t.style.notesCount, { n: draft.notes.length, max: MAX_NOTES_LENGTH })}
                     </span>
                   </div>
-                  <textarea
+                  <Textarea
                     id="notes"
                     rows={3}
                     maxLength={MAX_NOTES_LENGTH}
                     value={draft.notes}
                     onChange={(event) => update({ notes: event.target.value })}
                     placeholder={t.style.notesPlaceholder}
-                    className="mt-4 w-full resize-y bg-bone/70 px-5 py-4 text-lead transition-colors duration-200 placeholder:text-ink/70 focus:bg-bone focus:outline-3 focus:outline-ink"
+                    className="mt-4 w-full resize-y"
                   />
                 </div>
               </Question>
@@ -414,13 +413,9 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                 <li className="mr-1 text-ink/70">{t.order}</li>
                 {answered.map(([index, label]) => (
                   <li key={index}>
-                    <button
-                      type="button"
-                      onClick={() => go(index)}
-                      className="bg-bone/70 px-3 py-1.5 font-medium transition-colors duration-200 hover:bg-ink hover:text-bone"
-                    >
+                    <Button size="sm" variant="secondary" onClick={() => go(index)}>
                       {label}
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -438,41 +433,41 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
             <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-6">
                 {step > 0 && (
-                  <button type="button" className="link py-2 text-lead" onClick={() => go(step - 1)}>
+                  <Button variant="link" onClick={() => go(step - 1)}>
                     ← {t.back}
-                  </button>
+                  </Button>
                 )}
-                <p aria-live="polite" className="text-ink/70">
+                <p aria-live="polite" className="edge text-ink/70">
                   {format(t.progress, { n: step + 1, total: STEPS.length })}
                 </p>
                 {step > 0 && (
-                  <button
-                    type="button"
-                    className="link py-2 text-ink/70"
+                  <Button
+                    variant="link"
+                    className="opacity-70"
                     onClick={() => {
                       setDraft(EMPTY_DRAFT);
                       go(0);
                     }}
                   >
                     {t.restart}
-                  </button>
+                  </Button>
                 )}
               </div>
               <div className="flex flex-wrap items-center justify-end gap-x-5 gap-y-3 max-sm:order-first max-sm:w-full">
                 {!canContinue && (
-                  <p id="next-hint" className="text-ink/70 max-sm:order-last max-sm:w-full">
+                  <p id="next-hint" className="edge text-ink/70 max-sm:order-last max-sm:w-full">
                     {current === "bar" ? t.bar.choose : t.choose}
                   </p>
                 )}
-                <button
+                <Button
                   type="submit"
                   form="questionnaire"
-                  className="btn btn-primary max-sm:w-full"
+                  className="max-sm:w-full"
                   disabled={!canContinue}
                   aria-describedby={canContinue ? undefined : "next-hint"}
                 >
                   {current === "style" ? t.submit : t.next} <span aria-hidden>→</span>
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -538,7 +533,7 @@ function Glass({ fill }: { fill: number }) {
   return (
     <span aria-hidden className="relative block h-28 w-16 bg-ink/10 group-has-checked:bg-bone/20">
       <span
-        className="absolute inset-x-0 bottom-0 bg-accent transition-[height] duration-500 ease-out motion-safe:animate-[fill-up_800ms_var(--ease-out)_both] motion-safe:[animation-delay:260ms]"
+        className="absolute inset-x-0 bottom-0 bg-brand transition-[height] duration-500 ease-out motion-safe:animate-[fill-up_800ms_var(--ease-out)_both] motion-safe:[animation-delay:260ms]"
         style={{ height: `${fill * 100}%` }}
       />
     </span>

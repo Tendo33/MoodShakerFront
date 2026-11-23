@@ -15,7 +15,7 @@ export function RecentDrinks({ locale, title, hint }: { locale: Locale; title: s
         <h2 id="yours-heading" className="reveal text-head">
           {title}
         </h2>
-        <p className="reveal text-muted [--i:1]">{hint}</p>
+        <p className="reveal text-note [--i:1]">{hint}</p>
       </div>
       <ul className="mt-8 flex flex-wrap gap-2">
         {drinks.slice(0, 8).map((drink, index) => (

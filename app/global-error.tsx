@@ -1,6 +1,7 @@
 "use client";
 
 import "./globals.css";
+import { Button } from "@/components/action-button";
 
 /**
  * Last resort, shown when the root layout itself fails. It replaces the whole
@@ -23,9 +24,9 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
             </span>
           </p>
           <div className="mt-10">
-            <button type="button" className="btn btn-primary" onClick={reset}>
+            <Button type="button" onClick={reset}>
               重试 · Try again
-            </button>
+            </Button>
           </div>
         </main>
       </body>

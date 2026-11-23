@@ -9,6 +9,7 @@ import { isLocale, localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS } from "@/lib/moods";
 import { pageMetadata } from "@/lib/seo";
 import { orEmpty, summarize } from "@/lib/summaries";
+import { Button } from "@/components/action-button";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
@@ -69,9 +70,9 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                 {dict.home.headline[1]}
               </h1>
               <p className="mt-6 max-w-[34ch] text-lead">{dict.home.lede}</p>
-              <Link href={localizePath("/questions", locale)} className="btn btn-primary mt-8">
+              <Button render={<Link href={localizePath("/questions", locale)} />} className="mt-8">
                 {dict.home.cta} <span aria-hidden>→</span>
-              </Link>
+              </Button>
             </>
           )}
         </div>
@@ -84,11 +85,14 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         <div className="mt-12 grid gap-x-2.5 gap-y-12 lg:grid-cols-12">
           {/* Tell: the order as the guest gave it. */}
           <div className="flex flex-col lg:col-span-4">
-            <div className="reveal flex flex-col bg-surface p-6 lg:min-h-[28rem] lg:p-8">
+            <div className="reveal flex flex-col lg:min-h-[28rem]">
               {exampleOrder ? (
-                <>
-                  <p className="text-muted">{dict.home.ticket.title}</p>
-                  <dl className="mt-6 space-y-3.5">
+                <div className="ticket flex flex-1 flex-col">
+                  <div className="flex items-baseline justify-between gap-4 border-b border-ink pb-2.5">
+                    <span className="edge text-note">{dict.home.ticket.title}</span>
+                    <span className="edge">No. 0001</span>
+                  </div>
+                  <dl className="mt-5 space-y-3">
                     {(
                       [
                         [dict.home.ticket.mood, dict.options.moods[exampleOrder.mood].label],
@@ -102,18 +106,25 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                         [dict.home.ticket.style, dict.options.styles[exampleOrder.style].label],
                       ] as const
                     ).map(([term, value]) => (
-                      <div key={term} className="flex items-baseline justify-between gap-6">
-                        <dt className="text-muted">{term}</dt>
-                        <dd className="text-right text-lead font-medium">{value}</dd>
+                      <div key={term} className="flex items-baseline gap-2">
+                        <dt className="edge shrink-0 text-note">{term}</dt>
+                        <span className="leader" aria-hidden="true" />
+                        <dd className="shrink-0 text-[0.95rem] font-medium">{value}</dd>
                       </div>
                     ))}
                   </dl>
+                  {exampleDrink ? (
+                    <div className="mt-6 flex justify-end pb-4">
+                      <span className="stamp">{dict.home.ticket.read === undefined ? "已调好" : (locale === "cn" ? "已调好" : "POURED")}</span>
+                    </div>
+                  ) : null}
+                  <div className="ticket-tear -mb-px" aria-hidden="true" />
                   {exampleOrder.notes && exampleOrder.locale === locale && (
                     <p className="mt-auto pt-8 font-display text-[clamp(1.25rem,1.05rem+0.6vw,1.5rem)] leading-[1.35]">
                       {locale === "cn" ? `「${exampleOrder.notes}」` : `“${exampleOrder.notes}”`}
                     </p>
                   )}
-                </>
+                </div>
               ) : (
                 <div className="relative flex-1">
                   <Image src="/stages/ingredients.webp" alt="" fill sizes="(min-width: 1024px) 33vw, 100vw" className="specimen" />
@@ -191,7 +202,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                     className={`reveal-picture ${TILE_SHAPES[index % TILE_SHAPES.length]}`}
                   />
                   <p className="mt-2.5 font-display leading-snug transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
-                  <p className="text-small text-muted">{dict.vocab.spirits[drink.baseSpirit]}</p>
+                  <p className="text-small text-note">{dict.vocab.spirits[drink.baseSpirit]}</p>
                 </Link>
               </li>
             ))}
@@ -216,9 +227,9 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
               </h2>
               <p className="reveal mt-5 [--i:1]">{dict.home.closeBody}</p>
               <p className="reveal mt-4 text-lead [--i:2]">{dict.home.closeFact}</p>
-              <Link href={localizePath("/questions", locale)} className="btn btn-primary reveal mt-8 [--i:3] max-lg:w-full">
+              <Button render={<Link href={localizePath("/questions", locale)} />} className="reveal mt-8 [--i:3] max-lg:w-full">
                 {dict.home.cta} <span aria-hidden>→</span>
-              </Link>
+              </Button>
             </div>
           </div>
         </section>

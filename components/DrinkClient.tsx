@@ -11,6 +11,7 @@ import { localize } from "@/lib/domain/recipe";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { moodColor } from "@/lib/moods";
 import { deliverCard, renderShareCard } from "@/lib/share-card";
+import { Button } from "@/components/action-button";
 
 type Labels = Pick<Dictionary, "drink" | "recipe" | "vocab">;
 type Phase = "loading" | "missing" | "failed" | "ready";
@@ -150,20 +151,20 @@ export function DrinkClient({
         suggestions={suggestions}
       >
         {phase === "failed" && (
-          <button
+          <Button
             type="button"
-            className="btn btn-quiet"
+            variant="secondary"
             onClick={() => {
               setFetchPhase("loading");
               setAttempt((n) => n + 1);
             }}
           >
             {t.retry}
-          </button>
+          </Button>
         )}
-        <Link href={localizePath("/questions", locale)} className="btn btn-primary">
+        <Button render={<Link href={localizePath("/questions", locale)} />}>
           {t.again} <span aria-hidden>→</span>
-        </Link>
+        </Button>
       </EmptyState>
     );
   }
@@ -182,9 +183,9 @@ export function DrinkClient({
       ) : (
         <>
           {imageState === "failed" && <p className="text-lead">{t.imageFailed}</p>}
-          <button type="button" className="btn btn-quiet" onClick={() => void requestImage()}>
+          <Button type="button" variant="secondary" onClick={() => void requestImage()}>
             {t.retryImage}
-          </button>
+          </Button>
         </>
       )}
     </div>
@@ -196,12 +197,13 @@ export function DrinkClient({
   const actions = (
     <div>
       <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
-        <button type="button" className="btn btn-primary" disabled={busy !== null} onClick={() => void share(recipe.name)}>
+        <Button type="button" disabled={busy !== null} onClick={() => void share(recipe.name)}>
           {busy === "share" ? t.sharing : t.share}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className="btn bg-ink/10 transition-[background-color,color] duration-150 hover:bg-ink hover:text-bone"
+          variant="ghost"
+          className="bg-ink/10 hover:bg-ink hover:text-bone"
           disabled={busy !== null || !canPublish}
           aria-describedby={canPublish ? undefined : "publish-hint"}
           onClick={() => void togglePublish()}
@@ -213,7 +215,7 @@ export function DrinkClient({
               : drink.published
                 ? t.withdraw
                 : t.publish}
-        </button>
+        </Button>
         <Link href={localizePath("/questions", locale)} className="link col-span-2 py-2 sm:ml-2">
           {t.again} →
         </Link>

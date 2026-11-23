@@ -66,8 +66,8 @@ export function DrinkSheet({
             <dl className="enter mt-10 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4 [--i:4]">
               {facts.map(([term, value]) => (
                 <div key={term}>
-                  <dt className="text-small text-ink/70">{term}</dt>
-                  <dd className="mt-1 font-medium">{value}</dd>
+                  <dt className="edge text-ink/60">{term}</dt>
+                  <dd className="mt-1.5 font-medium">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -81,7 +81,7 @@ export function DrinkSheet({
 
       {/* Why this drink, said once and large: it is what makes the page this guest's and not a recipe card. */}
       <section className="frame mt-[clamp(72px,11vh,140px)] grid gap-x-8 lg:grid-cols-12" aria-labelledby="why-heading">
-        <h2 id="why-heading" className="label reveal text-muted lg:col-span-3 lg:pt-3">
+        <h2 id="why-heading" className="label reveal text-note lg:col-span-3 lg:pt-3">
           {t.why}
         </h2>
         <blockquote className="reveal mt-4 max-w-[26em] font-display text-[clamp(1.625rem,1rem+2.2vw,3rem)] leading-[1.25] tracking-[-0.01em] [--i:1] lg:col-span-9 lg:mt-0">
@@ -109,7 +109,7 @@ export function DrinkSheet({
                   <span className="self-center pr-4">
                     {item.name}
                     {item.substitute && (
-                      <span className="block text-small text-muted">
+                      <span className="block text-small text-note">
                         {t.substitute} {item.substitute}
                       </span>
                     )}
@@ -129,7 +129,7 @@ export function DrinkSheet({
                   <li key={index} className="reveal" style={{ ["--i" as string]: index }}>
                     {tool.name}
                     {tool.alternative && (
-                      <span className="text-muted">
+                      <span className="text-note">
                         {" "}
                         · {t.alternative} {tool.alternative}
                       </span>
@@ -157,7 +157,7 @@ export function DrinkSheet({
                 </span>
                 <div>
                   <p className="text-lead">{step.description}</p>
-                  {step.tips && <p className="mt-2 text-muted">{step.tips}</p>}
+                  {step.tips && <p className="mt-2 text-note">{step.tips}</p>}
                 </div>
               </li>
             ))}

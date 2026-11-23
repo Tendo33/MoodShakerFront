@@ -6,6 +6,7 @@ import { isLocale, localizePath, type Locale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
 import { summarize } from "@/lib/summaries";
 import { Specimen } from "@/components/Specimen";
+import { Button } from "@/components/action-button";
 
 const FILTERS = [...STOCKABLE_SPIRITS, "none"] as const satisfies readonly (typeof BASE_SPIRITS)[number][];
 
@@ -56,7 +57,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
               key={code ?? "all"}
               href={href({ spirit: code })}
               aria-current={active ? "page" : undefined}
-              className={`nav-link ${active ? "font-medium" : "text-muted hover:text-ink"}`}
+              className={`nav-link ${active ? "font-medium" : "text-note hover:text-ink"}`}
             >
               {code ? dict.vocab.spirits[code] : dict.gallery.all}
             </Link>
@@ -68,13 +69,13 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
         <div className="py-32">
           <p className="text-lead">{dict.gallery.empty}</p>
           <div className="mt-8 flex flex-wrap gap-2">
-            <Link href={localizePath("/questions", locale)} className="btn btn-primary">
+            <Button render={<Link href={localizePath("/questions", locale)} />}>
               {dict.nav.shake} <span aria-hidden>→</span>
-            </Link>
+            </Button>
             {spirit && (
-              <Link href={href({})} className="btn btn-quiet">
+              <Button variant="secondary" render={<Link href={href({})} />}>
                 {dict.gallery.all}
-              </Link>
+              </Button>
             )}
           </div>
         </div>
@@ -99,7 +100,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
                   >
                     {drink.name}
                   </p>
-                  <p className="mt-1 text-small text-muted">
+                  <p className="edge mt-1 text-note">
                     {dict.vocab.spirits[drink.baseSpirit]} · {dict.vocab.alcohol[drink.alcoholLevel]}
                     {drink.mood && ` · ${dict.options.moods[drink.mood].label}`}
                   </p>
@@ -120,9 +121,9 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
             <span />
           )}
           {page.nextCursor && (
-            <Link href={href({ spirit, cursor: page.nextCursor })} className="btn btn-quiet">
+            <Button variant="secondary" render={<Link href={href({ spirit, cursor: page.nextCursor })} />}>
               {dict.gallery.next} <span aria-hidden>→</span>
-            </Link>
+            </Button>
           )}
         </div>
       )}

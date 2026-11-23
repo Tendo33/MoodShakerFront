@@ -4,11 +4,12 @@ import { MenuLink } from "@/components/MenuLink";
 import type { Dictionary } from "@/lib/dictionaries";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS } from "@/lib/moods";
+import { Button } from "@/components/action-button";
 
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
     <header className="frame flex h-20 items-center justify-between gap-2 sm:gap-6">
-      <a href="#main" className="skip-link btn btn-quiet">
+      <a href="#main" className="skip-link bg-ink px-4 py-2 text-bone">
         {dict.nav.skip}
       </a>
       <Link
@@ -27,9 +28,9 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
       <nav className="flex items-center gap-1 whitespace-nowrap sm:gap-6">
         <MenuLink href={localizePath("/gallery", locale)}>{dict.nav.menu}</MenuLink>
         <LanguageSwitch locale={locale} label={dict.nav.switchTo} ariaLabel={dict.nav.switchLabel} />
-        <Link href={localizePath("/questions", locale)} className="btn btn-primary ml-1.5 min-h-11 px-3.5 sm:ml-2 sm:px-5">
+        <Button render={<Link href={localizePath("/questions", locale)} />} className="sm:h-11 px-4">
           {dict.nav.shake}
-        </Link>
+        </Button>
       </nav>
     </header>
   );
