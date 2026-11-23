@@ -81,8 +81,12 @@ the stamp and the tear.
 - The questionnaire is built from the registry: mood tiles, answer cards and the
   spirits list are coss `Toggle`; steps and the submit are `Button`; the guest
   note is `Textarea`.
-- No `<input>` or `<button>` is hand-written outside `components/coss/`. The only
-  native elements left are a `type="file"` input and hidden form plumbing.
+- Buttons, the note field and the multi-select spirits list come from the
+  registry. The **single-choice groups** (mood, strength, style) are a native
+  `type="radio"` inside a styled `<label>`: coss `Radio` is a fixed-size dot and
+  cannot host a colour tile or a drawn glass, and a single-choice question must
+  announce itself as a radio, not as a pressed button. This is the one
+  deliberate exception, and it is why the e2e suite can still query by role.
 
 ## Motion
 

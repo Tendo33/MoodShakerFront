@@ -267,16 +267,21 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
               <Question title={t.mood.title} hint={t.mood.hint}>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
                   {MOODS.map((mood, index) => (
-                    <Toggle
+                    <label
                       key={mood}
-                      pressed={draft.mood === mood}
-                      onPressedChange={() => update({ mood })}
                       onClick={advanceOnPointer}
-                      className="group enter flex h-auto flex-col items-stretch justify-start gap-0 rounded-none border-0 bg-transparent p-0 text-left data-pressed:bg-transparent"
+                      className="group enter block cursor-pointer has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
                       style={{ ["--i" as string]: index }}
                     >
+                      <input
+                        type="radio"
+                        name="mood"
+                        className="sr-only"
+                        checked={draft.mood === mood}
+                        onChange={() => update({ mood })}
+                      />
                       <span
-                        className="relative block aspect-[5/4] overflow-hidden transition-transform duration-300 ease-out group-data-pressed:scale-[0.96] lg:aspect-[3/4]"
+                        className="relative block aspect-[5/4] overflow-hidden lg:aspect-[3/4] transition-transform duration-300 ease-out group-has-checked:scale-[0.96]"
                         style={{ backgroundColor: MOOD_COLORS[mood] }}
                       >
                         {moodImages[mood]?.[0] && (
@@ -287,10 +292,10 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                       </span>
                       <span className="mt-3 flex items-baseline justify-between gap-3">
                         <span className="text-lead font-medium">{dict.options.moods[mood].label}</span>
-                        <span aria-hidden className="size-3 shrink-0 bg-ink opacity-0 transition-opacity duration-200 group-data-pressed:opacity-100" />
+                        <span aria-hidden className="size-3 shrink-0 bg-ink opacity-0 transition-opacity duration-200 group-has-checked:opacity-100" />
                       </span>
                       <span className="block text-small text-ink/70">{dict.options.moods[mood].note}</span>
-                    </Toggle>
+                    </label>
                   ))}
                 </div>
               </Question>
@@ -508,19 +513,18 @@ function Choice({
   children?: React.ReactNode;
 }) {
   return (
-    <Toggle
-      pressed={checked}
-      onPressedChange={onChange}
+    <label
       onClick={onClick}
-      className="group enter flex h-auto flex-col items-stretch justify-between gap-6 rounded-none border-0 bg-bone/70 p-5 text-left transition-[background-color,transform] duration-200 ease-out hover:bg-bone data-pressed:bg-ink data-pressed:text-bone active:scale-[0.98] sm:text-base"
+      className="group enter flex cursor-pointer flex-col justify-between gap-6 bg-bone/70 p-5 transition-[background-color,transform] duration-200 ease-out hover:bg-bone active:scale-[0.98] has-checked:bg-ink has-checked:text-bone has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
       style={{ ["--i" as string]: index }}
     >
+      <input type="radio" name={name} className="sr-only" checked={checked} onChange={onChange} />
       {children}
       <span>
         <span className="block text-lead font-medium">{label}</span>
-        <span className="mt-1 block text-ink/70 group-data-pressed:text-bone/70">{note}</span>
+        <span className="mt-1 block text-ink/70 group-has-checked:text-bone/70">{note}</span>
       </span>
-    </Toggle>
+    </label>
   );
 }
 
