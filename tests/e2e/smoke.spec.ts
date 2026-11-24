@@ -54,8 +54,8 @@ test("a private drink goes on the menu once photographed, and comes off again", 
   try {
     // A private copy of a seed, without its photograph.
     await sql`
-      insert into drinks (id, edit_token_hash, "order", recipe, base_spirit)
-      select ${id}, ${hash}, "order", recipe, base_spirit from drinks where id = 'seed-boulevardier'`;
+      insert into drinks (id, edit_token_hash, "order", recipe, base_spirit, mood)
+      select ${id}, ${hash}, "order", recipe, base_spirit, mood from drinks where id = 'seed-boulevardier'`;
     await sql`delete from rate_limits where key like 'publish:%'`;
 
     await page.addInitScript(
