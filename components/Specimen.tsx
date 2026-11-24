@@ -1,3 +1,5 @@
+import type { MotionProps } from "motion/react";
+import * as motion from "motion/react-client";
 import Image from "next/image";
 import { DevelopedImage } from "@/components/DevelopedImage";
 import type { Mood } from "@/lib/domain/vocabulary";
@@ -19,6 +21,7 @@ export function Specimen({
   develop,
   className = "aspect-[4/5]",
   inset = "2%",
+  entrance,
   children,
 }: {
   src: string | null;
@@ -31,10 +34,12 @@ export function Specimen({
   className?: string;
   /** Space between the glass and the edge of its field. */
   inset?: string;
+  /** Entrance of the whole field. The photograph is multiplied inside it, so field and glass fade as one. */
+  entrance?: MotionProps;
   children?: React.ReactNode;
 }) {
   return (
-    <div className={`relative overflow-hidden ${className}`} style={{ backgroundColor: moodColor(mood) }}>
+    <motion.div {...entrance} className={`relative overflow-hidden ${className}`} style={{ backgroundColor: moodColor(mood) }}>
       {src ? (
         <div className="absolute" style={{ inset }}>
           {develop ? (
@@ -46,6 +51,6 @@ export function Specimen({
       ) : (
         children
       )}
-    </div>
+    </motion.div>
   );
 }

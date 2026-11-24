@@ -56,7 +56,14 @@ export async function createDrink(order: Order, recipe: Recipe) {
 
   const [row] = await getDb()
     .insert(drinks)
-    .values({ id, editTokenHash: hashToken(editToken), order, recipe, baseSpirit: recipe.baseSpirit })
+    .values({
+      id,
+      editTokenHash: hashToken(editToken),
+      order,
+      recipe,
+      baseSpirit: recipe.baseSpirit,
+      mood: order.mood,
+    })
     .returning();
 
   return { drink: toView(row), editToken };
@@ -134,6 +141,7 @@ function decodeCursor(cursor: string): { publishedAt: Date; id: string } | null 
 
 /** Keyset-paginated, newest first. `nextCursor` is null on the last page. */
 export async function listPublishedDrinks(options: {
+  mood?: Mood;
   spirit?: BaseSpirit;
   cursor?: string;
   limit?: number;
@@ -147,6 +155,7 @@ export async function listPublishedDrinks(options: {
     .where(
       and(
         isNotNull(drinks.publishedAt),
+        options.mood ? eq(drinks.mood, options.mood) : undefined,
         options.spirit ? eq(drinks.baseSpirit, options.spirit) : undefined,
         after
           ? or(

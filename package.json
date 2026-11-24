@@ -24,6 +24,7 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.4",
     "lucide-react": "^1.78.0",
+    "motion": "^14.14.0",
     "next": "16.4.5",
     "postgres": "^3.4.9",
     "react": "^19",

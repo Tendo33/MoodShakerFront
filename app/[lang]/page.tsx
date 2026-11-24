@@ -1,3 +1,5 @@
+import * as motion from "motion/react-client";
+import { reveal, revealPicture } from "@/lib/motion";
 import Image from "next/image";
 import Link from "next/link";
 import { MoodPlinth, type PlinthDrink } from "@/components/MoodPlinth";
@@ -79,13 +81,13 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       </section>
 
       <section className="frame mt-[clamp(88px,14vh,180px)]" aria-labelledby="steps-title">
-        <h2 id="steps-title" className="reveal text-head">
+        <motion.h2 {...reveal(0)} id="steps-title" className="text-head">
           {dict.home.stepsTitle}
-        </h2>
+        </motion.h2>
         <div className="mt-12 grid gap-x-2.5 gap-y-12 lg:grid-cols-12">
           {/* Tell: the order as the guest gave it. */}
           <div className="flex flex-col lg:col-span-4">
-            <div className="reveal flex flex-col lg:min-h-[28rem]">
+            <motion.div {...reveal(0)} className="flex flex-col lg:min-h-[28rem]">
               {exampleOrder ? (
                 <div className="ticket flex flex-1 flex-col">
                   <div className="flex items-baseline justify-between gap-4 border-b border-ink pb-2.5">
@@ -130,23 +132,23 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                   <Image src="/stages/ingredients.webp" alt="" fill sizes="(min-width: 1024px) 33vw, 100vw" className="specimen" />
                 </div>
               )}
-            </div>
-            <h3 className="label reveal mt-5 text-lead">{dict.home.steps[0].title}</h3>
-            <p className="reveal mt-2 max-w-[34ch] [--i:1]">{dict.home.steps[0].body}</p>
+            </motion.div>
+            <motion.h3 {...reveal(0)} className="label mt-5 text-lead">{dict.home.steps[0].title}</motion.h3>
+            <motion.p {...reveal(1)} className="mt-2 max-w-[34ch]">{dict.home.steps[0].body}</motion.p>
           </div>
 
           {/* Shake. */}
           <div className="flex flex-col lg:col-span-3">
-            <div
-              className="reveal-picture relative max-lg:aspect-[4/3] lg:h-[28rem] [--i:1]"
+            <motion.div {...revealPicture(1)}
+              className="relative max-lg:aspect-[4/3] lg:h-[28rem]"
               style={{ backgroundColor: MOOD_COLORS.blue }}
             >
               <div className="absolute inset-[6%]">
                 <Image src="/stages/shaker.webp" alt="" fill sizes="(min-width: 1024px) 25vw, 100vw" className="specimen" />
               </div>
-            </div>
-            <h3 className="label reveal mt-5 text-lead [--i:1]">{dict.home.steps[1].title}</h3>
-            <p className="reveal mt-2 max-w-[34ch] [--i:2]">{dict.home.steps[1].body}</p>
+            </motion.div>
+            <motion.h3 {...reveal(1)} className="label mt-5 text-lead">{dict.home.steps[1].title}</motion.h3>
+            <motion.p {...reveal(2)} className="mt-2 max-w-[34ch]">{dict.home.steps[1].body}</motion.p>
           </div>
 
           {/* Pour: the drink that order became. */}
@@ -158,18 +160,21 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                   alt={exampleDrink.name}
                   mood={exampleDrink.mood}
                   sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="reveal-picture max-lg:aspect-[4/3] lg:h-[28rem] [--i:2]"
+                  entrance={revealPicture(2)}
+                  className="max-lg:aspect-[4/3] lg:h-[28rem]"
                 />
               </Link>
             ) : (
               <div className="lg:h-[28rem]" style={{ backgroundColor: MOOD_COLORS.romantic }} />
             )}
-            <h3 className="label reveal mt-5 text-lead [--i:2]">{dict.home.steps[2].title}</h3>
-            <p className="reveal mt-2 max-w-[34ch] [--i:3]">{dict.home.steps[2].body}</p>
+            <motion.h3 {...reveal(2)} className="label mt-5 text-lead">{dict.home.steps[2].title}</motion.h3>
+            <motion.p {...reveal(3)} className="mt-2 max-w-[34ch]">{dict.home.steps[2].body}</motion.p>
             {exampleDrink && (
-              <Link href={localizePath(`/cocktail/${exampleDrink.slug}`, locale)} className="link reveal mt-2 flex min-h-11 w-fit items-center [--i:3]">
+              <motion.div {...reveal(3)} className="mt-2">
+              <Link href={localizePath(`/cocktail/${exampleDrink.slug}`, locale)} className="link flex min-h-11 w-fit items-center">
                 {exampleDrink.name} · {dict.home.ticket.read} →
               </Link>
+              </motion.div>
             )}
           </div>
         </div>
@@ -180,15 +185,15 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       {pictured.length > 0 && (
         <section className="mt-[clamp(120px,18vh,240px)]" aria-labelledby="menu-title">
           <div className="frame grid gap-6 lg:grid-cols-12">
-            <h2 id="menu-title" className="reveal text-head lg:col-span-6">
+            <motion.h2 {...reveal(0)} id="menu-title" className="text-head lg:col-span-6">
               {dict.home.menuTitle}
-            </h2>
-            <div className="reveal lg:col-span-5 lg:col-start-8 [--i:1]">
+            </motion.h2>
+            <motion.div {...reveal(1)} className="lg:col-span-5 lg:col-start-8">
               <p className="text-lead">{dict.home.menuStatement}</p>
               <Link href={localizePath("/gallery", locale)} className="link mt-3 inline-block py-2">
                 {dict.home.viewMenu} →
               </Link>
-            </div>
+            </motion.div>
           </div>
           <ul className="frame mt-16 columns-2 gap-1 sm:columns-3 lg:columns-6">
             {pictured.slice(0, 18).map((drink, index) => (
@@ -199,7 +204,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                     alt={drink.name}
                     mood={drink.mood}
                     sizes="(min-width: 1024px) 17vw, (min-width: 640px) 33vw, 50vw"
-                    className={`reveal-picture ${TILE_SHAPES[index % TILE_SHAPES.length]}`}
+                    entrance={revealPicture()}
+                    className={TILE_SHAPES[index % TILE_SHAPES.length]}
                   />
                   <p className="mt-2.5 font-display leading-snug transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
                   <p className="text-small text-note">{dict.vocab.spirits[drink.baseSpirit]}</p>
@@ -217,19 +223,25 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
           style={{ backgroundColor: MOOD_COLORS[finale.mood ?? "romantic"] }}
           aria-labelledby="close-title"
         >
-          <div className="pointer-events-none absolute -bottom-[12%] -left-[6%] h-[115%] w-[75%] max-lg:top-auto max-lg:h-[60%] max-lg:w-[130%]">
-            <Image src={finale.imageUrl!} alt="" fill sizes="75vw" className="specimen reveal-picture object-left-bottom" />
-          </div>
+          <motion.div
+            {...revealPicture(0)}
+            className="pointer-events-none absolute -bottom-[12%] -left-[6%] h-[115%] w-[75%] max-lg:top-auto max-lg:h-[60%] max-lg:w-[130%]"
+            style={{ backgroundColor: MOOD_COLORS[finale.mood ?? "romantic"] }}
+          >
+            <Image src={finale.imageUrl!} alt="" fill sizes="75vw" className="specimen object-left-bottom" />
+          </motion.div>
           <div className="frame relative grid lg:grid-cols-12">
             <div className="lg:col-span-3 lg:col-start-10 max-lg:pt-16 max-lg:pb-[62%]">
-              <h2 id="close-title" className="reveal text-head">
+              <motion.h2 {...reveal(0)} id="close-title" className="text-head">
                 {dict.home.closeTitle}
-              </h2>
-              <p className="reveal mt-5 [--i:1]">{dict.home.closeBody}</p>
-              <p className="reveal mt-4 text-lead [--i:2]">{dict.home.closeFact}</p>
-              <Button render={<Link href={localizePath("/questions", locale)} />} className="reveal mt-8 [--i:3] max-lg:w-full">
-                {dict.home.cta} <span aria-hidden>→</span>
-              </Button>
+              </motion.h2>
+              <motion.p {...reveal(1)} className="mt-5">{dict.home.closeBody}</motion.p>
+              <motion.p {...reveal(2)} className="mt-4 text-lead">{dict.home.closeFact}</motion.p>
+              <motion.div {...reveal(3)} className="mt-8">
+                <Button render={<Link href={localizePath("/questions", locale)} />} className="max-lg:w-full">
+                  {dict.home.cta} <span aria-hidden>→</span>
+                </Button>
+              </motion.div>
             </div>
           </div>
         </section>

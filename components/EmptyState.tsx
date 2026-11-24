@@ -1,3 +1,5 @@
+import * as motion from "motion/react-client";
+import { enter, reveal } from "@/lib/motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Specimen } from "@/components/Specimen";
@@ -32,27 +34,27 @@ export function EmptyState({
     <div className="frame py-12 lg:py-16">
       <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
         <div className="lg:col-span-6">
-          <h1 className="title title-measure enter">{title}</h1>
-          {body && <p className="enter mt-6 max-w-[40ch] text-lead [--i:1]">{body}</p>}
-          <div className="enter mt-10 flex flex-wrap gap-2 [--i:2]">{children}</div>
+          <motion.h1 {...enter(0)} className="title title-measure">{title}</motion.h1>
+          {body && <motion.p {...enter(1)} className="mt-6 max-w-[40ch] text-lead">{body}</motion.p>}
+          <motion.div {...enter(2)} className="mt-10 flex flex-wrap gap-2">{children}</motion.div>
         </div>
-        <div
-          className="enter relative aspect-square lg:col-span-6 lg:aspect-[5/4] [--i:1]"
+        <motion.div {...enter(1)}
+          className="relative aspect-square lg:col-span-6 lg:aspect-[5/4]"
           style={{ backgroundColor: MOOD_COLORS.blue }}
         >
           <div className="absolute inset-[4%]">
             <Image src="/stages/shaker.webp" alt="" fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="specimen" />
           </div>
-        </div>
+        </motion.div>
       </div>
       {suggestions.length > 0 && (
         <section className="mt-[clamp(96px,14vh,180px)]" aria-labelledby="suggestions-heading">
-          <h2 id="suggestions-heading" className="reveal text-head">
+          <motion.h2 {...reveal(0)} id="suggestions-heading" className="text-head">
             {suggestionsTitle}
-          </h2>
+          </motion.h2>
           <ul className="mt-10 grid grid-cols-2 gap-2 lg:grid-cols-4">
             {suggestions.map((drink, index) => (
-              <li key={drink.href} className="reveal" style={{ ["--i" as string]: index }}>
+              <motion.li {...reveal(index)} key={drink.href}>
                 <Link href={drink.href} className="group block">
                   <Specimen
                     src={drink.imageUrl}
@@ -63,7 +65,7 @@ export function EmptyState({
                   />
                   <p className="mt-3 font-display text-lead leading-snug transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
                 </Link>
-              </li>
+              </motion.li>
             ))}
           </ul>
         </section>

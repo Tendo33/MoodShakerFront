@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { Reveals } from "@/components/Reveals";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { getDictionary } from "@/lib/dictionaries";
 import { isLocale } from "@/lib/i18n";
@@ -13,7 +12,6 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     <>
       <SiteHeader locale={lang} dict={dict} />
       <main id="main">{children}</main>
-      <Reveals />
       <SiteFooter locale={lang} dict={dict} />
     </>
   );

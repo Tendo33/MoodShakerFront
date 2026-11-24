@@ -149,6 +149,7 @@ export const cn: Dictionary = {
     spirit: "基酒",
     strength: "酒精度",
     flavor: "风味",
+    mood: "心情",
     why: "为什么是这一杯",
     substitute: "可替换为",
     tip: "小贴士",
@@ -182,6 +183,7 @@ export const cn: Dictionary = {
     empty: "这一栏还没有酒，来调第一杯。",
     next: "下一页",
     first: "回到第一页",
+    stamp: "已调好",
   },
   detail: {
     back: "返回酒单",
@@ -189,6 +191,7 @@ export const cn: Dictionary = {
     shakeYours: "按你的心情调一杯",
     more: "酒单上的其他几杯",
     moreForMood: "同样为「{mood}」而调",
+    stamp: "已调好",
   },
   footer: {
     credit: "酒的照片由 AI 生成。",

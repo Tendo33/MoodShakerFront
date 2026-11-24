@@ -18,6 +18,8 @@ export const drinks = pgTable(
     recipe: jsonb("recipe").$type<Recipe>().notNull(),
     /** Copied out of `recipe` so the gallery can filter on an index. */
     baseSpirit: text("base_spirit").notNull(),
+    /** Copied out of `order` so the gallery can filter on an index. */
+    mood: text("mood").notNull(),
     imageUrl: text("image_url"),
     thumbnailUrl: text("thumbnail_url"),
     /** Assigned on first publish and kept afterwards, so a re-publish keeps its URL. */
@@ -31,6 +33,7 @@ export const drinks = pgTable(
       .on(table.publishedAt.desc(), table.id.desc())
       .where(sql`${table.publishedAt} is not null`),
     index("drinks_base_spirit_idx").on(table.baseSpirit),
+    index("drinks_mood_idx").on(table.mood),
   ],
 );
 

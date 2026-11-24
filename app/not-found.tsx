@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { EmptyState } from "@/components/EmptyState";
-import { Reveals } from "@/components/Reveals";
 import { menuSuggestions } from "@/lib/summaries";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { getDictionary } from "@/lib/dictionaries";
@@ -33,7 +32,6 @@ export default async function NotFound() {
         </EmptyState>
       </main>
       <SiteFooter locale={locale} dict={dict} />
-      <Reveals />
     </>
   );
 }

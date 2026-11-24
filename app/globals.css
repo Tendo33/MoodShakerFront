@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 /*
- * MoodShaker: the specimen catalogue. Each drink stands alone on the colour of
- * the mood it was poured for. One ground (bone), one ink, one accent (Campari
- * red, on the primary action only), and six mood fields. See DESIGN.md.
+ * MoodShaker: a printed order ticket. Each drink stands on the colour of the
+ * mood it was poured for. One ground (bone), one ink, one accent (brand red:
+ * the stamp, and the primary action on hover), and six mood fields. See DESIGN.md.
  */
 @theme {
   --color-bone: #fbf9f4;
@@ -33,6 +33,7 @@
   --text-display: clamp(3.25rem, 1rem + 8vw, 8.5rem);
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-skeleton: skeleton 1.6s ease-in-out infinite;
 }
 
 
@@ -292,49 +293,13 @@
   }
 }
 
-/*
- * Entrances. Driven by the scroll timeline where supported, so nothing waits on
- * a script and content is visible wherever the feature is missing.
- */
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-}
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
 /* Loading skeleton pulse: gentler than the browser default, stays in the palette. */
 @keyframes skeleton {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.45; }
 }
 
-.enter {
-  animation: rise 620ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 60ms);
-}
-
-.reveals .reveal:not(.is-in) {
-  opacity: 0;
-  transform: translateY(20px);
-}
-.reveals .reveal-picture:not(.is-in) {
-  opacity: 0;
-  transform: scale(1.04);
-}
-.reveals .reveal,
-.reveals .reveal-picture {
-  transition:
-    opacity 520ms var(--ease-out),
-    transform 620ms var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 60ms);
-}
-
+/* Entrances, the wait and the page turn are `motion` components (lib/motion.ts); CSS keeps only feedback transitions. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -349,101 +314,4 @@
 /* A page that ends on a colour field runs straight into the footer. */
 main:has([data-bleed-end]) ~ footer {
   margin-top: 0;
-}
-
-/* The one moving picture: the drink on the plinth breathes very slightly. */
-@keyframes drift {
-  from {
-    transform: translateY(0) scale(1);
-  }
-  to {
-    transform: translateY(-1.5%) scale(1.025);
-  }
-}
-
-/* Shaking screen: the title breathes instead of generic pulse. */
-@keyframes breathe {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-/*
- * The flow from question to glass. A step leaves and the next arrives in the
- * direction the guest is going; going back reverses it.
- */
-@keyframes step-forward {
-  from {
-    opacity: 0;
-    transform: translateX(28px);
-  }
-}
-@keyframes step-back {
-  from {
-    opacity: 0;
-    transform: translateX(-28px);
-  }
-}
-.step {
-  transition:
-    opacity 170ms ease,
-    transform 170ms ease;
-}
-.step[data-dir="forward"] .enter {
-  animation-name: step-forward;
-}
-.step[data-dir="back"] .enter {
-  animation-name: step-back;
-}
-.step[data-leaving="forward"] {
-  opacity: 0;
-  transform: translateX(-18px);
-}
-.step[data-leaving="back"] {
-  opacity: 0;
-  transform: translateX(18px);
-}
-
-/* A new page arrives as one piece before its parts make their own entrances. */
-.page-enter {
-  animation: fade-in 260ms ease both;
-}
-
-/* The strength glasses fill as the question arrives. */
-@keyframes fill-up {
-  from {
-    height: 0;
-  }
-}
-
-/* The wait: the shaker works in bursts, then rests. */
-@keyframes shake {
-  0%,
-  70%,
-  100% {
-    transform: rotate(0deg) translate(0, 0);
-  }
-  /* Up over the shoulder and back, five times, then set down. */
-  7%,
-  21%,
-  35%,
-  49%,
-  63% {
-    transform: rotate(-17deg) translate(-4%, -6%);
-  }
-  14%,
-  28%,
-  42%,
-  56% {
-    transform: rotate(-5deg) translate(4%, 5%);
-  }
-}
-
-/* Runs fast, then slows, and never quite arrives: the real end is the answer. */
-@keyframes pour {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(0.94);
-  }
 }

@@ -1,10 +1,13 @@
+import * as motion from "motion/react-client";
+import { enter, revealPicture } from "@/lib/motion";
 import Link from "next/link";
 import { listPublishedDrinks } from "@/lib/db/drinks";
 import { getDictionary } from "@/lib/dictionaries";
-import { BASE_SPIRITS, isBaseSpirit, STOCKABLE_SPIRITS } from "@/lib/domain/vocabulary";
+import { BASE_SPIRITS, isBaseSpirit, isMood, MOODS, STOCKABLE_SPIRITS } from "@/lib/domain/vocabulary";
 import { isLocale, localizePath, type Locale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
 import { summarize } from "@/lib/summaries";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/coss/card";
 import { Specimen } from "@/components/Specimen";
 import { Button } from "@/components/action-button";
 
@@ -28,14 +31,15 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
   const locale = lang as Locale;
   const dict = getDictionary(locale);
 
+  const mood = isMood(query.mood) ? query.mood : undefined;
   const spirit = isBaseSpirit(query.spirit) ? query.spirit : undefined;
   const cursor = typeof query.cursor === "string" ? query.cursor : undefined;
-  const page = await listPublishedDrinks({ spirit, cursor });
+  const page = await listPublishedDrinks({ mood, spirit, cursor });
   const drinks = page.drinks.map((row) => summarize(row, locale));
-  const features = featureSlots(drinks.length);
 
-  const href = (params: { spirit?: string; cursor?: string }) => {
+  const href = (params: { mood?: string; spirit?: string; cursor?: string }) => {
     const search = new URLSearchParams();
+    if (params.mood) search.set("mood", params.mood);
     if (params.spirit) search.set("spirit", params.spirit);
     if (params.cursor) search.set("cursor", params.cursor);
     const qs = search.toString();
@@ -45,17 +49,33 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
   return (
     <div className="frame">
       <header className="grid gap-6 pt-6 lg:grid-cols-12 lg:items-end">
-        <h1 className="enter text-display leading-[0.95] lg:col-span-7">{dict.gallery.title}</h1>
-        <p className="enter max-w-[36ch] text-lead [--i:1] lg:col-span-5 lg:justify-self-end lg:pb-3">{dict.gallery.lede}</p>
+        <motion.h1 {...enter(0)} className="text-display leading-[0.95] lg:col-span-7">{dict.gallery.title}</motion.h1>
+        <motion.p {...enter(1)} className="max-w-[36ch] text-lead lg:col-span-5 lg:justify-self-end lg:pb-3">{dict.gallery.lede}</motion.p>
       </header>
 
-      <nav aria-label={dict.recipe.spirit} className="enter mt-12 flex flex-wrap gap-x-4 gap-y-1 text-lead [--i:2]">
+      <motion.nav {...enter(2)} aria-label={dict.recipe.mood} className="mt-12 flex flex-wrap gap-x-4 gap-y-1 text-lead">
+        {[undefined, ...MOODS].map((code) => {
+          const active = code === mood;
+          return (
+            <Link
+              key={code ?? "all"}
+              href={href({ mood: code, spirit })}
+              aria-current={active ? "page" : undefined}
+              className={`nav-link ${active ? "font-medium" : "text-note hover:text-ink"}`}
+            >
+              {code ? dict.options.moods[code].label : dict.gallery.all}
+            </Link>
+          );
+        })}
+      </motion.nav>
+
+      <motion.nav {...enter(3)} aria-label={dict.recipe.spirit} className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-lead">
         {[undefined, ...FILTERS].map((code) => {
           const active = code === spirit;
           return (
             <Link
               key={code ?? "all"}
-              href={href({ spirit: code })}
+              href={href({ mood, spirit: code })}
               aria-current={active ? "page" : undefined}
               className={`nav-link ${active ? "font-medium" : "text-note hover:text-ink"}`}
             >
@@ -63,7 +83,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
             </Link>
           );
         })}
-      </nav>
+      </motion.nav>
 
       {drinks.length === 0 ? (
         <div className="py-32">
@@ -72,7 +92,7 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
             <Button render={<Link href={localizePath("/questions", locale)} />}>
               {dict.nav.shake} <span aria-hidden>→</span>
             </Button>
-            {spirit && (
+            {(mood || spirit) && (
               <Button variant="secondary" render={<Link href={href({})} />}>
                 {dict.gallery.all}
               </Button>
@@ -80,30 +100,35 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
           </div>
         </div>
       ) : (
-        <ul className="mt-10 grid grid-flow-dense grid-cols-2 gap-x-2 gap-y-8 md:grid-cols-4">
+        <ul className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
           {drinks.map((drink, index) => {
-            const feature = features.has(index);
+            const meta = [
+              dict.vocab.spirits[drink.baseSpirit],
+              dict.vocab.alcohol[drink.alcoholLevel],
+              drink.mood ? dict.options.moods[drink.mood].label : null,
+            ]
+              .filter((part): part is string => Boolean(part))
+              .join(" · ");
             return (
-              <li key={drink.slug} className={feature ? "col-span-2 row-span-2" : ""}>
-                <Link href={localizePath(`/cocktail/${drink.slug}`, locale)} className="group block">
-                  <Specimen
-                    src={feature ? drink.imageUrl : drink.thumbnailUrl}
-                    alt={drink.name}
-                    mood={drink.mood}
-                    sizes={feature ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"}
-                    className="reveal-picture aspect-[4/5]"
-                  />
-                  <p
-                    className={`mt-3 font-display transition-opacity duration-200 group-hover:opacity-60 ${
-                      feature ? "text-[clamp(1.5rem,1.2rem+1vw,2.125rem)] leading-tight" : "text-lead leading-snug"
-                    }`}
-                  >
-                    {drink.name}
-                  </p>
-                  <p className="edge mt-1 text-note">
-                    {dict.vocab.spirits[drink.baseSpirit]} · {dict.vocab.alcohol[drink.alcoholLevel]}
-                    {drink.mood && ` · ${dict.options.moods[drink.mood].label}`}
-                  </p>
+              <li key={drink.slug} className="min-w-0">
+                <Link href={localizePath(`/cocktail/${drink.slug}`, locale)} className="group block h-full">
+                  <Card className="h-full overflow-hidden shadow-none before:shadow-none">
+                    <Specimen
+                      src={drink.thumbnailUrl}
+                      alt={drink.name}
+                      mood={drink.mood}
+                      sizes="(min-width: 768px) 25vw, 50vw"
+                      priority={index < 4}
+                      entrance={revealPicture()}
+                      className="aspect-[4/5]"
+                    />
+                    <CardHeader className="flex flex-1 flex-col gap-2 px-4 pt-4 pb-5">
+                      <CardTitle className="text-balance font-display text-lead leading-snug" render={<h2 />}>
+                        {drink.name}
+                      </CardTitle>
+                      <CardDescription className="mt-auto text-pretty text-small text-note">{meta}</CardDescription>
+                    </CardHeader>
+                  </Card>
                 </Link>
               </li>
             );
@@ -114,14 +139,14 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
       {(page.nextCursor || cursor) && (
         <div className="mt-20 flex items-center justify-between">
           {cursor ? (
-            <Link href={href({ spirit })} className="link py-2">
+            <Link href={href({ mood, spirit })} className="link py-2">
               ← {dict.gallery.first}
             </Link>
           ) : (
             <span />
           )}
           {page.nextCursor && (
-            <Button variant="secondary" render={<Link href={href({ spirit, cursor: page.nextCursor })} />}>
+            <Button variant="secondary" render={<Link href={href({ mood, spirit, cursor: page.nextCursor })} />}>
               {dict.gallery.next} <span aria-hidden>→</span>
             </Button>
           )}
@@ -129,18 +154,4 @@ export default async function GalleryPage({ params, searchParams }: PageProps<"/
       )}
     </div>
   );
-}
-
-/**
- * Which tiles are drawn double size. A feature takes four cells, so the count
- * is chosen to make the sheet come out even in both four and two columns, with
- * the features spread through it; holes at the end read as a broken page.
- */
-function featureSlots(count: number): Set<number> {
-  for (let features = Math.ceil(count / 3); features > 0; features -= 1) {
-    if ((count + 3 * features) % 4 === 0) {
-      return new Set(Array.from({ length: features }, (_, k) => Math.round((k * count) / features)));
-    }
-  }
-  return new Set();
 }

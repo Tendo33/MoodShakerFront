@@ -86,6 +86,7 @@ export interface Dictionary {
     | "spirit"
     | "strength"
     | "flavor"
+    | "mood"
     | "why"
     | "substitute"
     | "tip"
@@ -114,8 +115,8 @@ export interface Dictionary {
     | "actionFailed",
     string
   >;
-  gallery: Record<"title" | "lede" | "all" | "empty" | "next" | "first", string>;
-  detail: Record<"back" | "pouredFor" | "shakeYours" | "more" | "moreForMood", string>;
+  gallery: Record<"title" | "lede" | "all" | "empty" | "next" | "first" | "stamp", string>;
+  detail: Record<"back" | "pouredFor" | "shakeYours" | "more" | "moreForMood" | "stamp", string>;
   footer: { disclaimer: string; credit: string };
   notFound: Record<"title" | "body" | "home", string>;
   error: Record<"title" | "body" | "retry", string>;

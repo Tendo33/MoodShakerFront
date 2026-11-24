@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { DrinkView } from "@/lib/db/drinks";
 import type { Dictionary } from "@/lib/dictionaries";
 import { format } from "@/lib/dictionaries";
@@ -20,8 +20,16 @@ import { callApi, saveDrink } from "@/lib/client";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS } from "@/lib/moods";
 import { Button } from "@/components/action-button";
+import { Alert, AlertDescription } from "@/components/coss/alert";
+import { Fieldset, FieldsetLegend } from "@/components/coss/fieldset";
 import { Textarea } from "@/components/coss/textarea";
+import { Label } from "@/components/coss/label";
+import { PourProgress } from "@/components/PourProgress";
+import { Progress, ProgressIndicator, ProgressTrack } from "@/components/coss/progress";
 import { Toggle } from "@/components/coss/toggle";
+import { motion } from "motion/react";
+import { MotionImage } from "@/components/MotionImage";
+import { EASE_OUT, enter, stepEnter } from "@/lib/motion";
 
 type Labels = Pick<Dictionary, "questions" | "options" | "vocab">;
 type Draft = Partial<Omit<Order, "locale" | "spirits" | "notes">> & { spirits: StockableSpirit[]; notes: string };
@@ -32,7 +40,9 @@ const DRAFT_KEY = "moodshaker:draft";
 const STEPS = ["mood", "strength", "bar", "style"] as const;
 const EMPTY_DRAFT: Draft = { spirits: [], notes: "" };
 type Direction = "forward" | "back";
-/** How long a step takes to leave. Matches `.step` in globals.css. */
+/** Which way the guest is moving, so every part of a question arrives from that side. */
+const DirectionContext = createContext<Direction | null>(null);
+/** How long a step takes to leave: the form's exit animation runs for this long. */
 const LEAVE_MS = 170;
 /** The finished wait is shown for a moment before the drink's page opens. */
 const POURED_MS = 650;
@@ -136,7 +146,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
 
   // The form and the waiting screen swap in place, so the page is brought back
   // to the top for the wait, and a refused order is brought into view.
-  const errorRef = useRef<HTMLParagraphElement>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (pouring) window.scrollTo({ top: 0 });
   }, [pouring]);
@@ -250,12 +260,14 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
         // A full screen for every question, with the bar and the controls at its foot:
         // they hold their place while the questions above them change length.
         <div className="frame flex min-h-[calc(100svh-5rem)] flex-col pt-8 pb-10">
-          <form
+          <DirectionContext.Provider value={direction}>
+          <motion.form
             key={current}
             id="questionnaire"
-            className="step mt-4 lg:mt-8"
-            data-dir={direction ?? undefined}
-            data-leaving={leaving ?? undefined}
+            className="mt-4 lg:mt-8"
+            initial={false}
+            animate={leaving ? { opacity: 0, x: leaving === "forward" ? -18 : 18 } : { opacity: 1, x: 0 }}
+            transition={{ duration: LEAVE_MS / 1000, ease: "easeOut" }}
             onSubmit={(event) => {
               event.preventDefault();
               if (!canContinue) return;
@@ -265,13 +277,13 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
           >
             {current === "mood" && (
               <Question title={t.mood.title} hint={t.mood.hint}>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+                <div role="radiogroup" aria-labelledby="question-title" className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
                   {MOODS.map((mood, index) => (
-                    <label
+                    <motion.label
                       key={mood}
+                      {...stepEnter(direction, index)}
                       onClick={advanceOnPointer}
-                      className="group enter block cursor-pointer has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
-                      style={{ ["--i" as string]: index }}
+                      className="group block cursor-pointer has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
                     >
                       <input
                         type="radio"
@@ -295,7 +307,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                         <span aria-hidden className="size-3 shrink-0 bg-ink opacity-0 transition-opacity duration-200 group-has-checked:opacity-100" />
                       </span>
                       <span className="block text-small text-ink/70">{dict.options.moods[mood].note}</span>
-                    </label>
+                    </motion.label>
                   ))}
                 </div>
               </Question>
@@ -303,7 +315,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
 
             {current === "strength" && (
               <Question title={t.strength.title} hint={t.strength.hint}>
-                <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+                <div role="radiogroup" aria-labelledby="question-title" className="grid grid-cols-2 gap-2 lg:grid-cols-4">
                   {STRENGTHS.map((strength, index) => (
                     <Choice
                       key={strength}
@@ -323,8 +335,8 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
 
             {current === "bar" && (
               <Question title={t.bar.title} hint={t.bar.hint}>
-                <fieldset>
-                  <legend className="text-lead font-medium">{t.bar.spirits}</legend>
+                <Fieldset>
+                  <FieldsetLegend className="text-lead font-medium">{t.bar.spirits}</FieldsetLegend>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {STOCKABLE_SPIRITS.map((spirit) => (
                       <Toggle
@@ -343,9 +355,9 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                       </Toggle>
                     ))}
                   </div>
-                </fieldset>
-                <fieldset className="mt-14">
-                  <legend className="text-lead font-medium">{t.bar.skill}</legend>
+                </Fieldset>
+                <Fieldset className="mt-14">
+                  <FieldsetLegend className="text-lead font-medium">{t.bar.skill}</FieldsetLegend>
                   <div className="mt-4 grid gap-2 sm:grid-cols-3">
                     {SKILL_LEVELS.map((skill, index) => (
                       <Choice
@@ -358,13 +370,13 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                       />
                     ))}
                   </div>
-                </fieldset>
+                </Fieldset>
               </Question>
             )}
 
             {current === "style" && (
               <Question title={t.style.title} hint={t.style.hint}>
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div role="radiogroup" aria-labelledby="question-title" className="grid gap-2 sm:grid-cols-2">
                   {STYLES.map((style, index) => (
                     <Choice
                       key={style}
@@ -378,9 +390,9 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                 </div>
                 <div className="mt-14">
                   <div className="flex items-baseline justify-between gap-4">
-                    <label htmlFor="notes" className="text-lead font-medium">
+                    <Label htmlFor="notes" className="text-[length:var(--text-lead)] sm:text-[length:var(--text-lead)]">
                       {t.style.notes}
-                    </label>
+                    </Label>
                     <span className="num text-small text-ink/70">
                       {format(t.style.notesCount, { n: draft.notes.length, max: MAX_NOTES_LENGTH })}
                     </span>
@@ -399,12 +411,13 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
             )}
 
             {error && (
-              <p ref={errorRef} role="alert" tabIndex={-1} className="mt-10 bg-ink px-5 py-4 text-bone">
-                {error}
-              </p>
+              <Alert ref={errorRef} tabIndex={-1} variant="error" className="mt-10 rounded-none bg-bone/80 focus:outline-none">
+                <AlertDescription className="text-ink">{error}</AlertDescription>
+              </Alert>
             )}
 
-          </form>
+          </motion.form>
+          </DirectionContext.Provider>
 
           {/* Outside the keyed form, so the bar and the controls stay put while the question turns. */}
           <div className="mt-auto pt-10">
@@ -422,12 +435,11 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
             )}
             <div className="grid grid-cols-4 gap-1" aria-hidden>
               {STEPS.map((name, index) => (
-                <span key={name} className="h-1 overflow-hidden bg-ink/15">
-                  <span
-                    className="block h-full origin-left bg-ink transition-transform duration-500 ease-out"
-                    style={{ transform: `scaleX(${index <= step ? 1 : 0})` }}
-                  />
-                </span>
+                <Progress key={name} value={index <= step ? 100 : 0} className="gap-0">
+                  <ProgressTrack className="h-1 rounded-none bg-ink/15">
+                    <ProgressIndicator className="rounded-none bg-ink ease-out" />
+                  </ProgressTrack>
+                </Progress>
               ))}
             </div>
             <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
@@ -478,16 +490,20 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
 }
 
 function Question({ title, hint, children }: { title: string; hint: string; children: React.ReactNode }) {
+  const direction = useContext(DirectionContext);
   return (
     <>
-      <h1
+      <motion.h1
+        {...stepEnter(direction)}
         id="question-title"
         tabIndex={-1}
-        className="title enter focus:outline-none"
+        className="title focus:outline-none"
       >
         {title}
-      </h1>
-      <p className="enter mt-5 max-w-[40ch] text-lead [--i:1]">{hint}</p>
+      </motion.h1>
+      <motion.p {...stepEnter(direction, 1)} className="mt-5 max-w-[40ch] text-lead">
+        {hint}
+      </motion.p>
       <div className="mt-10">{children}</div>
     </>
   );
@@ -512,11 +528,12 @@ function Choice({
   onClick?: (event: React.MouseEvent) => void;
   children?: React.ReactNode;
 }) {
+  const direction = useContext(DirectionContext);
   return (
-    <label
+    <motion.label
+      {...stepEnter(direction, index)}
       onClick={onClick}
-      className="group enter flex cursor-pointer flex-col justify-between gap-6 bg-bone/70 p-5 transition-[background-color,transform] duration-200 ease-out hover:bg-bone active:scale-[0.98] has-checked:bg-ink has-checked:text-bone has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
-      style={{ ["--i" as string]: index }}
+      className="group flex cursor-pointer flex-col justify-between gap-6 bg-bone/70 p-5 transition-[background-color,scale] duration-200 ease-out hover:bg-bone active:scale-[0.98] has-checked:bg-ink has-checked:text-bone has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
     >
       <input type="radio" name={name} className="sr-only" checked={checked} onChange={onChange} />
       {children}
@@ -524,7 +541,7 @@ function Choice({
         <span className="block text-lead font-medium">{label}</span>
         <span className="mt-1 block text-ink/70 group-has-checked:text-bone/70">{note}</span>
       </span>
-    </label>
+    </motion.label>
   );
 }
 
@@ -532,15 +549,27 @@ function Choice({
 function Glass({ fill }: { fill: number }) {
   return (
     <span aria-hidden className="relative block h-28 w-16 bg-ink/10 group-has-checked:bg-bone/20">
-      <span
-        className="absolute inset-x-0 bottom-0 bg-brand transition-[height] duration-500 ease-out motion-safe:animate-[fill-up_800ms_var(--ease-out)_both] motion-safe:[animation-delay:260ms]"
-        style={{ height: `${fill * 100}%` }}
+      <motion.span
+        initial={{ height: 0 }}
+        animate={{ height: `${fill * 100}%` }}
+        transition={{ duration: 0.8, delay: 0.26, ease: EASE_OUT }}
+        className="absolute inset-x-0 bottom-0 bg-brand"
       />
     </span>
   );
 }
 
 /** Seconds into the wait at which each line of the work begins, spread over the minute a pour takes. */
+/** Rocks left and right, then rests. The first 70% of the loop is the shaking. */
+const SHAKE_TIMES = [0, 0.07, 0.14, 0.21, 0.28, 0.35, 0.42, 0.49, 0.56, 0.63, 0.7, 1];
+const SHAKER = {
+  rotate: [0, -17, 17, -17, 17, -17, 17, -17, 17, -17, 0, 0],
+  x: ["0%", "-4%", "4%", "-4%", "4%", "-4%", "4%", "-4%", "4%", "-4%", "0%", "0%"],
+  y: ["0%", "-6%", "-4%", "-6%", "-4%", "-6%", "-4%", "-6%", "-4%", "-6%", "0%", "0%"],
+};
+const SHAKER_REST = { rotate: 0, x: "0%", y: "0%" };
+const SHAKER_TRANSITION = { duration: 3, times: SHAKE_TIMES, ease: "easeInOut" as const, repeat: Infinity };
+
 const LINE_STARTS = [0, 6, 16, 30];
 
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
@@ -566,9 +595,9 @@ function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: b
       role="status"
     >
       <div className="lg:col-span-5">
-        <h1 key={done ? "done" : "working"} className="enter text-head" aria-live="polite">
+        <motion.h1 key={done ? "done" : "working"} {...enter(0)} className="text-head" aria-live="polite">
           {done ? dict.done : `${dict.title}…`}
-        </h1>
+        </motion.h1>
         <ul className="mt-10 space-y-3 text-lead">
           {dict.lines.map((line, index) => {
             const state = index < active ? "done" : index === active ? "active" : "waiting";
@@ -577,13 +606,15 @@ function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: b
                 key={line}
                 className={`flex items-center gap-4 transition-opacity duration-500 ${state === "waiting" ? "opacity-35" : ""}`}
               >
-                <span
+                <motion.span
                   aria-hidden
+                  animate={state === "active" ? { opacity: [1, 0.4, 1] } : { opacity: 1 }}
+                  transition={state === "active" ? { duration: 1.6, ease: "easeInOut", repeat: Infinity } : { duration: 0.5 }}
                   className={`size-2.5 shrink-0 bg-ink transition-transform duration-500 ease-out ${
                     state === "waiting"
                       ? "scale-50"
                       : state === "active"
-                        ? "motion-safe:animate-[breathe_1.6s_ease-in-out_infinite]"
+                        ? ""
                         : ""
                   }`}
                 />
@@ -593,15 +624,7 @@ function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: b
           })}
         </ul>
         <div className="mt-10 flex items-center gap-4" aria-hidden>
-          <span className="h-1 flex-1 overflow-hidden bg-ink/15">
-            <span
-              className={`block h-full origin-left bg-ink ${
-                // Reduced motion clamps every animation to an instant, which would park the bar
-                // at its end and read as "nearly done"; there the track stays empty and the clock speaks.
-                done ? "" : "motion-safe:animate-[pour_120s_cubic-bezier(0.25,0.6,0.5,1)_both] motion-reduce:hidden"
-              }`}
-            />
-          </span>
+          <PourProgress done={done} seconds={40} className="flex-1" />
           <span className="num w-10 text-right text-ink/70">{clock(elapsed)}</span>
         </div>
         <p className="mt-6 text-ink/70">{dict.note}</p>
@@ -609,13 +632,15 @@ function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: b
       <div className="relative mx-auto aspect-square w-full max-w-[560px] max-lg:max-w-[240px] lg:col-span-6 lg:col-start-7">
         {/* The animation sits on the photograph itself: a moving wrapper would be
             composited on its own, and the white backdrop would cross the field as a square. */}
-        <Image
+        <MotionImage
           src="/stages/shaker.webp"
           alt=""
           fill
           priority
           sizes="(min-width: 1024px) 40vw, 320px"
-          className={`specimen ${done ? "" : "motion-safe:animate-[shake_3s_ease-in-out_infinite]"}`}
+          className="specimen"
+          animate={done ? SHAKER_REST : SHAKER}
+          transition={done ? { duration: 0.4 } : SHAKER_TRANSITION}
         />
       </div>
     </div>

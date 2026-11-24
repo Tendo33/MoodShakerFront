@@ -48,9 +48,10 @@ Utilities in `app/globals.css`:
   the drink exists.
 - `.edge` — the small mono uppercase label used for ticket headers and terms.
 
-A row on the ticket is `term · · · value`: `.edge` label, `.leader`, value at
-`0.95rem`. The header carries the ticket title and `No. 0001`; the foot carries
-the stamp and the tear.
+A row on the home ticket is `term · · · value`: `.edge` label, `.leader`, value
+at `0.95rem`. That example header reads `No. 0001`. The menu and the drink
+sheet do not rebuild this paper: they use coss `Card`, `Table`, and `Badge`.
+The drink sheet still prints a stable four-digit slip number from the slug.
 
 ## Rules
 
@@ -87,6 +88,19 @@ the stamp and the tear.
   cannot host a colour tile or a drawn glass, and a single-choice question must
   announce itself as a radio, not as a pressed button. This is the one
   deliberate exception, and it is why the e2e suite can still query by role.
+- Motion is the `motion` package, not hand-written CSS. Entrances, scroll
+  reveals, the question-to-question turn, the shaker and the plinth drift are
+  `motion.*` elements driven by the helpers in `lib/motion.ts` (`enter`,
+  `reveal`, `revealPicture`, `stepEnter`); `MotionRoot` applies
+  `reducedMotion="user"` to all of them. A photograph multiplied onto a mood
+  field animates the field and glass together (`Specimen`'s `entrance`) or the
+  `<img>` itself (`MotionImage`), never a wrapper around the bare photograph.
+  The waits use coss `Progress` (`PourProgress`) and `Skeleton`; errors use
+  coss `Alert`. `globals.css` keeps only the `skeleton` keyframe and the
+  reduced-motion floor. Every helper tags its element `data-motion`, and a
+  `<noscript>` rule in `app/layout.tsx` shows tagged elements when script is
+  off, because the hidden start state is written into the server HTML. Do not
+  match on inline `opacity:0` instead: the plinth's crossfade layers use it too.
 
 ## Motion
 
@@ -107,6 +121,5 @@ the stamp and the tear.
 
 ## Still to do
 
-Gallery and drink detail pages still use the previous layout and have not been
-restyled to the ticket language. The questionnaire's step chrome (progress bar,
-step counter) is still the old treatment.
+The questionnaire's progress bar is coss `Progress`; the step counter is still
+plain mono text.

@@ -1,5 +1,6 @@
 import { DrinkClient } from "@/components/DrinkClient";
 import { getDictionary } from "@/lib/dictionaries";
+import { MOODS, type Mood } from "@/lib/domain/vocabulary";
 import { isLocale, type Locale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
 import { menuSuggestions } from "@/lib/summaries";
@@ -27,6 +28,8 @@ export default async function DrinkPage({ params }: PageProps<"/[lang]/drink/[id
       id={id}
       locale={locale}
       dict={{ drink: dict.drink, recipe: dict.recipe, vocab: dict.vocab }}
+      stamp={dict.detail.stamp}
+      moodLabels={Object.fromEntries(MOODS.map((mood) => [mood, dict.options.moods[mood].label])) as Record<Mood, string>}
       suggestions={await menuSuggestions(locale)}
     />
   );

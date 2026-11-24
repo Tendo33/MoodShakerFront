@@ -8,10 +8,14 @@ import { callApi, useSavedDrinks } from "@/lib/client";
 import type { DrinkView } from "@/lib/db/drinks";
 import type { Dictionary } from "@/lib/dictionaries";
 import { localize } from "@/lib/domain/recipe";
+import type { Mood } from "@/lib/domain/vocabulary";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { moodColor } from "@/lib/moods";
 import { deliverCard, renderShareCard } from "@/lib/share-card";
 import { Button } from "@/components/action-button";
+import { Alert, AlertDescription } from "@/components/coss/alert";
+import { PourProgress } from "@/components/PourProgress";
+import { Skeleton } from "@/components/coss/skeleton";
 
 type Labels = Pick<Dictionary, "drink" | "recipe" | "vocab">;
 type Phase = "loading" | "missing" | "failed" | "ready";
@@ -24,12 +28,16 @@ export function DrinkClient({
   locale,
   dict,
   suggestions,
+  stamp,
+  moodLabels,
 }: {
   id: string;
   locale: Locale;
   dict: Labels;
   /** Drinks from the menu, offered when this one cannot be opened. */
   suggestions: Suggestion[];
+  stamp: string;
+  moodLabels: Record<Mood, string>;
 }) {
   const t = dict.drink;
   const savedDrinks = useSavedDrinks();
@@ -131,10 +139,10 @@ export function DrinkClient({
         <div className="frame grid gap-x-8 gap-y-6 py-8 lg:grid-cols-12 lg:py-12">
           <div className="order-2 aspect-square md:max-lg:aspect-[16/10] lg:order-none lg:col-span-6 lg:aspect-[4/5]" />
           <div className="order-1 flex flex-col gap-4 lg:order-none lg:col-span-6 lg:col-start-7 lg:self-end lg:pb-40 lg:pl-6">
-            <div className="h-10 w-2/3 bg-ink/10 motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite]" />
-            <div className="h-5 w-1/3 bg-ink/10 motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] [animation-delay:80ms]" />
-            <div className="mt-6 h-4 w-full bg-ink/10 motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] [animation-delay:160ms]" />
-            <div className="h-4 w-5/6 bg-ink/10 motion-safe:animate-[skeleton_1.6s_ease-in-out_infinite] [animation-delay:240ms]" />
+            <Skeleton className="h-10 w-2/3 rounded-none" />
+            <Skeleton className="h-5 w-1/3 rounded-none [animation-delay:80ms]" />
+            <Skeleton className="mt-6 h-4 w-full rounded-none [animation-delay:160ms]" />
+            <Skeleton className="h-4 w-5/6 rounded-none [animation-delay:240ms]" />
           </div>
         </div>
         <span className="sr-only">{t.loading}</span>
@@ -176,9 +184,7 @@ export function DrinkClient({
       {imageState === "pending" ? (
         <div role="status" className="w-full max-w-[18rem]">
           <p className="text-lead">{t.imagePending}…</p>
-          <span aria-hidden className="mt-5 block h-1 overflow-hidden bg-ink/15">
-            <span className="block h-full origin-left bg-ink motion-safe:animate-[pour_80s_cubic-bezier(0.25,0.6,0.5,1)_both] motion-reduce:hidden" />
-          </span>
+          <PourProgress seconds={30} className="mt-5" />
         </div>
       ) : (
         <>
@@ -197,13 +203,19 @@ export function DrinkClient({
   const actions = (
     <div>
       <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
-        <Button type="button" disabled={busy !== null} onClick={() => void share(recipe.name)}>
+        <Button
+          type="button"
+          variant={drink.published ? undefined : "ghost"}
+          className={drink.published ? undefined : "bg-ink/10 hover:bg-ink hover:text-bone"}
+          disabled={busy !== null}
+          onClick={() => void share(recipe.name)}
+        >
           {busy === "share" ? t.sharing : t.share}
         </Button>
         <Button
           type="button"
-          variant="ghost"
-          className="bg-ink/10 hover:bg-ink hover:text-bone"
+          variant={drink.published ? "ghost" : undefined}
+          className={drink.published ? "bg-ink/10 hover:bg-ink hover:text-bone" : undefined}
           disabled={busy !== null || !canPublish}
           aria-describedby={canPublish ? undefined : "publish-hint"}
           onClick={() => void togglePublish()}
@@ -234,9 +246,9 @@ export function DrinkClient({
         </p>
       )}
       {actionError && (
-        <p role="alert" className="mt-5 font-medium">
-          {t.actionFailed}
-        </p>
+        <Alert variant="error" className="mt-5 rounded-none">
+          <AlertDescription className="text-ink">{t.actionFailed}</AlertDescription>
+        </Alert>
       )}
     </div>
   );
@@ -247,6 +259,9 @@ export function DrinkClient({
       mood={drink.mood}
       imageUrl={drink.imageUrl}
       dict={dict}
+      stamp={stamp}
+      moodLabel={drink.mood ? moodLabels[drink.mood] : null}
+      ticketKey={drink.slug ?? drink.id}
       actions={actions}
       photoFallback={photoFallback}
       develop

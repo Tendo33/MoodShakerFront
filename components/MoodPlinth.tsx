@@ -1,6 +1,7 @@
 "use client";
 
-import Image from "next/image";
+import * as motion from "motion/react-client";
+import { enter } from "@/lib/motion";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { format, type Dictionary } from "@/lib/dictionaries";
@@ -8,7 +9,9 @@ import { MOODS, type Mood } from "@/lib/domain/vocabulary";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS, moodForHour } from "@/lib/moods";
 import { Button } from "@/components/action-button";
+import { MotionImage } from "@/components/MotionImage";
 import { Toggle } from "@/components/coss/toggle";
+import { Fieldset, FieldsetLegend } from "@/components/coss/fieldset";
 import { cn } from "@/lib/utils";
 
 export interface PlinthDrink {
@@ -71,21 +74,22 @@ export function MoodPlinth({
           `contents` on small screens keeps the mobile order lede, drink, picker. */}
       <div className="max-lg:contents lg:col-span-5 lg:row-span-2 lg:flex lg:flex-col lg:justify-center">
         <div className="order-1">
-          <h1
+          <motion.h1 {...enter(0)}
             id="home-title"
-            className="headline enter"
+            className="headline"
           >
             {dict.home.headline[0]}
             <br />
             {dict.home.headline[1]}
-          </h1>
-          <p className="enter mt-6 max-w-[34ch] text-lead [--i:1] lg:mt-8">
+          </motion.h1>
+          <motion.p {...enter(1)} className="mt-6 max-w-[34ch] text-lead lg:mt-8">
             {dict.home.lede}
-          </p>
+          </motion.p>
         </div>
         <div className="order-3 mt-10 lg:mt-12">
-          <fieldset className="enter [--i:2]">
-            <legend className="font-medium">{dict.home.moodPrompt}</legend>
+          <motion.div {...enter(2)}>
+          <Fieldset>
+            <FieldsetLegend className="font-medium">{dict.home.moodPrompt}</FieldsetLegend>
             {/* Each mood is its own colour, so the picker is the palette of the whole site. */}
             <div className="mt-4 grid grid-cols-3 gap-1.5">
               {MOODS.map((code) => {
@@ -99,7 +103,7 @@ export function MoodPlinth({
                       setTick(0);
                     }}
                     className={cn(
-                      "flex min-h-14 items-center justify-between gap-2 rounded-none px-4 text-left font-medium whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-out hover:bg-transparent hover:-translate-y-0.5 active:scale-[0.97] data-pressed:bg-transparent sm:text-base",
+                      "flex min-h-14 items-center justify-between gap-2 rounded-none px-4 text-left font-medium whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-out hover:bg-transparent hover:-translate-y-0.5 active:scale-[0.97] data-pressed:bg-transparent data-pressed:text-bone sm:text-base",
                       selected && "text-bone",
                     )}
                     style={{
@@ -121,8 +125,9 @@ export function MoodPlinth({
                 );
               })}
             </div>
-          </fieldset>
-          <div className="enter mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 [--i:3]">
+          </Fieldset>
+          </motion.div>
+          <motion.div {...enter(3)} className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
             <Button
               render={<Link href={`${localizePath("/questions", locale)}?mood=${mood}`} />}
             >
@@ -130,11 +135,11 @@ export function MoodPlinth({
               <span aria-hidden>→</span>
             </Button>
             <span className="text-note">{dict.home.ctaNote}</span>
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      <figure className="enter order-2 lg:order-none lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:flex lg:flex-col [--i:1]">
+      <motion.figure {...enter(1)} className="order-2 lg:order-none lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:flex lg:flex-col">
         <div
           className="relative aspect-square w-full overflow-hidden transition-colors duration-700 ease-out sm:aspect-[4/3] lg:aspect-auto lg:min-h-[560px] lg:flex-1"
           style={{ backgroundColor: MOOD_COLORS[mood] }}
@@ -153,13 +158,16 @@ export function MoodPlinth({
                 pointerEvents: drink === active ? "auto" : "none",
               }}
             >
-              <Image
+              <MotionImage
                 src={drink.imageUrl}
                 alt={drink.name}
                 fill
                 priority={index === 0}
                 sizes="(min-width: 1024px) 45vw, 100vw"
-                className="specimen motion-safe:animate-[drift_11s_ease-in-out_infinite_alternate]"
+                className="specimen"
+                initial={{ y: "0%", scale: 1 }}
+                animate={{ y: "-1.5%", scale: 1.025 }}
+                transition={{ duration: 11, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
               />
             </Link>
           ))}
@@ -177,7 +185,7 @@ export function MoodPlinth({
             </span>
           </figcaption>
         )}
-      </figure>
+      </motion.figure>
     </div>
   );
 }

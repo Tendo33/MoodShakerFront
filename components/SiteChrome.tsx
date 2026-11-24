@@ -1,3 +1,5 @@
+import * as motion from "motion/react-client";
+import { reveal } from "@/lib/motion";
 import Link from "next/link";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { MenuLink } from "@/components/MenuLink";
@@ -78,24 +80,24 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
   return (
     <footer className="mt-32 bg-night text-bone">
       <div className="frame pt-16 pb-10">
-        <div className="reveal">
+        <motion.div {...reveal(0)}>
           <BlockMark />
-        </div>
+        </motion.div>
         <div className="mt-14 grid gap-10 sm:grid-cols-12">
-          <nav className="reveal flex flex-col sm:col-span-4">
+          <motion.nav {...reveal(0)} className="flex flex-col sm:col-span-4">
             <Link href={localizePath("/questions", locale)} className="link flex min-h-11 w-fit items-center">
               {dict.nav.shake}
             </Link>
             <Link href={localizePath("/gallery", locale)} className="link flex min-h-11 w-fit items-center">
               {dict.nav.menu}
             </Link>
-          </nav>
-          <div className="reveal space-y-3 text-bone/75 sm:col-span-6 sm:col-start-7 [--i:1]">
+          </motion.nav>
+          <motion.div {...reveal(1)} className="space-y-3 text-bone/75 sm:col-span-6 sm:col-start-7">
             <p>{dict.footer.credit}</p>
             <p>{dict.footer.disclaimer}</p>
-          </div>
+          </motion.div>
         </div>
-        <p className="reveal mt-14 text-small text-bone/60 [--i:2]">© {new Date().getFullYear()} MoodShaker</p>
+        <motion.p {...reveal(2)} className="mt-14 text-small text-bone/60">© {new Date().getFullYear()} MoodShaker</motion.p>
       </div>
     </footer>
   );

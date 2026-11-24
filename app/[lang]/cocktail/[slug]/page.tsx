@@ -1,7 +1,10 @@
+import * as motion from "motion/react-client";
+import { reveal } from "@/lib/motion";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { DrinkSheet } from "@/components/DrinkSheet";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/coss/card";
 import { Specimen } from "@/components/Specimen";
 import { getPublishedDrink, listPublishedDrinks } from "@/lib/db/drinks";
 import { orEmpty, summarize } from "@/lib/summaries";
@@ -63,6 +66,9 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
         mood={mood ?? null}
         imageUrl={row.imageUrl}
         dict={dict}
+        stamp={dict.detail.stamp}
+        moodLabel={mood ? dict.options.moods[mood].label : null}
+        ticketKey={slug}
         actions={
           <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
             <Button render={<Link href={`${localizePath("/questions", locale)}${mood ? `?mood=${mood}` : ""}`} />}>
@@ -74,31 +80,46 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
         more={
           <section className="frame mt-[clamp(120px,18vh,220px)]" aria-labelledby="more-heading">
             <div className="flex flex-wrap items-baseline justify-between gap-4">
-              <h2 id="more-heading" className="reveal text-head">
+              <motion.h2 {...reveal(0)} id="more-heading" className="text-head">
                 {mood && onlySameMood
                   ? format(dict.detail.moreForMood, { mood: dict.options.moods[mood].label })
                   : dict.detail.more}
-              </h2>
+              </motion.h2>
               <Link href={localizePath("/gallery", locale)} className="link py-2 text-lead">
                 {dict.detail.back} →
               </Link>
             </div>
-            <ul className="mt-10 grid grid-cols-2 gap-2 lg:grid-cols-4">
-              {others.map((other, index) => (
-                <li key={other.slug} className="reveal" style={{ ["--i" as string]: index }}>
-                  <Link href={localizePath(`/cocktail/${other.slug}`, locale)} className="group block">
-                    <Specimen
-                      src={other.thumbnailUrl}
-                      alt={other.name}
-                      mood={other.mood}
-                      sizes="(min-width: 1024px) 25vw, 50vw"
-                      className="aspect-[4/5]"
-                    />
-                    <p className="mt-3 font-display text-lead leading-snug transition-opacity duration-200 group-hover:opacity-60">{other.name}</p>
-                    <p className="edge mt-1 text-note">{dict.vocab.spirits[other.baseSpirit]}</p>
-                  </Link>
-                </li>
-              ))}
+            <ul className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
+              {others.map((other, index) => {
+                const meta = [
+                  dict.vocab.spirits[other.baseSpirit],
+                  dict.vocab.alcohol[other.alcoholLevel],
+                  other.mood ? dict.options.moods[other.mood].label : null,
+                ]
+                  .filter((part): part is string => Boolean(part))
+                  .join(" · ");
+                return (
+                  <motion.li {...reveal(index)} key={other.slug} className="min-w-0">
+                    <Link href={localizePath(`/cocktail/${other.slug}`, locale)} className="group block h-full">
+                      <Card className="h-full overflow-hidden shadow-none before:shadow-none">
+                        <Specimen
+                          src={other.thumbnailUrl}
+                          alt={other.name}
+                          mood={other.mood}
+                          sizes="(min-width: 1024px) 25vw, 50vw"
+                          className="aspect-[4/5]"
+                        />
+                        <CardHeader className="flex flex-1 flex-col gap-2 px-4 pt-4 pb-5">
+                          <CardTitle className="text-balance font-display text-lead leading-snug" render={<h3 />}>
+                            {other.name}
+                          </CardTitle>
+                          <CardDescription className="mt-auto text-pretty text-small text-note">{meta}</CardDescription>
+                        </CardHeader>
+                      </Card>
+                    </Link>
+                  </motion.li>
+                );
+              })}
             </ul>
           </section>
         }

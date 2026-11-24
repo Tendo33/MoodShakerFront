@@ -65,3 +65,7 @@ export type Style = (typeof STYLES)[number];
 export function isBaseSpirit(value: unknown): value is BaseSpirit {
   return typeof value === "string" && (BASE_SPIRITS as readonly string[]).includes(value);
 }
+
+export function isMood(value: unknown): value is Mood {
+  return typeof value === "string" && (MOODS as readonly string[]).includes(value);
+}

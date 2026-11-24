@@ -149,6 +149,7 @@ export const en: Dictionary = {
     spirit: "Base",
     strength: "Strength",
     flavor: "Flavour",
+    mood: "Mood",
     why: "Why this one",
     substitute: "or use",
     tip: "Tip",
@@ -182,6 +183,7 @@ export const en: Dictionary = {
     empty: "Nothing here yet. Pour the first one.",
     next: "Next page",
     first: "Back to the first page",
+    stamp: "Poured",
   },
   detail: {
     back: "Back to the menu",
@@ -189,6 +191,7 @@ export const en: Dictionary = {
     shakeYours: "Shake one for your mood",
     more: "More from the menu",
     moreForMood: "Also poured for “{mood}”",
+    stamp: "Poured",
   },
   footer: {
     credit: "Drink photographs are AI-generated.",

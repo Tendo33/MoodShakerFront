@@ -33,6 +33,7 @@ async function main() {
       order: seed.order,
       recipe,
       baseSpirit: recipe.baseSpirit,
+      mood: seed.order.mood,
       imageUrl: seed.imageUrl,
       thumbnailUrl: seed.thumbnailUrl,
       slug: seed.slug,

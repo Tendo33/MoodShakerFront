@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, JetBrains_Mono, Noto_Sans_SC } from "next/font/google";
 import { headers } from "next/headers";
 import { DEFAULT_LOCALE, HTML_LANG, isLocale } from "@/lib/i18n";
+import { MotionRoot } from "@/components/MotionRoot";
 import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -54,7 +55,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       lang={HTML_LANG[isLocale(locale) ? locale : DEFAULT_LOCALE]}
       className={`${hanken.variable} ${notoSansSC.variable} ${jetbrainsMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {/* Entrances start from a hidden state written into the HTML; without script nothing would show them. */}
+        <noscript>
+          <style>{`[data-motion]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+        <MotionRoot>{children}</MotionRoot>
+      </body>
     </html>
   );
 }
