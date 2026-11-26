@@ -1,41 +1,33 @@
-# Project Agent Entrypoint
+# MoodShakerFront
 
-This file is the cross-tool entrypoint for AI assistants in MoodShakerFront.
+双语 AI 鸡尾酒推荐产品，Next.js + Drizzle/PostgreSQL。不是通用 Next.js 模板。
 
-## Working rules
+## 不能破坏的契约
 
-- MoodShaker is a bilingual AI cocktail recommendation product, not a generic Next.js template.
-- Preserve localized routes, private drink access (edit token in POST bodies only), the Drizzle/Postgres schema and migrations, rate limiting, and deployment warnings. Visual rules live in DESIGN.md.
-- Keep changes minimal, typed, and explicit.
+- 保留 `/cn` 与 `/en` 本地化路由、`proxy.ts` 的语言检测、以及本地化词典。
+- 私密酒单用 POST body 里的 `editToken`，绝不放进 URL。它只由 `POST /api/drinks` 返回一次，库里只存 SHA-256 哈希，其他任何响应都不能带出。
+- Drizzle 结构变更走 `pnpm db:generate`（生成的 SQL 在 `drizzle/`），并要在本地库跑通 `pnpm db:init`。
+- 生产环境缺少共享限流存储属于部署错误，不能静默退化成进程内限流。
+- 只用 pnpm，不要引入 npm/yarn 的 lockfile。
+- 视觉规则在 `DESIGN.md`。
 
-## Execution style
+## 命令
 
-### Think before editing
+```bash
+pnpm install
+pnpm dev
+pnpm lint
+pnpm typecheck
+pnpm test          # node --test，覆盖 tests/**/*.test.ts
+pnpm test:e2e      # Playwright
+pnpm build
+pnpm db:generate   # 生成迁移
+pnpm db:init       # migrate + seed，需要本地库
+```
 
-- State assumptions when they affect the implementation.
-- If multiple interpretations exist, surface them instead of choosing silently.
-- Prefer clarifying uncertainty before editing files.
-- If a simpler approach exists, say so before implementing.
-- Push back when warranted instead of mechanically following a weak approach.
+## 验证
 
-### Simplicity first
-
-- Choose the smallest change that fully solves the task.
-- Do not add speculative flexibility, configuration, or abstraction.
-- Prefer direct fixes over framework-like restructuring.
-- Do not create abstractions for single-use code.
-
-### Surgical diffs
-
-- Touch only files and lines that relate to the request.
-- Match existing project style and terminology.
-- Do not improve adjacent code, comments, or formatting unless required.
-- If you notice unrelated dead code, mention it instead of deleting it.
-
-### Goal-driven verification
-
-- Turn each task into a verifiable outcome.
-- For non-trivial work, keep a short plan and verification path in mind before editing.
+改动后端或数据层要跑 typecheck 与 test；涉及路由、语言切换、私密酒单的改动补 e2e。视觉改动对照 `DESIGN.md`，不另起一套。
 
 <!-- BEGIN:nextjs-agent-rules -->
 
