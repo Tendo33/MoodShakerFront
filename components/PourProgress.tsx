@@ -29,7 +29,7 @@ export function PourProgress({
 
   return (
     <Progress value={value} aria-hidden className={cn("gap-0", className)}>
-      <ProgressTrack className="h-1 rounded-none bg-ink/15">
+      <ProgressTrack className="h-[3px] rounded-none bg-ink/15">
         <ProgressIndicator className="rounded-none bg-ink duration-1000 ease-linear" />
       </ProgressTrack>
     </Progress>

@@ -11,7 +11,7 @@ export default function manifest(): MetadataRoute.Manifest {
     // The shaker sits on this mint. A bone splash would show a ring around the icon.
     background_color: "#c5e2ce",
     // Same bone as the root viewport themeColor.
-    theme_color: "#e6e0d2",
+    theme_color: "#fbf9f4",
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { src: "/icon-512.png", sizes: "512x512", type: "image/png" },

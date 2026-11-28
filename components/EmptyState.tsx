@@ -35,7 +35,7 @@ export function EmptyState({
       <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
         <div className="lg:col-span-6">
           <motion.h1 {...enter(0)} className="title title-measure">{title}</motion.h1>
-          {body && <motion.p {...enter(1)} className="mt-6 max-w-[40ch] text-lead">{body}</motion.p>}
+          {body && <motion.p {...enter(1)} className="measure mt-6 text-lead">{body}</motion.p>}
           <motion.div {...enter(2)} className="mt-10 flex flex-wrap gap-2">{children}</motion.div>
         </div>
         <motion.div {...enter(1)}
@@ -49,10 +49,14 @@ export function EmptyState({
       </div>
       {suggestions.length > 0 && (
         <section className="mt-[clamp(96px,14vh,180px)]" aria-labelledby="suggestions-heading">
-          <motion.h2 {...reveal(0)} id="suggestions-heading" className="text-head">
+          <motion.h2
+            {...reveal(0)}
+            id="suggestions-heading"
+            className="text-[clamp(1.5rem,1.2rem+1vw,2.125rem)] leading-tight"
+          >
             {suggestionsTitle}
           </motion.h2>
-          <ul className="mt-10 grid grid-cols-2 gap-2 lg:grid-cols-4">
+          <ul className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4">
             {suggestions.map((drink, index) => (
               <motion.li {...reveal(index)} key={drink.href}>
                 <Link href={drink.href} className="group block">
@@ -63,7 +67,7 @@ export function EmptyState({
                     sizes="(min-width: 1024px) 25vw, 50vw"
                     className="aspect-[4/5]"
                   />
-                  <p className="mt-3 font-display text-lead leading-snug transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
+                  <p className="mt-3 w-fit text-[1.0625rem] leading-snug font-medium tracking-[-0.01em] underline-offset-4 group-hover:underline">{drink.name}</p>
                 </Link>
               </motion.li>
             ))}

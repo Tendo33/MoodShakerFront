@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { createContext, useContext, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { DrinkView } from "@/lib/db/drinks";
 import type { Dictionary } from "@/lib/dictionaries";
 import { format } from "@/lib/dictionaries";
@@ -259,7 +259,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
       ) : (
         // A full screen for every question, with the bar and the controls at its foot:
         // they hold their place while the questions above them change length.
-        <div className="frame flex min-h-[calc(100svh-5rem)] flex-col pt-8 pb-10">
+        <div className="frame flex min-h-[calc(100svh-4.5rem)] flex-col pt-8 pb-10 sm:min-h-[calc(100svh-5rem)]">
           <DirectionContext.Provider value={direction}>
           <motion.form
             key={current}
@@ -292,8 +292,11 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                         checked={draft.mood === mood}
                         onChange={() => update({ mood })}
                       />
+                      {/* The chosen tile is pressed in: the glass holds still, the field
+                          takes an ink edge, and its name is underlined — three quiet
+                          signals instead of a moving dot. */}
                       <span
-                        className="relative block aspect-[5/4] overflow-hidden lg:aspect-[3/4] transition-transform duration-300 ease-out group-has-checked:scale-[0.96]"
+                        className="relative block aspect-[5/4] overflow-hidden transition-[transform,box-shadow] duration-300 ease-out group-has-checked:scale-[0.97] group-has-checked:ring-2 group-has-checked:ring-ink group-has-checked:ring-inset lg:aspect-[3/4]"
                         style={{ backgroundColor: MOOD_COLORS[mood] }}
                       >
                         {moodImages[mood]?.[0] && (
@@ -302,11 +305,12 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                           </span>
                         )}
                       </span>
-                      <span className="mt-3 flex items-baseline justify-between gap-3">
-                        <span className="text-lead font-medium">{dict.options.moods[mood].label}</span>
-                        <span aria-hidden className="size-3 shrink-0 bg-ink opacity-0 transition-opacity duration-200 group-has-checked:opacity-100" />
+                      <span className="mt-3 flex flex-col gap-0.5">
+                        <span className="w-fit text-lead font-medium underline-offset-4 group-has-checked:underline group-has-checked:decoration-2">
+                          {dict.options.moods[mood].label}
+                        </span>
+                        <span className="block text-small text-ink/70">{dict.options.moods[mood].note}</span>
                       </span>
-                      <span className="block text-small text-ink/70">{dict.options.moods[mood].note}</span>
                     </motion.label>
                   ))}
                 </div>
@@ -349,7 +353,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                               : draft.spirits.filter((item) => item !== spirit),
                           })
                         }
-                        className="h-auto rounded-none px-5 py-3 data-pressed:bg-ink data-pressed:text-bone sm:text-base"
+                        className="h-auto rounded-none border border-ink/15 bg-bone/55 px-4 py-2.5 text-[0.9375rem] hover:bg-bone/85 data-pressed:border-ink data-pressed:bg-ink data-pressed:text-bone sm:text-[0.9375rem]"
                       >
                         {dict.vocab.spirits[spirit]}
                       </Toggle>
@@ -426,22 +430,26 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                 <li className="mr-1 text-ink/70">{t.order}</li>
                 {answered.map(([index, label]) => (
                   <li key={index}>
-                    <Button size="sm" variant="secondary" onClick={() => go(index)}>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="bg-bone/80 hover:bg-bone data-pressed:bg-bone"
+                      onClick={() => go(index)}
+                    >
                       {label}
                     </Button>
                   </li>
                 ))}
               </ul>
             )}
-            <div className="grid grid-cols-4 gap-1" aria-hidden>
-              {STEPS.map((name, index) => (
-                <Progress key={name} value={index <= step ? 100 : 0} className="gap-0">
-                  <ProgressTrack className="h-1 rounded-none bg-ink/15">
-                    <ProgressIndicator className="rounded-none bg-ink ease-out" />
-                  </ProgressTrack>
-                </Progress>
-              ))}
-            </div>
+            {/* One rule that fills as the questions go, not four blocks: the bar is
+                the counter of the whole order, and the step counter beside it says
+                which question is on the desk. */}
+            <Progress value={((step + 1) / STEPS.length) * 100} className="gap-0">
+              <ProgressTrack className="h-[3px] rounded-none bg-ink/15">
+                <ProgressIndicator className="rounded-none bg-ink transition-[width] duration-500 ease-out" />
+              </ProgressTrack>
+            </Progress>
             <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-6">
                 {step > 0 && (
@@ -474,7 +482,7 @@ function QuestionnaireForm({ locale, dict, moodImages, initial }: Props & { init
                 <Button
                   type="submit"
                   form="questionnaire"
-                  className="max-sm:w-full"
+                  className="max-sm:w-full disabled:border-ink/10 disabled:bg-ink/[0.08] disabled:text-ink/40 disabled:opacity-100 disabled:shadow-none"
                   disabled={!canContinue}
                   aria-describedby={canContinue ? undefined : "next-hint"}
                 >
@@ -501,10 +509,10 @@ function Question({ title, hint, children }: { title: string; hint: string; chil
       >
         {title}
       </motion.h1>
-      <motion.p {...stepEnter(direction, 1)} className="mt-5 max-w-[40ch] text-lead">
+      <motion.p {...stepEnter(direction, 1)} className="measure question-hint mt-5 text-balance text-lead">
         {hint}
       </motion.p>
-      <div className="mt-10">{children}</div>
+      <div className="question-options mt-10">{children}</div>
     </>
   );
 }
@@ -533,7 +541,7 @@ function Choice({
     <motion.label
       {...stepEnter(direction, index)}
       onClick={onClick}
-      className="group flex cursor-pointer flex-col justify-between gap-6 bg-bone/70 p-5 transition-[background-color,scale] duration-200 ease-out hover:bg-bone active:scale-[0.98] has-checked:bg-ink has-checked:text-bone has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-ink"
+      className="group flex cursor-pointer flex-col justify-between gap-6 bg-bone/90 p-5 transition-[background-color,scale] duration-200 ease-out hover:bg-bone active:scale-[0.98] has-checked:bg-ink has-checked:text-bone has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink"
     >
       <input type="radio" name={name} className="sr-only" checked={checked} onChange={onChange} />
       {children}
@@ -545,17 +553,44 @@ function Choice({
   );
 }
 
-/** A glass drawn as a filled column: how much of it is spirit. */
+/**
+ * A tumbler drawn in SVG, filled to the strength asked for: the number is a
+ * picture of the pour, not a bar chart. The liquid rises once, when the step
+ * arrives, and holds still afterwards.
+ */
 function Glass({ fill }: { fill: number }) {
+  const id = useId();
+  const bottom = 108;
+  const inner = 102;
   return (
-    <span aria-hidden className="relative block h-28 w-16 bg-ink/10 group-has-checked:bg-bone/20">
-      <motion.span
-        initial={{ height: 0 }}
-        animate={{ height: `${fill * 100}%` }}
-        transition={{ duration: 0.8, delay: 0.26, ease: EASE_OUT }}
-        className="absolute inset-x-0 bottom-0 bg-brand"
+    <svg viewBox="0 0 72 116" aria-hidden className="block h-28 w-[4.5rem]">
+      <defs>
+        <clipPath id={id}>
+          <path d="M10 6 H62 L55 104 Q54.6 108 50.6 108 H21.4 Q17.4 108 17 104 Z" />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        <rect x="0" y="0" width="72" height="116" className="fill-current opacity-[0.05]" />
+        <motion.rect
+          x="0"
+          width="72"
+          className="fill-brand"
+          initial={{ y: bottom, height: 0 }}
+          animate={{ y: bottom - inner * fill, height: inner * fill }}
+          transition={{ duration: 0.9, delay: 0.24, ease: EASE_OUT }}
+        />
+        {/* One soft light down the left of the glass. */}
+        <rect x="16" y="12" width="3" height="92" className="fill-bone/45" />
+      </g>
+      <path
+        d="M10 6 H62 L55 104 Q54.6 108 50.6 108 H21.4 Q17.4 108 17 104 Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        opacity="0.4"
       />
-    </span>
+      <line x1="8" y1="6" x2="64" y2="6" stroke="currentColor" strokeWidth="1.5" opacity="0.55" />
+    </svg>
   );
 }
 
@@ -591,7 +626,7 @@ function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: b
 
   return (
     <div
-      className="frame grid min-h-[calc(100svh-5rem)] content-center gap-10 pt-12 pb-24 lg:grid-cols-12 lg:items-center"
+      className="frame grid min-h-[calc(100svh-4.5rem)] content-center gap-10 pt-12 pb-24 sm:min-h-[calc(100svh-5rem)] lg:grid-cols-12 lg:items-center"
       role="status"
     >
       <div className="lg:col-span-5">
@@ -606,16 +641,14 @@ function Shaking({ dict, done }: { dict: Labels["questions"]["shaking"]; done: b
                 key={line}
                 className={`flex items-center gap-4 transition-opacity duration-500 ${state === "waiting" ? "opacity-35" : ""}`}
               >
+                {/* A printed checklist: a filled box for a line done, an empty
+                    box for one not yet reached, the current line pulsing. */}
                 <motion.span
                   aria-hidden
-                  animate={state === "active" ? { opacity: [1, 0.4, 1] } : { opacity: 1 }}
+                  animate={state === "active" ? { opacity: [1, 0.35, 1] } : { opacity: 1 }}
                   transition={state === "active" ? { duration: 1.6, ease: "easeInOut", repeat: Infinity } : { duration: 0.5 }}
-                  className={`size-2.5 shrink-0 bg-ink transition-transform duration-500 ease-out ${
-                    state === "waiting"
-                      ? "scale-50"
-                      : state === "active"
-                        ? ""
-                        : ""
+                  className={`size-2.5 shrink-0 border-[1.5px] transition-colors duration-500 ${
+                    state === "waiting" ? "border-ink/35 bg-transparent" : "border-ink bg-ink"
                   }`}
                 />
                 <span className={state === "active" ? "font-medium" : ""}>{line}</span>

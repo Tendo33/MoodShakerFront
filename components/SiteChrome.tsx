@@ -10,27 +10,28 @@ import { Button } from "@/components/action-button";
 
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
-    <header className="frame flex h-20 items-center justify-between gap-2 sm:gap-6">
+    <header className="frame flex h-[4.5rem] items-center justify-between gap-3 sm:h-20 sm:gap-6">
       <a href="#main" className="skip-link bg-ink px-4 py-2 text-bone">
         {dict.nav.skip}
       </a>
       <Link
         href={localizePath("/", locale)}
         aria-label={dict.nav.home}
-        className="group flex items-center gap-3 py-2 text-lead font-medium tracking-[-0.03em]"
+        className="group flex items-baseline gap-2.5 py-2 text-[1.0625rem] font-medium tracking-[-0.035em] sm:gap-3 sm:text-lead"
       >
-        {/* The footer's block wordmark, in three blocks. */}
-        <span aria-hidden className="flex items-end gap-[3px] max-[419px]:hidden">
-          <span className="h-3.5 w-2 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-125" style={{ backgroundColor: MOOD_COLORS.unwind }} />
-          <span className="h-5 w-2 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-75" style={{ backgroundColor: MOOD_COLORS.celebrate }} />
-          <span className="h-3 w-2 origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-150" style={{ backgroundColor: MOOD_COLORS.romantic }} />
+        {/* The footer's block wordmark, in three blocks: the shortest under the
+            baseline, the tallest over it, so the mark sits on the same line as the name. */}
+        <span aria-hidden className="flex translate-y-[-1px] items-end gap-[3px] self-center max-[419px]:hidden">
+          <span className="h-[0.8125rem] w-[5px] origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-110" style={{ backgroundColor: MOOD_COLORS.unwind }} />
+          <span className="h-[1.0625rem] w-[5px] origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-90" style={{ backgroundColor: MOOD_COLORS.celebrate }} />
+          <span className="h-[0.6875rem] w-[5px] origin-bottom transition-transform duration-300 ease-out group-hover:scale-y-125" style={{ backgroundColor: MOOD_COLORS.romantic }} />
         </span>
-        MoodShaker
+        <span>MoodShaker</span>
       </Link>
-      <nav className="flex items-center gap-1 whitespace-nowrap sm:gap-6">
+      <nav className="flex items-center gap-3 whitespace-nowrap sm:gap-7">
         <MenuLink href={localizePath("/gallery", locale)}>{dict.nav.menu}</MenuLink>
         <LanguageSwitch locale={locale} label={dict.nav.switchTo} ariaLabel={dict.nav.switchLabel} />
-        <Button render={<Link href={localizePath("/questions", locale)} />} className="sm:h-11 px-4">
+        <Button render={<Link href={localizePath("/questions", locale)} />} className="h-10 px-3 text-[0.9375rem] sm:h-11 sm:px-4 sm:text-base">
           {dict.nav.shake}
         </Button>
       </nav>
@@ -41,10 +42,11 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
 const LETTERS = "MOODSHAKER".split("");
 const FIELDS = Object.values(MOOD_COLORS);
 const HEIGHTS = [78, 100, 64, 88, 72, 96, 60, 84, 92, 70];
-const MARK_W = 1000;
+// Ten blocks of 98 and nine gaps of 4: whole numbers, so nothing lands on a half pixel.
+const MARK_W = 1016;
 const MARK_H = 230;
 const GAP = 4;
-const BLOCK_W = (MARK_W - GAP * (LETTERS.length - 1)) / LETTERS.length;
+const BLOCK_W = 98;
 
 /** The wordmark as ten blocks in the mood colours, each letter standing on the baseline. */
 function BlockMark() {
@@ -58,12 +60,12 @@ function BlockMark() {
             <rect x={x} y={MARK_H - height} width={BLOCK_W} height={height} fill={FIELDS[index % FIELDS.length]} />
             <text
               x={x + BLOCK_W / 2}
-              y={MARK_H - 8}
+              y={MARK_H - 12}
               textAnchor="middle"
-              fontSize={112}
+              fontSize={94}
               fontWeight={500}
-              letterSpacing={-4}
-              fill="#1a1a1a"
+              letterSpacing={-3}
+              fill="#14120f"
               style={{ fontFamily: "var(--font-hanken), sans-serif" }}
             >
               {letter}

@@ -9,7 +9,7 @@ import { MOODS, type Mood } from "@/lib/domain/vocabulary";
 import { localizePath, type Locale } from "@/lib/i18n";
 import { MOOD_COLORS, moodForHour } from "@/lib/moods";
 import { Button } from "@/components/action-button";
-import { MotionImage } from "@/components/MotionImage";
+import Image from "next/image";
 import { Toggle } from "@/components/coss/toggle";
 import { Fieldset, FieldsetLegend } from "@/components/coss/fieldset";
 import { cn } from "@/lib/utils";
@@ -73,7 +73,7 @@ export function MoodPlinth({
       {/* One column that spans both rows and centres itself against the plinth:
           `contents` on small screens keeps the mobile order lede, drink, picker. */}
       <div className="max-lg:contents lg:col-span-5 lg:row-span-2 lg:flex lg:flex-col lg:justify-center">
-        <div className="order-1">
+        <div className="@container order-1">
           <motion.h1 {...enter(0)}
             id="home-title"
             className="headline"
@@ -89,9 +89,13 @@ export function MoodPlinth({
         <div className="order-3 mt-10 lg:mt-12">
           <motion.div {...enter(2)}>
           <Fieldset>
-            <FieldsetLegend className="font-medium">{dict.home.moodPrompt}</FieldsetLegend>
-            {/* Each mood is its own colour, so the picker is the palette of the whole site. */}
-            <div className="mt-4 grid grid-cols-3 gap-1.5">
+            <FieldsetLegend className="text-small font-medium tracking-[0.04em] text-note">
+              {dict.home.moodPrompt}
+            </FieldsetLegend>
+            {/* Each mood is its own colour, so the picker is the palette of the whole site.
+                The chosen one is ink, with its own colour kept as a rule along the foot;
+                the swatch it replaces read as a stray dot at this size. */}
+            <div className="mt-3 grid grid-cols-3 gap-1.5">
               {MOODS.map((code) => {
                 const selected = code === mood;
                 return (
@@ -103,7 +107,7 @@ export function MoodPlinth({
                       setTick(0);
                     }}
                     className={cn(
-                      "flex min-h-14 items-center justify-between gap-2 rounded-none px-4 text-left font-medium whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-out hover:bg-transparent hover:-translate-y-0.5 active:scale-[0.97] data-pressed:bg-transparent data-pressed:text-bone sm:text-base",
+                      "relative flex h-12 items-center justify-start overflow-hidden rounded-none px-4 text-left text-[0.9375rem] font-medium whitespace-nowrap transition-[background-color,color,transform,filter] duration-200 ease-out hover:bg-transparent hover:brightness-[0.965] active:scale-[0.98] data-pressed:bg-transparent data-pressed:text-bone data-pressed:brightness-100 sm:text-base lg:h-[3.25rem]",
                       selected && "text-bone",
                     )}
                     style={{
@@ -115,10 +119,10 @@ export function MoodPlinth({
                     {dict.options.moods[code].label}
                     <span
                       aria-hidden
-                      className="size-2.5 shrink-0 transition-transform duration-200 ease-out"
+                      className="absolute inset-x-0 bottom-0 h-[3px] origin-left transition-transform duration-300 ease-out"
                       style={{
                         backgroundColor: MOOD_COLORS[code],
-                        transform: selected ? "scale(1)" : "scale(0)",
+                        transform: selected ? "scaleX(1)" : "scaleX(0)",
                       }}
                     />
                   </Toggle>
@@ -139,7 +143,7 @@ export function MoodPlinth({
         </div>
       </div>
 
-      <motion.figure {...enter(1)} className="order-2 lg:order-none lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:flex lg:flex-col">
+      <motion.figure {...enter(1)} className="group/figure order-2 lg:order-none lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:flex lg:flex-col">
         <div
           className="relative aspect-square w-full overflow-hidden transition-colors duration-700 ease-out sm:aspect-[4/3] lg:aspect-auto lg:min-h-[560px] lg:flex-1"
           style={{ backgroundColor: MOOD_COLORS[mood] }}
@@ -152,22 +156,21 @@ export function MoodPlinth({
               aria-hidden={drink !== active}
               // Blended here, where the opacity is: a fading layer is composited on its own,
               // and a photograph multiplied only inside it would cross the field as a white square.
-              className="absolute inset-[2%] mix-blend-multiply transition-opacity duration-[1600ms] ease-in-out"
+              className="group absolute inset-[2%] mix-blend-multiply transition-opacity duration-[1600ms] ease-in-out"
               style={{
                 opacity: drink === active ? 1 : 0,
                 pointerEvents: drink === active ? "auto" : "none",
               }}
             >
-              <MotionImage
+              {/* The photograph holds still; the crossfade between drinks is the
+                  only movement, so the plinth never competes with the copy beside it. */}
+              <Image
                 src={drink.imageUrl}
                 alt={drink.name}
                 fill
                 priority={index === 0}
                 sizes="(min-width: 1024px) 45vw, 100vw"
-                className="specimen"
-                initial={{ y: "0%", scale: 1 }}
-                animate={{ y: "-1.5%", scale: 1.025 }}
-                transition={{ duration: 11, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+                className="specimen transition-transform duration-700 ease-out group-hover:scale-[1.02]"
               />
             </Link>
           ))}
@@ -177,7 +180,9 @@ export function MoodPlinth({
             className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1"
             aria-live="polite"
           >
-            <span className="font-display text-[clamp(1.375rem,1.1rem+0.8vw,1.75rem)]">{active.name}</span>
+            <span className="w-fit font-display text-[clamp(1.375rem,1.1rem+0.8vw,1.75rem)] underline-offset-[6px] group-hover/figure:underline">
+              {active.name}
+            </span>
             <span className="text-note">
               {format(dict.home.pouredFor, {
                 mood: dict.options.moods[active.mood ?? mood].label,

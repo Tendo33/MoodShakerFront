@@ -54,9 +54,9 @@ The menu filters on two rows, by mood and by base spirit, with one tile per drin
 
 <img src="docs/screenshots/gallery.webp" alt="The menu: one row filters by mood, the next by base spirit, with a photo card for each drink" width="900">
 
-On a narrow screen the moods become a horizontal strip:
+On a phone the drink comes first, then the moods:
 
-<img src="docs/screenshots/home-mobile.webp" alt="The home page on a phone: title, a horizontally scrolling mood strip and the start button" width="300">
+<img src="docs/screenshots/home-mobile.webp" alt="The home page on a phone: the title, one drink standing on its mood's colour, and the six mood swatches below" width="300">
 
 ## Quick Start
 

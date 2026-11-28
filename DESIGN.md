@@ -14,10 +14,11 @@ product, so the serif is retired and the ticket is the device.
 | --- | --- | --- |
 | `bone` | `#fbf9f4` | receipt paper, page field, ticket body |
 | `surface` | `#f1eee6` | quiet fills, hover rows |
-| `ink` | `#17161a` | text, selected state, primary fill |
+| `ink` | `#1a1815` | text, selected state, primary fill; a warm near-black, not a violet one |
 | `note` | `#6b675f` | secondary notes only, never running text |
 | `brand` | `#c2402f` | the stamp, and the primary action on hover |
 | `desk` | `#ddd7c8` | the surface a ticket sits on; shows through its tear |
+| `night` | `#14120f` | the desk after hours: the footer |
 | mood fields | `lib/moods.ts` | unchanged, they are product data |
 
 Mood fields stay mid-light: drinks are laid on them with
@@ -33,24 +34,38 @@ Two voices, neither of them a serif.
   would read on the paper — the ticket header, labels, values, the guest note,
   the stamp, the total. Latin only; Chinese stays in the grotesk.
 
-Five sizes: `small`, `body`, `lead`, `head`, `display`. Headlines are weight 700
-with tight tracking; the old display serif is gone from `app/layout.tsx`.
+Four token sizes — `small`, `body`, `lead`, `head` — plus the two utilities that
+carry a page: `.title` (the page title) and `.text-section` (the step below it,
+used for the recipe's 原料 / 做法 and the row of other drinks, so a long page
+has one title and section heads that answer to it). Headlines are weight 700
+(600 in Chinese) with tight tracking; the old display serif is gone from
+`app/layout.tsx`.
+
+**Every weight is a real file.** Hanken Grotesk loads 400/500/600/700 and Noto
+Sans SC 400/500/600; `font-synthesis-weight: none` on `body` makes the browser
+use the nearest real face rather than smearing bold out of 500. Headline weight
+was previously synthesised, which is most of why the type looked coarse.
+
+The registry's radii are all `0`: its 2px would round every button against an
+otherwise square page.
 
 ## The ticket
 
 Utilities in `app/globals.css`:
 
-- `.ticket` — paper with a hairline shadow; padding `1.5rem 1.25rem 0`.
+- `.ticket` — paper with two shadows (its own edge, then the lift off the desk),
+  a 5% fibre grain, padding `1.625rem 1.375rem 0`.
 - `.ticket-tear` — the perforated foot, punched as a mask so the desk shows
   through; negative inline margin so it spans the full ticket width.
 - `.leader` — the dotted run between a term and its value (`flex: 1`).
-- `.stamp` — brand-red outline, mono, uppercase, rotated `-9deg`; used once, when
-  the drink exists.
-- `.edge` — the small mono uppercase label used for ticket headers and terms.
+- `.stamp` — brand-red outline, mono, uppercase, rotated `-8deg`; used once, when
+  the drink exists. The home ticket and the drink sheet print the same stamp.
+- `.edge` — the small mono uppercase label used for ticket headers and terms,
+  12px with `0.11em` tracking.
 
 A row on the home ticket is `term · · · value`: `.edge` label, `.leader`, value
-at `0.95rem`. That example header reads `No. 0001`. The menu and the drink
-sheet do not rebuild this paper: they use coss `Card`, `Table`, and `Badge`.
+at `0.94rem`. That example header reads `No. 0001`. The menu and the drink
+sheet do not rebuild this paper: they use coss `Card` and `Table`.
 The drink sheet still prints a stable four-digit slip number from the slug.
 
 ## Rules
@@ -69,7 +84,15 @@ The drink sheet still prints a stable four-digit slip number from the slug.
   hairline rules. Separate with space and tone; the ticket's rules are the only
   lines we draw.
 - Headlines two lines at most. Running text is full ink, 16px or more.
-- Every page closes with the block wordmark in `SiteChrome.tsx`.
+- Chinese is set looser than Latin (`line-height: 1.7`, no negative tracking) and
+  measured in `em`, not `ch`; `.measure` holds the reading column for both.
+- A link that is the title of a drink underlines on hover; the accent red stays
+  with the stamp, the liquid and the primary action.
+- Every page closes with the block wordmark in `SiteChrome.tsx`. "你调过的"
+  lists this browser's drinks as numbered slips, not grey chips.
+- The browser chrome takes the paper colour (`themeColor` and the manifest are
+  bone); the footer is the only dark surface, and its focus ring and selection
+  flip to bone there.
 
 ## Components
 
@@ -82,6 +105,24 @@ The drink sheet still prints a stable four-digit slip number from the slug.
 - The questionnaire is built from the registry: mood tiles, answer cards and the
   spirits list are coss `Toggle`; steps and the submit are `Button`; the guest
   note is `Textarea`.
+- The **strength choice** draws a tumbler in SVG and fills it with the mood's
+  accent to the strength asked for; the answer is a picture of the pour, not a
+  bar chart.
+- Secondary buttons carry a hairline (`border-ink/30`) because the registry's
+  grey fill is invisible on bone; the primary is ink and turns brand on hover.
+  The answered-order chips on the questionnaire pass `bg-bone/80` so they read
+  as slips laid on the mood field.
+- The menu's empty state keeps the filtered mood's field and stands the empty
+  shaker on it — the slip is blank, the mood is not.
+- A private drink without its photograph shows the shaker on the field with the
+  photograph's own progress under it, not a line of text floating in an empty
+  box. The wait screen lists its work as a printed checklist: a filled box for a
+  line done, an empty one for a line not reached.
+- Every question ends on one coss `Progress` rule that fills across the four
+  questions; the step counter beside it (`第 2 问，共 4 问`) is mono.
+- The drink sheet's ticket is the home ticket in coss clothes: a named header
+  row, `.edge` terms, values, and the stamp in the footer. Cards elsewhere
+  (menu, related drinks) have no frame: the specimen's field is the boundary.
 - Buttons, the note field and the multi-select spirits list come from the
   registry. The **single-choice groups** (mood, strength, style) are a native
   `type="radio"` inside a styled `<label>`: coss `Radio` is a fixed-size dot and
@@ -121,5 +162,5 @@ The drink sheet still prints a stable four-digit slip number from the slug.
 
 ## Still to do
 
-The questionnaire's progress bar is coss `Progress`; the step counter is still
-plain mono text.
+Nothing is pending in the ticket system. The next look at the site should start
+from the rendered pages, not this document.

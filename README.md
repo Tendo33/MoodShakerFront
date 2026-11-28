@@ -54,9 +54,9 @@
 
 <img src="docs/screenshots/gallery.webp" alt="酒单：第一行按心情筛选，第二行按基酒筛选，下面是每杯酒的照片卡片" width="900">
 
-窄屏下心情改成一行横滑：
+窄屏上先看酒，再挑心情：
 
-<img src="docs/screenshots/home-mobile.webp" alt="手机上的首页：标题、心情横滑条与发起调酒的按钮" width="300">
+<img src="docs/screenshots/home-mobile.webp" alt="手机上的首页：标题、一杯立在它心情色上的酒，下面是六个心情色块" width="300">
 
 ## 快速开始
 

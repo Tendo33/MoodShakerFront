@@ -17,7 +17,7 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
           <p lang="en" className="mt-3 text-lead">
             Spilled behind the bar
           </p>
-          <p className="mt-8 max-w-[40ch]">
+          <p className="measure mt-8">
             再试一次；还不行的话，刷新页面。
             <span lang="en" className="block">
               Try again. If it keeps happening, refresh the page.

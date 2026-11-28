@@ -4,7 +4,6 @@ import type { Dictionary } from "@/lib/dictionaries";
 import type { RecipeView } from "@/lib/domain/recipe";
 import type { Mood } from "@/lib/domain/vocabulary";
 import { moodColor } from "@/lib/moods";
-import { Badge } from "@/components/coss/badge";
 import { Card, CardAction, CardFooter, CardHeader, CardPanel, CardTitle } from "@/components/coss/card";
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/coss/table";
 import { Specimen } from "@/components/Specimen";
@@ -78,21 +77,23 @@ export function DrinkSheet({
           </Specimen>
           <div className="order-1 lg:order-none lg:col-span-6 lg:col-start-7 lg:self-end lg:pl-6">
             <motion.h1 {...enter(1)} className="text-[clamp(2.5rem,1.2rem+3.6vw,4.75rem)]">{recipe.name}</motion.h1>
-            <motion.p {...enter(2)} className="mt-3 text-lead text-ink/70">{recipe.altName}</motion.p>
+            <motion.p {...enter(2)} className="edge mt-3 text-ink/75">{recipe.altName}</motion.p>
           </div>
           <div className="order-3 lg:order-none lg:col-span-6 lg:col-start-7 lg:pl-6">
-            <motion.p {...enter(3)} className="max-w-[44ch] text-pretty text-lead">{recipe.description}</motion.p>
+            <motion.p {...enter(3)} className="measure text-pretty text-lead">{recipe.description}</motion.p>
+            {/* The drink sheet's ticket: the same paper rules as the home ticket —
+                a named header row, term, dotted run, value — kept on coss Card and Table. */}
             <motion.div {...enter(4)} className="mt-10">
-              <Card className="shadow-none before:shadow-none">
-                <CardHeader className="border-b">
+              <Card className="gap-0 rounded-none shadow-none before:hidden">
+                <CardHeader className="flex-row items-baseline justify-between gap-4 border-b border-ink/75 px-4 pt-4 pb-3">
                   {moodLabel ? (
                     <CardTitle className="font-display text-lead leading-snug">{moodLabel}</CardTitle>
                   ) : null}
-                  <CardAction className="self-center">
-                    <span className="edge">{ticketNumber(ticketKey)}</span>
+                  <CardAction className="self-auto">
+                    <span className="edge num">{ticketNumber(ticketKey)}</span>
                   </CardAction>
                 </CardHeader>
-                <CardPanel className="px-3 py-1">
+                <CardPanel className="px-4 py-1">
                   <Table>
                     <TableBody>
                       {facts.map((row) => (
@@ -100,21 +101,15 @@ export function DrinkSheet({
                           <TableHead scope="row" className="edge h-auto w-2/5 py-3 whitespace-normal text-note">
                             {row.term}
                           </TableHead>
-                          <TableCell className="py-3 text-end font-medium leading-snug whitespace-normal">{row.value}</TableCell>
+                          <TableCell className="py-3 text-end text-[0.9375rem] font-medium leading-snug whitespace-normal">{row.value}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 </CardPanel>
                 {stamp ? (
-                  <CardFooter className="justify-end border-t">
-                    <Badge
-                      variant="outline"
-                      size="lg"
-                      className="h-auto border-brand px-2.5 py-1 font-mono tracking-widest text-brand uppercase"
-                    >
-                      {stamp}
-                    </Badge>
+                  <CardFooter className="justify-end border-t border-ink/12 px-4 py-3.5">
+                    <span className="stamp">{stamp}</span>
                   </CardFooter>
                 ) : null}
               </Card>
@@ -137,7 +132,7 @@ export function DrinkSheet({
       <div className="frame mt-[clamp(72px,11vh,140px)] grid gap-x-8 gap-y-20 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <section aria-labelledby="ingredients-heading">
-            <motion.h2 {...reveal(0)} id="ingredients-heading" className="text-head">
+            <motion.h2 {...reveal(0)} id="ingredients-heading" className="text-section">
               {t.ingredients}
             </motion.h2>
             <Table className="mt-8 text-base">
@@ -152,7 +147,7 @@ export function DrinkSheet({
                         </span>
                       ) : null}
                     </TableCell>
-                    <TableCell className="py-3.5 text-end font-medium leading-snug whitespace-normal">
+                    <TableCell className="num py-3.5 text-end font-medium leading-snug whitespace-normal">
                       {item.amount}
                       {item.unit ? ` ${item.unit}` : ""}
                     </TableCell>
@@ -187,14 +182,14 @@ export function DrinkSheet({
         </div>
 
         <section className="lg:col-span-6 lg:col-start-7" aria-labelledby="method-heading">
-          <motion.h2 {...reveal(0)} id="method-heading" className="text-head">
+          <motion.h2 {...reveal(0)} id="method-heading" className="text-section">
             {t.method}
           </motion.h2>
           <ol className="mt-8 space-y-9">
             {recipe.steps.map((step) => (
               <motion.li {...reveal(step.stepNumber - 1)} key={step.stepNumber}>
                 <div className="grid grid-cols-[3rem_1fr] gap-x-4 sm:grid-cols-[4.5rem_1fr]">
-                  <span aria-hidden className="num font-display text-[clamp(2.25rem,1.6rem+1.6vw,3.25rem)] leading-[0.9] text-ink/35">
+                  <span aria-hidden className="edge num text-[clamp(1.5rem,1.2rem+0.9vw,2rem)] leading-none text-ink/35">
                     {step.stepNumber}
                   </span>
                   <div>

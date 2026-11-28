@@ -22,11 +22,15 @@ export function RecentDrinks({ locale, title, hint }: { locale: Locale; title: s
       <ul className="mt-8 flex flex-wrap gap-2">
         {drinks.slice(0, 8).map((drink, index) => (
           <motion.li {...reveal(index)} key={drink.id}>
+            {/* A slip in the stack: the number is printed, the name is written. */}
             <Link
               href={localizePath(`/drink/${drink.id}`, locale)}
-              className="block bg-surface px-5 py-3 text-lead transition-colors duration-200 hover:bg-ink hover:text-bone"
+              className="group flex min-h-11 items-center gap-3 border border-ink/20 px-4 py-2 transition-[border-color,background-color] duration-200 hover:border-ink hover:bg-surface"
             >
-              {drink.name?.[locale] ?? drink.id}
+              <span aria-hidden className="edge num text-note">{String(index + 1).padStart(2, "0")}</span>
+              <span className="text-[1.0625rem] leading-snug font-medium underline-offset-4 group-hover:underline">
+                {drink.name?.[locale] ?? drink.id}
+              </span>
             </Link>
           </motion.li>
         ))}

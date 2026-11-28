@@ -80,7 +80,7 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
         more={
           <section className="frame mt-[clamp(120px,18vh,220px)]" aria-labelledby="more-heading">
             <div className="flex flex-wrap items-baseline justify-between gap-4">
-              <motion.h2 {...reveal(0)} id="more-heading" className="text-head">
+              <motion.h2 {...reveal(0)} id="more-heading" className="text-section">
                 {mood && onlySameMood
                   ? format(dict.detail.moreForMood, { mood: dict.options.moods[mood].label })
                   : dict.detail.more}
@@ -89,7 +89,7 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
                 {dict.detail.back} →
               </Link>
             </div>
-            <ul className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
+            <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
               {others.map((other, index) => {
                 const meta = [
                   dict.vocab.spirits[other.baseSpirit],
@@ -101,7 +101,7 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
                 return (
                   <motion.li {...reveal(index)} key={other.slug} className="min-w-0">
                     <Link href={localizePath(`/cocktail/${other.slug}`, locale)} className="group block h-full">
-                      <Card className="h-full overflow-hidden shadow-none before:shadow-none">
+                      <Card className="h-full gap-0 overflow-visible rounded-none border-0 bg-transparent shadow-none before:hidden">
                         <Specimen
                           src={other.thumbnailUrl}
                           alt={other.name}
@@ -109,8 +109,8 @@ export default async function CocktailPage({ params }: PageProps<"/[lang]/cockta
                           sizes="(min-width: 1024px) 25vw, 50vw"
                           className="aspect-[4/5]"
                         />
-                        <CardHeader className="flex flex-1 flex-col gap-2 px-4 pt-4 pb-5">
-                          <CardTitle className="text-balance font-display text-lead leading-snug" render={<h3 />}>
+                        <CardHeader className="flex flex-1 flex-col gap-1 px-0 pt-4 pb-0">
+                          <CardTitle className="w-fit text-balance text-[1.0625rem] leading-snug font-medium tracking-[-0.01em] underline-offset-4 group-hover:underline" render={<h3 />}>
                             {other.name}
                           </CardTitle>
                           <CardDescription className="mt-auto text-pretty text-small text-note">{meta}</CardDescription>

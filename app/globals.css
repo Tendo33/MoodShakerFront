@@ -8,10 +8,10 @@
 @theme {
   --color-bone: #fbf9f4;
   --color-surface: #f1eee6;
-  --color-ink: #17161a;
+  --color-ink: #1a1815;
   --color-note: #6b675f;
   --color-brand: #c2402f;
-  --color-night: #17161a;
+  --color-night: #14120f;
   --color-desk: #ddd7c8;
 
   --color-unwind: #a9d3b5;
@@ -25,12 +25,13 @@
   --font-display: var(--font-hanken), var(--font-noto-sans-sc), "PingFang SC", system-ui, sans-serif;
   --font-mono: var(--font-ticket), ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Five sizes do all the work. */
+  /* The scale. `.title` and `.text-section`, below, are the two larger steps. */
   --text-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
   --text-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --text-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
   --text-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
-  --text-display: clamp(3.25rem, 1rem + 8vw, 8.5rem);
+
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --animate-skeleton: skeleton 1.6s ease-in-out infinite;
@@ -69,11 +70,13 @@
   --color-warning: #8a5a10;
   --color-warning-foreground: #ffffff;
 
-  --radius-sm: 1px;
-  --radius-md: 2px;
-  --radius-lg: 2px;
-  --radius-xl: 3px;
-  --radius-2xl: 3px;
+  /* Square, as the ticket is: the registry's 2px would round every button
+     against an otherwise square page. */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
 }
 
 @layer base {
@@ -84,6 +87,8 @@
   }
 
   body {
+    /* Every weight is a real file; never let the browser smear one out of another. */
+    font-synthesis-weight: none;
     min-height: 100dvh;
     background: var(--color-bone);
     color: var(--color-ink);
@@ -93,6 +98,13 @@
     letter-spacing: -0.005em;
     font-feature-settings: "tnum" 0;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Chinese sits looser than Latin and takes no negative tracking: the glyphs
+     already fill the em, so tightening them only closes the counters. */
+  :lang(zh-CN) body {
+    line-height: 1.7;
+    letter-spacing: 0;
   }
 
   h1,
@@ -126,8 +138,8 @@
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-ink);
-    outline-offset: 3px;
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
   }
 
   /* The caret and scrollbar take the ink, so every input surface stays in the palette. */
@@ -143,21 +155,27 @@
 }
 
 @layer components {
-  /* A receipt on the desk: paper, a hairline head, a torn foot. */
+  /* A receipt on the desk: paper, a hairline head, a torn foot. The shadow is
+     two layers — the paper's own edge, then the ambient lift off the desk. */
   .ticket {
     position: relative;
-    background: var(--color-bone);
-    padding: 1.5rem 1.25rem 0;
-    box-shadow:
-      0 1px 0 color-mix(in srgb, var(--color-ink) 8%, transparent),
-      0 16px 38px -28px rgb(0 0 0 / 0.55);
-  }
-  .ticket-tear {
-    height: 13px;
-    margin: 1.25rem -1.25rem 0;
     background-color: var(--color-bone);
-    background-image: radial-gradient(circle at center bottom, var(--color-desk) 6px, transparent 6.5px);
-    background-size: 19px 13px;
+    /* A trace of fibre in the paper, so the ticket is a surface and not a flat fill. */
+    background-image: var(--paper-grain);
+    background-size: 160px 160px;
+    padding: 1.625rem 1.375rem 0;
+    box-shadow:
+      0 1px 0 color-mix(in srgb, var(--color-ink) 7%, transparent),
+      0 10px 18px -14px rgb(26 24 21 / 0.28),
+      0 32px 56px -44px rgb(26 24 21 / 0.42);
+  }
+  /* The perforation is punched through the paper, so the desk shows between the teeth. */
+  .ticket-tear {
+    height: 11px;
+    margin-inline: -1.375rem;
+    background-color: var(--color-bone);
+    background-image: radial-gradient(circle at center bottom, var(--color-desk) 5px, transparent 5.5px);
+    background-size: 16px 11px;
     background-repeat: repeat-x;
     background-position: center;
   }
@@ -165,27 +183,35 @@
   .leader {
     flex: 1;
     min-width: 12px;
-    border-bottom: 1px dotted color-mix(in srgb, var(--color-ink) 32%, transparent);
-    margin-bottom: 4px;
+    border-bottom: 1px dotted color-mix(in srgb, var(--color-ink) 30%, transparent);
+    transform: translateY(-0.3em);
   }
   .stamp {
     display: inline-block;
-    border: 2.5px solid var(--color-brand);
+    border: 2px solid var(--color-brand);
     color: var(--color-brand);
-    padding: 4px 10px;
+    padding: 0.3125rem 0.625rem 0.25rem;
     font-family: var(--font-mono);
     font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.24em;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    transform: rotate(-9deg);
-    opacity: 0.85;
+    text-indent: 0.22em;
+    transform: rotate(-8deg);
+    opacity: 0.88;
   }
   .edge {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.14em;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
+  }
+  /* Latin and figures want the loose mono tracking; Chinese already fills the
+     em, so it takes a quarter of it. */
+  :lang(zh-CN) .edge {
+    letter-spacing: 0.035em;
   }
 
   /* One pair of outer margins for the whole site. */
@@ -212,6 +238,12 @@
   .headline {
     font-size: clamp(2.75rem, 1.2rem + 5.6vw, 6.25rem);
   }
+  /* English carries three times the characters of the Chinese line, so it takes
+     a size set from the width of its own column instead of the viewport: two
+     lines at every width, never a four-line stack. */
+  :lang(en) .headline {
+    font-size: clamp(2.5rem, 10.9cqw, 5rem);
+  }
   :lang(zh-CN) .headline {
     font-size: clamp(2.5rem, 1rem + 4.2vw, 5rem);
     white-space: nowrap;
@@ -227,6 +259,26 @@
   }
   :lang(zh-CN) .title-measure {
     max-width: 9em;
+  }
+
+  /* A readable column. `ch` is the width of a digit, so it is not a Chinese
+     character; Chinese is measured in characters instead. */
+  .measure {
+    max-width: 34ch;
+  }
+  :lang(zh-CN) .measure {
+    max-width: 22em;
+  }
+
+  /* The only dark surface a focusable element sits on directly is the footer,
+     where an ink ring would vanish. */
+  .bg-night :focus-visible {
+    outline-color: var(--color-bone);
+  }
+
+  .bg-night ::selection {
+    background: var(--color-bone);
+    color: var(--color-night);
   }
 
   /* First stop for keyboard users; out of sight until it has focus. */
@@ -290,6 +342,35 @@
 
   .num {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* A section of a long page: below the page's own title, above the body. */
+  .text-section {
+    font-size: clamp(2rem, 1.5rem + 1.4vw, 2.75rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  :lang(zh-CN) .text-section {
+    letter-spacing: 0;
+    line-height: 1.2;
+  }
+}
+
+/* A phone held sideways has about 390px of height. At the normal type scale the
+   question's title and hint take the whole screen and the answers sit below the
+   fold, so the title steps down and the gaps close. */
+@media (max-height: 520px) {
+  .title,
+  :lang(en) .headline,
+  :lang(zh-CN) .headline {
+    font-size: clamp(1.75rem, 9.5vh, 2.75rem);
+  }
+  .question-hint {
+    margin-top: 0.5rem;
+    font-size: var(--text-body);
+  }
+  .question-options {
+    margin-top: 1.25rem;
   }
 }
 

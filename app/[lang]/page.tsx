@@ -90,11 +90,11 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             <motion.div {...reveal(0)} className="flex flex-col lg:min-h-[28rem]">
               {exampleOrder ? (
                 <div className="ticket flex flex-1 flex-col">
-                  <div className="flex items-baseline justify-between gap-4 border-b border-ink pb-2.5">
+                  <div className="flex items-baseline justify-between gap-4 border-b border-ink/75 pb-2.5">
                     <span className="edge text-note">{dict.home.ticket.title}</span>
-                    <span className="edge">No. 0001</span>
+                    <span className="edge num">No. 0001</span>
                   </div>
-                  <dl className="mt-5 space-y-3">
+                  <dl className="mt-5 space-y-3.5">
                     {(
                       [
                         [dict.home.ticket.mood, dict.options.moods[exampleOrder.mood].label],
@@ -111,21 +111,25 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                       <div key={term} className="flex items-baseline gap-2">
                         <dt className="edge shrink-0 text-note">{term}</dt>
                         <span className="leader" aria-hidden="true" />
-                        <dd className="shrink-0 text-[0.95rem] font-medium">{value}</dd>
+                        <dd className="shrink-0 text-[0.9375rem] font-medium">{value}</dd>
                       </div>
                     ))}
                   </dl>
-                  {exampleDrink ? (
-                    <div className="mt-6 flex justify-end pb-4">
-                      <span className="stamp">{dict.home.ticket.read === undefined ? "已调好" : (locale === "cn" ? "已调好" : "POURED")}</span>
-                    </div>
-                  ) : null}
-                  <div className="ticket-tear -mb-px" aria-hidden="true" />
-                  {exampleOrder.notes && exampleOrder.locale === locale && (
-                    <p className="mt-auto pt-8 font-display text-[clamp(1.25rem,1.05rem+0.6vw,1.5rem)] leading-[1.35]">
-                      {locale === "cn" ? `「${exampleOrder.notes}」` : `“${exampleOrder.notes}”`}
-                    </p>
-                  )}
+                  {/* The guest's own words stay on the paper, above the tear, and the
+                      stamp closes the sheet at its foot: facts, then the note, then the mark. */}
+                  <div className="mt-auto pt-8">
+                    {exampleOrder.notes && exampleOrder.locale === locale && (
+                      <p className="text-pretty font-display text-[clamp(1.25rem,1.05rem+0.6vw,1.5rem)] leading-[1.5]">
+                        {locale === "cn" ? `「${exampleOrder.notes}」` : `“${exampleOrder.notes}”`}
+                      </p>
+                    )}
+                    {exampleDrink ? (
+                      <div className="mt-7 flex justify-end">
+                        <span className="stamp">{locale === "cn" ? "已调好" : "POURED"}</span>
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="ticket-tear -mb-px mt-6" aria-hidden="true" />
                 </div>
               ) : (
                 <div className="relative flex-1">
@@ -133,8 +137,11 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                 </div>
               )}
             </motion.div>
-            <motion.h3 {...reveal(0)} className="label mt-5 text-lead">{dict.home.steps[0].title}</motion.h3>
-            <motion.p {...reveal(1)} className="mt-2 max-w-[34ch]">{dict.home.steps[0].body}</motion.p>
+            <motion.h3 {...reveal(0)} className="label mt-5 flex items-baseline gap-3 text-lead">
+              <span aria-hidden className="edge num text-note">01</span>
+              {dict.home.steps[0].title}
+            </motion.h3>
+            <motion.p {...reveal(1)} className="measure mt-2">{dict.home.steps[0].body}</motion.p>
           </div>
 
           {/* Shake. */}
@@ -147,8 +154,11 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                 <Image src="/stages/shaker.webp" alt="" fill sizes="(min-width: 1024px) 25vw, 100vw" className="specimen" />
               </div>
             </motion.div>
-            <motion.h3 {...reveal(1)} className="label mt-5 text-lead">{dict.home.steps[1].title}</motion.h3>
-            <motion.p {...reveal(2)} className="mt-2 max-w-[34ch]">{dict.home.steps[1].body}</motion.p>
+            <motion.h3 {...reveal(1)} className="label mt-5 flex items-baseline gap-3 text-lead">
+              <span aria-hidden className="edge num text-note">02</span>
+              {dict.home.steps[1].title}
+            </motion.h3>
+            <motion.p {...reveal(2)} className="measure mt-2">{dict.home.steps[1].body}</motion.p>
           </div>
 
           {/* Pour: the drink that order became. */}
@@ -167,12 +177,16 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             ) : (
               <div className="lg:h-[28rem]" style={{ backgroundColor: MOOD_COLORS.romantic }} />
             )}
-            <motion.h3 {...reveal(2)} className="label mt-5 text-lead">{dict.home.steps[2].title}</motion.h3>
-            <motion.p {...reveal(3)} className="mt-2 max-w-[34ch]">{dict.home.steps[2].body}</motion.p>
+            <motion.h3 {...reveal(2)} className="label mt-5 flex items-baseline gap-3 text-lead">
+              <span aria-hidden className="edge num text-note">03</span>
+              {dict.home.steps[2].title}
+            </motion.h3>
+            <motion.p {...reveal(3)} className="measure mt-2">{dict.home.steps[2].body}</motion.p>
             {exampleDrink && (
-              <motion.div {...reveal(3)} className="mt-2">
-              <Link href={localizePath(`/cocktail/${exampleDrink.slug}`, locale)} className="link flex min-h-11 w-fit items-center">
-                {exampleDrink.name} · {dict.home.ticket.read} →
+              <motion.div {...reveal(3)} className="mt-1">
+              <Link href={localizePath(`/cocktail/${exampleDrink.slug}`, locale)} className="link group/link flex min-h-11 w-fit items-center gap-1.5">
+                {exampleDrink.name} · {dict.home.ticket.read}
+                <span aria-hidden className="transition-transform duration-200 ease-out group-hover/link:translate-x-0.5">→</span>
               </Link>
               </motion.div>
             )}
@@ -189,15 +203,16 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
               {dict.home.menuTitle}
             </motion.h2>
             <motion.div {...reveal(1)} className="lg:col-span-5 lg:col-start-8">
-              <p className="text-lead">{dict.home.menuStatement}</p>
-              <Link href={localizePath("/gallery", locale)} className="link mt-3 inline-block py-2">
-                {dict.home.viewMenu} →
+              <p className="measure text-lead">{dict.home.menuStatement}</p>
+              <Link href={localizePath("/gallery", locale)} className="link group/link mt-3 inline-flex items-center gap-1.5 py-2">
+                {dict.home.viewMenu}
+                <span aria-hidden className="transition-transform duration-200 ease-out group-hover/link:translate-x-0.5">→</span>
               </Link>
             </motion.div>
           </div>
-          <ul className="frame mt-16 columns-2 gap-1 sm:columns-3 lg:columns-6">
+          <ul className="frame mt-14 columns-2 gap-x-3 sm:columns-3 lg:columns-6">
             {pictured.slice(0, 18).map((drink, index) => (
-              <li key={drink.slug} className="mb-4 break-inside-avoid">
+              <li key={drink.slug} className="mb-7 break-inside-avoid">
                 <Link href={localizePath(`/cocktail/${drink.slug}`, locale)} className="group block">
                   <Specimen
                     src={drink.thumbnailUrl}
@@ -207,8 +222,10 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                     entrance={revealPicture()}
                     className={TILE_SHAPES[index % TILE_SHAPES.length]}
                   />
-                  <p className="mt-2.5 font-display leading-snug transition-opacity duration-200 group-hover:opacity-60">{drink.name}</p>
-                  <p className="text-small text-note">{dict.vocab.spirits[drink.baseSpirit]}</p>
+                  <p className="mt-3 w-fit text-[1.0625rem] leading-snug font-medium tracking-[-0.01em] underline-offset-4 group-hover:underline">
+                    {drink.name}
+                  </p>
+                  <p className="mt-0.5 text-small text-note">{dict.vocab.spirits[drink.baseSpirit]}</p>
                 </Link>
               </li>
             ))}
@@ -219,25 +236,27 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       {finale && (
         <section
           data-bleed-end
-          className="relative mt-[clamp(120px,18vh,240px)] flex min-h-[90svh] items-center overflow-hidden"
+          className="relative mt-[clamp(120px,18vh,240px)] flex min-h-[86svh] items-center overflow-hidden"
           style={{ backgroundColor: MOOD_COLORS[finale.mood ?? "romantic"] }}
           aria-labelledby="close-title"
         >
+          {/* The last glass is laid on the field like the rest: its own margin, its
+              own colour behind it, cropped by the foot of the section. */}
           <motion.div
             {...revealPicture(0)}
-            className="pointer-events-none absolute -bottom-[12%] -left-[6%] h-[115%] w-[75%] max-lg:top-auto max-lg:h-[60%] max-lg:w-[130%]"
+            className="pointer-events-none absolute -bottom-[4%] -left-[3%] h-[88%] w-[54%] max-lg:top-auto max-lg:h-[54%] max-lg:w-[104%]"
             style={{ backgroundColor: MOOD_COLORS[finale.mood ?? "romantic"] }}
           >
-            <Image src={finale.imageUrl!} alt="" fill sizes="75vw" className="specimen object-left-bottom" />
+            <Image src={finale.imageUrl!} alt="" fill sizes="54vw" className="specimen object-left-bottom" />
           </motion.div>
           <div className="frame relative grid lg:grid-cols-12">
-            <div className="lg:col-span-3 lg:col-start-10 max-lg:pt-16 max-lg:pb-[62%]">
+            <div className="lg:col-span-4 lg:col-start-9 max-lg:pt-16 max-lg:pb-[58%]">
               <motion.h2 {...reveal(0)} id="close-title" className="text-head">
                 {dict.home.closeTitle}
               </motion.h2>
-              <motion.p {...reveal(1)} className="mt-5">{dict.home.closeBody}</motion.p>
+              <motion.p {...reveal(1)} className="measure mt-5">{dict.home.closeBody}</motion.p>
               <motion.p {...reveal(2)} className="mt-4 text-lead">{dict.home.closeFact}</motion.p>
-              <motion.div {...reveal(3)} className="mt-8">
+              <motion.div {...reveal(3)} className="mt-9">
                 <Button render={<Link href={localizePath("/questions", locale)} />} className="max-lg:w-full">
                   {dict.home.cta} <span aria-hidden>→</span>
                 </Button>

@@ -8,14 +8,18 @@ import "./globals.css";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  // 600 and 700 are the headline weights. Without them the browser synthesises
+  // bold from the 500 face, and every headline looks smeared rather than set.
+  weight: ["400", "500", "600", "700"],
   variable: "--font-hanken",
 });
 
 // Chinese glyphs come in many unicode-range slices; preloading them all would
 // stall first paint, so the browser fetches only the slices a page uses.
 const notoSansSC = Noto_Sans_SC({
-  weight: ["400", "500"],
+  // Chinese headings are 600; a synthesised 600 from the 500 face thickens the
+  // strokes unevenly, which is most of the difference between set and printed.
+  weight: ["400", "500", "600"],
   preload: false,
   variable: "--font-noto-sans-sc",
 });
@@ -39,7 +43,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#e6e0d2",
+  themeColor: "#fbf9f4",
 };
 
 /**
